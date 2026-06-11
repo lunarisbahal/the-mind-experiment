@@ -232,6 +232,7 @@
   <button class="mini" onclick="UI.toggleJournal()">GÜNLÜK</button>
   <button class="mini" onclick="Game.toggleMap()">HARİTA</button>
   <button class="mini" id="sndBtn" onclick="Snd.toggle()">SES: AÇIK</button>
+  <button class="mini" id="radBtn" onclick="Snd.toggleRadio()">RADYO: AÇIK</button>
   <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">EŞZAMANLI: KAPALI</button>
 </div>
 
@@ -304,6 +305,7 @@ const L={
   ovStone2:{x:240,z:42,r:4.5,name:'ORDOS VERITAS DİKİLİTAŞI'},
   lucius:{x:186,z:154,r:5,name:'ÜTÜLÜ TAKIM ELBİSELİ ADAM'},
   payphone:{x:176,z:247,r:4.5,name:'ANKESÖRLÜ TELEFON'},
+  radio:{x:190.5,z:241.5,r:3.5,name:'CIZIRTILI RADYO'},
   lunaris:{x:274,z:66,r:6,name:'SU IŞIĞINDAKİ SİLUET'},
   caseD:{x:101,z:7,r:4.5,name:'VAKA D TERMİNALİ'},
   diskAltar:{x:68,z:106,r:4.5,name:'AĞIR DİSK'},
@@ -909,6 +911,7 @@ function waypoint(){
 /* ---------------- Etkileşimler ---------------- */
 function interactTarget(){
   if(S.stage>=5&&!S.solved.s4&&near(L.labyrinth,0))return['Eksik kelimeyi kazı',doLabyrinth];
+  if(near(L.radio,0))return['Radyoyu dinle',doRadio];
   if(near(L.casefile))return['Vaka dosyasını oku',doCasefile];
   if(near(L.cot))return['Uyu — ayı ilerlet',sleepMenu];
   if(near(L.archive))return['Arşiv sığınağı',doArchive];
@@ -1094,6 +1097,14 @@ function doSilvanus(){
     ['SILVANUS','Üst katmana geçerken, acıyı ait olduğu katmanda bırak. Tekniğin tamamı bu. Gerisi süs.'],
     ['SILVANUS','Berraklığın tazelendi. Disk tarlasındaki rapçiye dikkat et — o, bu dersi reddetmenin altına ritim döşenmiş hâli.']
   ]);
+}
+function doRadio(){
+  S.flags.radio=true;save();
+  UI.doc('CIZIRTILI RADYO',
+    `<p>Eski bir kısa dalga alıcısı; yanında, etiketleri elle yazılmış ses kaydı kasetleri duruyor. Kadran hep aynı yerde kilitli.</p>
+     <p>Parazitin altında, çok uzak bir istasyondan bir şarkı sızıyor. Tanıyorsun: <b>Refuge — VAS</b>. O, kayıtları hep bununla açardı. Gecenin en sessiz saatinde, mikrofonu kurmadan önce, bir süre sadece bunu dinlerdi.</p>
+     <p style="color:var(--dim)">Sinyal hiçbir zaman tam oturmuyor. Belki istasyon yok. Belki kadran bozuk. Belki de şarkı, yalnızca hatırlayan için çalıyor.</p>
+     <p style="color:var(--violet)">İç ses: “Radyoyu kapatabilirsin; menüde düğmesi var. Ama önce bir dakika dur. Altmış kalp atışı.”</p>`);
 }
 function doLucida(){
   S.flags.lucida=true;S.lucidity=Math.min(100,S.lucidity+30);teachUnlock('lucida');save();refreshHud();
@@ -1297,9 +1308,49 @@ const Snd={
       src.connect(bp);bp.connect(wg);wg.connect(this.master);src.start();
       const lfo=ac.createOscillator();lfo.frequency.value=.07;
       const lg=ac.createGain();lg.gain.value=200;lfo.connect(lg);lg.connect(bp.frequency);lfo.start();
+      /* ---- CIZIRTILI RADYO — çok uzak bir istasyon ----
+         (Orijinal, isimsiz bir eter yayını; kayıt odasındaki radyodan sızar.) */
+      this.radioGain=ac.createGain();this.radioGain.gain.value=0;
+      this.radioGain.connect(this.master);
+      // parazit: bant dalgalanmalı filtreli gürültü
+      const rsrc=ac.createBufferSource();rsrc.buffer=buf;rsrc.loop=true;
+      const rbp=ac.createBiquadFilter();rbp.type='bandpass';rbp.frequency.value=2400;rbp.Q.value=.4;
+      const rng=ac.createGain();rng.gain.value=.16;
+      rsrc.connect(rbp);rbp.connect(rng);rng.connect(this.radioGain);rsrc.start();
+      const rlfo=ac.createOscillator();rlfo.frequency.value=.21;
+      const rlg=ac.createGain();rlg.gain.value=.09;rlfo.connect(rlg);rlg.connect(rng.gain);rlfo.start();
+      // uzak vokal hissi: formant süzgeçli, yavaş kayan tek ses (özgün doku)
+      const vox=ac.createOscillator();vox.type='sine';vox.frequency.value=329.63;
+      const vib=ac.createOscillator();vib.frequency.value=4.6;
+      const vibg=ac.createGain();vibg.gain.value=3.2;vib.connect(vibg);vibg.connect(vox.frequency);vib.start();
+      const f1=ac.createBiquadFilter();f1.type='bandpass';f1.frequency.value=700;f1.Q.value=5;
+      const f2=ac.createBiquadFilter();f2.type='bandpass';f2.frequency.value=1180;f2.Q.value=7;
+      const vg=ac.createGain();vg.gain.value=.30;
+      vox.connect(f1);f1.connect(vg);vox.connect(f2);f2.connect(vg);
+      // uzaklık: yankı kuyruğu
+      const dly=ac.createDelay(1.2);dly.delayTime.value=.42;
+      const fb=ac.createGain();fb.gain.value=.45;
+      vg.connect(dly);dly.connect(fb);fb.connect(dly);
+      vg.connect(this.radioGain);dly.connect(this.radioGain);vox.start();
+      // pentatonik gezinti — yavaş, melodi kurmayan (özgün)
+      const NOTES=[220,246.94,293.66,329.63,392,440];
+      this._radTimer=setInterval(()=>{if(!this.radioOn)return;
+        const n=NOTES[Math.floor(Math.random()*NOTES.length)];
+        try{vox.frequency.linearRampToValueAtTime(n,ac.currentTime+2.6);}catch(e){}},3400);
+      this._radTarget=.0;
       this.started=true;
     }catch(e){}
   },
+  radioOn:true,_prox:0,
+  setProx(d){ // radyoya yaklaştıkça belirginleşir; uzakta çok hafif bir zemin olarak kalır
+    if(!this.radioGain)return;
+    const near=Math.max(0,1-d/9);
+    const base=this.radioOn?(.04+near*.45):0;
+    this.radioGain.gain.value+=(base-this.radioGain.gain.value)*.06;
+  },
+  toggleRadio(){this.radioOn=!this.radioOn;this.init();
+    document.getElementById('radBtn').textContent='RADYO: '+(this.radioOn?'AÇIK':'KAPALI');
+    if(!this.radioOn&&this.radioGain)this.radioGain.gain.value=0;},
   toggle(){this.on=!this.on;
     document.getElementById('sndBtn').textContent='SES: '+(this.on?'AÇIK':'KAPALI');
     if(this.on){this.init();if(this.master)this.master.gain.value=.5;}
@@ -1351,7 +1402,23 @@ if(HAS3D)(function(){
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));
     scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xdde6f5,size:1.3,sizeAttenuation:false,transparent:true,opacity:.85})));
   })();
-  const moonMesh=new THREE.Mesh(new THREE.SphereGeometry(20,28,28),new THREE.MeshBasicMaterial({color:0xefebda}));
+  /* Ay: güne göre gerçek evre görseli (dolunay, hilal, dördün…) */
+  function moonTex(p){
+    const c=document.createElement('canvas');c.width=c.height=256;
+    const x=c.getContext('2d'),r=110;
+    x.clearRect(0,0,256,256);
+    x.fillStyle='#efebda';x.beginPath();x.arc(128,128,r,0,7);x.fill();
+    x.fillStyle='rgba(180,176,160,.5)'; // kraterler
+    [[92,96,14],[150,142,18],[118,170,9],[168,90,8],[88,150,7]].forEach(k=>{
+      x.beginPath();x.arc(k[0],k[1],k[2],0,7);x.fill();});
+    // gölge diski: yeniayda merkezde, dolunayda dışarıda
+    const off=(p<.5? p*2 : -((1-p)*2))*2*r;
+    if(Math.abs(off)<2*r-6){
+      x.fillStyle='#070a14';x.beginPath();x.arc(128+off,128,r+4,0,7);x.fill();}
+    return new THREE.CanvasTexture(c);
+  }
+  const moonMesh=new THREE.Sprite(new THREE.SpriteMaterial({map:moonTex(moonPhase()),transparent:true,depthWrite:false}));
+  moonMesh.scale.set(46,46,1);
   moonMesh.position.set(460,230,-160);scene.add(moonMesh);
   const moonGlow=(()=>{const c=document.createElement('canvas');c.width=c.height=128;
     const x=c.getContext('2d'),g=x.createRadialGradient(64,64,8,64,64,64);
@@ -1453,6 +1520,12 @@ if(HAS3D)(function(){
     /* payphone */
     box(1.2,2.6,1.2,std(0x18324a,{emissive:0x2a5a7a,emissiveIntensity:.5}),L.payphone.x,1.3,L.payphone.z);
     const pl=new THREE.PointLight(0x5aa0c8,.7,8,2);pl.position.set(L.payphone.x,2.6,L.payphone.z);scene.add(pl);
+    /* cızırtılı radyo + kaset rafı (kayıt köşesi) */
+    box(.9,.5,.4,std(0x3a2c1c,{roughness:.5}),L.radio.x,1.18,L.radio.z,.3);
+    box(.5,.18,.06,std(0x111,{emissive:0xd8a050,emissiveIntensity:.9}),L.radio.x,1.3,L.radio.z+.18,.3,scene,false);
+    cyl(.015,.015,.7,std(0x9aa4b8,{metalness:.9}),L.radio.x-.3,1.85,L.radio.z);
+    box(.8,.3,.5,std(0x222a38),L.radio.x+1,1.05,L.radio.z); /* kasetler */
+    box(.7,.22,.42,std(0x1a222e,{emissive:0x4d6a9a,emissiveIntensity:.25}),L.radio.x+1,1.3,L.radio.z);
   })();
 
   /* ---- forest ---- */
@@ -1937,13 +2010,16 @@ if(HAS3D)(function(){
   W3.applyMoon=()=>{
     if(S.flags.inPleroma){
       moonLight.intensity=.04;hemi.intensity=.14;scene.fog.density=.02;
-      moonMesh.material.color.set(0x1a1e28);moonGlow.material.opacity=.05;
+      moonMesh.material.opacity=.06;moonGlow.material.opacity=.04;
       renderer.toneMappingExposure=1.0;waterUni.glow.value=.1;return;}
     moonLight.intensity=isFull()?1.2:isNew()?.16:.6;
     hemi.intensity=isNew()?.3:.5;
     scene.fog.density=isNew()?.0088:.0065;
-    moonMesh.material.color.set(isNew()?0x3a4150:0xefebda);
-    moonGlow.material.opacity=isNew()?.15:1;
+    const oldMap=moonMesh.material.map;
+    moonMesh.material.map=moonTex(moonPhase());
+    if(oldMap)oldMap.dispose();
+    moonMesh.material.opacity=isNew()?.55:.95;
+    moonGlow.material.opacity=.08+(1-Math.abs(moonPhase()-.5)*2)*.85;
     waterUni.glow.value=isFull()?1.2:.4;
     renderer.toneMappingExposure=isNew()?1.0:1.15;
   };
@@ -2157,6 +2233,8 @@ if(HAS3D)(function(){
           p.f.g.position.z+=(p.tz-p.f.g.position.z)*Math.min(1,dt*8);
           p.f.g.rotation.y=p.ry||0;}}
     }
+    /* radyo yakınlık sesi */
+    Snd.setProx&&Snd.setProx(Math.hypot(S.px-L.radio.x,S.pz-L.radio.z));
     document.getElementById('dmg').style.opacity=S.lucidity<35?(35-S.lucidity)/40:0;
 
     /* beacon */
