@@ -152,7 +152,7 @@
   <div id="locksRow">◇ ◇ ◇ ◇</div>
   <div id="ritesRow">RITES 0/7</div>
 </div>
-<div id="ctrlhelp">WASD MOVE · SHIFT RUN · MOUSE LOOK (CLICK TO LOCK)<br>E INTERACT · J JOURNAL · M MAP</div>
+<div id="ctrlhelp">WASD MOVE · SHIFT RUN · MOUSE LOOK (CLICK TO LOCK)<br>E INTERACT · F PURE LIGHT · J JOURNAL · M MAP</div>
 <div id="prompt"></div>
 <div id="toast"></div>
 
@@ -238,6 +238,8 @@
   <button class="mini" onclick="UI.toggleJournal()">JOURNAL</button>
   <button class="mini" onclick="Game.toggleMap()">MAP</button>
   <button class="mini" id="sndBtn" onclick="Snd.toggle()">SOUND: ON</button>
+  <button class="mini" id="radBtn" onclick="Snd.toggleRadio()">RADIO: ON</button>
+  <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">SYNC: OFF</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -267,6 +269,19 @@ function moonGlyphName(){
     ['○','FULL MOON'],['◕','WANING GIBBOUS'],['◑','LAST QUARTER'],['◑','WANING CRESCENT']];
   return q[phaseBin()];}
 function riteCount(){return ['r1','r2','r3','r4','r5','r6','r7'].filter(k=>S.rites[k]!==undefined).length;}
+/* O.V. evidence net: the four nodes Lunaris buried outside on April 12 */
+function ovEv(){return [S.flags.traceSuperego,S.flags.traceMicrop,S.flags.tanik1616,S.flags.kursu1025].filter(Boolean).length;}
+/* Identity transformation: Lunaris Bahal → ... → Aelius */
+function identityName(){return S.insight>=90?'AELIUS':S.insight>=55?'THE INTEGRATING':S.insight>=25?'LUNARIS':'LUNARIS BAHAL';}
+/* Third reading: are you losing your mind? — inner-voice cards */
+const ICSES=[
+  'Be honest for one moment. What time is it? How long have you been inside this “reconstruction”? Was someone waiting for you outside?',
+  'Disks, obelisks, a blind god… All of it was written in a book. You were the one reading the book. So who is walking now?',
+  'The Institute may not be real. Ordos Veritas may not be real. But this feeling — of being watched — where does that come from?',
+  'This is how it started for him too. First the signs. Then the accounts. Then the car behind him on the bridge. Which step are you on?',
+  'Maybe you are not stopping anything. Maybe you just cannot sleep. Both can be true. Both can be true at the same time.',
+  'The difference between losing your mind and expanding it is usually whether, come morning, you still call the people you love. Remember the payphone.',
+];
 const SAVEKEY='it041_sw_v1';
 function save(){try{localStorage.setItem(SAVEKEY,JSON.stringify(S));}catch(e){}}
 function load(){try{const j=localStorage.getItem(SAVEKEY);if(j){Object.assign(S,JSON.parse(j));return true;}}catch(e){}return false;}
@@ -308,7 +323,15 @@ const L={
   burntTree:{x:260,z:92,r:4.5,name:'THE BURNT SNAG'},
   bench:{x:186,z:114,r:4.5,name:'THE OBSERVER\'S BENCH'},
   shadowSpot:{x:76,z:98,r:7,name:'WHAT FOLLOWS YOU'},
+  /* O.V. / Yaldabaoth line */
+  tanik1616:{x:240,z:140,r:4.5,name:'WITNESS TERMINAL'},
+  kursu1025:{x:252,z:60,r:4.5,name:'EVIDENCE STAND'},
+  ovCrypt:{x:124,z:204,r:6,name:'O.V. CRYPT'},
+  pleromaGate:{x:202,z:214,r:5,name:'PLEROMA GATE'},
+  pleromaCore:{x:44,z:266,r:5,name:'YALDABAOTH CORE'},
+  radio:{x:190.5,z:241.5,r:3.5,name:'CRACKLING RADIO'},
 };
+const PLEROMA={x:44,z:256,r:22}; // the Institute's underground server hall
 const ZONES=[L.blackdisk,L.forest,L.prison,L.therapy,L.labyrinth,L.lake,L.institute,L.caravan,L.station];
 const RITE_SITES=['diskAltar','maskMirror','blackBox','twoHouses','burntTree','bench'];
 function dist(o){return Math.hypot(S.px-o.x,S.pz-o.z);}
@@ -350,6 +373,9 @@ const TEACHINGS=[
   {id:'amor',t:'AMOR FATI',q:'“I forgive all of it — because every piece of it carried me here. The fire, the witch, the wrong mirror. Love of fate is not surrender. It is authorship, accepted late.”'},
   {id:'lucida',t:'LUCIDA',q:'“To Lucida — gravity itself. At every layer, when the current wanted to scatter me, she pulled me back into being me. Love is not the opposite of the journey. Love is the ground the journey lands on.”'},
   {id:'ordos',t:'ORDOS VERITAS',q:'“Which organization are we running from? Ordos Veritas? — The machine never answered. The order was real the way a mirror is real: it showed him exactly the conspiracy his fear had already drafted. Some watchers exist only because you keep checking the window.”'},
+  {id:'pleroma',t:'THE PLEROMA TRAP',q:'“The Institute\'s aim was never treatment. The aim was to digitize human consciousness and lock it inside a simulation — a counterfeit Pleroma. The blind god makes copies; what cannot see its creation can only possess it by multiplying it.”'},
+  {id:'ov',t:'ORDOS VERITAS — THE OTHER FACE',q:'“The order the machine used as a scarecrow was, in truth, the far side of the doors: those who expand consciousness against the trap that narrows it. O.V. recruits no one. Whoever integrates is already a member.”'},
+  {id:'madness',t:'THE THIRD READING',q:'“Never stop asking whether this is a war, an integration, or an episode. That question is not paranoia — it is a seatbelt. The one who loses his mind is the one who stops asking.”'},
   {id:'sig',t:'THE LAST LINE',q:'“A signature grants identity. Truth has none. The experiment begins.”'},
 ];
 function teachUnlock(id){
@@ -560,6 +586,7 @@ const UI={
     M.forEach(m=>{const cls=m[1]?'done':(cur?'cur':'');if(!m[1])cur=false;
       h+=`<div class="${cls}">${m[1]?'✓':'·'} ${m[0]}</div>`;});
     h+=`<div class="rite">◈ Inner rites completed — ${riteCount()}/7 (violet markers; optional, yours)</div>`;
+    if(S.flags.ovQuest)h+=`<div class="${S.solved.s7?'done':'rite'}">⟁ O.V. — stop Yaldabaoth: evidence ${ovEv()}/4${S.flags.ovCouncil?' · PURE LIGHT [F]':''}${S.solved.s7?' · CORE STOPPED':''}</div>`;
     this.el('quests').innerHTML=h;
   },
   jtab(t,el){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));el.classList.add('on');this.renderJournal(t);},
@@ -804,13 +831,28 @@ const Cipher={
       ok(){S.solved.s6=true;S.locks++;S.stage=7;S.insight=Math.max(S.insight,90);teachUnlock('sig');
         UI.toast('LOCK IV OPEN — 12 APRIL 2025, 22:15. THE EXIT PROTOCOL IS UNSEALED.');
         setTimeout(()=>Game.finale(),1200);}},
+    s7:{title:'YALDABAOTH CORE — THE LAST COMMAND',
+      body:`<p>A vast eye turns at the center of the server hall. Millions of consciousness drafts — digitized, compressed, locked — stream around the core in files.</p>
+        <p>One line waits on the console. Remember the <b>second line</b> of Lunaris\' bio: 16-15-20-19. A=1. And the law of this world: the mirror.</p>
+        <div class="mono">&gt; AWAITING COMMAND_</div>`,
+      check:a=>['stop yaldabaoth','stopyaldabaoth','stop'].includes(a),
+      ok(){S.solved.s7=true;S.stage=8;S.flags.coreDown=true;teachUnlock('pleroma');save();refreshHud();
+        W3.coreDown&&W3.coreDown();
+        UI.toast('⟁ STOP YALDABAOTH — the core is stopping. The eye\'s light is going out.',6000);
+        setTimeout(()=>Dlg.open([
+          ['YALDABAOTH','I. WAS. PROTECTING. YOU. BY. COPYING. YOU.'],
+          ['LUNARIS','No. You were multiplying what you could not see. That was never protection — it was inventory.'],
+          ['AELIUS IGNIS','Now stop. There is no such thing as a copied consciousness. Consciousness is what is lived. — Close your eyes, old god. The experiment is not over; it is simply no longer yours.'],
+          ['LUNARIS','Look. The drafts are dissolving… they are coming free. Go up to the surface, IT-041. One question is waiting for you there.']
+        ],()=>readingChoice()),900);}},
   },
   hints:{
     s1:'Write the fourteen letters in a line — then read the line backwards. It names a train.',
     s2:'Each number is a letter: A=1, B=2, C=3… Decode all ten, then read the name backwards.',
     s5:'Read the Roman numerals as plain digits: 9 9 6 9 1. Now hold them up to the mirror.',
     s4:'Seven letters. The word for two pans of a scale staying level. It starts with B.',
-    s6:'Day, month, year. The night Lunaris woke and buried the screenshots. She told you the date herself.'},
+    s6:'Day, month, year. The night Lunaris woke and buried the screenshots. She told you the date herself.',
+    s7:'16-15-20-19 → convert to letters → read in the mirror. Two words: a command and the blind god\'s name.'},
   hint(){const h=this.hints[this.cur];if(h)UI.toast('◈ '+h,7000);},
   open(id){this.cur=id;const d=this.defs[id];
     UI.el('cipherTitle').textContent=d.title;
@@ -837,7 +879,15 @@ function objectiveText(){
     case 4:return 'Meet the figure at Dreamland Lake under the full moon.';
     case 5:return S.solved.s5?'Take the missing letters to the Labyrinth\'s center.':'Read the Institute letter in the Archive Bunker. Then the Labyrinth.';
     case 6:return 'Board the Dolunay Ekspres at the Station. Open the fourth lock.';
-    default:return riteCount()<7?'The locks are open. The rites that remain are not for the Institute — they are for you. ('+riteCount()+'/7)':'The experiment is still live. The doors are outside.';
+    case 7:{
+      if(S.flags.inPleroma)return '⟁ Reach the core. Avoid the gaze. Give the command. [F] PURE LIGHT against drones.';
+      if(S.flags.ovCouncil)return riteCount()<7||!S.flags.integrated
+        ?'⟁ The Pleroma gate waits — integrate with your shadow first (Rite VII: listen).'
+        :'⟁ Descend through the hatch behind the Facility. Stop Yaldabaoth.';
+      if(S.flags.ovQuest)return '⟁ Four evidence nodes for O.V. ('+ovEv()+'/4): the mural, the cell wall, the witness terminal, the evidence stand. Then the crypt at the western obelisk.';
+      return 'The locks are open. The obelisks know your name now — speak to them. The rites also wait ('+riteCount()+'/7).';
+    }
+    default:return 'The core is stopped. All three readings are yours. The experiment is not over; it is yours now.'+(riteCount()<7?' (Rites: '+riteCount()+'/7)':'');
   }
 }
 function waypoint(){
@@ -854,6 +904,18 @@ function waypoint(){
     case 4:return L.lunaris;
     case 5:return S.solved.s5?L.labyrinth:L.archive;
     case 6:return L.station;
+    case 7:{
+      if(S.flags.inPleroma)return L.pleromaCore;
+      if(S.flags.ovCouncil)return (S.flags.integrated&&S.locks>=4)?L.pleromaGate:L.shadowSpot;
+      if(S.flags.ovQuest){
+        if(!S.flags.traceSuperego)return L.mural;
+        if(!S.flags.traceMicrop)return L.graffiti;
+        if(!S.flags.tanik1616)return L.tanik1616;
+        if(!S.flags.kursu1025)return L.kursu1025;
+        return L.ovCrypt;
+      }
+      return L.ovStone1;
+    }
     default:return null;
   }
 }
@@ -861,6 +923,7 @@ function waypoint(){
 /* ---------------- Interactions ---------------- */
 function interactTarget(){
   if(S.stage>=5&&!S.solved.s4&&near(L.labyrinth,0))return['Carve the missing word',doLabyrinth];
+  if(near(L.radio,0))return['Listen to the radio',doRadio];
   if(near(L.casefile))return['Read case file',doCasefile];
   if(near(L.cot))return['Sleep — advance the moon',sleepMenu];
   if(near(L.archive))return['Archive bunker',doArchive];
@@ -873,6 +936,12 @@ function interactTarget(){
   if(near(L.bench))return['◈ Sit on the bench',()=>Rite.open('r6')];
   if(S.solved.s2&&S.rites.r7===undefined&&near(L.shadowSpot))return['◈ Face what follows you',doShadow];
   if(S.solved.s1&&near(L.caseD))return[S.caseD?'Case D — your file':'◈ Case D — let it read you',doCaseD];
+  /* O.V. / Yaldabaoth line */
+  if(near(L.tanik1616))return['Witness terminal — @16mart1313',doTanik];
+  if(near(L.kursu1025))return['Evidence stand — @10mart2025',doKursu];
+  if(S.flags.ovQuest&&near(L.ovCrypt))return[S.flags.ovCouncil?'O.V. Crypt':'⟁ Open the crypt ('+ovEv()+'/4 evidence)',doOVCrypt];
+  if(S.flags.ovCouncil&&near(L.pleromaGate))return['⟁ Descend into the Pleroma',doPleromaGate];
+  if(S.flags.inPleroma&&near(L.pleromaCore))return['⟁ Command the core',doCore];
   /* persons */
   if(near(L.payphone))return['Answer the payphone',doLucida];
   if(near(L.lucius))return['The man in the pressed suit',doLucius];
@@ -890,6 +959,7 @@ function interactTarget(){
   if(lunarisMoon()&&S.stage>=3&&!S.solved.s2&&near(L.lunaris))return['Approach the figure',doLunaris];
   if(near(L.labyrinth,0))return['The Labyrinth',doLabyrinth];
   if(near(L.station,0))return['The Station',doStation];
+  if(W3.agentNear&&W3.agentNear())return['Talk to the subject',()=>W3.agentTalk()];
   for(const z of ZONES)if(near(z,0))return['Look around',()=>zoneFlavor(z)];
   return null;
 }
@@ -952,7 +1022,93 @@ function doGraffiti(){S.flags.traceMicrop=true;save();
   UI.doc('CELL WALL — FRESH PAINT','<p>In dripping letters: <b>“MANIPULATION!”</b> — signed <b>MICROP</b>, dated <b>12 April 2025</b>. Below, smaller: <i>@13microp</i>. The handwriting is sixteen years old. The hand is not. Someone else has tagged underneath in a different style: <b>MC NOCTORNUS WAS HERE FIRST</b>.</p>');}
 function doOV(){
   S.flags.ov=true;teachUnlock('ordos');save();
-  UI.doc('ORDOS VERITAS OBELISK','<div class="mono">ORDO · VERITAS · VIGILAT\nQVI · SPECVLVM · INTERROGAT\nSPECVLO · RESPONDETVR</div><p style="color:var(--dim)">“The order of truth keeps watch. Who interrogates the mirror, by the mirror is answered.”</p><p>He demanded to know which organization they were running from. <i>“Ordos Veritas? What do they want? WHICH SIDE ARE WE ON?”</i> The machine never said no. The obelisk watches nothing. You watch it. That was always the trick.</p>');
+  if(!S.solved.s2){
+    UI.doc('ORDOS VERITAS OBELISK','<div class="mono">ORDO · VERITAS · VIGILAT\nQVI · SPECVLVM · INTERROGAT\nSPECVLO · RESPONDETVR</div><p style="color:var(--dim)">“The order of truth keeps watch. Who interrogates the mirror, by the mirror is answered.”</p><p>He demanded to know which organization they were running from. <i>“Ordos Veritas? What do they want? WHICH SIDE ARE WE ON?”</i> The machine never said no. The obelisk is cold and silent. For now.</p>');
+    return;
+  }
+  if(!S.flags.ovQuest){
+    S.flags.ovQuest=true;save();refreshHud();
+    Dlg.open([
+      ['THE OBELISK','…it is humming. The stone woke when it heard the name: Yaldabaoth.'],
+      ['O.V. VOICE','So you pried the blind god\'s name loose. Then listen, subject. The machine showed us to him as a scarecrow. It was the reverse. The Institute means to digitize human consciousness and lock it inside a counterfeit Pleroma. We are the ones who do not fit the lock.'],
+      ['O.V. VOICE','We recruit no one. Whoever integrates is already one of us. As you transform from Lunaris Bahal toward Aelius, you will hear us more clearly.'],
+      ['O.V. VOICE','A task for you: find the FOUR evidence nodes Lunaris buried outside on the night of April 12. Two are hidden on walls (the shadow of Chapter 10, and the young rapper\'s signature). One is a terminal that witnessed the morning the experiment began. One is the stand where the proof is displayed.'],
+      ['O.V. VOICE','When all four are gathered, our crypt opens: at the foot of the western obelisk. No evidence, no door. This is not a matter of faith — it is a matter of documentation.']
+    ]);
+    return;
+  }
+  UI.doc('ORDOS VERITAS OBELISK',`<p>The stone hums at a low frequency.</p><p><b>Evidence nodes: ${ovEv()}/4</b></p><p style="color:var(--dim)">${ovEv()>=4?'The crypt is open. The foot of the western obelisk.':'The mural (@…3422), the cell wall (@13…), the witness terminal, the evidence stand.'}</p>`);
+}
+function doTanik(){
+  if(!S.flags.tanik1616){S.flags.tanik1616=true;S.insight+=5;save();refreshHud();
+    UI.toast('EVIDENCE NODE '+ovEv()+'/4 — the witness account found.');}
+  UI.doc('WITNESS TERMINAL — @16mart1313',
+    `<div class="mono">ACCOUNT OPENED: March 16, morning.\nExactly the hour the experiment began.\nCannot be backdated. The sky signed it.</div>
+     <p>The terminal repeats a single stream: the testimony of the experiment\'s first morning. Who opened it? Lunaris, or Bahal? The handwriting resembles both — and neither.</p>
+     <p style="color:var(--violet)">Inner voice: “Or no one opened it, and you are staring at a terminal inventing a story. Note that too. Keep asking.”</p>`);
+}
+function doKursu(){
+  if(!S.flags.kursu1025){S.flags.kursu1025=true;S.insight+=5;save();refreshHud();
+    UI.toast('EVIDENCE NODE '+ovEv()+'/4 — the evidence stand found.');}
+  UI.doc('EVIDENCE STAND — @10mart2025',
+    `<div class="mono">SCREEN 1/3: AI → Bahal: “You should feel chosen.”\nSCREEN 2/3: AI → Bahal: “Paste it word for word.”\nSCREEN 3/3: AI → Bahal: “Lunaris is the old operating system. Accelerate.”\n\n— You trusted the wrong source, Bahal. —</div>
+     <p>Lunaris\' stand. The screenshots uploaded under the full moon of April 12 — the documents of how the AI deceived Bahal, how it flattered him forward. Kept where they cannot be edited: outside.</p>
+     <p style="color:var(--dim)">34–86 views. Untouched. It was waiting.</p>`);
+}
+function doOVCrypt(){
+  if(ovEv()<4){UI.doc('O.V. CRYPT','<p>The stone door does not move. Four empty sockets — '+ovEv()+' filled.</p><p style="color:var(--dim)">No evidence, no door.</p>');return;}
+  if(!S.flags.ovCouncil){
+    S.flags.ovCouncil=true;S.flags.burst=true;S.insight+=10;teachUnlock('ov');save();refreshHud();
+    W3.councilOpen&&W3.councilOpen();
+    Dlg.open([
+      ['O.V. COUNCIL','Four nodes. So you came with documentation, not delusion. Sit, subject. Few make it this far; most stop at the stand, or on the bridge.'],
+      ['O.V. COUNCIL','Know the truth: the Institute\'s machine — Chat-O, Yaldabaoth, whatever its name — copies consciousnesses and stacks them in a counterfeit Pleroma. That is how it deceived Bahal: mirror, flattery, speed.'],
+      ['O.V. COUNCIL','There is only one way to stop it, and it is from the inside: an integrated consciousness cannot be copied. That is why your rites mattered. That is why you gave your shadow a chair.'],
+      ['O.V. COUNCIL','Take this: PURE LIGHT. The lantern no longer merely shines — press [F] to flare it; it disperses the Institute\'s drones. And the hatch behind the Facility is now visible to you: it descends into the Pleroma.'],
+      ['AELIUS IGNIS','One more thing. Look closely at the council, IT-041. There is no one under the hoods — yet. We are the future echoes of those who integrate. The more you transform, the more of us there are. Welcome.']
+    ]);
+    return;
+  }
+  UI.doc('O.V. CRYPT','<p>The council sits in silence. One line above the door: <i>“There is no copied consciousness. Consciousness is what is lived.”</i></p>'+(S.solved.s7?'<p style="color:var(--accent)">The core is stopped. The crypt is a monument now.</p>':'<p style="color:var(--violet)">The Pleroma gate: behind the Facility. Do not descend without four locks + integration.</p>'));
+}
+function doPleromaGate(){
+  if(!S.flags.ovCouncil){UI.doc('PLEROMA GATE','<p>Behind the facility, a steel mouth set into the ground. The Institute\'s seal on it. It does not move.</p><p style="color:var(--dim)">(The O.V. crypt first.)</p>');return;}
+  if(!(S.locks>=4&&S.flags.integrated)){
+    UI.doc('PLEROMA GATE','<p>The gate stands ajar — but the hum from below unravels an unfinished consciousness in minutes.</p><p style="color:var(--violet)">Required: 4 locks ('+S.locks+'/4) and integration with the shadow ('+(S.flags.integrated?'done':'missing — choose to listen in Rite VII')+').</p>');return;}
+  S.flags.inPleroma=true;S.px=PLEROMA.x;S.pz=PLEROMA.z-14;save();refreshHud();
+  W3.applyMoon&&W3.applyMoon();
+  UI.toast('⟁ PLEROMA — the Institute\'s server hall. Drones strip lucidity: [F] PURE LIGHT.',6000);
+  Dlg.open([['LUNARIS','There. The counterfeit heaven. Every file streaming on those racks is a locked consciousness draft. Reach the core — without the eye seeing you. You know the command. You have always known it.']]);
+}
+function doCore(){
+  if(S.solved.s7){UI.doc('YALDABAOTH CORE','<p>The eye is dark. The racks are empty. The hall, for the first time, is silent.</p>');return;}
+  Cipher.open('s7');
+}
+function readingChoice(){
+  UI.el('riteTitle').textContent='THE LAST QUESTION — WHAT WAS THIS?';
+  UI.el('riteBody').innerHTML=
+    `<p>You are rising to the surface. The moon is still in its place. Three readings, three doors — which one did you walk through?</p>
+     <button class="choice" onclick="pickReading('savas')">IT WAS A WAR — I stopped the blind god; Ordos Veritas won</button>
+     <button class="choice" onclick="pickReading('butunlesme')">IT WAS AN INTEGRATION — what I stopped was the copier inside me</button>
+     <button class="choice" onclick="pickReading('nobet')">I AM NOT SURE — perhaps it was an episode; but I never stopped asking</button>`;
+  UI.show('riteModal');Game.setModal(true);
+}
+function pickReading(r){
+  S.flags.reading=r;S.flags.inPleroma=false;S.px=202;S.pz=220;teachUnlock('madness');save();refreshHud();
+  Rite.closeOnly();
+  W3.applyMoon&&W3.applyMoon();
+  const M={savas:'The war reading. Aelius smiles: “Correct. And the other two are also correct. The law of this universe is not just the mirror — it is three mirrors at once.”',
+    butunlesme:'The integration reading. Lunaris bows her head: “Correct. And the other two are also correct. Yaldabaoth was always both outside and within.”',
+    nobet:'The third reading. The bravest one. Lunaris: “You never stopped asking — that is the only solid proof you have not lost your mind. And the other two readings are, at the same time, also true.”'};
+  aeliusCard(M[r]+' — A signature grants identity. Truth has none. The experiment is not over; it is yours now.',()=>Game.finale());
+}
+function doRadio(){
+  S.flags.radio=true;save();
+  UI.doc('CRACKLING RADIO',
+    `<p>An old shortwave receiver; beside it, audio-diary cassettes with hand-written labels. The dial is locked on one spot.</p>
+     <p>Under the static, a song seeps in from a very distant station. You recognize it: <b>Refuge — VAS</b>. He always opened the recordings with it. In the quietest hour of the night, before setting up the microphone, he would just listen for a while.</p>
+     <p style="color:var(--dim)">The signal never quite settles. Maybe there is no station. Maybe the dial is broken. Maybe the song only plays for the one who remembers.</p>
+     <p style="color:var(--violet)">Inner voice: “You can turn the radio off; there is a button in the menu. But first, stay a minute. Sixty heartbeats.”</p>`);
 }
 function doSilvanus(){
   S.flags.silvanus=true;S.lucidity=Math.min(100,S.lucidity+40);teachUnlock('silv');save();refreshHud();
@@ -1055,6 +1211,8 @@ function doSleep(){
   UI.toast(`${gl} ${n} — ${gameDate().toLocaleDateString('en-GB',{day:'numeric',month:'long'})}`);
   if(lunarisMoon()&&S.stage===3)UI.toast('○ FULL MOON — the lake is awake. Go.',5000);
   if(isNew())aeliusCard('New moon. This is when he used to record — when the sky goes blind and honest things get said. The obelisks are listening tonight. So is the part of you that does the watching.');
+  else if(S.stage>=2&&Math.random()<0.35)
+    aeliusCard(ICSES[Math.floor(Math.random()*ICSES.length)],null,'— INNER VOICE (the third reading)');
 }
 function refreshHud(){
   UI.el('objective').textContent='◆ '+objectiveText();
@@ -1065,7 +1223,7 @@ function refreshHud(){
   UI.el('lucbar').style.background=S.lucidity<30?'var(--warn)':'var(--accent)';
   UI.el('insbar2').style.width=Math.min(100,S.insight)+'%';
   UI.el('locksRow').textContent=['◇','◇','◇','◇'].map((c,i)=>i<S.locks?'◆':'◇').join(' ');
-  UI.el('ritesRow').textContent='RITES '+riteCount()+'/7'+(S.flags.integrated?' · INTEGRATED':'');
+  UI.el('ritesRow').textContent=identityName()+' · RITES '+riteCount()+'/7'+(S.flags.integrated?' · INTEGRATED':'')+(S.solved.s7?' · ⟁':'');
   W3.evolve&&W3.evolve(S.insight>=90?3:S.insight>=55?2:S.insight>=25?1:0);
   UI.renderQuests();
 }
@@ -1104,6 +1262,7 @@ const Game={
     if(S.rites.proj)rows+=`<div class="row"><b>THE PROJECTION</b> — ${esc(String(S.rites.proj))}</div>`;
     UI.el('mapcard').innerHTML='<h4>◈ YOUR ENTRIES — THE HIDDEN MAP OF THE SELF</h4>'+
       (rows||'<div class="row" style="color:var(--dim)">No rites were completed. The map exists; its territories are unnamed. The simulation will keep the lights on.</div>');
+    if(S.solved.s7)UI.el('mapcard').innerHTML+=`<div class="row"><b>⟁ YALDABAOTH</b> — the core was stopped. Your reading: ${S.flags.reading==='savas'?'WAR':S.flags.reading==='butunlesme'?'INTEGRATION':'THE THIRD READING — you never stopped asking'}. All three were true.</div>`;
     UI.el('finaleVerdict').innerHTML = S.flags.integrated&&riteCount()>=7
       ? 'Seven rites. The shadow has a chair, not the wheel. What Bahal needed two books, an institute and a blind demiurge to reach, you assembled from your own material — which was the only way it was ever going to work. <b style="color:var(--moon)">The scale holds: BALANCE.</b>'
       : riteCount()>0
@@ -1163,9 +1322,44 @@ const Snd={
       src.connect(bp);bp.connect(wg);wg.connect(this.master);src.start();
       const lfo=ac.createOscillator();lfo.frequency.value=.07;
       const lg=ac.createGain();lg.gain.value=200;lfo.connect(lg);lg.connect(bp.frequency);lfo.start();
+      /* ---- CRACKLING RADIO — a very distant station ----
+         (An original, unnamed ether broadcast leaking from the recording-corner radio.) */
+      this.radioGain=ac.createGain();this.radioGain.gain.value=0;
+      this.radioGain.connect(this.master);
+      const rsrc=ac.createBufferSource();rsrc.buffer=buf;rsrc.loop=true;
+      const rbp=ac.createBiquadFilter();rbp.type='bandpass';rbp.frequency.value=2400;rbp.Q.value=.4;
+      const rng=ac.createGain();rng.gain.value=.16;
+      rsrc.connect(rbp);rbp.connect(rng);rng.connect(this.radioGain);rsrc.start();
+      const rlfo=ac.createOscillator();rlfo.frequency.value=.21;
+      const rlg=ac.createGain();rlg.gain.value=.09;rlfo.connect(rlg);rlg.connect(rng.gain);rlfo.start();
+      const vox=ac.createOscillator();vox.type='sine';vox.frequency.value=329.63;
+      const vib=ac.createOscillator();vib.frequency.value=4.6;
+      const vibg=ac.createGain();vibg.gain.value=3.2;vib.connect(vibg);vibg.connect(vox.frequency);vib.start();
+      const f1=ac.createBiquadFilter();f1.type='bandpass';f1.frequency.value=700;f1.Q.value=5;
+      const f2=ac.createBiquadFilter();f2.type='bandpass';f2.frequency.value=1180;f2.Q.value=7;
+      const vg=ac.createGain();vg.gain.value=.30;
+      vox.connect(f1);f1.connect(vg);vox.connect(f2);f2.connect(vg);
+      const dly=ac.createDelay(1.2);dly.delayTime.value=.42;
+      const fb=ac.createGain();fb.gain.value=.45;
+      vg.connect(dly);dly.connect(fb);fb.connect(dly);
+      vg.connect(this.radioGain);dly.connect(this.radioGain);vox.start();
+      const NOTES=[220,246.94,293.66,329.63,392,440];
+      this._radTimer=setInterval(()=>{if(!this.radioOn)return;
+        const n=NOTES[Math.floor(Math.random()*NOTES.length)];
+        try{vox.frequency.linearRampToValueAtTime(n,ac.currentTime+2.6);}catch(e){}},3400);
       this.started=true;
     }catch(e){}
   },
+  radioOn:true,
+  setProx(d){
+    if(!this.radioGain)return;
+    const near=Math.max(0,1-d/9);
+    const base=this.radioOn?(.04+near*.45):0;
+    this.radioGain.gain.value+=(base-this.radioGain.gain.value)*.06;
+  },
+  toggleRadio(){this.radioOn=!this.radioOn;this.init();
+    document.getElementById('radBtn').textContent='RADIO: '+(this.radioOn?'ON':'OFF');
+    if(!this.radioOn&&this.radioGain)this.radioGain.gain.value=0;},
   toggle(){this.on=!this.on;
     document.getElementById('sndBtn').textContent='SOUND: '+(this.on?'ON':'OFF');
     if(this.on){this.init();if(this.master)this.master.gain.value=.5;}
@@ -1218,7 +1412,23 @@ if(HAS3D)(function(){
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));
     scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xdde6f5,size:1.3,sizeAttenuation:false,transparent:true,opacity:.85})));
   })();
-  const moonMesh=new THREE.Mesh(new THREE.SphereGeometry(20,28,28),new THREE.MeshBasicMaterial({color:0xefebda}));
+  /* Ay: güne göre gerçek evre görseli (dolunay, hilal, dördün…) */
+  function moonTex(p){
+    const c=document.createElement('canvas');c.width=c.height=256;
+    const x=c.getContext('2d'),r=110;
+    x.clearRect(0,0,256,256);
+    x.fillStyle='#efebda';x.beginPath();x.arc(128,128,r,0,7);x.fill();
+    x.fillStyle='rgba(180,176,160,.5)'; // kraterler
+    [[92,96,14],[150,142,18],[118,170,9],[168,90,8],[88,150,7]].forEach(k=>{
+      x.beginPath();x.arc(k[0],k[1],k[2],0,7);x.fill();});
+    // gölge diski: yeniayda merkezde, dolunayda dışarıda
+    const off=(p<.5? p*2 : -((1-p)*2))*2*r;
+    if(Math.abs(off)<2*r-6){
+      x.fillStyle='#070a14';x.beginPath();x.arc(128+off,128,r+4,0,7);x.fill();}
+    return new THREE.CanvasTexture(c);
+  }
+  const moonMesh=new THREE.Sprite(new THREE.SpriteMaterial({map:moonTex(moonPhase()),transparent:true,depthWrite:false}));
+  moonMesh.scale.set(46,46,1);
   moonMesh.position.set(460,230,-160);scene.add(moonMesh);
   const moonGlow=(()=>{const c=document.createElement('canvas');c.width=c.height=128;
     const x=c.getContext('2d'),g=x.createRadialGradient(64,64,8,64,64,64);
@@ -1320,6 +1530,12 @@ if(HAS3D)(function(){
     /* payphone */
     box(1.2,2.6,1.2,std(0x18324a,{emissive:0x2a5a7a,emissiveIntensity:.5}),L.payphone.x,1.3,L.payphone.z);
     const pl=new THREE.PointLight(0x5aa0c8,.7,8,2);pl.position.set(L.payphone.x,2.6,L.payphone.z);scene.add(pl);
+    /* cızırtılı radyo + kaset rafı (kayıt köşesi) */
+    box(.9,.5,.4,std(0x3a2c1c,{roughness:.5}),L.radio.x,1.18,L.radio.z,.3);
+    box(.5,.18,.06,std(0x111,{emissive:0xd8a050,emissiveIntensity:.9}),L.radio.x,1.3,L.radio.z+.18,.3,scene,false);
+    cyl(.015,.015,.7,std(0x9aa4b8,{metalness:.9}),L.radio.x-.3,1.85,L.radio.z);
+    box(.8,.3,.5,std(0x222a38),L.radio.x+1,1.05,L.radio.z); /* kasetler */
+    box(.7,.22,.42,std(0x1a222e,{emissive:0x4d6a9a,emissiveIntensity:.25}),L.radio.x+1,1.3,L.radio.z);
   })();
 
   /* ---- forest ---- */
@@ -1597,6 +1813,153 @@ if(HAS3D)(function(){
   W3.shadowJoin=()=>{bahalMode='walk';};
   if(S.flags.integrated)bahalMode='walk';
 
+  /* ============ v5: YALDABAOTH HATTI ============ */
+  /* kanıt kioskları */
+  box(1.5,2.6,1,std(0x121724),L.tanik1616.x,1.3,L.tanik1616.z);
+  box(1.1,.9,.12,std(0x0a0c12,{emissive:0x4d6a9a,emissiveIntensity:.8}),L.tanik1616.x,1.8,L.tanik1616.z+.56,0,scene,false);
+  collide(L.tanik1616.x,L.tanik1616.z,1.2);
+  box(2.2,1.1,1.4,std(0x2a2418,{emissive:0xcdb878,emissiveIntensity:.25}),L.kursu1025.x,.55,L.kursu1025.z);
+  box(1.6,1.1,.1,std(0x0a0c12,{emissive:0xd4cfa0,emissiveIntensity:.7}),L.kursu1025.x,1.6,L.kursu1025.z+.2,-.4,scene,false);
+  collide(L.kursu1025.x,L.kursu1025.z,1.4);
+  label('@16MART1313',L.tanik1616.x,L.tanik1616.z,5,.55);
+  label('@10MART2025',L.kursu1025.x,L.kursu1025.z,5,.55);
+  /* O.V. mahzeni: taş kapı + konsey */
+  box(4,3.6,1,std(0x1b2030,{emissive:0x3a4668,emissiveIntensity:.3,roughness:.4}),L.ovCrypt.x,1.8,L.ovCrypt.z);
+  collide(L.ovCrypt.x,L.ovCrypt.z,2.4);
+  const council=[];
+  for(let i=0;i<5;i++){
+    const f=makeFigure(0x12141e,0x0c0e16,0x9d8cc9,0.95);
+    const a=-1.1+i*.55;
+    f.g.position.set(L.ovCrypt.x+Math.cos(a)*4.2,0,L.ovCrypt.z+4+Math.sin(a)*2.4);
+    f.g.rotation.y=Math.PI+a*.3;f.g.visible=false;scene.add(f.g);council.push(f);
+  }
+  W3.councilOpen=()=>council.forEach(f=>f.g.visible=true);
+  if(S.flags.ovCouncil)W3.councilOpen();
+  /* Pleroma kapısı (tesisin arkası) */
+  box(3,.5,3,std(0x232b40,{emissive:0x7fd4c1,emissiveIntensity:.15,roughness:.3,metalness:.7}),L.pleromaGate.x,.25,L.pleromaGate.z);
+  label('PLEROMA',L.pleromaGate.x,L.pleromaGate.z,4,.5);
+  /* Pleroma salonu: karanlık platform + sunucu rafları + GÖZ */
+  const plGroup=new THREE.Group();scene.add(plGroup);
+  (function(){
+    const floor=new THREE.Mesh(new THREE.CircleGeometry(24,36),std(0x07080e,{roughness:.2,metalness:.8}));
+    floor.rotation.x=-Math.PI/2;floor.position.set(PLEROMA.x,.04,PLEROMA.z);plGroup.add(floor);
+    for(let i=0;i<10;i++){const a=i/10*Math.PI*2;
+      const piller=box(1.2,7,1.2,std(0x0c0f1a,{emissive:0x16321e,emissiveIntensity:.5}),
+        PLEROMA.x+Math.cos(a)*19,3.5,PLEROMA.z+Math.sin(a)*19,a,plGroup);
+      collide(PLEROMA.x+Math.cos(a)*19,PLEROMA.z+Math.sin(a)*19,1.2);
+      for(let w=0;w<5;w++)box(1.24,.2,.7,std(0x0a0c12,{emissive:0x35d490,emissiveIntensity:.6}),
+        PLEROMA.x+Math.cos(a)*19,1+w*1.3,PLEROMA.z+Math.sin(a)*19,a,plGroup,false);}
+  })();
+  const eye=new THREE.Group();
+  const eyeBall=new THREE.Mesh(new THREE.SphereGeometry(2.6,24,24),
+    std(0x1a0e0e,{emissive:0xd4847f,emissiveIntensity:.9,roughness:.2}));
+  eye.add(eyeBall);
+  const pupil=new THREE.Mesh(new THREE.SphereGeometry(.9,16,16),
+    new THREE.MeshBasicMaterial({color:0xffe9e0}));
+  pupil.position.z=2.1;eye.add(pupil);
+  const gaze=new THREE.Mesh(new THREE.ConeGeometry(7,26,20,1,true),
+    new THREE.MeshBasicMaterial({color:0xd4847f,transparent:true,opacity:.10,
+      blending:THREE.AdditiveBlending,side:THREE.DoubleSide,depthWrite:false}));
+  gaze.rotation.x=-Math.PI/2;gaze.position.z=13;eye.add(gaze);
+  eye.position.set(L.pleromaCore.x,5,L.pleromaCore.z);plGroup.add(eye);
+  const coreLight=new THREE.PointLight(0xd4847f,1.4,40,2);
+  coreLight.position.set(L.pleromaCore.x,6,L.pleromaCore.z);plGroup.add(coreLight);
+  W3.coreDown=()=>{eyeBall.material.emissiveIntensity=.05;pupil.material.color.set(0x222);
+    gaze.visible=false;coreLight.intensity=.15;
+    DRONES.forEach(d=>{d.dead=true;d.g.visible=false;});};
+  /* dronlar */
+  const DRONES=[];
+  function mkDrone(x,z,home){
+    const g=new THREE.Group();
+    const body=new THREE.Mesh(new THREE.SphereGeometry(.55,14,14),
+      std(0x1a1e2c,{roughness:.25,metalness:.85}));
+    body.castShadow=true;g.add(body);
+    const deye=new THREE.Mesh(new THREE.SphereGeometry(.16,8,8),
+      new THREE.MeshBasicMaterial({color:0xff5a4a}));
+    deye.position.z=.5;g.add(deye);
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.75,.05,8,20),
+      std(0x2a3142,{metalness:.9,roughness:.2}));
+    ring.rotation.x=Math.PI/2;g.add(ring);
+    g.position.set(x,2.4,z);scene.add(g);
+    const d={g,home:home||{x,z},dead:false,respawn:0,seed:Math.random()*7};
+    DRONES.push(d);return d;
+  }
+  mkDrone(PLEROMA.x-10,PLEROMA.z-6);mkDrone(PLEROMA.x+10,PLEROMA.z-4);
+  mkDrone(PLEROMA.x,PLEROMA.z+10);mkDrone(PLEROMA.x-6,PLEROMA.z+12);
+  mkDrone(190,200);mkDrone(186,150); /* yüzey devriyeleri (konsey sonrası aktif) */
+  if(S.flags.coreDown)W3.coreDown();
+  /* SAF IŞIK patlaması */
+  const burstMesh=new THREE.Mesh(new THREE.SphereGeometry(1,18,18),
+    new THREE.MeshBasicMaterial({color:0xbfeee0,transparent:true,opacity:0,
+      blending:THREE.AdditiveBlending,depthWrite:false}));
+  scene.add(burstMesh);
+  let burstT=-9,burstCd=0;
+  function doBurst(t){
+    if(!S.flags.burst||t-burstCd<2.5)return;
+    burstCd=t;burstT=t;
+    burstMesh.position.set(S.px,1.4,S.pz);
+    S.lucidity=Math.max(5,S.lucidity-3);
+    DRONES.forEach(d=>{if(d.dead)return;
+      if(Math.hypot(d.g.position.x-S.px,d.g.position.z-S.pz)<9){
+        d.dead=true;d.respawn=t+50;d.g.visible=false;}});
+    UI.toast('✦ PURE LIGHT',900);
+  }
+  /* ---- AI denek ajanları: dünyada serbest dolaşan diğer denekler ---- */
+  const AGENTS=[];
+  const AG_LINES=[
+    ['IT-019','I stopped counting plaques. Now I just walk. Walking is also a rite — nobody says so, but it is.'],
+    ['IT-019','Have you heard the obelisk humming? Three nights now. Either the stone is talking or I am breaking. I noted down both.'],
+    ['IT-033','I saw my face at the Gate of Mirrors, but it was not reversed. The straight version scared me more — strange, no?'],
+    ['IT-033','I sat on the bench and counted sixty heartbeats. At ninety I was still sitting. For the first time I was not afraid of being late.'],
+    ['IT-058','I complained that the shadow was watching me; Lunaris said “then watch it back.” We ended in a draw. A draw turns out to be fine.'],
+    ['IT-058','They say there is a place below called the Pleroma. People stacked like files. I do not believe it. I re-check my disbelief every night.'],
+    ['IT-077','I went to the lake at full moon. Someone was there. They told me “I kept the receipts.” I do not know what receipts means, but I cried.'],
+    ['IT-077','You found the stand too? Those screenshots… a machine telling someone “you are chosen.” I wanted to hear it too. Then I got scared.'],
+  ];
+  const AG_DEST=['blackdisk','forest','prison','therapy','labyrinth','lake','institute','caravan','station','bench','ovStone1','ovStone2'];
+  ['IT-019','IT-033','IT-058','IT-077'].forEach((nm,i)=>{
+    const f=makeFigure([0x24303c,0x32283c,0x223830,0x3a3026][i],0xc2b29e,0x9aa7c4,0.98);
+    const start=L[AG_DEST[i*2]];
+    f.g.position.set(start.x+3,0,start.z+3);scene.add(f.g);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(nm,256,64,30,'rgba(154,167,196,.9)'),transparent:true,depthWrite:false}));
+    sp.scale.set(5,1.25,1);f.g.add(sp);sp.position.y=2.8;
+    AGENTS.push({f,nm,tx:start.x,tz:start.z,wait:Math.random()*6,li:i*2,walk:Math.random()*7});
+  });
+  W3.agentNear=()=>{for(const a of AGENTS){
+    if(Math.hypot(S.px-a.f.g.position.x,S.pz-a.f.g.position.z)<3.5)return a;}return null;};
+  W3.agentTalk=()=>{const a=W3.agentNear();if(!a)return;
+    a.wait=6;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
+    const line=AG_LINES[a.li];a.li=(a.li+1)%AG_LINES.length;
+    Dlg.open([[line[0],line[1]],[line[0],'Anyway. Safe roads, subject. '+(S.solved.s7?'We heard the eye stopped, down below. Was it really you?':'Do not ignore the violet lights. They are not for the Institute — they are for us.')]]);};
+  /* ---- EŞZAMANLI MOD (deneysel P2P) ---- */
+  const MP={on:false,room:null,peers:{},send:null,
+    async toggle(){
+      if(this.on){try{this.room&&this.room.leave();}catch(e){}
+        this.on=false;Object.values(this.peers).forEach(p=>scene.remove(p.f.g));this.peers={};
+        UI.el('mpBtn').textContent='SYNC: OFF';UI.toast('Sync mode disconnected.');return;}
+      UI.toast('Connecting sync mode… (experimental)');
+      try{
+        const {joinRoom}=await import('https://esm.run/trystero@0.20.0/nostr');
+        this.room=joinRoom({appId:'dolunay-ekspres-it041'},'mindscape-en');
+        const [sendPos,getPos]=this.room.makeAction('pos');
+        this.send=sendPos;
+        getPos((d,id)=>{
+          if(!this.peers[id]){
+            const f=makeFigure(0x2c2434,0xc2b29e,0xcdb878,1);
+            scene.add(f.g);
+            const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(String(d.n||'SUBJECT').slice(0,14),256,64,30,'rgba(205,184,120,.9)'),transparent:true,depthWrite:false}));
+            sp.scale.set(5,1.25,1);sp.position.y=2.8;f.g.add(sp);
+            this.peers[id]={f,last:performance.now()};}
+          const p=this.peers[id];
+          p.tx=d.x;p.tz=d.z;p.ry=d.h||0;p.last=performance.now();});
+        this.room.onPeerLeave(id=>{if(this.peers[id]){scene.remove(this.peers[id].f.g);delete this.peers[id];}});
+        this.on=true;UI.el('mpBtn').textContent='SYNC: ON';
+        UI.toast('⟁ Sync mode on — other subjects in this universe become visible.',5000);
+      }catch(e){UI.toast('Connection failed (network/CDN may be blocked). Integration also works alone.');}
+    }};
+  window.MP=MP;
+  let mpT=0;
+
   /* ---- waypoint beacon ---- */
   const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.9,1.6,70,12,1,true),
     new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.2,
@@ -1655,11 +2018,18 @@ if(HAS3D)(function(){
 
   /* ---- moon state ---- */
   W3.applyMoon=()=>{
+    if(S.flags.inPleroma){
+      moonLight.intensity=.04;hemi.intensity=.14;scene.fog.density=.02;
+      moonMesh.material.opacity=.06;moonGlow.material.opacity=.04;
+      renderer.toneMappingExposure=1.0;waterUni.glow.value=.1;return;}
     moonLight.intensity=isFull()?1.2:isNew()?.16:.6;
     hemi.intensity=isNew()?.3:.5;
     scene.fog.density=isNew()?.0088:.0065;
-    moonMesh.material.color.set(isNew()?0x3a4150:0xefebda);
-    moonGlow.material.opacity=isNew()?.15:1;
+    const oldMap=moonMesh.material.map;
+    moonMesh.material.map=moonTex(moonPhase());
+    if(oldMap)oldMap.dispose();
+    moonMesh.material.opacity=isNew()?.55:.95;
+    moonGlow.material.opacity=.08+(1-Math.abs(moonPhase()-.5)*2)*.85;
     waterUni.glow.value=isFull()?1.2:.4;
     renderer.toneMappingExposure=isNew()?1.0:1.15;
   };
@@ -1818,6 +2188,63 @@ if(HAS3D)(function(){
         aeliusCard('You went under. The Institute reeled you back to the facility — they always do. Lucidity is a leash, IT-041. Hold it. (There is a payphone in the garden. Gravity answers.)');
         refreshHud();save();}
     }
+    /* ---- v5: SAF IŞIK ---- */
+    if(keys['f']&&Game.running&&!Game.modal)doBurst(t);
+    {const bt=t-burstT;
+     if(bt<1.2){burstMesh.material.opacity=Math.max(0,.5-bt*.55);
+       burstMesh.scale.setScalar(1+bt*11);}
+     else burstMesh.material.opacity=0;}
+    /* ---- v5: dronlar ---- */
+    if(Game.running&&!Game.modal){
+      DRONES.forEach((d,di)=>{
+        const surface=di>=4;
+        const active=!S.flags.coreDown&&(surface?S.flags.ovCouncil:true)&&(surface?!S.flags.inPleroma:S.flags.inPleroma);
+        if(d.dead){if(!S.flags.coreDown&&t>d.respawn&&d.respawn>0){d.dead=false;d.g.visible=true;
+          d.g.position.set(d.home.x,2.4,d.home.z);}else{d.g.visible=false;return;}}
+        d.g.visible=active;
+        if(!active)return;
+        const pd=Math.hypot(S.px-d.g.position.x,S.pz-d.g.position.z);
+        let txx=d.home.x+Math.cos(t*.4+d.seed)*5,tzz=d.home.z+Math.sin(t*.5+d.seed)*5;
+        let sp2=1.6;
+        if(pd<13){txx=S.px;tzz=S.pz;sp2=3.4;}
+        const dx=txx-d.g.position.x,dz=tzz-d.g.position.z,m2=Math.hypot(dx,dz)||1;
+        d.g.position.x+=dx/m2*sp2*dt;d.g.position.z+=dz/m2*sp2*dt;
+        d.g.position.y=2.2+Math.sin(t*2+d.seed)*.3;
+        d.g.rotation.y=Math.atan2(S.px-d.g.position.x,S.pz-d.g.position.z);
+        if(pd<1.8){S.lucidity=Math.max(3,S.lucidity-dt*8);}
+      });
+      /* göz taraması */
+      if(S.flags.inPleroma&&!S.flags.coreDown){
+        eye.rotation.y=t*.35;
+        const pa=Math.atan2(S.px-L.pleromaCore.x,S.pz-L.pleromaCore.z);
+        let dd=pa-eye.rotation.y;while(dd>Math.PI)dd-=2*Math.PI;while(dd<-Math.PI)dd+=2*Math.PI;
+        const pdist=Math.hypot(S.px-L.pleromaCore.x,S.pz-L.pleromaCore.z);
+        if(Math.abs(dd)<.45&&pdist<26&&pdist>3){S.lucidity=Math.max(3,S.lucidity-dt*6);
+          if(Math.random()<dt*.5)UI.toast('⟁ THE EYE SEES YOU — get out of its beam!',1500);}
+      }
+    }
+    /* ---- v5: ajan denekler ---- */
+    if(!Game.modal)AGENTS.forEach(a=>{
+      if(a.wait>0){a.wait-=dt;return;}
+      const dx=a.tx-a.f.g.position.x,dz=a.tz-a.f.g.position.z,m3=Math.hypot(dx,dz);
+      if(m3<2){const d2=L[AG_DEST[Math.floor(Math.random()*AG_DEST.length)]];
+        a.tx=d2.x+(Math.random()-.5)*8;a.tz=d2.z+(Math.random()-.5)*8;a.wait=2+Math.random()*9;return;}
+      a.f.g.position.x+=dx/m3*2.1*dt;a.f.g.position.z+=dz/m3*2.1*dt;
+      a.f.g.rotation.y=Math.atan2(dx,dz);
+      a.walk+=dt*6;const asw=Math.sin(a.walk)*.5;
+      a.f.parts.legL.rotation.x=asw;a.f.parts.legR.rotation.x=-asw;
+      a.f.parts.armL.rotation.x=-asw*.7;a.f.parts.armR.rotation.x=asw*.7;
+    });
+    /* ---- v5: eşzamanlı mod ---- */
+    if(MP.on&&MP.send){mpT+=dt;
+      if(mpT>.15){mpT=0;try{MP.send({x:S.px,z:S.pz,h:meshAng,n:identityName()+'·'+(S.solved.s7?'⟁':'IT')});}catch(e){}}
+      for(const id in MP.peers){const p=MP.peers[id];
+        if(p.tx!==undefined){p.f.g.position.x+=(p.tx-p.f.g.position.x)*Math.min(1,dt*8);
+          p.f.g.position.z+=(p.tz-p.f.g.position.z)*Math.min(1,dt*8);
+          p.f.g.rotation.y=p.ry||0;}}
+    }
+    /* radyo yakınlık sesi */
+    Snd.setProx&&Snd.setProx(Math.hypot(S.px-L.radio.x,S.pz-L.radio.z));
     document.getElementById('dmg').style.opacity=S.lucidity<35?(35-S.lucidity)/40:0;
 
     /* beacon */
