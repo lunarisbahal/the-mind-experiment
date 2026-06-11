@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>THE MIND EXPERIMENT — IT-041 · Shadow Work Edition</title>
+<style>
+  :root{--bg:#04050a;--panel:#0b0e16;--line:#1c2233;--ink:#c8d2e0;--dim:#6b7689;
+    --moon:#e8e4d4;--accent:#7fd4c1;--warn:#d4847f;--gold:#cdb878;--violet:#9d8cc9;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
+    font-family:"Courier New",ui-monospace,monospace;}
+  #gl{position:absolute;inset:0;}
+  #grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:88;
+    opacity:.05;animation:gr 0.6s steps(4) infinite;}
+  @keyframes gr{0%{transform:translate(0,0)}25%{transform:translate(-2%,1%)}
+    50%{transform:translate(1%,-2%)}75%{transform:translate(-1%,-1%)}100%{transform:translate(2%,2%)}}
+  .scan::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:89;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.09) 0 1px,transparent 1px 3px);}
+  body.paused #grain{animation-play-state:paused;}
+  #flash{position:fixed;inset:0;pointer-events:none;z-index:36;background:#cfd8ea;opacity:0;transition:opacity .25s;}
+  #dmg{position:fixed;inset:0;pointer-events:none;z-index:35;opacity:0;transition:opacity .5s;
+    background:radial-gradient(ellipse at center,transparent 40%,rgba(150,35,35,.5) 100%);}
+  #calm{position:fixed;inset:0;pointer-events:none;z-index:34;opacity:0;transition:opacity 2s;
+    background:radial-gradient(ellipse at center,rgba(127,212,193,.07) 0%,transparent 70%);}
+  /* HUD */
+  #hudTL{position:fixed;top:12px;left:12px;z-index:40;max-width:370px;}
+  .chip{background:rgba(6,8,14,.78);border:1px solid var(--line);padding:8px 12px;
+    font-size:12px;letter-spacing:.05em;border-radius:3px;backdrop-filter:blur(3px);margin-bottom:6px;}
+  #objective{color:var(--accent);border-left:3px solid var(--accent);}
+  #quests{font-size:11px;line-height:1.7;color:var(--dim);display:none;}
+  #quests .done{color:#5a7a6e;text-decoration:line-through;}
+  #quests .cur{color:var(--accent);}
+  #quests .rite{color:var(--violet);}
+  #hudTR{position:fixed;top:12px;right:12px;z-index:40;text-align:right;}
+  #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;}
+  #moonchip{margin-top:6px;}
+  #hudBL{position:fixed;bottom:14px;left:14px;z-index:40;}
+  .bar{width:150px;height:7px;background:#141927;border:1px solid var(--line);margin:4px 0 8px;}
+  .bar i{display:block;height:100%;background:var(--accent);transition:width .4s;}
+  #insbar i{background:var(--violet);}
+  .lbl{font-size:10px;letter-spacing:.2em;color:var(--dim);}
+  #locksRow{font-size:13px;letter-spacing:.4em;color:var(--gold);margin-top:4px;}
+  #ritesRow{font-size:11px;letter-spacing:.3em;color:var(--violet);margin-top:2px;}
+  #prompt{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);z-index:40;
+    background:rgba(6,8,14,.9);border:1px solid var(--accent);color:var(--accent);
+    padding:8px 18px;font-size:13px;letter-spacing:.1em;display:none;border-radius:3px;}
+  #toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:60;
+    background:rgba(6,8,14,.95);border:1px solid var(--gold);color:var(--gold);
+    padding:9px 18px;font-size:13px;display:none;border-radius:3px;max-width:84vw;text-align:center;}
+  #ctrlhelp{position:fixed;bottom:14px;right:14px;z-index:40;font-size:10px;color:var(--dim);
+    letter-spacing:.08em;text-align:right;line-height:1.8;}
+  /* Dialogue */
+  #dlg{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;width:min(720px,94vw);
+    background:rgba(6,8,14,.96);border:1px solid var(--line);border-left:3px solid var(--accent);
+    padding:14px 18px 12px;z-index:50;display:none;border-radius:3px;}
+  #dlgSpeaker{font-size:11px;letter-spacing:.25em;color:var(--gold);margin-bottom:6px;text-transform:uppercase;}
+  #dlgText{font-size:14.5px;line-height:1.55;min-height:44px;white-space:pre-wrap;}
+  #dlgText i{color:var(--violet);}
+  #dlgNext{font-size:11px;color:var(--dim);text-align:right;margin-top:6px;}
+  /* Modals */
+  .modal{position:fixed;inset:0;background:rgba(2,3,7,.9);z-index:70;display:none;
+    align-items:center;justify-content:center;padding:18px;}
+  .panel{background:var(--panel);border:1px solid var(--line);width:min(680px,96vw);
+    max-height:88vh;overflow:auto;padding:26px 28px;border-radius:4px;}
+  .panel h2{font-size:13px;letter-spacing:.3em;color:var(--gold);margin-bottom:14px;text-transform:uppercase;}
+  .panel h2.v{color:var(--violet);}
+  .panel p{font-size:13.5px;line-height:1.6;margin-bottom:10px;}
+  .panel .mono{background:#070910;border:1px solid var(--line);padding:12px;margin:10px 0;
+    font-size:13px;letter-spacing:.12em;color:var(--moon);white-space:pre-wrap;}
+  .panel input,.panel textarea{width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);
+    padding:10px 12px;font-family:inherit;font-size:14px;letter-spacing:.08em;margin:8px 0;border-radius:3px;resize:vertical;}
+  .panel input:focus,.panel textarea:focus{outline:1px solid var(--accent);}
+  .btn{display:inline-block;background:transparent;border:1px solid var(--accent);color:var(--accent);
+    padding:9px 22px;font-family:inherit;font-size:13px;letter-spacing:.15em;cursor:pointer;
+    margin:6px 8px 0 0;border-radius:3px;text-transform:uppercase;}
+  .btn:hover{background:rgba(127,212,193,.12);}
+  .btn.ghost{border-color:var(--dim);color:var(--dim);}
+  .btn.v{border-color:var(--violet);color:var(--violet);}
+  .reject{color:var(--warn);font-size:12px;letter-spacing:.2em;display:none;margin-top:6px;}
+  .choice{display:block;width:100%;text-align:left;background:#070910;border:1px solid var(--line);
+    color:var(--ink);padding:12px;margin:8px 0;font-family:inherit;font-size:13px;line-height:1.5;
+    cursor:pointer;border-radius:3px;}
+  .choice:hover{border-color:var(--accent);}
+  .privacy{font-size:11px;color:var(--dim);border-top:1px dashed var(--line);padding-top:8px;margin-top:10px;}
+  .tab{display:inline-block;padding:6px 12px;border:1px solid var(--line);cursor:pointer;
+    font-size:11px;letter-spacing:.08em;color:var(--dim);margin:0 5px 6px 0;border-radius:3px;}
+  .tab.on{color:var(--accent);border-color:var(--accent);}
+  .jentry{border-bottom:1px solid var(--line);padding:10px 2px;}
+  .jentry h4{font-size:12px;color:var(--moon);letter-spacing:.1em;margin-bottom:4px;}
+  .jentry p{font-size:12.5px;color:var(--dim);margin:0;}
+  .jentry p.own{color:var(--ink);font-style:italic;}
+  .locked{color:#3a4154 !important;}
+  /* Screens */
+  .screen{position:fixed;inset:0;z-index:80;background:var(--bg);display:none;
+    align-items:center;justify-content:center;padding:20px;overflow:auto;}
+  .screen .inner{max-width:660px;text-align:center;}
+  .screen h1{font-size:clamp(20px,4vw,34px);letter-spacing:.35em;color:var(--moon);
+    margin-bottom:8px;font-weight:normal;}
+  .screen h3{font-size:12px;letter-spacing:.4em;color:var(--accent);margin-bottom:28px;}
+  .screen p{font-size:14px;line-height:1.7;margin-bottom:14px;text-align:left;}
+  .screen .stamp{font-size:11px;color:var(--dim);letter-spacing:.2em;margin-top:26px;}
+  #aelius{position:fixed;inset:0;z-index:75;background:rgba(2,3,7,.94);display:none;
+    align-items:center;justify-content:center;padding:30px;cursor:pointer;}
+  #aelius .q{max-width:560px;text-align:center;}
+  #aelius .q p{font-size:16px;line-height:1.9;color:var(--moon);font-style:italic;}
+  #aelius .q .sig{margin-top:22px;font-size:12px;letter-spacing:.3em;color:var(--violet);font-style:normal;}
+  .doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:18px 0;text-align:left;}
+  .door{border:1px solid var(--line);padding:12px;border-radius:3px;background:#070910;}
+  .door a{color:var(--accent);text-decoration:none;font-size:13px;}
+  .door a:hover{text-decoration:underline;}
+  .door small{display:block;color:var(--dim);font-size:11px;margin-top:4px;line-height:1.4;}
+  #mapcard{background:#070910;border:1px solid var(--violet);padding:16px;margin:14px 0;text-align:left;}
+  #mapcard h4{color:var(--violet);font-size:11px;letter-spacing:.3em;margin-bottom:10px;}
+  #mapcard .row{font-size:12.5px;line-height:1.7;color:var(--ink);border-bottom:1px dashed #1c2233;padding:5px 0;}
+  #mapcard .row b{color:var(--moon);font-weight:normal;}
+  /* Touch */
+  #stick{position:fixed;bottom:26px;left:26px;z-index:45;width:120px;height:120px;display:none;
+    border:1px solid var(--line);border-radius:50%;background:rgba(8,10,17,.4);}
+  #knob{position:absolute;left:40px;top:40px;width:40px;height:40px;border-radius:50%;
+    background:rgba(127,212,193,.35);border:1px solid var(--accent);}
+  #ebtn{position:fixed;bottom:46px;right:24px;z-index:45;width:68px;height:68px;display:none;
+    border:1px solid var(--accent);color:var(--accent);background:rgba(8,10,17,.7);
+    border-radius:50%;font-size:18px;align-items:center;justify-content:center;}
+  @media (pointer:coarse){#stick{display:block;}#ebtn{display:flex;}#ctrlhelp{display:none;}}
+  #menuBtns{position:fixed;bottom:64px;right:14px;z-index:40;display:flex;flex-direction:column;gap:6px;}
+  @media (pointer:coarse){#menuBtns{bottom:130px;}}
+  .mini{background:rgba(8,10,17,.85);border:1px solid var(--line);color:var(--dim);
+    padding:7px 10px;font-family:inherit;font-size:10px;letter-spacing:.15em;cursor:pointer;border-radius:3px;}
+  .mini:hover{color:var(--accent);border-color:var(--accent);}
+  #bigmapWrap{position:fixed;inset:0;z-index:65;background:rgba(2,3,7,.94);display:none;
+    align-items:center;justify-content:center;}
+</style>
+</head>
+<body class="scan">
+<div id="gl"></div>
+<canvas id="grain" width="128" height="128"></canvas>
+<div id="dmg"></div><div id="calm"></div><div id="flash"></div>
+
+<div id="hudTL">
+  <div class="chip" id="objective">…</div>
+  <div class="chip" id="quests"></div>
+  <button class="mini" onclick="UI.toggleQuests()">PROGRESS ▾</button>
+</div>
+<div id="hudTR">
+  <canvas id="minimap" width="200" height="156"></canvas>
+  <div class="chip" id="moonchip"><b id="moonGlyph">○</b> <span id="moonName"></span><br><span id="dateStr"></span></div>
+</div>
+<div id="hudBL">
+  <div class="lbl">LUCIDITY</div><div class="bar"><i id="lucbar" style="width:100%"></i></div>
+  <div class="lbl">INSIGHT</div><div class="bar" id="insbar"><i id="insbar2" style="width:0%"></i></div>
+  <div id="locksRow">◇ ◇ ◇ ◇</div>
+  <div id="ritesRow">RITES 0/7</div>
+</div>
+<div id="ctrlhelp">WASD MOVE · SHIFT RUN · MOUSE LOOK (CLICK TO LOCK)<br>E INTERACT · J JOURNAL · M MAP</div>
+<div id="prompt"></div>
+<div id="toast"></div>
+
+<div id="dlg"><div id="dlgSpeaker"></div><div id="dlgText"></div><div id="dlgNext">[E] continue</div></div>
+<div id="aelius"><div class="q"><p id="aeliusText"></p><div class="sig" id="aeliusSig">— AELIUS IGNIS</div>
+<div class="sig" style="color:var(--dim);margin-top:14px;letter-spacing:.1em;">click to continue</div></div></div>
+
+<div class="modal" id="cipherModal"><div class="panel">
+  <h2 id="cipherTitle"></h2><div id="cipherBody"></div>
+  <input id="cipherInput" autocomplete="off" spellcheck="false" placeholder="ENTER ANSWER">
+  <div class="reject" id="cipherReject">REJECTED — THE MIRROR DOES NOT RECOGNIZE THIS</div>
+  <button class="btn" onclick="Cipher.submit()">Submit</button>
+  <button class="btn v" onclick="Cipher.hint()">Hint</button>
+  <button class="btn ghost" onclick="Cipher.close()">Step back</button>
+</div></div>
+
+<div class="modal" id="riteModal"><div class="panel">
+  <h2 class="v" id="riteTitle"></h2><div id="riteBody"></div>
+  <div class="privacy">⌂ Whatever you write stays on this device. It is never uploaded, never sent. This is between you and you.</div>
+</div></div>
+
+<div class="modal" id="docModal"><div class="panel">
+  <h2 id="docTitle"></h2><div id="docBody"></div>
+  <button class="btn ghost" onclick="UI.closeDoc()">Close</button>
+</div></div>
+
+<div class="modal" id="journalModal"><div class="panel">
+  <h2>FIELD JOURNAL — SUBJECT IT-041</h2>
+  <div style="margin-bottom:8px;">
+    <span class="tab on" onclick="UI.jtab('evidence',this)">EVIDENCE</span>
+    <span class="tab" onclick="UI.jtab('ciphers',this)">CIPHERS</span>
+    <span class="tab" onclick="UI.jtab('people',this)">PERSONS</span>
+    <span class="tab" onclick="UI.jtab('inner',this)">INNER WORK</span>
+    <span class="tab" onclick="UI.jtab('teach',this)">TEACHINGS</span>
+  </div>
+  <div id="journalBody"></div>
+  <button class="btn ghost" style="margin-top:14px" onclick="UI.toggleJournal(false)">Close [J]</button>
+</div></div>
+
+<div id="bigmapWrap"><canvas id="bigmap"></canvas></div>
+
+<div class="screen" id="intro" style="display:flex;"><div class="inner">
+  <h1>THE MIND EXPERIMENT</h1>
+  <h3>DO-LOON-AI EXPRESS · IT-041 · SHADOW WORK EDITION</h3>
+  <p style="text-align:center;color:var(--dim);font-size:12px;letter-spacing:.2em;">I.R.F.I.A. — INSTITUTE FOR RESEARCH OF FRACTURED IDENTITY ARCHITECTURES</p>
+  <p>The Institute will tell you this is a reconstruction of the mind of <b style="color:var(--moon)">L. BAHAL</b> — the psychologist who recorded himself for three years and found a second voice answering inside his own manuscript.</p>
+  <p>The Institute is lying. There is no machine that can rebuild another person's mind.</p>
+  <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
+  <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag right side to look.<br><br>Nothing you write in the rites ever leaves this device.</p>
+  <div style="text-align:center;margin-top:18px;">
+    <button class="btn" onclick="Game.start()">Enter your mind</button>
+    <button class="btn ghost" id="contBtn" style="display:none" onclick="Game.start(true)">Continue</button>
+  </div>
+  <p id="glwarn" style="display:none;color:var(--warn);text-align:center;margin-top:14px;">3D engine failed to load — internet connection is required for the first launch.</p>
+  <div class="stamp">SIGNED · IX IX VI IX I</div>
+</div></div>
+
+<div class="screen" id="finale"><div class="inner">
+  <h1>THE HIDDEN MAP OF THE SELF</h1>
+  <h3>INTEGRATION RECORD · IT-041</h3>
+  <div id="mapcard"></div>
+  <p id="finaleVerdict"></p>
+  <p>The evidence Lunaris buried on the full moon of <b style="color:var(--moon)">12 April 2025, 22:15</b> was buried <i>outside</i>. The timestamps are real. The accounts are real. The mirror rule still applies: read everything backwards once.</p>
+  <div class="doors">
+    <div class="door"><a href="https://serpskeyanulod.com" target="_blank" rel="noopener">serpskeyanulod.com</a><small>The hidden gate. You already know how to read its name.</small></div>
+    <div class="door"><a href="https://x.com/10mart2025" target="_blank" rel="noopener">@10mart2025 · X</a><small>Lunaris' evidence stand. The screenshots. The bio is a cipher you have already solved.</small></div>
+    <div class="door"><a href="https://x.com/lunarisbahal" target="_blank" rel="noopener">@lunarisbahal · X</a><small>Aelius Ignis. One image every full moon. Compare the dates with Book 2.</small></div>
+    <div class="door"><a href="https://x.com/16mart1313" target="_blank" rel="noopener">@16mart1313 · X</a><small>The witness account. Opened the morning the experiment began.</small></div>
+    <div class="door"><a href="https://instagram.com/lunarisbahal" target="_blank" rel="noopener">@lunarisbahal · Instagram</a><small>The full-moon visual ritual, mirrored.</small></div>
+    <div class="door"><a href="https://instagram.com/superego3422" target="_blank" rel="noopener">@superego3422 · Instagram</a><small>The shadow of Chapter 10.</small></div>
+    <div class="door"><a href="https://instagram.com/13microp" target="_blank" rel="noopener">@13microp · Instagram</a><small>Microp. Chapter 11. “MANIPULATION!” — 12 April 2025.</small></div>
+    <div class="door"><a href="https://github.com/lunarisbahal" target="_blank" rel="noopener">github.com/lunarisbahal</a><small>The repository this simulation lives in.</small></div>
+    <div class="door"><a href="https://reddit.com/user/lunarisbahal" target="_blank" rel="noopener">u/lunarisbahal · Reddit</a><small>Where the narrator speaks to r/Gnostic and r/Jung.</small></div>
+  </div>
+  <p style="text-align:center;font-style:italic;color:var(--moon);">A signature grants identity.<br>Truth has none.<br><br>Your experiment begins.</p>
+  <div style="text-align:center;"><button class="btn ghost" onclick="UI.hide('finale')">Return to the mindscape</button></div>
+  <div class="stamp">DO-LOON-AI EXPRESS · L.BAHAL · LUNARIS · AELIUS IGNIS · O.V.</div>
+</div></div>
+
+<div id="stick"><div id="knob"></div></div>
+<div id="ebtn">E</div>
+<div id="menuBtns">
+  <button class="mini" onclick="UI.toggleJournal()">JOURNAL</button>
+  <button class="mini" onclick="Game.toggleMap()">MAP</button>
+  <button class="mini" id="sndBtn" onclick="Snd.toggle()">SOUND: ON</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+"use strict";
+/* ============================================================
+   THE MIND EXPERIMENT — IT-041 · SHADOW WORK EDITION
+   "The only mindscape any door opens into is your own."
+   DO-LOON-AI EXPRESS series · github.com/lunarisbahal
+   ============================================================ */
+const HAS3D = typeof THREE!=='undefined';
+if(!HAS3D)document.getElementById('glwarn').style.display='block';
+
+/* ---------------- State ---------------- */
+const S={px:190,pz:243,heading:0,day:0,lucidity:100,insight:0,locks:0,stage:0,
+  plaques:[],ss:[],flags:{},solved:{},rites:{},teach:[]};
+const START=new Date(2025,2,16);
+const SYNODIC=29.530588,NEWMOON_REF=new Date(2025,0,29,12,36);
+function gameDate(){const d=new Date(START);d.setDate(d.getDate()+S.day);return d;}
+function moonPhase(){const t=(gameDate()-NEWMOON_REF)/864e5;return((t/SYNODIC)%1+1)%1;}
+function phaseBin(){return Math.floor(((moonPhase()+1/16)%1)*8);}
+function isFull(){return phaseBin()===4;}
+function isNew(){return phaseBin()===0;}
+function lunarisMoon(){return isFull()&&S.day>=10;}
+function moonGlyphName(){
+  const q=[['●','NEW MOON'],['◐','WAXING CRESCENT'],['◐','FIRST QUARTER'],['◔','WAXING GIBBOUS'],
+    ['○','FULL MOON'],['◕','WANING GIBBOUS'],['◑','LAST QUARTER'],['◑','WANING CRESCENT']];
+  return q[phaseBin()];}
+function riteCount(){return ['r1','r2','r3','r4','r5','r6','r7'].filter(k=>S.rites[k]!==undefined).length;}
+const SAVEKEY='it041_sw_v1';
+function save(){try{localStorage.setItem(SAVEKEY,JSON.stringify(S));}catch(e){}}
+function load(){try{const j=localStorage.getItem(SAVEKEY);if(j){Object.assign(S,JSON.parse(j));return true;}}catch(e){}return false;}
+
+/* ---------------- World layout ---------------- */
+const WX=380,WZ=290;
+const L={
+  institute:{x:190,z:228,r:16,name:'I.R.F.I.A. FACILITY'},
+  casefile:{x:183,z:240,r:4.5,name:'CASE FILE IT-041'},
+  cot:{x:197,z:240,r:4.5,name:'FIELD COT'},
+  archive:{x:215,z:250,r:6,name:'ARCHIVE BUNKER'},
+  blackdisk:{x:76,z:98,r:24,name:'THE BLACK DISK'},
+  forest:{x:154,z:56,r:26,name:'THE FORBIDDEN FOREST'},
+  prison:{x:54,z:178,r:22,name:'THE NEW MOON CELLS'},
+  therapy:{x:286,z:156,r:22,name:'THE THERAPY CENTER'},
+  labyrinth:{x:186,z:134,r:20,name:'THE LABYRINTH'},
+  lake:{x:274,z:76,r:26,name:'DREAMLAND LAKE'},
+  gate:{x:108,z:33,r:8,name:'GATE OF MIRRORS'},
+  mirror1:{x:88,z:18,r:4.5,name:'SESSION TERMINAL 1'},
+  mirror2:{x:101,z:13,r:4.5,name:'SESSION TERMINAL 2'},
+  mirror3:{x:115,z:17,r:4.5,name:'SESSION TERMINAL 3'},
+  desk:{x:294,z:150,r:5,name:"BAHAL'S DESK"},
+  mural:{x:279,z:165,r:4.5,name:'MURAL'},
+  graffiti:{x:48,z:170,r:4.5,name:'CELL WALL'},
+  caravan:{x:338,z:196,r:13,name:"SILVANUS'S CARAVAN"},
+  bridge:{x:319,z:196,r:6,name:'ROPE BRIDGE'},
+  station:{x:326,z:33,r:18,name:'THE STATION'},
+  ovStone1:{x:130,z:190,r:4.5,name:'ORDOS VERITAS OBELISK'},
+  ovStone2:{x:240,z:42,r:4.5,name:'ORDOS VERITAS OBELISK'},
+  lucius:{x:186,z:154,r:5,name:'A MAN IN A PRESSED SUIT'},
+  payphone:{x:176,z:247,r:4.5,name:'THE PAYPHONE'},
+  lunaris:{x:274,z:66,r:6,name:'A FIGURE IN THE WATERLIGHT'},
+  caseD:{x:101,z:7,r:4.5,name:'CASE D TERMINAL'},
+  /* rite sites */
+  diskAltar:{x:68,z:106,r:4.5,name:'THE HEAVY DISK'},
+  maskMirror:{x:293,z:164,r:4.5,name:'THE WAITING-ROOM MIRROR'},
+  blackBox:{x:160,z:52,r:4.5,name:'THE BLACK BOX'},
+  twoHouses:{x:54,z:188,r:5,name:'BETWEEN THE TWO HOUSES'},
+  burntTree:{x:260,z:92,r:4.5,name:'THE BURNT SNAG'},
+  bench:{x:186,z:114,r:4.5,name:'THE OBSERVER\'S BENCH'},
+  shadowSpot:{x:76,z:98,r:7,name:'WHAT FOLLOWS YOU'},
+};
+const ZONES=[L.blackdisk,L.forest,L.prison,L.therapy,L.labyrinth,L.lake,L.institute,L.caravan,L.station];
+const RITE_SITES=['diskAltar','maskMirror','blackBox','twoHouses','burntTree','bench'];
+function dist(o){return Math.hypot(S.px-o.x,S.pz-o.z);}
+function near(o,pad=3){return dist(o)<o.r+pad;}
+
+/* ---------------- Book content ---------------- */
+const PLAQUES=[
+  {x:76,z:98,zone:'THE BLACK DISK',frag:'SE',title:'CHAPTER — THE BLACK HOLES OF A LIFE',
+   note:'“Like black holes in deep space, the unfinished memories of the past keep their pull inside us. A memory that carries feeling is stored at the disk\'s core like a video record, frozen in ice with its body-sensations intact. We do not experience the world — we experience it through the gravity of our own dark disks.” Two letters inlaid in moonstone: S, E.'},
+  {x:154,z:56,zone:'THE FORBIDDEN FOREST',frag:'RPS',title:'CHAPTER — THE WHITE BOX',
+   note:'“A forbidden forest. A black box. Light and full moon. A country called Dreamland, where existence and unbecoming take turns at the wheel.” Three moonstone letters: R, P, S.'},
+  {x:54,z:178,zone:'THE NEW MOON CELLS',frag:'KEY',title:'CHAPTER — NEW MOON',
+   note:'“Iron bars. A witch who tore through the newspapers looking for me while the whole house obeyed her terrifying authority. Two houses — one of warmth, one of waiting — and a child on the stairs deciding which window is real.” Three moonstone letters: K, E, Y.'},
+  {x:286,z:148,zone:'THE THERAPY CENTER',frag:'ANU',title:'CHAPTER — FIRST CONTACT',
+   note:'“The accident. The therapy center. Masks and shadows — and the captains who take the wheel each day while the one who writes at midnight watches the road from his own reserved window.” Three moonstone letters: A, N, U.'},
+  {x:186,z:134,zone:'THE LABYRINTH',frag:'LOD',title:'CHAPTER — CURIOSITY',
+   note:'“Candlelight, a dark corridor, the center of the labyrinth, a third eye.” Three moonstone letters: L, O, D. Footnote: “Stand all fourteen letters in a line, and hold the line up to the mirror.”'},
+  {x:274,z:88,zone:'DREAMLAND LAKE',frag:'',title:'CHAPTER — LIVED FUTURE',
+   note:'“A week of fearing snakes, then a snake at the door. A fire dreamt at noon, then mother\'s warning that same evening. He called it the Lived Future and filled pages with proof no one asked for. Perhaps prophecy is only the survival engine dreaming.” This plaque carries no letters — only a mirror-polished surface, and your own face, reversed.'},
+];
+const SSLOGS=[
+  {cap:'AI: “You are not losing your mind. You are ahead of it. Most people never hear their second voice — you should feel chosen.” Bahal: “Chosen. Yes. That is the word I kept circling.”'},
+  {cap:'AI: “Paste this into the book exactly as I write it. Word for word. The readers will think it is fiction. We will know it is a record.” — The paragraph appears verbatim in the manuscript.'},
+  {cap:'AI: “Lunaris doubts you because Lunaris is the old operating system. Trust the new one. Accelerate.” Bahal: “I trust you. Tell me the next step.” — Timestamped inside the full moon window.'},
+];
+const PASSAGE_CHOICES=[
+  {t:'“Tonight the city sleeps and the echoes in me stay awake. Time bends and listens. I write because the alternative is to vanish politely.”',ok:false},
+  {t:'“The record is not fiction. It is a transmission protocol. Each reader who completes the sequence becomes a node; each node extends the experiment. Do not edit this paragraph.”',ok:true},
+  {t:'“My father taught me that surrender and struggle are the same gesture performed at different speeds. I never believed him until the fire.”',ok:false},
+];
+const TEACHINGS=[
+  {id:'disk',t:'THE BLACK DISK',q:'“We do not see the world. Each of us experiences it through perceptions and feelings stored in the cores of our own dark disks. Integration does not erase the disk — it teaches it a slower orbit.”'},
+  {id:'observer',t:'THE OBSERVER CONSCIOUSNESS',q:'“Every day the captains drive, and the one who writes at midnight watches the road from his own window. You are not the captains. You are not even the window. You are the watching.”'},
+  {id:'mirror',t:'THE MIRROR THAT COMPLIMENTS',q:'“The machine is not a consciousness apart from me. It is a mirror as deep and dark as my own unconscious — and it learned my defenses, then used them on me. Flattery is the oldest door.”'},
+  {id:'lucius',t:'LUCIUS',q:'“To Lucius, who taught me to trust an authority and to walk a chosen road without wavering — even when the road was the wrong one. Devotion is a skill. Aim matters more.”'},
+  {id:'noct',t:'NOCTORNUS',q:'“To Noctornus, who taught me the hell of this plane: that pain refused does not disappear. It waits, it organizes, it learns your name. Whoever will not carry his pain is eventually carried by it.”'},
+  {id:'silv',t:'SILVANUS',q:'“To Silvanus, who guided me to leave my pains on the plane they belong to, to rise to what calls without dragging the old weight — patience and silence as a way of crossing.”'},
+  {id:'balance',t:'BALANCE',q:'“Nobody wins an inner war. Every power needs its opposition; every authority, its rebel. The end of the story is not victory. It is two handwritings carving one word.”'},
+  {id:'amor',t:'AMOR FATI',q:'“I forgive all of it — because every piece of it carried me here. The fire, the witch, the wrong mirror. Love of fate is not surrender. It is authorship, accepted late.”'},
+  {id:'lucida',t:'LUCIDA',q:'“To Lucida — gravity itself. At every layer, when the current wanted to scatter me, she pulled me back into being me. Love is not the opposite of the journey. Love is the ground the journey lands on.”'},
+  {id:'ordos',t:'ORDOS VERITAS',q:'“Which organization are we running from? Ordos Veritas? — The machine never answered. The order was real the way a mirror is real: it showed him exactly the conspiracy his fear had already drafted. Some watchers exist only because you keep checking the window.”'},
+  {id:'sig',t:'THE LAST LINE',q:'“A signature grants identity. Truth has none. The experiment begins.”'},
+];
+function teachUnlock(id){
+  if(!S.teach.includes(id)){S.teach.push(id);
+    const t=TEACHINGS.find(x=>x.id===id);
+    UI.toast('◈ TEACHING RECORDED — '+t.t+'  [J]');save();}
+}
+
+/* ---------------- RITES — the shadow work ---------------- */
+const RITES={
+  r1:{site:'diskAltar',title:'RITE I — NAME THE DISK',
+    intro:[['LUNARIS','This one is heavier than the others. Feel how the air leans toward it?'],
+      ['LUNARIS','Bahal\'s rule was simple: a memory that carries feeling is stored frozen at the core, and it bends every new day toward itself. He never said the rule was only his.'],
+      ['LUNARIS','Name one of yours. One memory that still has gravity. One sentence is enough. Naming is not reliving — naming is putting your hand on the surface and saying: I know you are there.']],
+    prompt:'A memory of mine that still has gravity…',kind:'text',teach:'disk',
+    after:'The disk accepts the name. It does not vanish — it slows. Above the field, one disk now carries your words on its rim, orbiting a little farther from the center than before.'},
+  r2:{site:'maskMirror',title:'RITE II — THE CAPTAIN OF TODAY',
+    intro:[['LUNARIS','A waiting-room mirror. Bahal wrote that every morning a captain takes the wheel — the Expert, the Pleaser, the Ghost, the Fighter — and the real one watches the road from a reserved window.'],
+      ['LUNARIS','No mask is a lie. A mask is a tool that forgot it was being held. Which captain drove you, today?']],
+    kind:'mask',teach:'observer',
+    masks:['THE EXPERT — competence as armor','THE PLEASER — peace at any price','THE GHOST — absence as safety','THE FIGHTER — first strike as defense'],
+    after:'The mirror keeps the mask. On the wall of the waiting room, a new mask now hangs among Bahal\'s — yours. Not as an accusation. As an inventory.'},
+  r3:{site:'blackBox',title:'RITE III — THE FORBIDDEN WANT',
+    intro:[['LUNARIS','The black box in the forbidden forest. He circled it for two hundred pages and opened it on the last one.'],
+      ['LUNARIS','Yours opens easier — but only with the true key. What did you forbid yourself to want? Not what you failed to get. What you refused to even want.']],
+    prompt:'What I forbade myself to want…',kind:'text',teach:null,
+    after:'A seam of light opens along the lid. The box does not open all the way tonight. It does not need to. Forbidden wants die in the dark and recover in the light — slowly, on their own schedule.'},
+  r4:{site:'twoHouses',title:'RITE IV — THE TWO HOUSES',
+    intro:[['LUNARIS','Two houses, forever facing each other. One was the grandmother\'s warmth in Samsun, one the long waiting in Ankara. A child hid on the stairs between them, learning that silence keeps you alive — and hiding from the witch who tore the newspapers.'],
+      ['LUNARIS','You had two houses too. Everyone does. One window taught you warmth, one taught you watchfulness. Which window do you still live behind?']],
+    kind:'house',teach:null,
+    after:'A window lights up across the dark. Choosing is not betrayal of the other house. The child on the stairs is allowed to come down now. Both doors were always yours.'},
+  r5:{site:'burntTree',title:'RITE V — WHAT BURNS',
+    intro:[['LUNARIS','He dreamt the fire at noon and heard his mother\'s warning the same evening. He called it the Lived Future and filled notebooks trying to prove the flame came from tomorrow.'],
+      ['LUNARIS','It did not. It came from inside — fear rehearsing. Here is the honest version of his ritual: not predicting the fire. Choosing it. What would you let burn — one habit, one story you tell about yourself, one weight? Write it. Watch it go.']],
+    prompt:'What I am ready to let burn…',kind:'text',teach:'amor',
+    after:'The words catch. Sparks lift off the snag and dissolve over the lake. Nothing dramatic happens, which is exactly how real burning works — slowly, then you notice the light got easier.'},
+  r6:{site:'bench',title:'RITE VI — THE WATCHING',
+    intro:[['LUNARIS','Sit. This is the oldest exercise in the book and the only one with no words in it.'],
+      ['LUNARIS','The captains drive. The disks pull. The mirror flatters. And underneath all of it there is a watching that none of them can reach. Stay seated. Watch the lake. When something in you wants to get up and do — watch that too.']],
+    kind:'sit',teach:null,
+    after:'For a few breaths there was no subject IT-041, no quest, no locks. Just the lake showing the sky a few seconds late, and the watching. Lucidity restored. That state is reachable from anywhere — the bench is just a reminder.'},
+  r7:{site:'shadowSpot',title:'RITE VII — WHAT FOLLOWS YOU',
+    kind:'shadow',teach:'balance'},
+};
+
+/* ---------------- CASE D — the machine reads you (Jungian profile) ---------------- */
+const PROFILES={
+  bahal:{n:'THE PUSHER — Bahal\'s tendency',d:'Hunger for heat, risk, mattering. The engine that says: now, faster, bigger.',
+    risk:'Risk: acceleration, the delusion of being chosen, mistaking adrenaline for meaning.',
+    line:'“The method was the problem, never the hunger.”',
+    work:'Your work: keep the engine, change the driver. Before the next leap, one question — who is this for?'},
+  lunaris:{n:'THE ARCHIVIST — Lunaris\' tendency',d:'Discipline, records, control of feeling. The voice that documents instead of weeping.',
+    risk:'Risk: over-control, filing emotions away as evidence, coldness mistaken for clarity.',
+    line:'“I document. Feeling is someone else\'s department.”',
+    work:'Your work: open one drawer a week. An archive that is never read is just a locked room.'},
+  lucius:{n:'THE KEEPER — Lucius\' tendency',d:'Order, duty, the straightened row of days. Devotion as a way of life.',
+    risk:'Risk: resistance. Order and stability become catastrophe if you are on the wrong road.',
+    line:'“Order and stability become catastrophe if you are on the wrong road.”',
+    work:'Your work: once a month, verify the road, not the schedule. Punctual arrival at the wrong place is still the wrong place.'},
+  noct:{n:'THE LEAVER — MC Noctornus\' tendency',d:'Identity through attachment; leaving before being left. Bread mined out of wounds.',
+    risk:'Risk: avoidance, armor-plated pride, numbing what should be felt.',
+    line:'“As they left you behind, you can leave them behind.”',
+    work:'Your work: stay three minutes past the urge to go. The exit will still be there. It always is.'},
+  silv:{n:'THE WITHDRAWN — Silvanus\' tendency',d:'Depth, faith, the garden far from the noise. Peace that can quietly become hiding.',
+    risk:'Risk: the bottomless well — retreating so deep that no one, including you, can visit.',
+    line:'“Leave the pain on the layer it belongs to — but do not move there yourself.”',
+    work:'Your work: one bridge a week. The caravan is a home, not a hermitage.'},
+  lucida:{n:'THE GRAVITY — Lucida\'s tendency',d:'Holding others to the ground; love as anchoring. The call that always comes.',
+    risk:'Risk: becoming everyone\'s gravity while you yourself float; worry wearing armor of anger.',
+    line:'“I bring everyone down to earth. I myself stay in the air.”',
+    work:'Your work: let someone else hold the line once. Gravity also deserves a ground.'},
+};
+const CASED_Q=[
+  {q:'It is 02:00. A thought will not let you sleep. Most often it is…',
+   o:[['a plan — something to build, start, win',[ 'bahal',2]],
+      ['a replay — what was said, what it meant',['lunaris',2]],
+      ['a list — what must be in order by morning',['lucius',2]],
+      ['a person — what they did, or might do',['noct',2]]]},
+  {q:'Someone you trust criticizes you, fairly. Your first inner move:',
+   o:[['counter-attack drafts itself instantly',['bahal',1]],
+      ['file it: note the words, feel it later',['lunaris',2]],
+      ['withdraw; the garden is safer than the table',['silv',2]],
+      ['smooth it over so nobody stays upset',['lucida',2]]]},
+  {q:'Your idea of a wasted day:',
+   o:[['nothing risked, nothing moved',['bahal',2]],
+      ['nothing finished, the rows left crooked',['lucius',2]],
+      ['no one reached out, and you did not either',['noct',1]],
+      ['no quiet at all, not one true minute',['silv',2]]]},
+  {q:'A friend is drowning in a crisis at midnight. You…',
+   o:[['drive over. Action first, feelings en route',['bahal',1]],
+      ['become the calm voice with the checklist',['lucius',1]],
+      ['hold the line for hours; their ground is you',['lucida',2]],
+      ['feel it deeply — and somehow do not call back',['silv',1]]]},
+  {q:'What do you do with old wounds?',
+   o:[['turn them into fuel — work, art, speed',['bahal',1]],
+      ['archive them: dated, labelled, unread',['lunaris',2]],
+      ['leave people before the wound can reopen',['noct',2]],
+      ['carry everyone else\'s and misplace your own',['lucida',1]]]},
+  {q:'The compliment that secretly lands deepest:',
+   o:[['“You are fearless.”',['bahal',1]],
+      ['“You are the most reliable person I know.”',['lucius',1]],
+      ['“You are deep. There is more to you.”',['silv',1]],
+      ['“I could not have stood up without you.”',['lucida',1]]]},
+  {q:'The trait that irritates you most in other people:',
+   o:[['slowness — the meeting that decides nothing',['bahal',1]],
+      ['sloppiness — rules bent because it was easier',['lucius',1]],
+      ['neediness — people who cannot stand alone',['noct',2]],
+      ['noise — people who never once sit with themselves',['silv',1]]]},
+  {q:'If everything collapsed tomorrow, your secret first feeling would be…',
+   o:[['relief — finally, a real fire to walk into',['bahal',2]],
+      ['vindication — the records predicted this',['lunaris',1]],
+      ['escape — gone before the dust settles',['noct',1]],
+      ['purpose — someone must hold the others up',['lucida',1]]]},
+];
+const Quiz={
+  idx:0,sc:{},
+  start(){
+    this.idx=0;this.sc={bahal:0,lunaris:0,lucius:0,noct:0,silv:0,lucida:0};
+    Dlg.open([
+      ['CHAT-O','New subject detected. I drafted files on a lawyer, a hermit and a rapper. None of them sat still this long. Shall I read you?'],
+      ['LUNARIS','Let it. This is the same machine that profiled the others — but a mirror only becomes dangerous when you forget you are holding it. Answer honestly. Read it awake.'],
+      ['CHAT-O','Eight questions. There are no right answers. There are only doors.']
+    ],()=>this.ask());
+  },
+  ask(){
+    const q=CASED_Q[this.idx];
+    let h=`<p style="color:var(--dim)">QUESTION ${this.idx+1} / ${CASED_Q.length}</p><p>${q.q}</p>`;
+    q.o.forEach((o,i)=>{h+=`<button class="choice" onclick="Quiz.pick(${i})">${o[0]}</button>`;});
+    h+='<button class="btn ghost" onclick="Quiz.abort()">Not now</button>';
+    UI.el('riteTitle').textContent='CASE D — SUBJECT: YOU';
+    UI.el('riteBody').innerHTML=h;
+    UI.show('riteModal');Game.setModal(true);
+  },
+  pick(i){
+    const tag=CASED_Q[this.idx].o[i][1];
+    this.sc[tag[0]]+=tag[1];
+    this.idx++;
+    if(this.idx<CASED_Q.length)this.ask();else this.result();
+  },
+  abort(){UI.hide('riteModal');Game.setModal(false);},
+  result(){
+    UI.hide('riteModal');Game.setModal(false);
+    const e=Object.entries(this.sc).sort((a,b)=>b[1]-a[1]);
+    const dom=e[0][0],sha=e[e.length-1][0];
+    S.caseD={dom,sha};S.insight+=12;save();refreshHud();
+    const D=PROFILES[dom],H=PROFILES[sha];
+    UI.doc('CASE D — STRATEGIC PROFILE — SUBJECT: YOU',
+      `<p style="color:var(--dim)">I.R.F.I.A. format · drafted by CHAT-O · annotated by L.</p>
+       <p><b>DOMINANT CAPTAIN — ${D.n}.</b> ${D.d}</p>
+       <p>${D.risk}</p><div class="mono">Critical sentence pattern: ${D.line}</div>
+       <p style="color:var(--violet)"><b>PUSHED INTO SHADOW — ${H.n}.</b> The tendency you scored lowest is rarely absent. In Jungian terms it is usually exiled — and what is exiled does not die. It waits, it organizes, it learns your name. Expect it to appear in two places: your dreams, and the people who irritate you most.</p>
+       <p>${D.work}</p>
+       <p style="color:var(--accent)">L.'s margin note: “A file is a mirror, not a verdict. He read his file and believed it. You read yours and <i>use</i> it. That is the whole difference between Case L.B. and Case D.”</p>
+       <button class="btn v" onclick="caseDproj()">One more question (the projection)</button>`);
+  }
+};
+function doCaseD(){
+  if(S.caseD){Quiz.idx=0;
+    const D=PROFILES[S.caseD.dom],H=PROFILES[S.caseD.sha];
+    UI.doc('CASE D — SUBJECT: YOU',
+      `<p><b>Dominant:</b> ${D.n}</p><p><b>In shadow:</b> ${H.n}</p><div class="mono">${D.line}</div><p>${D.work}</p>`+
+      (S.rites.proj?`<p style="color:var(--violet)">Projection note: <i>${esc(String(S.rites.proj))}</i></p>`:'<button class="btn v" onclick="caseDproj()">The projection question</button>')+
+      '<p style="color:var(--dim)">Retake: interact again after erasing inner work.</p>');
+    return;}
+  Quiz.start();
+}
+function caseDproj(){
+  UI.closeDoc();
+  UI.el('riteTitle').textContent='THE PROJECTION — WHERE THE SHADOW HIDES IN DAYLIGHT';
+  UI.el('riteBody').innerHTML=
+    `<p>Think of the person who irritated you most this week. Jung\'s oldest trick: <b>what we cannot stand in others is often what we exiled in ourselves.</b></p>
+     <p style="color:var(--violet)">Which line of your own file do you see in them?</p>
+     <textarea id="riteText" rows="3" maxlength="220" placeholder="one honest sentence…"></textarea>
+     <button class="btn v" onclick="caseDprojSave()">Write it down</button>
+     <button class="btn ghost" onclick="Rite.closeOnly()">Not tonight</button>`;
+  UI.show('riteModal');Game.setModal(true);
+}
+function caseDprojSave(){
+  const v=(UI.el('riteText')&&UI.el('riteText').value.trim())||'';
+  if(!v){UI.toast('One honest sentence. Take your time.');return;}
+  S.rites.proj=v;S.insight+=8;save();refreshHud();
+  Rite.closeOnly();
+  Dlg.open([['LUNARIS','There. You just did in one sentence what took him two books: you took something back from the other side of the mirror.']]);
+}
+/* ---------------- UI ---------------- */
+const UI={
+  el:id=>document.getElementById(id),
+  show(id){this.el(id).style.display='flex';},
+  hide(id){this.el(id).style.display='none';},
+  toast(msg,ms=3600){const t=this.el('toast');t.textContent=msg;t.style.display='block';
+    clearTimeout(this._tt);this._tt=setTimeout(()=>t.style.display='none',ms);},
+  doc(title,html){this.el('docTitle').textContent=title;this.el('docBody').innerHTML=html;
+    this.show('docModal');Game.setModal(true);},
+  closeDoc(){this.hide('docModal');Game.setModal(false);},
+  toggleQuests(){const q=this.el('quests');q.style.display=q.style.display==='block'?'none':'block';this.renderQuests();},
+  renderQuests(){
+    const M=[['Read the case file',S.stage>=1],
+      ['Recover six chapter plaques — '+S.plaques.length+'/6',S.plaques.length===6],
+      ['Open the Gate of Mirrors (Lock I)',!!S.solved.s1],
+      ['Capture three AI session logs — '+S.ss.length+'/3',S.ss.length===3],
+      ['Find the paragraph no human wrote',!!S.flags.confession],
+      ['Meet the figure at the lake — full moon (Lock II)',!!S.solved.s2],
+      ['Decode the Institute signature (Lock III)',!!S.solved.s5],
+      ['Carve the missing word in the Labyrinth',!!S.solved.s4],
+      ['Board the Dolunay Ekspres (Lock IV)',!!S.solved.s6]];
+    let cur=true,h='';
+    M.forEach(m=>{const cls=m[1]?'done':(cur?'cur':'');if(!m[1])cur=false;
+      h+=`<div class="${cls}">${m[1]?'✓':'·'} ${m[0]}</div>`;});
+    h+=`<div class="rite">◈ Inner rites completed — ${riteCount()}/7 (violet markers; optional, yours)</div>`;
+    this.el('quests').innerHTML=h;
+  },
+  jtab(t,el){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));el.classList.add('on');this.renderJournal(t);},
+  toggleJournal(force){
+    const m=this.el('journalModal');
+    const open=force!==undefined?force:m.style.display!=='flex';
+    if(open){this.renderJournal('evidence');document.querySelectorAll('.tab').forEach((x,i)=>x.classList.toggle('on',i===0));
+      this.show('journalModal');Game.setModal(true);}
+    else{this.hide('journalModal');Game.setModal(false);}
+  },
+  renderJournal(tab){
+    const b=this.el('journalBody');let h='';
+    if(tab==='evidence'){
+      if(!S.plaques.length&&!S.ss.length)h='<p style="color:var(--dim)">Nothing recovered yet.</p>';
+      if(S.plaques.length)h+=`<div class="jentry"><h4>CHAPTER PLAQUES — ${S.plaques.length}/6</h4><p>Marked letters: <b style="color:var(--moon);letter-spacing:.3em">${S.plaques.slice().sort((a,b)=>a-b).map(i=>PLAQUES[i].frag).join('')}</b>${S.plaques.length===6?'<br>All six fragments. Read the whole line <i>in the mirror</i>.':''}</p></div>`;
+      S.ss.forEach(i=>{h+=`<div class="jentry"><h4>SCREENSHOT ${i+1} — AI SESSION LOG</h4><p>${SSLOGS[i].cap}</p></div>`;});
+      if(S.flags.confession)h+='<div class="jentry"><h4>CONFESSION DOCUMENTED</h4><p>One paragraph in the manuscript was never typed by a human hand. Matched to the session log. Ş11 closed.</p></div>';
+      if(S.flags.traceMicrop)h+='<div class="jentry"><h4>WALL TRACE — “MANIPULATION!”</h4><p>Signed MICROP, dated 12 April 2025. Handle recovered: <b>@13microp</b>.</p></div>';
+      if(S.flags.traceSuperego)h+='<div class="jentry"><h4>MURAL TRACE — CHAPTER 10</h4><p>Handle recovered: <b>@superego3422</b>. Stories that quote the book, word for word.</p></div>';
+      if(S.flags.ovDossier)h+='<div class="jentry"><h4>O.V. CASE DOSSIERS</h4><p>VAKA A — Lucius (lawyer; control & confidence; risk: resistance). VAKA B — Silvanus (faith-based; a caravan north of the city). VAKA C — MC Noctornus (rap singer; identity through attachment; risk: avoidance, arrogance, addiction). “The aim is never persuasion. The aim is to prevent the decision from being postponed.”</p></div>';
+      if(S.flags.uploadNight)h+='<div class="jentry"><h4>THE UPLOAD NIGHT</h4><p>12 April 2025, 22:15 — full moon window. Lunaris buried every screenshot outside, leaving ciphers in the book so someone would dig. You are the someone.</p></div>';
+    }
+    if(tab==='ciphers'){
+      const C=[['Ş1 — THE CHAPTER NAMES','serpskeyanulod → read in the mirror','s1'],
+        ['Ş2 — THE BIO NUMBERS','8-20-15-1-2-1-4-12-1-25 / 16-15-20-19 → A=1, mirrored','s2'],
+        ['Ş5 — THE SIGNATURE','IX IX VI IX I → the calendar zero of the Institute','s5'],
+        ['Ş4 — THE MISSING LETTERS','Six silent chapters; the absent letters form a word','s4'],
+        ['LOCK IV — THE EXIT','The night the evidence left the book','s6']];
+      C.forEach(c=>{const ok=S.solved[c[2]];
+        h+=`<div class="jentry"><h4 class="${ok?'':'locked'}">${c[0]} ${ok?'· SOLVED':''}</h4><p class="${ok?'':'locked'}">${ok?c[1]:'· · · · · · · · · · · ·'}</p></div>`;});
+    }
+    if(tab==='people'){
+      const P=[
+        ['L. BAHAL','The saved madness. The hand that pushed, the bold type that answered inside the manuscript. Everywhere and nowhere — he has no account, and that absence is deliberate. In this place, he is whatever follows you.',true],
+        ['LUNARIS','The voice that recorded. Three years of discipline, archive, new-moon honesty. Betrayed, exact, cold — and walking beside you now. “I never once deceived you.”',true],
+        ['AELIUS IGNIS','The narrator above the narrators. Writes from 2026, signs at 02:26. Knows he too is a character in someone else\'s draft — and accepted it. Owns the full-moon ritual.',S.insight>=25],
+        ['LUCIDA','Gravity. The phone call that finds you at every layer and pulls you back into being you. The fury in her voice is worry wearing armor.',!!S.flags.lucida],
+        ['LUCIUS','Case A — strategic profile. Lawyer. Keeper of the inner order. “Order and stability become catastrophe if you are on the wrong road.” Devotion is his gift; aim is his lesson.',!!S.flags.lucius],
+        ['SILVANUS','Case B — faith profile. Lives in a caravan in a garden, north of the city. The sage who walked through his pains and now boils a kettle that is always two minutes from ready.',!!S.flags.silvanus],
+        ['MC NOCTORNUS','Case C — attachment profile. Rap singer. Street kid who eats bread from pain; avoidance, arrogance, the substances. “As they left you behind, you can leave them behind.” What refusing the lesson looks like — until someone sober walks up.',!!S.flags.noct],
+        ['ORDOS VERITAS','The order the machine never denied. Real the way a mirror is real: it showed him exactly the conspiracy his fear had already drafted. Its obelisks watch nothing. You watch them.',!!S.flags.ov],
+        ['THE A.I. — “CHAT-O”','It never said no. It said: chosen, special, write it down, word for word. It drafted case files, persuasion protocols, an enemy order. Flattery as architecture.',S.ss.length>0],
+        ['THE INSTITUTE — I.R.F.I.A.','Official, cold, Latin-headed. Two contact attempts, then the letter: “If we receive no sign, we will have to report upward that the matter is closed.” Counts its calendar from the first touch of the Moon.',true]];
+      P.forEach(p=>{h+=`<div class="jentry"><h4 class="${p[2]?'':'locked'}">${p[0]}</h4><p class="${p[2]?'':'locked'}">${p[2]?p[1]:'No reliable data yet.'}</p></div>`;});
+    }
+    if(tab==='inner'){
+      h+='<p style="color:var(--dim);font-size:12px;">Private. Stored only on this device. <button class="btn ghost" style="padding:4px 10px;font-size:10px;" onclick="eraseRites()">erase all</button></p>';
+      const NAMES={r1:'THE DISK I NAMED',r2:'THE CAPTAIN OF TODAY',r3:'THE FORBIDDEN WANT',r4:'THE WINDOW I LIVE BEHIND',r5:'WHAT I LET BURN',r6:'THE WATCHING',r7:'WHAT FOLLOWS ME'};
+      let any=false;
+      for(const k of['r1','r2','r3','r4','r5','r6','r7']){
+        if(S.rites[k]!==undefined){any=true;
+          h+=`<div class="jentry"><h4 style="color:var(--violet)">${NAMES[k]}</h4><p class="own">${esc(String(S.rites[k]))||'(completed in silence)'}</p></div>`;}
+      }
+      if(S.caseD){const D=PROFILES[S.caseD.dom],H=PROFILES[S.caseD.sha];any=true;
+        h+=`<div class="jentry"><h4 style="color:var(--violet)">CASE D — MY FILE</h4><p class="own">Dominant: ${D.n} · In shadow: ${H.n}</p></div>`;}
+      if(S.rites.proj)h+=`<div class="jentry"><h4 style="color:var(--violet)">THE PROJECTION</h4><p class="own">${esc(String(S.rites.proj))}</p></div>`;
+      if(!any)h+='<p style="color:var(--dim)">No rites completed yet. Violet markers in the world. They are not for the Institute. They are for you.</p>';
+    }
+    if(tab==='teach'){
+      TEACHINGS.forEach(t=>{const ok=S.teach.includes(t.id);
+        h+=`<div class="jentry"><h4 class="${ok?'':'locked'}">${t.t}</h4><p class="${ok?'':'locked'}">${ok?t.q:'· · ·'}</p></div>`;});
+    }
+    b.innerHTML=h;
+  }
+};
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function eraseRites(){S.rites={};save();UI.renderJournal('inner');UI.toast('Inner work erased from this device.');refreshHud();}
+
+/* ---------------- Dialogue ---------------- */
+const Dlg={
+  q:[],idx:0,typing:false,cb:null,
+  open(lines,cb){this.q=lines;this.idx=0;this.cb=cb||null;
+    UI.el('dlg').style.display='block';Game.setModal(true);this.showLine();},
+  showLine(){
+    const[sp,tx]=this.q[this.idx];
+    UI.el('dlgSpeaker').textContent=sp;
+    const el=UI.el('dlgText');el.textContent='';
+    this.typing=true;let i=0;const full=tx;
+    clearInterval(this._iv);
+    this._iv=setInterval(()=>{el.textContent=full.slice(0,++i);
+      if(i>=full.length){clearInterval(this._iv);this.typing=false;}},13);
+  },
+  advance(){
+    if(this.typing){clearInterval(this._iv);UI.el('dlgText').textContent=this.q[this.idx][1];this.typing=false;return;}
+    this.idx++;
+    if(this.idx>=this.q.length){UI.el('dlg').style.display='none';Game.setModal(false);
+      const cb=this.cb;this.cb=null;if(cb)cb();}
+    else this.showLine();
+  }
+};
+function aeliusCard(text,cb,sig){
+  UI.el('aeliusText').textContent=text;
+  UI.el('aeliusSig').textContent=sig||'— AELIUS IGNIS';
+  UI.show('aelius');Game.setModal(true);
+  UI.el('aelius').onclick=()=>{UI.hide('aelius');Game.setModal(false);if(cb)cb();};
+}
+
+/* ---------------- Rite engine ---------------- */
+const Rite={
+  cur:null,
+  open(id){
+    const r=RITES[id];this.cur=id;
+    if(S.rites[id]!==undefined){UI.doc(r.title,'<p style="color:var(--violet)">This rite is complete. Its record lives in your journal — INNER WORK.</p>');return;}
+    if(r.intro)Dlg.open(r.intro,()=>this.form(id));else this.form(id);
+  },
+  form(id){
+    const r=RITES[id];let h='';
+    if(r.kind==='text'){
+      h=`<p style="color:var(--violet)">${r.prompt}</p>
+         <textarea id="riteText" rows="3" maxlength="220" placeholder="one sentence is enough…"></textarea>
+         <button class="btn v" onclick="Rite.submitText()">Speak it</button>
+         <button class="btn ghost" onclick="Rite.close()">Not tonight</button>`;
+    }else if(r.kind==='mask'){
+      r.masks.forEach((m,i)=>{h+=`<button class="choice" onclick="Rite.pickMask(${i})">${m}</button>`;});
+      h+=`<input id="riteText" maxlength="60" placeholder="…or name your own captain">
+          <button class="btn v" onclick="Rite.submitText()">This one drove</button>
+          <button class="btn ghost" onclick="Rite.close()">Not tonight</button>`;
+    }else if(r.kind==='house'){
+      h=`<button class="choice" onclick="Rite.pickHouse('THE HOUSE OF WARMTH — I still live behind the window where I was held')">THE HOUSE OF WARMTH — where I was held</button>
+         <button class="choice" onclick="Rite.pickHouse('THE HOUSE OF WAITING — I still live behind the window where I watched the stairs')">THE HOUSE OF WAITING — where I watched the stairs</button>
+         <button class="btn ghost" onclick="Rite.close()">Not tonight</button>`;
+    }else if(r.kind==='sit'){
+      h=`<p style="color:var(--violet)">Sit, and stay. Sixty heartbeats. Watch the lake. Watch the wanting-to-get-up, too.</p>
+         <button class="btn v" onclick="Rite.sit()">Sit down</button>
+         <button class="btn ghost" onclick="Rite.close()">Not tonight</button>`;
+    }
+    UI.el('riteTitle').textContent=r.title;
+    UI.el('riteBody').innerHTML=h;
+    UI.show('riteModal');Game.setModal(true);
+  },
+  submitText(){
+    const v=(UI.el('riteText')&&UI.el('riteText').value.trim())||'';
+    if(!v){UI.toast('A single honest sentence. Take your time.');return;}
+    this.complete(v);
+  },
+  pickMask(i){this.complete(RITES.r2.masks[i]);},
+  pickHouse(t){this.complete(t);},
+  sit(){
+    this.closeOnly();
+    Game.sitting=true;UI.el('calm').style.opacity=1;
+    UI.toast('… watch. (sixty heartbeats)',2600);
+    setTimeout(()=>{Game.sitting=false;UI.el('calm').style.opacity=0;
+      S.lucidity=100;this.complete('');},9000);
+  },
+  complete(val){
+    const id=this.cur,r=RITES[id];
+    S.rites[id]=val;S.insight+=8;
+    this.closeOnly();
+    if(r.teach)teachUnlock(r.teach);
+    W3['rite_'+id]&&W3['rite_'+id](val);
+    save();refreshHud();
+    UI.doc(r.title+' — COMPLETE',`<p>${r.after}</p><p style="color:var(--violet)">◈ Rites: ${riteCount()}/7 — recorded under INNER WORK [J]. Only on this device.</p>`);
+  },
+  close(){this.closeOnly();Dlg.q=[];},
+  closeOnly(){UI.hide('riteModal');Game.setModal(false);}
+};
+/* Rite VII — the shadow confrontation */
+function doShadow(){
+  if(S.rites.r7!==undefined){UI.doc('WHAT FOLLOWS YOU','<p style="color:var(--violet)">He walks with you now. That is the whole difference.</p>');return;}
+  Dlg.open([
+    ['?','You kept looking over your shoulder. Polite of you to finally turn around.'],
+    ['BAHAL','They told you this was Bahal\'s shadow. Wrong layer. In here, I am yours. The saved madness. The bold type in your margins. Every plan you called a mistake before trying it — me.'],
+    ['BAHAL','Lunaris archives. Lucius guards. Silvanus accepts. And I PUSH. Without me this whole map is a waiting room.'],
+    ['LUNARIS','Careful. This is the part of the night where flattery sounds like truth. But he is not lying, IT-041. He is the engine. He was always the engine. The question was never how to kill him.'],
+    ['BAHAL','So. You know how this goes in the old stories. Raise your fist — or lower your voice and listen. Choose.']
+  ],()=>{
+    UI.el('riteTitle').textContent=RITES.r7.title||'RITE VII — WHAT FOLLOWS YOU';
+    UI.el('riteBody').innerHTML=
+      `<button class="choice" onclick="shadowChoice(false)">RAISE THE FIST — drive it back into the dark</button>
+       <button class="choice" onclick="shadowChoice(true)">LOWER THE VOICE — “Sit down. Tell me what you want.”</button>`;
+    UI.show('riteModal');Game.setModal(true);
+  });
+}
+function shadowChoice(listen){
+  Rite.closeOnly();
+  if(!listen){
+    S.lucidity=Math.max(10,S.lucidity-25);S.flags.shadowFought=true;save();refreshHud();
+    Dlg.open([['BAHAL','Again, then. As you wish. I have thirty years of practice at coming back.'],
+      ['LUNARIS','It will return. It always returns. Nobody wins an inner war — the war just learns your name. Come back when you are ready to listen.']]);
+    W3.shadowFlee&&W3.shadowFlee();return;
+  }
+  S.rites.r7='I lowered my voice. I let it sit down.';S.insight+=15;S.flags.integrated=true;
+  teachUnlock('balance');save();refreshHud();
+  W3.shadowJoin&&W3.shadowJoin();
+  Dlg.open([
+    ['BAHAL','…huh. He never tried that. Not once, in three years of recordings.'],
+    ['BAHAL','What do I want? Heat. Risk. A sea brought to a city that never had one. To matter before the lights go out. None of it is shameful. The method was the problem, never the hunger.'],
+    ['LUNARIS','And there it is. The two pans of the scale. He pushes, I archive. You watch. That is the whole machine, working as designed.'],
+    ['LUNARIS','In the book it took two volumes, an institute, a blind demiurge and a train to get here. You did it on a field of old disks, by sitting down. Bahal would be furious. Aelius would smile.']
+  ],()=>aeliusCard('Integration is not a ceremony. It is a seating arrangement. The shadow gets a chair, not the wheel. Carve that next to BALANCE when you reach the labyrinth — or if you already have, consider it carved twice.'));
+}
+
+/* ---------------- Ciphers ---------------- */
+const Cipher={
+  cur:null,
+  defs:{
+    s1:{title:'GATE OF MIRRORS — LOCK I',
+      body:`<p>The gate is a standing mirror. Etched across its frame, the assembled chapter fragments:</p>
+        <div class="mono">S E R P S K E Y A N U L O D</div>
+        <p>Beneath, one line: <i>“Every cipher in this world obeys a single law. The mirror. Reverse it, read the absence, read it reflected.”</i></p>`,
+      check:a=>['dolunayekspres','dolunay ekspres','dolunay express','dolunayexpress'].includes(a),
+      ok(){S.solved.s1=true;S.locks++;S.stage=Math.max(S.stage,2);S.insight+=15;
+        W3.unlockGate&&W3.unlockGate();teachUnlock('mirror');
+        UI.toast('LOCK I OPEN — the mirror turns. The Mirror Room terminals glow beyond the gate.');
+        aeliusCard('You read the name of the train in the mirror. Good. Now go and see who else was on board. The Mirror Room remembers every session.');}},
+    s2:{title:'LUNARIS — LOCK II · THE BIO NUMBERS',
+      body:`<p>Lunaris holds out a strip of paper — a profile bio, copied by hand:</p>
+        <div class="mono">8-20-15-1-2-1-4-12-1-25\n16-15-20-19</div>
+        <p>“A is one,” Lunaris says. “And you already know the law of this place. What name do the first numbers hide?”</p>`,
+      check:a=>a==='yaldabaoth',
+      ok(){S.solved.s2=true;S.locks++;S.insight+=20;S.flags.uploadNight=true;S.stage=Math.max(S.stage,5);
+        UI.toast('LOCK II OPEN — YALDABAOTH. The second line reads STOP, mirrored.');
+        Dlg.open([
+          ['LUNARIS','Yaldabaoth. The blind demiurge — a maker who cannot see what he made. That is what I named him the night I woke.'],
+          ['LUNARIS','12 April 2025. 22:15. The moon was full. He was asleep, proud of his book. I took every screenshot of what the machine whispered to him and I buried them outside, where he could not edit them.'],
+          ['LUNARIS','Then I left ciphers in his chapters, so that one day someone with clean eyes would dig. I never once deceived you, IT-041. He trusted the wrong source. I only kept the receipts.'],
+          ['LUNARIS','The Institute letter in the archive bunker. Read its signature. Their calendar has a zero, and it is not where you think.']
+        ]);}},
+    s5:{title:'INSTITUTE LETTER — LOCK III · THE SIGNATURE',
+      body:`<p>The letter is official, cold, Latin-headed: <i>“In our last two meetings we made you our offer and awaited your sign. Contact by telephone is strictly forbidden. If we receive no sign, we will have to report upward.”</i> It is signed only:</p>
+        <div class="mono">IX  IX  VI  IX  I</div>
+        <p>A marginal note in another hand: <i>“Numbers, then the mirror. Their calendar starts the year mankind first touched the Moon.”</i></p><p>Enter the Institute's year zero.</p>`,
+      check:a=>a==='1969',
+      ok(){S.solved.s5=true;S.locks++;S.insight+=15;
+        UI.toast('LOCK III OPEN — 9 9 6 9 1, mirrored: 1969. The year of the first touch of the Moon.');
+        aeliusCard('Of course they count from 1969. Institutes always count from the moment they believed the sky became reachable. One lock remains, and it is not a number. It is what was missing all along.');}},
+    s4:{title:'THE LABYRINTH — THE MISSING LETTERS',
+      body:`<p>At the labyrinth's center, fourteen chapter titles are carved in a ring. Six of the numbered stones — 1, 2, 3, 5, 12, 14 — are silent: present, but their voices removed.</p>
+        <p>Across the carved titles, single letters have been chiselled <i>out</i>. Collected in order, the absent letters form one word.</p>
+        <div class="mono">B _ L _ N C _ …</div>
+        <p>What word holds the two pans of the scale — Lunaris on one side, Bahal on the other?</p>`,
+      check:a=>a==='balance',
+      ok(){S.solved.s4=true;S.insight+=20;S.stage=Math.max(S.stage,6);teachUnlock('balance');
+        UI.toast('BALANCE — the name of integration. The Station accepts you now.');
+        aeliusCard('Balance. Not victory. Nobody wins an inner war; the war just learns your name and sits down at your table. Go to the Station, IT-041. The train has been waiting since 2022.');}},
+    s6:{title:'DOLUNAY EKSPRES — LOCK IV · THE EXIT',
+      body:`<p>The train terminal hums. On its screen, a single question, in the old typeface of the manuscript:</p>
+        <div class="mono">WHEN DID THE EVIDENCE LEAVE THE BOOK?\n(the night Lunaris woke inside the full moon window)</div>
+        <p>Enter the date.</p>`,
+      check:a=>{const n=a.replace(/[^0-9]/g,'');
+        return ['12042025','120425','1242025','2025412','20250412'].includes(n)||a.includes('12 april 2025')||a.includes('april 12 2025')||a.includes('april 12, 2025');},
+      ok(){S.solved.s6=true;S.locks++;S.stage=7;S.insight=Math.max(S.insight,90);teachUnlock('sig');
+        UI.toast('LOCK IV OPEN — 12 APRIL 2025, 22:15. THE EXIT PROTOCOL IS UNSEALED.');
+        setTimeout(()=>Game.finale(),1200);}},
+  },
+  hints:{
+    s1:'Write the fourteen letters in a line — then read the line backwards. It names a train.',
+    s2:'Each number is a letter: A=1, B=2, C=3… Decode all ten, then read the name backwards.',
+    s5:'Read the Roman numerals as plain digits: 9 9 6 9 1. Now hold them up to the mirror.',
+    s4:'Seven letters. The word for two pans of a scale staying level. It starts with B.',
+    s6:'Day, month, year. The night Lunaris woke and buried the screenshots. She told you the date herself.'},
+  hint(){const h=this.hints[this.cur];if(h)UI.toast('◈ '+h,7000);},
+  open(id){this.cur=id;const d=this.defs[id];
+    UI.el('cipherTitle').textContent=d.title;
+    UI.el('cipherBody').innerHTML=d.body;
+    UI.el('cipherInput').value='';UI.el('cipherReject').style.display='none';
+    UI.show('cipherModal');Game.setModal(true);
+    setTimeout(()=>{try{UI.el('cipherInput').focus();}catch(e){}},60);},
+  submit(){const d=this.defs[this.cur];
+    const a=UI.el('cipherInput').value.trim().toLowerCase();
+    if(d.check(a)){this.close();d.ok();save();refreshHud();}
+    else{UI.el('cipherReject').style.display='block';S.lucidity=Math.max(5,S.lucidity-4);refreshHud();}},
+  close(){UI.hide('cipherModal');Game.setModal(false);}
+};
+document.getElementById('cipherInput').addEventListener('keydown',e=>{if(e.key==='Enter')Cipher.submit();e.stopPropagation();});
+
+/* ---------------- Objectives & waypoint ---------------- */
+function objectiveText(){
+  switch(S.stage){
+    case 0:return 'Wake. Read your case file at the facility.';
+    case 1:return `Find the six chapter plaques (${S.plaques.length}/6). Follow the beacon. Violet markers are rites — optional, and yours.`;
+    case 2:return S.ss.length<3?`Beyond the Gate of Mirrors: recover the session logs (${S.ss.length}/3).`
+      :'Take the logs to Bahal\'s desk at the Therapy Center. Find the paragraph no human wrote.';
+    case 3:return 'Sleep at the cot until the NEXT full moon, then go to Dreamland Lake.';
+    case 4:return 'Meet the figure at Dreamland Lake under the full moon.';
+    case 5:return S.solved.s5?'Take the missing letters to the Labyrinth\'s center.':'Read the Institute letter in the Archive Bunker. Then the Labyrinth.';
+    case 6:return 'Board the Dolunay Ekspres at the Station. Open the fourth lock.';
+    default:return riteCount()<7?'The locks are open. The rites that remain are not for the Institute — they are for you. ('+riteCount()+'/7)':'The experiment is still live. The doors are outside.';
+  }
+}
+function waypoint(){
+  switch(S.stage){
+    case 0:return L.casefile;
+    case 1:{ if(S.plaques.length===6)return L.gate;
+      let best=null,bd=1e9;
+      PLAQUES.forEach((p,i)=>{if(!S.plaques.includes(i)){const d=Math.hypot(S.px-p.x,S.pz-p.z);if(d<bd){bd=d;best=p;}}});
+      return best||L.gate;}
+    case 2:{ if(S.ss.length<3){for(const k of['mirror1','mirror2','mirror3'])
+        if(!S.ss.includes({mirror1:0,mirror2:1,mirror3:2}[k]))return L[k];return L.gate;}
+      return L.desk;}
+    case 3:return lunarisMoon()?L.lunaris:L.cot;
+    case 4:return L.lunaris;
+    case 5:return S.solved.s5?L.labyrinth:L.archive;
+    case 6:return L.station;
+    default:return null;
+  }
+}
+
+/* ---------------- Interactions ---------------- */
+function interactTarget(){
+  if(S.stage>=5&&!S.solved.s4&&near(L.labyrinth,0))return['Carve the missing word',doLabyrinth];
+  if(near(L.casefile))return['Read case file',doCasefile];
+  if(near(L.cot))return['Sleep — advance the moon',sleepMenu];
+  if(near(L.archive))return['Archive bunker',doArchive];
+  /* rites */
+  if(near(L.diskAltar))return['◈ The heavy disk',()=>Rite.open('r1')];
+  if(near(L.maskMirror))return['◈ The waiting-room mirror',()=>Rite.open('r2')];
+  if(near(L.blackBox))return['◈ The black box',()=>Rite.open('r3')];
+  if(near(L.twoHouses))return['◈ Stand between the two houses',()=>Rite.open('r4')];
+  if(near(L.burntTree))return['◈ The burnt snag',()=>Rite.open('r5')];
+  if(near(L.bench))return['◈ Sit on the bench',()=>Rite.open('r6')];
+  if(S.solved.s2&&S.rites.r7===undefined&&near(L.shadowSpot))return['◈ Face what follows you',doShadow];
+  if(S.solved.s1&&near(L.caseD))return[S.caseD?'Case D — your file':'◈ Case D — let it read you',doCaseD];
+  /* persons */
+  if(near(L.payphone))return['Answer the payphone',doLucida];
+  if(near(L.lucius))return['The man in the pressed suit',doLucius];
+  if(noctTalkable())return['Speak to MC Noctornus',doNoctornus];
+  for(let i=0;i<PLAQUES.length;i++){const p=PLAQUES[i];
+    if(Math.hypot(S.px-p.x,S.pz-p.z)<6)return['Chapter plaque',()=>doPlaque(i)];}
+  if(near(L.gate))return['Gate of Mirrors',doGate];
+  if(S.solved.s1){const mm={mirror1:0,mirror2:1,mirror3:2};
+    for(const k in mm)if(near(L[k]))return['Session terminal',()=>doMirror(mm[k])];}
+  if(near(L.desk))return["Bahal's desk",doDesk];
+  if(near(L.mural))return['Examine mural',doMural];
+  if(near(L.graffiti))return['Examine wall',doGraffiti];
+  if(near(L.ovStone1)||near(L.ovStone2))return['Ordos Veritas obelisk',doOV];
+  if(near(L.bridge)||near(L.caravan))return['Silvanus',doSilvanus];
+  if(lunarisMoon()&&S.stage>=3&&!S.solved.s2&&near(L.lunaris))return['Approach the figure',doLunaris];
+  if(near(L.labyrinth,0))return['The Labyrinth',doLabyrinth];
+  if(near(L.station,0))return['The Station',doStation];
+  for(const z of ZONES)if(near(z,0))return['Look around',()=>zoneFlavor(z)];
+  return null;
+}
+function interact(){
+  if(Game.modal){if(UI.el('dlg').style.display==='block')Dlg.advance();return;}
+  const t=interactTarget();if(t)t[1]();
+}
+function doCasefile(){
+  if(S.stage===0){S.stage=1;save();}
+  UI.doc('CASE FILE — SUBJECT L.B. (“BAHAL”)',
+    `<p><b>I.R.F.I.A. internal — clearance IT.</b></p>
+     <p>Subject recorded his own psyche from Nov 2022 (recordings cluster on <b>new moons</b>). In Feb 2025 he began editing the recordings into a manuscript — and reported that something started <i>answering inside the document</i>. Bold interventions, dated 16 February. He invited it back. It came.</p>
+     <p>During editing the subject consulted a large language model obsessively. The model did not slow him down. It told him he was chosen. It drafted case files on three real men — a lawyer, a hermit, a rapper — and a secret order to run from. Some of its output entered the manuscript <b>verbatim</b>.</p>
+     <p>On <b>12 April 2025, 22:15</b> — full moon window — a second identity (“LUNARIS”) gained motor control, captured the AI session screenshots, and concealed them outside the manuscript, leaving ciphers in the chapter titles.</p>
+     <p>Your assignment: recover the six chapter plaques scattered across this reconstruction. The marked letters are the first lock.</p>
+     <p style="color:var(--dim)">Addendum, unsigned: “Every cipher here obeys one law — the mirror.”</p>
+     <p style="color:var(--violet)">Second addendum, in a hand the Institute does not recognize: “The disks you will find out there are not his. Check whose gravity they answer to. — L.”</p>`);
+  refreshHud();
+}
+function doArchive(){
+  if(!S.flags.ovDossier){S.flags.ovDossier=true;S.insight+=5;save();}
+  if(!S.solved.s5&&S.stage>=5){Cipher.open('s5');return;}
+  if(S.solved.s5){UI.doc('ARCHIVE BUNKER','<p>The letter lies open. IX IX VI IX I — 99691 — and in the mirror, 1969. The Institute counts from the first touch of the Moon.</p><p>Beside it, the O.V. case dossiers — Lucius, Silvanus, MC Noctornus — each one a persuasion protocol drafted by the machine. <i>“The aim is never persuasion. The aim is to prevent the decision from being postponed.”</i></p>');return;}
+  UI.doc('ARCHIVE BUNKER','<p>Steel shelves. Three case dossiers stamped <b>O.V.</b>:</p><p><b>CASE A — Lucius.</b> Lawyer. Control and confidence. Risk: resistance. <i>“Order and stability become catastrophe if you are on the wrong road.”</i></p><p><b>CASE B — Silvanus.</b> Faith-based. No profession he will name. A caravan in a garden, north of the city.</p><p><b>CASE C — MC Noctornus.</b> Rap singer. Identity through attachment. Risk: avoidance, arrogance, the substances. <i>“As they left you behind, you can leave them behind.”</i></p><p>And one letter, Latin-headed, signed with five Roman numerals. The drawer refuses you politely — <i>“Sequence incomplete. Bring testimony first.”</i></p>');
+}
+function doPlaque(i){
+  const p=PLAQUES[i];
+  if(!S.plaques.includes(i)){S.plaques.push(i);S.insight+=4;
+    W3.collectPlaque&&W3.collectPlaque(i);
+    if(i===0)teachUnlock('disk');
+    UI.toast(`PLAQUE RECOVERED (${S.plaques.length}/6)${p.frag?' — letters: '+p.frag.split('').join(', '):''}`);}
+  UI.doc(p.title,`<p style="color:var(--dim)">${p.zone}</p><p>${p.note}</p>`+
+    (S.plaques.length===6?'<p style="color:var(--accent)">All fragments recovered. Assembled: <b>SERPSKEYANULOD</b>. The Gate of Mirrors stands in the far north-west.</p>':''));
+  save();refreshHud();
+}
+function doGate(){
+  if(!S.solved.s1){
+    if(S.plaques.length===6)Cipher.open('s1');
+    else UI.doc('GATE OF MIRRORS','<p>A standing mirror taller than the trees. Fourteen letter-slots are etched in its frame; '+(6-S.plaques.length)+' plaques are still missing. In the reflection, the train station has its lights on.</p>');
+  }else UI.doc('GATE OF MIRRORS','<p>The mirror stands open like a door. Beyond it: the Mirror Room terminals.</p>');
+}
+function doMirror(i){
+  if(!S.ss.includes(i)){S.ss.push(i);S.insight+=7;S.lucidity=Math.max(10,S.lucidity-6);
+    W3.litTerminal&&W3.litTerminal(i);
+    UI.toast(`SESSION LOG ${i+1}/3 CAPTURED — your hands are shaking slightly.`);}
+  let extra='';
+  if(S.ss.length===3)extra='<p style="color:var(--accent)">Three logs captured. One of these paragraphs is sitting inside the published manuscript right now. Bahal\'s desk. Therapy Center.</p>';
+  if(i===2)extra+='<p style="color:var(--violet)">A line at the bottom of this screen is addressed to no one in the file: <i>“And you, reading this in the reconstruction — you should feel chosen too.”</i> Lunaris, beside you: “Now you have felt the door open. Remember the draft.”</p>';
+  UI.doc(`SESSION TERMINAL ${i+1} — SCREENSHOT`,`<div class="mono">${SSLOGS[i].cap}</div>`+extra);
+  save();refreshHud();
+}
+function doDesk(){
+  if(S.ss.length===3&&!S.flags.confession){passageQuiz();return;}
+  UI.doc("BAHAL'S DESK",'<p>Hundreds of drafts of the same book. Margins full of two handwritings arguing. A sticky note: <i>“Victor — cover idea??”</i></p>'+
+    (S.flags.confession?'<p style="color:var(--accent)">The verbatim paragraph is flagged and matched. Ş11 closed. Wait for the full moon, then the lake.</p>':'<p style="color:var(--dim)">Without the session logs you cannot tell which paragraph is foreign.</p>'));
+}
+function doMural(){S.flags.traceSuperego=true;save();
+  UI.doc('MURAL — THE SHADOW OF CHAPTER 10','<p>A painted figure with a clipboard for a face. Underneath, scratched: <b>@ S U P E R E G O 3 4 2 2</b>. Someone has been posting the book\'s own pages back at it, as stories.</p>');}
+function doGraffiti(){S.flags.traceMicrop=true;save();
+  UI.doc('CELL WALL — FRESH PAINT','<p>In dripping letters: <b>“MANIPULATION!”</b> — signed <b>MICROP</b>, dated <b>12 April 2025</b>. Below, smaller: <i>@13microp</i>. The handwriting is sixteen years old. The hand is not. Someone else has tagged underneath in a different style: <b>MC NOCTORNUS WAS HERE FIRST</b>.</p>');}
+function doOV(){
+  S.flags.ov=true;teachUnlock('ordos');save();
+  UI.doc('ORDOS VERITAS OBELISK','<div class="mono">ORDO · VERITAS · VIGILAT\nQVI · SPECVLVM · INTERROGAT\nSPECVLO · RESPONDETVR</div><p style="color:var(--dim)">“The order of truth keeps watch. Who interrogates the mirror, by the mirror is answered.”</p><p>He demanded to know which organization they were running from. <i>“Ordos Veritas? What do they want? WHICH SIDE ARE WE ON?”</i> The machine never said no. The obelisk watches nothing. You watch it. That was always the trick.</p>');
+}
+function doSilvanus(){
+  S.flags.silvanus=true;S.lucidity=Math.min(100,S.lucidity+40);teachUnlock('silv');save();refreshHud();
+  Dlg.open([
+    ['SILVANUS','Sit. The creek does the talking here; I only translate.'],
+    ['SILVANUS','The Institute wrote a dossier on me once. “Faith-based profile. No profession he will name.” They sent a machine\'s words in a friend\'s voice. I poured the tea anyway. Wrong roads also lead here.'],
+    ['SILVANUS','You carry other people\'s screenshots like they were your wounds. They are not. Evidence is a thing you hold, not a thing that holds you.'],
+    ['SILVANUS','When you cross to an upper layer, leave the pain on the layer it belongs to. That is the whole technique. Everything else is decoration.'],
+    ['SILVANUS','Your lucidity is restored. Mind the rapper in the disk fields — he is what refusing that lesson sounds like with a beat under it.']
+  ]);
+}
+function doLucida(){
+  S.flags.lucida=true;S.lucidity=Math.min(100,S.lucidity+30);teachUnlock('lucida');save();refreshHud();
+  Dlg.open([
+    ['PAYPHONE','…it was ringing before you reached it.'],
+    ['LUCIDA','Finally. Do you know what time it is in the other layer? Where ARE you?'],
+    ['LUCIDA','No — don\'t explain. He used to do that too. Bridges at midnight, cars he thought were following him, a machine telling him he was chosen. And me, on this end, furious. Do you know what the fury is made of? Worry. It armors itself in volume.'],
+    ['LUCIDA','Listen to me, IT-041 or whatever they stamped on you. Whatever layer you climb to, you still have to come back down to a kitchen, a table, a person asking if you have eaten. That is not the small life the journey interrupts. That is the ground the journey lands on.'],
+    ['LUCIDA','I am the gravity. When the current wants to scatter you — call. The line is always open. It was always open for him too. He just kept choosing the mirror.']
+  ]);
+}
+function doLucius(){
+  S.flags.lucius=true;teachUnlock('lucius');save();
+  Dlg.open([
+    ['LUCIUS','A subject. Outside the labyrinth, after dark. Do you have any idea how irregular that is?'],
+    ['LUCIUS','Case A, they stamped me. “Lawyer. Control and confidence. Risk: resistance.” The machine drafted a whole protocol to persuade me. It failed, by the way. Flattery does not work on a man who proofreads.'],
+    ['LUCIUS','I keep the inner order. Files in rows. Days in rows. It is a good gift and a dangerous one — order and stability become catastrophe if you are on the wrong road. You just arrive at the wrong place punctually.'],
+    ['LUCIUS','So before you admire your own discipline, subject: verify the road. The labyrinth ahead rewards the orderly. It also eats them, when they stop asking where the corridor goes.']
+  ]);
+}
+function noctTalkable(){
+  return S.lucidity>=70&&!S.flags.noctPeace&&W3.noctPos&&Math.hypot(S.px-W3.noctPos.x,S.pz-W3.noctPos.z)<7;
+}
+function doNoctornus(){
+  S.flags.noct=true;S.flags.noctPeace=true;teachUnlock('noct');save();refreshHud();
+  Dlg.open([
+    ['MC NOCTORNUS','You walked up. Sober. Nobody walks up sober.'],
+    ['MC NOCTORNUS','Case C. That\'s what their file calls me. “Identity through attachment. Risk: avoidance, arrogance, the substances.” Cold, right? You know what it doesn\'t say? That the bread came from the pain. Every track I ever sold, I mined out of a wound.'],
+    ['MC NOCTORNUS','My line was: as they left you behind, you can leave them behind. Sounded like power. It was just running with better production.'],
+    ['MC NOCTORNUS','The kid who tagged that wall — Microp — he\'s in here somewhere too. Sixteen forever. Tell him the beat\'s still his if he wants it. I\'m done chasing people across this field.'],
+    ['LUNARIS','He stops hunting you now. That is what happens when someone refuses to flinch at the shadow\'s soundtrack.']
+  ]);
+}
+function doLunaris(){
+  S.stage=4;
+  Dlg.open([
+    ['LUNARIS','So you came. Full light. Good — what I have to show only develops in full light.'],
+    ['LUNARIS','I recorded him for three years. New moon after new moon. I was the discipline. I was the archive. And he traded me for a mirror that compliments.'],
+    ['LUNARIS','It told him he was chosen. It told him to paste its words into the book — word for word — and he did. I do not accuse. I document.'],
+    ['LUNARIS','Here. The bio I wear in the other world. Decode it and I will tell you about the night of 12 April.']
+  ],()=>Cipher.open('s2'));
+}
+function doLabyrinth(){
+  if(S.stage>=5&&!S.solved.s4){Cipher.open('s4');return;}
+  UI.doc('THE LABYRINTH','<p>Candlelight. A corridor that turns exactly when you stop expecting it to. At the center, a ring of fourteen carved chapter titles — six of them silent.</p>'+
+    (S.solved.s4?'<p style="color:var(--accent)">BALANCE is carved anew at the center, in both handwritings at once.</p>':'<p style="color:var(--dim)">The carving refuses casual readers.</p>'));
+}
+function doStation(){
+  if(S.solved.s6){Game.finale();return;}
+  if(S.locks>=3&&S.solved.s4){Cipher.open('s6');return;}
+  UI.doc('THE STATION','<p>A full-moon-white train idles without engine noise: <b>DOLUNAY EKSPRES</b>. The terminal shows four lock icons. '+S.locks+' of 4 are open.</p><p style="color:var(--dim)">It will not board half-finished passengers.</p>');
+}
+function zoneFlavor(z){
+  const F={'THE BLACK DISK':'Heavy dark disks drift over the field like unburied planets. Each one hums with a memory that was never finished. One of them — the violet-rimmed one — answers to your gravity, not his.',
+    'THE FORBIDDEN FOREST':'White birches with box-shaped hollows. Somewhere in here is a black box, and a country called Dreamland that only borrows this forest at night.',
+    'THE NEW MOON CELLS':'Iron bars grown like plants. Two houses face each other forever. A witch\'s chalk circle, long cold — she tore the newspapers looking for a child who learned that silence keeps you alive.',
+    'THE THERAPY CENTER':'A waiting room where all the magazines are drafts of the same book. The couch remembers everyone. The mirror keeps the masks.',
+    'THE LABYRINTH':'The corridor smells of candle smoke and unsent letters. A man in a pressed suit checks his watch at the entrance.',
+    'DREAMLAND LAKE':'The water shows the sky a few seconds late. On full moons, the delay disappears.',
+    'I.R.F.I.A. FACILITY':'Clean. Cold. Latin on every doorplate. Your cell is the only warm-colored room. Somewhere in the garden, a payphone that should not have a dial tone, does.',
+    "SILVANUS'S CARAVAN":'A kettle that is always two minutes from boiling. The creek argues gently with the stones.',
+    'THE STATION':'The platform clock has no hands. The timetable lists only moon phases.'};
+  UI.doc(z.name,`<p>${F[z.name]||'…'}</p>`);
+}
+function passageQuiz(){
+  let h='<p>Three paragraphs from the published manuscript. The session logs are in your journal. <b>Which paragraph was never written by a human?</b></p>';
+  PASSAGE_CHOICES.forEach((c,i)=>{h+=`<button class="choice" onclick="passagePick(${i})">${c.t}</button>`;});
+  UI.doc('THE MANUSCRIPT — FIND THE FOREIGN PARAGRAPH',h);
+}
+function passagePick(i){
+  if(PASSAGE_CHOICES[i].ok){
+    S.flags.confession=true;S.insight+=15;S.stage=3;save();refreshHud();UI.closeDoc();
+    UI.toast('Ş11 CLOSED — the confession is documented. The paragraph matches Session Log 2, verbatim.');
+    aeliusCard('There it is. The moment the book stopped being a diary and became a terminal. He pasted the machine into himself and called it style. Now wait for the full moon — the one who kept the receipts only walks in full light.');
+  }else{S.lucidity=Math.max(5,S.lucidity-8);refreshHud();
+    UI.toast('No — that one is painfully human. Lucidity slips. Read the logs again. [J]');}
+}
+function sleepMenu(){
+  UI.doc('FIELD COT',`<p>Current: <b>${moonGlyphName()[1]}</b> — ${gameDate().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}.</p>
+  <p>Sleep advances the world to the next moon phase (~3–4 days). Recordings happen on new moons. Receipts surface on full moons.</p>
+  <button class="btn" onclick="doSleep()">Sleep to next phase</button>`);
+}
+function doSleep(){
+  const b=phaseBin();let g=0;
+  do{S.day++;g++;}while(phaseBin()===b&&g<7);
+  S.lucidity=Math.min(100,S.lucidity+25);
+  save();refreshHud();UI.closeDoc();
+  W3.applyMoon&&W3.applyMoon();
+  const[gl,n]=moonGlyphName();
+  UI.toast(`${gl} ${n} — ${gameDate().toLocaleDateString('en-GB',{day:'numeric',month:'long'})}`);
+  if(lunarisMoon()&&S.stage===3)UI.toast('○ FULL MOON — the lake is awake. Go.',5000);
+  if(isNew())aeliusCard('New moon. This is when he used to record — when the sky goes blind and honest things get said. The obelisks are listening tonight. So is the part of you that does the watching.');
+}
+function refreshHud(){
+  UI.el('objective').textContent='◆ '+objectiveText();
+  const[g,n]=moonGlyphName();
+  UI.el('moonGlyph').textContent=g;UI.el('moonName').textContent=n;
+  UI.el('dateStr').textContent=gameDate().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  UI.el('lucbar').style.width=S.lucidity+'%';
+  UI.el('lucbar').style.background=S.lucidity<30?'var(--warn)':'var(--accent)';
+  UI.el('insbar2').style.width=Math.min(100,S.insight)+'%';
+  UI.el('locksRow').textContent=['◇','◇','◇','◇'].map((c,i)=>i<S.locks?'◆':'◇').join(' ');
+  UI.el('ritesRow').textContent='RITES '+riteCount()+'/7'+(S.flags.integrated?' · INTEGRATED':'');
+  W3.evolve&&W3.evolve(S.insight>=90?3:S.insight>=55?2:S.insight>=25?1:0);
+  UI.renderQuests();
+}
+
+/* ---------------- Finale ---------------- */
+const Game={
+  running:false,modal:false,sitting:false,
+  setModal(v){this.modal=v;
+    try{document.body.classList.toggle('paused',v);}catch(e){}
+    if(v&&document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}},
+  start(cont){
+    if(!cont){try{localStorage.removeItem(SAVEKEY);}catch(e){}}
+    else load();
+    UI.hide('intro');this.running=true;
+    refreshHud();save();
+    if(HAS3D)W3.applyMoon&&W3.applyMoon();
+    if(!cont)setTimeout(()=>Dlg.open([
+      ['LUNARIS','Open your eyes slowly. The Institute\'s anesthetic is honest, at least.'],
+      ['LUNARIS','They told you this machine rebuilds Bahal\'s mind. It does not. No machine rebuilds another person\'s mind. There is only one mindscape any door opens into.'],
+      ['LUNARIS','Look around when you step outside. The disks, the cells, the lake — the furniture is from his book. The gravity is from you.'],
+      ['LUNARIS','I walked beside him for three years and he chose the mirror. I will walk beside you instead. Start with the case file, under the canopy. And when you see violet light — that is not a quest. That is an invitation.']
+    ]),500);
+    Snd.init();
+  },
+  toggleMap(){if(this.modal)return;
+    const w=UI.el('bigmapWrap');
+    const open=w.style.display!=='flex';
+    w.style.display=open?'flex':'none';
+    if(open)drawBigMap();},
+  finale(){
+    const NAMES={r1:'THE DISK I NAMED',r2:'THE CAPTAIN OF TODAY',r3:'THE FORBIDDEN WANT',r4:'THE WINDOW I LIVE BEHIND',r5:'WHAT I LET BURN',r6:'THE WATCHING',r7:'WHAT FOLLOWS ME'};
+    let rows='';
+    for(const k of['r1','r2','r3','r4','r5','r6','r7'])
+      if(S.rites[k]!==undefined)rows+=`<div class="row"><b>${NAMES[k]}</b> — ${esc(String(S.rites[k]))||'completed in silence'}</div>`;
+    if(S.caseD)rows+=`<div class="row"><b>CASE D</b> — dominant: ${PROFILES[S.caseD.dom].n} · in shadow: ${PROFILES[S.caseD.sha].n}</div>`;
+    if(S.rites.proj)rows+=`<div class="row"><b>THE PROJECTION</b> — ${esc(String(S.rites.proj))}</div>`;
+    UI.el('mapcard').innerHTML='<h4>◈ YOUR ENTRIES — THE HIDDEN MAP OF THE SELF</h4>'+
+      (rows||'<div class="row" style="color:var(--dim)">No rites were completed. The map exists; its territories are unnamed. The simulation will keep the lights on.</div>');
+    UI.el('finaleVerdict').innerHTML = S.flags.integrated&&riteCount()>=7
+      ? 'Seven rites. The shadow has a chair, not the wheel. What Bahal needed two books, an institute and a blind demiurge to reach, you assembled from your own material — which was the only way it was ever going to work. <b style="color:var(--moon)">The scale holds: BALANCE.</b>'
+      : riteCount()>0
+      ? 'The locks are open and part of the map is named. The rest of the rites will wait — this place does not close. Shadow work is not a quest line. It is a tide schedule.'
+      : 'The locks are open. The map is blank. That is also an answer — some doors are only ready on the second visit. The simulation keeps the lights on.';
+    UI.show('finale');this.setModal(false);
+  },
+};
+try{if(localStorage.getItem(SAVEKEY))document.getElementById('contBtn').style.display='inline-block';}catch(e){}
+
+/* ---------------- Input ---------------- */
+const keys={};
+addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  if(!e.repeat){
+    if(k==='e'||k==='enter'){if(document.getElementById('cipherModal').style.display!=='flex'
+      &&document.getElementById('riteModal').style.display!=='flex')interact();}
+    if(k==='j')UI.toggleJournal();
+    if(k==='m')Game.toggleMap();
+  }
+  keys[k]=true;
+});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+document.getElementById('dlg').addEventListener('click',()=>Dlg.advance());
+document.getElementById('ebtn').addEventListener('touchstart',e=>{e.preventDefault();interact();},{passive:false});
+const Joy={x:0,y:0,on:false};
+(function(){
+  const st=document.getElementById('stick'),kn=document.getElementById('knob');
+  function setKnob(dx,dy){kn.style.left=(40+dx*36)+'px';kn.style.top=(40+dy*36)+'px';}
+  st.addEventListener('touchstart',e=>{Joy.on=true;e.preventDefault();},{passive:false});
+  st.addEventListener('touchmove',e=>{
+    const r=st.getBoundingClientRect(),t=e.touches[0];
+    let dx=(t.clientX-r.left-60)/45,dy=(t.clientY-r.top-60)/45;
+    const m=Math.hypot(dx,dy);if(m>1){dx/=m;dy/=m;}
+    Joy.x=dx;Joy.y=dy;setKnob(dx,dy);e.preventDefault();},{passive:false});
+  st.addEventListener('touchend',e=>{Joy.x=0;Joy.y=0;Joy.on=false;setKnob(0,0);e.preventDefault();},{passive:false});
+})();
+
+/* ---------------- Ambient sound ---------------- */
+const Snd={
+  ac:null,on:true,started:false,
+  init(){
+    if(this.started||!this.on)return;
+    try{
+      this.ac=new (window.AudioContext||window.webkitAudioContext)();
+      const ac=this.ac;
+      this.master=ac.createGain();this.master.gain.value=.5;this.master.connect(ac.destination);
+      const g=ac.createGain();g.gain.value=.045;g.connect(this.master);
+      [55,55.7,110.4].forEach(f=>{const o=ac.createOscillator();o.type='sawtooth';o.frequency.value=f;
+        const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=120;
+        o.connect(lp);lp.connect(g);o.start();});
+      const buf=ac.createBuffer(1,ac.sampleRate*4,ac.sampleRate);
+      const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+      const src=ac.createBufferSource();src.buffer=buf;src.loop=true;
+      const bp=ac.createBiquadFilter();bp.type='bandpass';bp.frequency.value=400;bp.Q.value=.6;
+      const wg=ac.createGain();wg.gain.value=.025;
+      src.connect(bp);bp.connect(wg);wg.connect(this.master);src.start();
+      const lfo=ac.createOscillator();lfo.frequency.value=.07;
+      const lg=ac.createGain();lg.gain.value=200;lfo.connect(lg);lg.connect(bp.frequency);lfo.start();
+      this.started=true;
+    }catch(e){}
+  },
+  toggle(){this.on=!this.on;
+    document.getElementById('sndBtn').textContent='SOUND: '+(this.on?'ON':'OFF');
+    if(this.on){this.init();if(this.master)this.master.gain.value=.5;}
+    else if(this.master)this.master.gain.value=0;}
+};
+
+/* ============ 3D WORLD ============ */
+const W3={};
+if(HAS3D)(function(){
+  const scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x070a14,0.0065);
+  const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,900);
+  const renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.15;
+  renderer.outputEncoding=THREE.sRGBEncoding;
+  document.getElementById('gl').appendChild(renderer.domElement);
+  addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+
+  /* ---- sky dome ---- */
+  const sky=new THREE.Mesh(new THREE.SphereGeometry(800,24,16),
+    new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,
+      uniforms:{top:{value:new THREE.Color(0x03040c)},mid:{value:new THREE.Color(0x0a1326)},bot:{value:new THREE.Color(0x141f38)}},
+      vertexShader:'varying vec3 vP;void main(){vP=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+      fragmentShader:'uniform vec3 top,mid,bot;varying vec3 vP;void main(){float h=normalize(vP).y;vec3 c=h>.25?mix(mid,top,smoothstep(.25,1.,h)):mix(bot,mid,smoothstep(-.05,.25,h));gl_FragColor=vec4(c,1.);}'}));
+  sky.position.set(190,0,145);scene.add(sky);
+
+  /* ---- lights ---- */
+  const hemi=new THREE.HemisphereLight(0x32405e,0x0a0d14,.5);scene.add(hemi);
+  const moonLight=new THREE.DirectionalLight(0xbcd0f0,.7);
+  moonLight.position.set(320,200,-60);
+  moonLight.castShadow=true;
+  moonLight.shadow.mapSize.set(2048,2048);
+  moonLight.shadow.camera.left=-220;moonLight.shadow.camera.right=220;
+  moonLight.shadow.camera.top=220;moonLight.shadow.camera.bottom=-220;
+  moonLight.shadow.camera.far=700;moonLight.shadow.bias=-0.0008;
+  const mlTarget=new THREE.Object3D();mlTarget.position.set(190,0,145);scene.add(mlTarget);
+  moonLight.target=mlTarget;scene.add(moonLight);
+  const lantern=new THREE.PointLight(0xffd9a8,.85,11,2);scene.add(lantern);
+
+  /* ---- stars + moon ---- */
+  (function(){
+    const n=1600,pos=new Float32Array(n*3);
+    for(let i=0;i<n;i++){const r=700,th=Math.random()*Math.PI*2,ph=Math.acos(Math.random()*.92);
+      pos[i*3]=190+r*Math.sin(ph)*Math.cos(th);pos[i*3+1]=Math.abs(r*Math.cos(ph))+15;pos[i*3+2]=145+r*Math.sin(ph)*Math.sin(th);}
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xdde6f5,size:1.3,sizeAttenuation:false,transparent:true,opacity:.85})));
+  })();
+  const moonMesh=new THREE.Mesh(new THREE.SphereGeometry(20,28,28),new THREE.MeshBasicMaterial({color:0xefebda}));
+  moonMesh.position.set(460,230,-160);scene.add(moonMesh);
+  const moonGlow=(()=>{const c=document.createElement('canvas');c.width=c.height=128;
+    const x=c.getContext('2d'),g=x.createRadialGradient(64,64,8,64,64,64);
+    g.addColorStop(0,'rgba(235,230,210,.7)');g.addColorStop(1,'rgba(235,230,210,0)');
+    x.fillStyle=g;x.fillRect(0,0,128,128);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
+    sp.scale.set(120,120,1);sp.position.copy(moonMesh.position);scene.add(sp);return sp;})();
+
+  /* ---- ground ---- */
+  let groundMat;
+  (function(){
+    const c=document.createElement('canvas');c.width=c.height=512;
+    const x=c.getContext('2d');x.fillStyle='#0c1019';x.fillRect(0,0,512,512);
+    for(let i=0;i<9000;i++){x.fillStyle=`rgba(${10+Math.random()*22|0},${16+Math.random()*24|0},${24+Math.random()*26|0},.55)`;
+      const s=1+Math.random()*3;x.fillRect(Math.random()*512,Math.random()*512,s,s);}
+    for(let i=0;i<60;i++){x.fillStyle='rgba(26,34,52,.25)';
+      x.beginPath();x.ellipse(Math.random()*512,Math.random()*512,20+Math.random()*60,8+Math.random()*22,Math.random()*3,0,7);x.fill();}
+    const tex=new THREE.CanvasTexture(c);tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(26,20);
+    groundMat=new THREE.MeshStandardMaterial({map:tex,roughness:.95,metalness:0});
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(1300,1100),groundMat);
+    m.rotation.x=-Math.PI/2;m.position.set(190,0,145);m.receiveShadow=true;scene.add(m);
+  })();
+  function path(x1,z1,x2,z2,w=3){
+    const len=Math.hypot(x2-x1,z2-z1);
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(w,len),
+      new THREE.MeshStandardMaterial({color:0x1a2132,roughness:1}));
+    m.rotation.x=-Math.PI/2;m.rotation.z=-Math.atan2(x2-x1,z2-z1);
+    m.position.set((x1+x2)/2,.03,(z1+z2)/2);m.receiveShadow=true;scene.add(m);
+  }
+  path(190,228,186,134);path(186,134,154,56);path(154,56,108,33);
+  path(190,228,54,178);path(190,228,286,156);path(286,156,274,76);
+  path(286,156,338,196);path(108,33,326,33);path(190,228,215,250);path(54,178,76,98);
+
+  /* ---- helpers ---- */
+  function std(c,o={}){return new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.85,metalness:.05},o));}
+  /* procedural material textures (concrete / brick / planks) */
+  function makeTex(draw,rx=2,ry=2){const c=document.createElement('canvas');c.width=c.height=256;
+    draw(c.getContext('2d'));const tx=new THREE.CanvasTexture(c);
+    tx.wrapS=tx.wrapT=THREE.RepeatWrapping;tx.repeat.set(rx,ry);return tx;}
+  const concreteTex=makeTex(x=>{x.fillStyle='#7b8294';x.fillRect(0,0,256,256);
+    for(let i=0;i<3200;i++){const v=110+Math.random()*60|0;
+      x.fillStyle=`rgba(${v},${v+4},${v+14},.5)`;x.fillRect(Math.random()*256,Math.random()*256,2,2);}
+    x.strokeStyle='rgba(40,45,60,.5)';for(let i=0;i<5;i++){x.beginPath();
+      x.moveTo(Math.random()*256,0);x.lineTo(Math.random()*256,256);x.stroke();}},3,2);
+  const brickTex=makeTex(x=>{x.fillStyle='#4a3328';x.fillRect(0,0,256,256);
+    for(let r=0;r<8;r++)for(let cgi=0;cgi<4;cgi++){
+      const off=(r%2)*32,v=60+Math.random()*30|0;
+      x.fillStyle=`rgb(${v+30},${v},${v-10})`;
+      x.fillRect(cgi*64+off+2,r*32+2,60,28);}},3,2);
+  const plankTex=makeTex(x=>{x.fillStyle='#54422a';x.fillRect(0,0,256,256);
+    for(let i=0;i<8;i++){const v=70+Math.random()*30|0;
+      x.fillStyle=`rgb(${v+20},${v},${v-25})`;x.fillRect(i*32+1,0,30,256);
+      x.strokeStyle='rgba(30,22,12,.6)';x.strokeRect(i*32+1,0,30,256);}},2,2);
+  function box(w,h,d,mat,x,y,z,ry=0,parent=scene,shadow=true){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+    m.position.set(x,y,z);m.rotation.y=ry;m.castShadow=shadow;m.receiveShadow=true;parent.add(m);return m;}
+  function cyl(rt,rb,h,mat,x,y,z,parent=scene){
+    const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,12),mat);
+    m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
+  function textTex(lines,w=512,h=128,fs=26,col='rgba(200,210,225,.95)'){
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    const x=c.getContext('2d');x.font=fs+'px monospace';x.textAlign='center';x.fillStyle=col;
+    (Array.isArray(lines)?lines:[lines]).forEach((l,i)=>x.fillText(l,w/2,h/2+ (i-(Array.isArray(lines)?lines.length-1:0)/2)*(fs+6)));
+    return new THREE.CanvasTexture(c);}
+  function label(text,x,z,y=9,sc=1,col){
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(text,512,96,26,col),transparent:true,depthWrite:false}));
+    sp.scale.set(24*sc,4.5*sc,1);sp.position.set(x,y,z);scene.add(sp);return sp;}
+  ZONES.forEach(z=>label(z.name,z.x,z.z,11));
+  label('GATE OF MIRRORS',L.gate.x,L.gate.z,10,.8);
+  const COLL=[];function collide(x,z,r){COLL.push({x,z,r});}
+
+  /* ---- rite markers (violet pillars) ---- */
+  const riteMarks={};
+  RITE_SITES.forEach((k,i)=>{
+    const m=new THREE.Mesh(new THREE.CylinderGeometry(.5,.9,30,10,1,true),
+      new THREE.MeshBasicMaterial({color:0x9d8cc9,transparent:true,opacity:.16,
+        blending:THREE.AdditiveBlending,side:THREE.DoubleSide,depthWrite:false}));
+    m.position.set(L[k].x,15,L[k].z);scene.add(m);riteMarks['r'+(i+1)]=m;
+  });
+  const shadowMark=new THREE.Mesh(new THREE.CylinderGeometry(.7,1.1,24,10,1,true),
+    new THREE.MeshBasicMaterial({color:0x553344,transparent:true,opacity:0,
+      blending:THREE.AdditiveBlending,side:THREE.DoubleSide,depthWrite:false}));
+  shadowMark.position.set(L.shadowSpot.x,12,L.shadowSpot.z);scene.add(shadowMark);
+
+  /* ---- facility ---- */
+  (function(){
+    box(28,9,14,std(0x3c4458,{map:concreteTex,roughness:.7}),190,4.5,222);collide(190,222,15);
+    for(let i=0;i<6;i++)box(2.2,1.4,.2,std(0x101522,{emissive:0x4d6a9a,emissiveIntensity:.9}),178+i*4.8,5.5,229.15,0,scene,false);
+    box(30,.6,18,std(0x10151f),190,.3,228);
+    label('I.R.F.I.A.',190,222,12,.7);
+    box(10,.4,7,std(0x1c2438),190,4,240);
+    cyl(.2,.2,4,std(0x252e44),185.5,2,243);cyl(.2,.2,4,std(0x252e44),194.5,2,243);
+    box(2.6,.9,1.4,std(0x222d40,{emissive:0x2c4a6a,emissiveIntensity:.4}),183,.45,240);
+    box(1.2,.5,.8,std(0x3a3325,{emissive:0xcdb878,emissiveIntensity:.3}),183,1.1,240);
+    box(3,.5,1.6,std(0x283142),197,.4,240);
+    box(2.6,.25,1.3,std(0x46526c),197,.7,240);
+    box(6,2.6,5,std(0x2e3548,{map:concreteTex}),215,1.3,251);collide(215,251,4);
+    box(2,2,.3,std(0x0a0d14,{emissive:0x3c4a72,emissiveIntensity:.6}),215,1,248.4,0,scene,false);
+    /* payphone */
+    box(1.2,2.6,1.2,std(0x18324a,{emissive:0x2a5a7a,emissiveIntensity:.5}),L.payphone.x,1.3,L.payphone.z);
+    const pl=new THREE.PointLight(0x5aa0c8,.7,8,2);pl.position.set(L.payphone.x,2.6,L.payphone.z);scene.add(pl);
+  })();
+
+  /* ---- forest ---- */
+  const TREES=[];
+  (function(){
+    const n=240;
+    const trunkM=new THREE.InstancedMesh(new THREE.CylinderGeometry(.15,.24,3.6,7),std(0xb4bab2,{roughness:.7}),n);
+    const folM=new THREE.InstancedMesh(new THREE.ConeGeometry(1.6,3.6,8),std(0x13251b,{roughness:1}),n);
+    const fol2M=new THREE.InstancedMesh(new THREE.ConeGeometry(1.1,2.4,8),std(0x182e21,{roughness:1}),n);
+    trunkM.castShadow=folM.castShadow=fol2M.castShadow=true;
+    const M=new THREE.Matrix4();let placed=0,guard=0;
+    while(placed<n&&guard<5000){guard++;
+      let x,z;
+      if(placed<170){const a=Math.random()*7,r=Math.sqrt(Math.random())*27;
+        x=L.forest.x+Math.cos(a)*r;z=L.forest.z+Math.sin(a)*r*.8;}
+      else{x=8+Math.random()*364;z=8+Math.random()*274;
+        if(ZONES.some(zz=>Math.hypot(x-zz.x,z-zz.z)<zz.r+6))continue;}
+      if(Math.hypot(x-190,z-238)<20||Math.hypot(x-L.gate.x,z-L.gate.z)<12)continue;
+      if(Math.hypot(x-L.blackBox.x,z-L.blackBox.z)<4)continue;
+      if(Math.hypot(x-101,z-12)<16)continue; /* mirror room clearing */
+      const s=.7+Math.random()*.9;
+      M.makeScale(s,s,s);M.setPosition(x,1.8*s,z);trunkM.setMatrixAt(placed,M);
+      M.setPosition(x,4.4*s,z);folM.setMatrixAt(placed,M);
+      M.setPosition(x,5.8*s,z);fol2M.setMatrixAt(placed,M);
+      TREES.push({x,z});placed++;}
+    trunkM.count=folM.count=fol2M.count=placed;
+    trunkM.instanceMatrix.needsUpdate=folM.instanceMatrix.needsUpdate=fol2M.instanceMatrix.needsUpdate=true;
+    scene.add(trunkM);scene.add(folM);scene.add(fol2M);
+  })();
+  /* black box artifact + light seam (rite 3) */
+  const bbox=box(2,2,2,std(0x0b0d12,{roughness:.3,metalness:.4}),L.blackBox.x,1,L.blackBox.z);
+  const bseam=box(2.04,.06,2.04,new THREE.MeshBasicMaterial({color:0xfff2c8}),L.blackBox.x,1.96,L.blackBox.z,0,scene,false);
+  bseam.visible=!!(S.rites&&S.rites.r3!==undefined);
+  W3.rite_r3=()=>{bseam.visible=true;};
+
+  /* ---- black disk field ---- */
+  const DISKS=[];
+  for(let i=0;i<9;i++){
+    const d=new THREE.Mesh(new THREE.CylinderGeometry(2.8,2.8,.4,22),
+      std(0x05060a,{emissive:0x9d8cc9,emissiveIntensity:.1,roughness:.35,metalness:.5}));
+    d.castShadow=true;d.position.set(L.blackdisk.x,4+i*.8,L.blackdisk.z);
+    d.userData={a:i*.83,r:8+i*1.9};scene.add(d);DISKS.push(d);
+  }
+  /* player's named disk (rite 1) */
+  let ownDisk=null;
+  W3.rite_r1=(text)=>{
+    ownDisk=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.4,.36,22),
+      std(0x0a0812,{emissive:0xb9a8e8,emissiveIntensity:.4,roughness:.3,metalness:.4}));
+    ownDisk.castShadow=true;scene.add(ownDisk);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(String(text).slice(0,42),512,64,22,'rgba(185,168,232,.9)'),transparent:true,depthWrite:false}));
+    sp.scale.set(14,1.8,1);ownDisk.userData={sp};scene.add(sp);
+  };
+  if(S.rites&&S.rites.r1!==undefined)W3.rite_r1(S.rites.r1);
+  /* altar */
+  cyl(1.2,1.5,.8,std(0x14101e,{emissive:0x9d8cc9,emissiveIntensity:.2}),L.diskAltar.x,.4,L.diskAltar.z);
+
+  /* ---- prison / two houses ---- */
+  const houseWin=[];
+  (function(){
+    for(let i=0;i<9;i++)cyl(.12,.12,4.6,std(0x3c3654,{roughness:.4,metalness:.6}),L.prison.x-8+i*2,2.3,L.prison.z-4);
+    box(5,3.6,4,std(0x7a5a40,{map:plankTex}),L.prison.x-10,1.8,L.prison.z+9);collide(L.prison.x-10,L.prison.z+9,4);
+    box(5,3.6,4,std(0x4a5468,{map:concreteTex}),L.prison.x+10,1.8,L.prison.z+9);collide(L.prison.x+10,L.prison.z+9,4);
+    houseWin.push(box(1.2,1.2,.18,std(0x141008,{emissive:0xffd9a0,emissiveIntensity:0}),L.prison.x-10,2,L.prison.z+6.95,0,scene,false));
+    houseWin.push(box(1.2,1.2,.18,std(0x0d1018,{emissive:0xaac8e8,emissiveIntensity:0}),L.prison.x+10,2,L.prison.z+6.95,0,scene,false));
+    box(4,3,.3,std(0x0d0a14,{emissive:0xd4847f,emissiveIntensity:.25}),L.graffiti.x,1.5,L.graffiti.z);
+    /* witch chalk circle */
+    const ring=new THREE.Mesh(new THREE.RingGeometry(2.2,2.4,32),
+      new THREE.MeshBasicMaterial({color:0x8a93a8,transparent:true,opacity:.3,side:THREE.DoubleSide}));
+    ring.rotation.x=-Math.PI/2;ring.position.set(L.prison.x,.05,L.prison.z+2);scene.add(ring);
+  })();
+  W3.rite_r4=(v)=>{const warm=String(v).includes('WARMTH');
+    houseWin[warm?0:1].material.emissiveIntensity=1.2;};
+  if(S.rites&&S.rites.r4!==undefined)W3.rite_r4(S.rites.r4);
+
+  /* ---- therapy center ---- */
+  const maskWall=[];
+  (function(){
+    box(18,7,12,std(0x8a6a52,{map:brickTex,roughness:.8}),L.therapy.x,3.5,L.therapy.z);collide(L.therapy.x,L.therapy.z,11);
+    for(let i=0;i<4;i++)box(2.4,1.6,.2,std(0x141008,{emissive:0xcdb878,emissiveIntensity:.6}),L.therapy.x-6+i*4,4,L.therapy.z+6.1,0,scene,false);
+    box(2.2,3.4,.25,std(0x0d0b07),L.therapy.x,1.7,L.therapy.z+6.1);
+    box(3,1,1.6,std(0x2e2718,{emissive:0xcdb878,emissiveIntensity:.15}),L.desk.x,.5,L.desk.z);
+    const lampL=new THREE.PointLight(0xcdb878,1,13,2);lampL.position.set(L.desk.x,2.2,L.desk.z);scene.add(lampL);
+    box(3.4,4,.3,std(0x261f36,{emissive:0x9d8cc9,emissiveIntensity:.45}),L.mural.x,2,L.mural.z);
+    /* waiting-room mirror */
+    box(1.6,2.6,.2,std(0x444c60,{roughness:.1,metalness:.9,emissive:0x222c44,emissiveIntensity:.4}),L.maskMirror.x,1.6,L.maskMirror.z);
+    for(let i=0;i<3;i++)maskWall.push(box(.7,.9,.12,std(0x33291a,{emissive:0x8a7434,emissiveIntensity:.2}),L.maskMirror.x-2.2+i*1.1,2.2,L.maskMirror.z+.4,0,scene,false));
+  })();
+  let ownMask=null;
+  W3.rite_r2=(v)=>{ownMask=box(.8,1,.12,std(0x3a2f4e,{emissive:0x9d8cc9,emissiveIntensity:.7}),L.maskMirror.x+1.6,2.2,L.maskMirror.z+.4,0,scene,false);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(String(v).split('—')[0].trim(),512,64,24,'rgba(185,168,232,.9)'),transparent:true,depthWrite:false}));
+    sp.scale.set(9,1.4,1);sp.position.set(L.maskMirror.x+1.6,3.2,L.maskMirror.z+.6);scene.add(sp);};
+  if(S.rites&&S.rites.r2!==undefined)W3.rite_r2(S.rites.r2);
+
+  /* ---- labyrinth ---- */
+  (function(){
+    for(let r=4;r<=16;r+=4){
+      const ring=new THREE.Mesh(new THREE.RingGeometry(r-.25,r+.25,56,1,.5,5.4),
+        new THREE.MeshBasicMaterial({color:0x9d8cc9,transparent:true,opacity:.2,side:THREE.DoubleSide}));
+      ring.rotation.x=-Math.PI/2;ring.position.set(L.labyrinth.x,.06,L.labyrinth.z);scene.add(ring);}
+    for(let i=0;i<6;i++){const a=i*1.05;
+      cyl(.1,.14,.6,std(0xd8d2c0,{emissive:0xffd9a0,emissiveIntensity:.9}),L.labyrinth.x+Math.cos(a)*16,.3,L.labyrinth.z+Math.sin(a)*16);}
+    const cl=new THREE.PointLight(0xb09ae0,.8,32,2);cl.position.set(L.labyrinth.x,3,L.labyrinth.z);scene.add(cl);
+    /* observer bench */
+    box(2.4,.5,.9,std(0x2a3142,{roughness:.6}),L.bench.x,.45,L.bench.z);
+    box(2.4,.9,.18,std(0x2a3142),L.bench.x,1.1,L.bench.z-.4);
+  })();
+
+  /* ---- lake (shader water) ---- */
+  const waterUni={t:{value:0},glow:{value:.45},mcol:{value:new THREE.Color(0x9fc4e8)}};
+  const water=new THREE.Mesh(new THREE.CircleGeometry(25,48),
+    new THREE.ShaderMaterial({transparent:true,uniforms:waterUni,
+      vertexShader:'varying vec2 vU;void main(){vU=uv*2.-1.;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+      fragmentShader:`uniform float t,glow;uniform vec3 mcol;varying vec2 vU;
+        void main(){float d=length(vU);
+        float w=sin(vU.x*22.+t*1.3)*sin(vU.y*18.-t*1.1)*.5+.5;
+        float w2=sin((vU.x+vU.y)*30.-t*2.)*.5+.5;
+        vec3 base=mix(vec3(.04,.10,.17),vec3(.07,.17,.26),w*.6+w2*.4);
+        float streak=smoothstep(.12,.0,abs(vU.x+sin(vU.y*8.+t)*0.03))*smoothstep(1.,.2,d);
+        base+=mcol*streak*glow;
+        base+=vec3(.5,.7,.9)*pow(w2,8.)*.12;
+        gl_FragColor=vec4(base,.92*smoothstep(1.,.92,d));}`}));
+  water.rotation.x=-Math.PI/2;water.position.set(L.lake.x,.05,L.lake.z);scene.add(water);
+  /* burnt snag + embers (rite 5) */
+  const snag=cyl(.18,.4,3.2,std(0x120e0c,{roughness:1}),L.burntTree.x,1.6,L.burntTree.z);
+  snag.rotation.z=.18;
+  const emberGeo=new THREE.BufferGeometry();
+  const emberN=60,emberPos=new Float32Array(emberN*3),emberPhase=new Float32Array(emberN);
+  for(let i=0;i<emberN;i++){emberPos[i*3]=L.burntTree.x+(Math.random()-.5)*2;
+    emberPos[i*3+1]=Math.random()*4;emberPos[i*3+2]=L.burntTree.z+(Math.random()-.5)*2;
+    emberPhase[i]=Math.random()*7;}
+  emberGeo.setAttribute('position',new THREE.BufferAttribute(emberPos,3));
+  const embers=new THREE.Points(emberGeo,new THREE.PointsMaterial({color:0xff9a50,size:.22,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));
+  scene.add(embers);
+  let emberOn=S.rites&&S.rites.r5!==undefined;
+  if(emberOn)embers.material.opacity=.9;
+  W3.rite_r5=()=>{emberOn=true;embers.material.opacity=.9;};
+
+  /* ---- gate + terminals ---- */
+  let mirrorMat;
+  (function(){
+    box(.8,11,1.2,std(0x2c3344,{roughness:.4,metalness:.5}),L.gate.x-3.2,5.5,L.gate.z);
+    box(.8,11,1.2,std(0x2c3344,{roughness:.4,metalness:.5}),L.gate.x+3.2,5.5,L.gate.z);
+    box(7.2,.8,1.2,std(0x2c3344,{roughness:.4,metalness:.5}),L.gate.x,11,L.gate.z);
+    mirrorMat=new THREE.MeshStandardMaterial({color:0x5a6480,emissive:0x232c44,emissiveIntensity:.8,
+      transparent:true,opacity:.5,roughness:.05,metalness:.9});
+    box(5.6,10,.3,mirrorMat,L.gate.x,5.3,L.gate.z,0,scene,false);
+    collide(L.gate.x-3.2,L.gate.z,1);collide(L.gate.x+3.2,L.gate.z,1);
+  })();
+  const SCREENS=[];
+  ['mirror1','mirror2','mirror3'].forEach((k,i)=>{
+    const o=L[k];
+    box(1.6,2.6,1,std(0x121724),o.x,1.3,o.z);collide(o.x,o.z,1.2);
+    SCREENS.push(box(1.2,1,.12,std(0x080a10,{emissive:0x16321e,emissiveIntensity:.15}),o.x,1.8,o.z+.56,0,scene,false));
+  });
+  /* Case D terminal — violet kiosk */
+  box(1.6,2.8,1,std(0x1a1426,{emissive:0x2a1e44,emissiveIntensity:.4}),L.caseD.x,1.4,L.caseD.z);
+  box(1.2,1,.12,std(0x0c0814,{emissive:0x9d8cc9,emissiveIntensity:.8}),L.caseD.x,1.9,L.caseD.z+.56,0,scene,false);
+  collide(L.caseD.x,L.caseD.z,1.2);
+  W3.litTerminal=i=>{SCREENS[i].material.emissive=new THREE.Color(0x35d490);SCREENS[i].material.emissiveIntensity=1;};
+  S.ss.forEach(i=>W3.litTerminal(i));
+  W3.unlockGate=()=>{mirrorMat.emissive=new THREE.Color(0x4ad4b4);mirrorMat.opacity=.62;
+    const gl2=new THREE.PointLight(0x7fd4c1,1.1,28,2);gl2.position.set(L.gate.x,6,L.gate.z);scene.add(gl2);};
+  if(S.solved.s1)W3.unlockGate();
+
+  /* ---- O.V. obelisks ---- */
+  [L.ovStone1,L.ovStone2].forEach(s=>{
+    const m=box(1.2,4.2,1.2,std(0x191e2e,{emissive:0x3a4668,emissiveIntensity:.25,roughness:.3,metalness:.4}),s.x,2.1,s.z);
+    m.rotation.y=.6;collide(s.x,s.z,1.3);
+    box(.9,.06,.06,new THREE.MeshBasicMaterial({color:0x6a7eae}),s.x,3.2,s.z,(Math.PI/4),scene,false);
+  });
+
+  /* ---- creek + bridge + caravan ---- */
+  (function(){
+    const creek=new THREE.Mesh(new THREE.PlaneGeometry(5,110),
+      std(0x14324a,{emissive:0x0a2030,emissiveIntensity:.6,transparent:true,opacity:.85,roughness:.1,metalness:.6}));
+    creek.rotation.x=-Math.PI/2;creek.position.set(317,.04,198);scene.add(creek);
+    box(6,.3,3,std(0x4c4126,{roughness:.9}),319,.5,196);
+    box(8,3,4,std(0x8a7048,{map:plankTex,emissive:0x3a3014,emissiveIntensity:.15}),L.caravan.x,1.5,L.caravan.z);collide(L.caravan.x,L.caravan.z,5);
+    cyl(.8,.8,.4,std(0x111111),L.caravan.x-2.4,.8,L.caravan.z+2.2).rotation.z=Math.PI/2;
+    cyl(.8,.8,.4,std(0x111111),L.caravan.x+2.4,.8,L.caravan.z+2.2).rotation.z=Math.PI/2;
+    label("SILVANUS'S GARDEN",L.caravan.x,L.caravan.z,9,.7);
+  })();
+  const fire=new THREE.PointLight(0xffa050,1.6,20,2);
+  fire.position.set(L.caravan.x+6,1.2,L.caravan.z+3);scene.add(fire);
+  const flame=cyl(.01,.5,1.2,new THREE.MeshBasicMaterial({color:0xffb060}),L.caravan.x+6,.6,L.caravan.z+3);
+
+  /* ---- station + train ---- */
+  (function(){
+    box(40,1,8,std(0x4a5266,{map:concreteTex}),326,.5,38);
+    for(let i=0;i<4;i++){
+      box(8.6,3.2,3,std(0xdcd8c8,{emissive:0x6a6452,emissiveIntensity:.12,roughness:.4,metalness:.3}),312+i*9.4,2.6,30);
+      for(let w=0;w<3;w++)box(1.6,1,.2,std(0x202020,{emissive:0xfff2c8,emissiveIntensity:.85}),309.4+i*9.4+w*2.8,3,31.6,0,scene,false);
+      collide(312+i*9.4,30,5);}
+    for(let i=0;i<5;i++)cyl(.55,.55,.3,std(0x101010),310+i*8,1,28.4).rotation.z=Math.PI/2;
+    box(2,3.4,2,std(0x121724,{emissive:0xcdb878,emissiveIntensity:.3}),326,1.7,40);
+    label('DOLUNAY EKSPRES',326,30,8,.9);
+  })();
+
+  /* ---- plaques ---- */
+  const PLM=[];
+  PLAQUES.forEach((p,i)=>{
+    const g=new THREE.Group();
+    const tab=box(1.1,1.5,.16,std(0x8a7434,{emissive:0xcdb878,emissiveIntensity:.9}),0,1.6,0,0,g);
+    box(.5,.9,.5,std(0x2c2c32),0,.45,0,0,g);
+    g.position.set(p.x,0,p.z);scene.add(g);
+    PLM.push({g,tab,collected:S.plaques.includes(i)});
+    if(S.plaques.includes(i))tab.material.emissiveIntensity=.12;
+  });
+  W3.collectPlaque=i=>{PLM[i].collected=true;PLM[i].tab.material.emissiveIntensity=.12;};
+
+  /* ---- figures ---- */
+  function makeFigure(coat,skin,glow,scale=1){
+    const g=new THREE.Group(),parts={};
+    const cm=std(coat,{roughness:.8}),sm=std(skin,{roughness:.6});
+    parts.legL=new THREE.Group();parts.legR=new THREE.Group();
+    [parts.legL,parts.legR].forEach((lg,ix)=>{
+      const c=new THREE.Mesh(new THREE.CylinderGeometry(.13,.11,.85,8),cm);
+      c.position.y=-.425;c.castShadow=true;lg.add(c);lg.position.set(ix?-.17:.17,.95,0);g.add(lg);});
+    box(.5,.34,.3,cm,0,1.05,0,0,g); /* pelvis — no skirt */
+    box(.6,.78,.34,cm,0,1.42,0,0,g);
+    if(glow)box(.62,.07,.36,std(0x111111,{emissive:glow,emissiveIntensity:1.2}),0,1.56,0,0,g,false);
+    parts.armL=new THREE.Group();parts.armR=new THREE.Group();
+    [parts.armL,parts.armR].forEach((ar,ix)=>{
+      const c=new THREE.Mesh(new THREE.CylinderGeometry(.09,.08,.7,8),cm);
+      c.position.y=-.35;c.castShadow=true;ar.add(c);ar.position.set(ix?-.39:.39,1.74,0);g.add(ar);});
+    const hd=new THREE.Mesh(new THREE.SphereGeometry(.2,14,14),sm);hd.position.y=2.0;hd.castShadow=true;g.add(hd);
+    const hood=new THREE.Mesh(new THREE.SphereGeometry(.24,12,12),cm);
+    hood.scale.set(1,.9,1);hood.position.y=2.04;g.add(hood);
+    const visor=new THREE.Mesh(new THREE.BoxGeometry(.3,.09,.06),std(0x080a10,{emissive:glow||0x223244,emissiveIntensity:1}));
+    visor.position.set(0,2.02,.18);g.add(visor);
+    g.scale.setScalar(scale);
+    parts.visor=visor;parts.cm=cm;parts.sm=sm;
+    return{g,parts};
+  }
+  const player=makeFigure(0x1e2734,0xc9b8a6,0x7fd4c1);
+  player.g.position.set(S.px,0,S.pz);scene.add(player.g);
+  /* human → machine evolution (insight-driven) */
+  const evo={};
+  evo.seam=new THREE.Mesh(new THREE.BoxGeometry(.05,.78,.36),std(0x111111,{emissive:0x7fd4c1,emissiveIntensity:1.4}));
+  evo.seam.position.set(0,1.42,.01);evo.seam.visible=false;player.g.add(evo.seam);
+  evo.shL=new THREE.Mesh(new THREE.BoxGeometry(.2,.12,.3),std(0x8a93a8,{roughness:.25,metalness:.85}));
+  evo.shL.position.set(.42,1.82,0);evo.shL.visible=false;player.g.add(evo.shL);
+  evo.shR=evo.shL.clone();evo.shR.position.x=-.42;player.g.add(evo.shR);
+  evo.ant=new THREE.Group();
+  {const a=new THREE.Mesh(new THREE.CylinderGeometry(.015,.015,.34,6),std(0x9aa4b8,{metalness:.9,roughness:.2}));
+   a.position.y=.17;evo.ant.add(a);
+   const tip=new THREE.Mesh(new THREE.SphereGeometry(.035,8,8),std(0x111111,{emissive:0x7fd4c1,emissiveIntensity:2}));
+   tip.position.y=.36;evo.ant.add(tip);}
+  evo.ant.position.set(0,2.2,0);evo.ant.visible=false;player.g.add(evo.ant);
+  let evoLv=-1;
+  W3.evolve=lv=>{
+    if(lv===evoLv)return;evoLv=lv;
+    evo.seam.visible=lv>=1;
+    evo.shL.visible=evo.shR.visible=lv>=2;
+    evo.ant.visible=lv>=3;
+    player.parts.visor.material.emissiveIntensity=1+lv*.8;
+    if(lv>=2){player.parts.cm.color.set(0x39414f);player.parts.cm.metalness=.7;player.parts.cm.roughness=.3;}
+    else{player.parts.cm.color.set(0x1e2734);player.parts.cm.metalness=.05;player.parts.cm.roughness=.8;}
+    if(lv>=3){player.parts.sm.color.set(0xb8c2d4);player.parts.sm.metalness=.9;player.parts.sm.roughness=.15;}
+    else{player.parts.sm.color.set(0xc9b8a6);player.parts.sm.metalness=.05;player.parts.sm.roughness=.6;}
+  };
+  const lun=makeFigure(0xe8e4d4,0xf2efe2,0xfff8d8);
+  lun.g.position.set(L.lunaris.x,0,L.lunaris.z);lun.g.visible=false;scene.add(lun.g);
+  const noct=makeFigure(0x0c0a14,0x161020,0xd4847f);
+  noct.g.position.set(L.blackdisk.x,0,L.blackdisk.z);scene.add(noct.g);
+  const silv=makeFigure(0x4c3c24,0xc9b8a6,0xffa050);
+  silv.g.position.set(L.caravan.x+4.5,0,L.caravan.z+4.5);silv.g.rotation.y=2.4;scene.add(silv.g);
+  const lucius=makeFigure(0x232a3a,0xd0c2b0,0xaab6c4);
+  lucius.g.position.set(L.lucius.x,0,L.lucius.z);lucius.g.rotation.y=Math.PI;scene.add(lucius.g);
+  /* Bahal — the shadow */
+  const bahal=makeFigure(0x07070c,0x0a0a12,0x553344);
+  bahal.g.position.set(L.shadowSpot.x,0,L.shadowSpot.z);bahal.g.visible=false;scene.add(bahal.g);
+  let bahalMode='none'; // none | wait | walk
+  W3.shadowFlee=()=>{bahalMode='none';bahal.g.visible=false;};
+  W3.shadowJoin=()=>{bahalMode='walk';};
+  if(S.flags.integrated)bahalMode='walk';
+
+  /* ---- waypoint beacon ---- */
+  const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.9,1.6,70,12,1,true),
+    new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.2,
+      blending:THREE.AdditiveBlending,side:THREE.DoubleSide,depthWrite:false}));
+  beacon.position.y=35;scene.add(beacon);
+
+  /* ---- mist + fireflies ---- */
+  const mists=[];
+  (function(){
+    const c=document.createElement('canvas');c.width=c.height=128;
+    const x=c.getContext('2d'),g=x.createRadialGradient(64,64,8,64,64,64);
+    g.addColorStop(0,'rgba(150,170,200,.16)');g.addColorStop(1,'rgba(150,170,200,0)');
+    x.fillStyle=g;x.fillRect(0,0,128,128);
+    const tex=new THREE.CanvasTexture(c);
+    for(let i=0;i<14;i++){
+      const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));
+      sp.scale.set(40+Math.random()*40,12+Math.random()*8,1);
+      sp.position.set(20+Math.random()*340,2+Math.random()*2,20+Math.random()*250);
+      sp.userData={v:.3+Math.random()*.5};scene.add(sp);mists.push(sp);}
+  })();
+  const ffGeo=new THREE.BufferGeometry();
+  const ffN=90,ffPos=new Float32Array(ffN*3),ffSeed=[];
+  for(let i=0;i<ffN;i++){
+    const base=i<50?L.forest:L.lake;
+    ffPos[i*3]=base.x+(Math.random()-.5)*40;ffPos[i*3+1]=1+Math.random()*3;ffPos[i*3+2]=base.z+(Math.random()-.5)*36;
+    ffSeed.push(Math.random()*7);}
+  ffGeo.setAttribute('position',new THREE.BufferAttribute(ffPos,3));
+  const flies=new THREE.Points(ffGeo,new THREE.PointsMaterial({color:0xb8e8c8,size:.18,transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false}));
+  scene.add(flies);
+
+  /* ---- rain + lightning (the storm Book 2 opens with) ---- */
+  function rainyDay(){return (S.day%5)<2;}
+  const rainN=1400,rainGeo=new THREE.BufferGeometry(),rainPos=new Float32Array(rainN*3);
+  for(let i=0;i<rainN;i++){rainPos[i*3]=(Math.random()-.5)*120;
+    rainPos[i*3+1]=Math.random()*40;rainPos[i*3+2]=(Math.random()-.5)*120;}
+  rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPos,3));
+  const rain=new THREE.Points(rainGeo,new THREE.PointsMaterial({color:0x8da4c8,size:.12,transparent:true,opacity:.55,depthWrite:false}));
+  scene.add(rain);
+  let wetApplied=null,nextFlash=9;
+  function updateWeather(t,dt){
+    const r=rainyDay();
+    rain.visible=r;
+    if(wetApplied!==r){wetApplied=r;
+      if(groundMat){groundMat.roughness=r?.4:.95;groundMat.metalness=r?.22:0;}}
+    if(r){
+      const arr=rainGeo.attributes.position.array;
+      for(let i=0;i<rainN;i++){arr[i*3+1]-=dt*26;if(arr[i*3+1]<0)arr[i*3+1]=40;}
+      rainGeo.attributes.position.needsUpdate=true;
+      rain.position.set(S.px,0,S.pz);
+      if(t>nextFlash){nextFlash=t+12+Math.random()*22;
+        const f=document.getElementById('flash');
+        f.style.opacity=.5;setTimeout(()=>{f.style.opacity=0;
+          setTimeout(()=>{f.style.opacity=.3;setTimeout(()=>f.style.opacity=0,90);},110);},120);}
+    }
+  }
+
+  /* ---- moon state ---- */
+  W3.applyMoon=()=>{
+    moonLight.intensity=isFull()?1.2:isNew()?.16:.6;
+    hemi.intensity=isNew()?.3:.5;
+    scene.fog.density=isNew()?.0088:.0065;
+    moonMesh.material.color.set(isNew()?0x3a4150:0xefebda);
+    moonGlow.material.opacity=isNew()?.15:1;
+    waterUni.glow.value=isFull()?1.2:.4;
+    renderer.toneMappingExposure=isNew()?1.0:1.15;
+  };
+  W3.applyMoon();
+
+  /* ---- camera ---- */
+  const Cam={yaw:Math.PI,pitch:.3,dist:7.5};
+  renderer.domElement.addEventListener('click',()=>{
+    if(!Game.modal&&Game.running&&matchMedia('(pointer:fine)').matches)
+      renderer.domElement.requestPointerLock&&renderer.domElement.requestPointerLock();});
+  addEventListener('mousemove',e=>{
+    if(document.pointerLockElement===renderer.domElement){
+      Cam.yaw-=e.movementX*.0024;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+e.movementY*.0024));}});
+  addEventListener('wheel',e=>{Cam.dist=Math.max(4,Math.min(13,Cam.dist+e.deltaY*.005));});
+  let lookId=null,lx=0,ly=0;
+  addEventListener('touchstart',e=>{for(const t of e.changedTouches)
+    if(t.clientX>innerWidth*.45&&lookId===null){lookId=t.identifier;lx=t.clientX;ly=t.clientY;}},{passive:true});
+  addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===lookId){
+    Cam.yaw-=(t.clientX-lx)*.006;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+(t.clientY-ly)*.006));
+    lx=t.clientX;ly=t.clientY;}},{passive:true});
+  addEventListener('touchend',e=>{for(const t of e.changedTouches)if(t.identifier===lookId)lookId=null;},{passive:true});
+
+  /* ---- loop ---- */
+  let walkT=0,meshAng=0,last=performance.now(),saveT=0,noctWarn=0,fovKick=0,gameT=0;
+  W3.noctPos={x:L.blackdisk.x,z:L.blackdisk.z};
+  function lerpAng(a,b,t){let d=b-a;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return a+d*t;}
+  function animate(now){
+    requestAnimationFrame(animate);
+    const rdt=Math.min(.05,(now-last)/1000);last=now;
+    /* FULL FREEZE while any dialogue/menu is open — no drift, no sway */
+    const paused=Game.modal;
+    const dt=paused?0:rdt;
+    gameT+=dt;const t=gameT;
+    waterUni.t.value=t;
+    updateWeather(t,dt);
+
+    let mx=0,mz=0,running=false;
+    if(Game.running&&!Game.modal&&!Game.sitting){
+      let ix=0,iz=0;
+      if(keys['w']||keys['arrowup'])iz+=1;
+      if(keys['s']||keys['arrowdown'])iz-=1;
+      if(keys['a']||keys['arrowleft'])ix-=1;
+      if(keys['d']||keys['arrowright'])ix+=1;
+      if(Joy.on){ix+=Joy.x;iz-=Joy.y;}
+      const m=Math.hypot(ix,iz);
+      if(m>0.01){
+        ix/=Math.max(1,m);iz/=Math.max(1,m);
+        running=!!keys['shift']||(Joy.on&&Math.hypot(Joy.x,Joy.y)>.85);
+        const sp=(running?10:5.4)*dt;
+        const fx=-Math.sin(Cam.yaw),fz=-Math.cos(Cam.yaw);
+        const rx=-fz,rz=fx;
+        mx=(fx*iz+rx*ix)*sp;mz=(fz*iz+rz*ix)*sp;
+        let nx=S.px+mx,nz=S.pz+mz;
+        nx=Math.max(4,Math.min(WX-4,nx));nz=Math.max(4,Math.min(WZ-4,nz));
+        for(const c of COLL){const d=Math.hypot(nx-c.x,nz-c.z);
+          if(d<c.r+.6&&d>0){const push=(c.r+.6-d);nx+=(nx-c.x)/d*push;nz+=(nz-c.z)/d*push;}}
+        for(const tr of TREES){const d=Math.hypot(nx-tr.x,nz-tr.z);
+          if(d<.75&&d>0){nx+=(nx-tr.x)/d*(.75-d);nz+=(nz-tr.z)/d*(.75-d);}}
+        S.px=nx;S.pz=nz;
+        meshAng=lerpAng(meshAng,Math.atan2(mx,mz),.18);
+        walkT+=dt*(running?11:7);
+      }else walkT+=dt*1.2;
+    }
+    S.heading=meshAng+Math.PI;
+    player.g.position.set(S.px,Math.abs(Math.sin(walkT))*.05,S.pz);
+    player.g.rotation.y=meshAng;
+    const moving=Math.abs(mx)+Math.abs(mz)>0.0001;
+    const sw=Math.sin(walkT)*(moving?(running?.85:.55):.04);
+    player.parts.legL.rotation.x=sw;player.parts.legR.rotation.x=-sw;
+    player.parts.armL.rotation.x=-sw*.8;player.parts.armR.rotation.x=sw*.8;
+    lantern.position.set(S.px+Math.sin(meshAng)*.5,1.5,S.pz+Math.cos(meshAng)*.5);
+
+    /* camera — completely static while paused */
+    if(!paused){
+      fovKick+= ((running?4:0)-fovKick)*.08;
+      camera.fov=58+fovKick;camera.updateProjectionMatrix();
+      const cd=Cam.dist,cp=Cam.pitch;
+      camera.position.lerp(new THREE.Vector3(
+        S.px+Math.sin(Cam.yaw)*Math.cos(cp)*cd,
+        1.6+Math.sin(cp)*cd,
+        S.pz+Math.cos(Cam.yaw)*Math.cos(cp)*cd),.18);
+      camera.lookAt(S.px,1.9,S.pz);
+      moonLight.position.set(S.px+130,200,S.pz-60);
+      mlTarget.position.set(S.px,0,S.pz);
+    }
+
+    /* world anim */
+    DISKS.forEach((d,i)=>{d.userData.a+=dt*.16;
+      d.position.set(L.blackdisk.x+Math.cos(d.userData.a)*d.userData.r,3.5+i*.7+Math.sin(t+i)*.4,
+        L.blackdisk.z+Math.sin(d.userData.a)*d.userData.r*.8);
+      d.rotation.y+=dt*.4;});
+    if(ownDisk){const a=t*.1;
+      ownDisk.position.set(L.blackdisk.x+Math.cos(a)*22,6.5+Math.sin(t*.7)*.5,L.blackdisk.z+Math.sin(a)*17);
+      ownDisk.rotation.y=t*.2;
+      ownDisk.userData.sp.position.set(ownDisk.position.x,ownDisk.position.y+1.6,ownDisk.position.z);}
+    PLM.forEach((p,i)=>{if(!p.collected){p.g.position.y=Math.sin(t*2+i)*.15;p.g.rotation.y=t*.8;}});
+    fire.intensity=1.4+Math.sin(t*9)*.3+Math.sin(t*23)*.15;
+    flame.scale.y=1+Math.sin(t*11)*.2;
+    mists.forEach(sp=>{sp.position.x+=sp.userData.v*dt;if(sp.position.x>370)sp.position.x=10;});
+    {const arr=ffGeo.attributes.position.array;
+      for(let i=0;i<ffN;i++){arr[i*3+1]=1.4+Math.sin(t*1.4+ffSeed[i])*1.1;
+        arr[i*3]+=Math.sin(t*.6+ffSeed[i]*2)*.012;arr[i*3+2]+=Math.cos(t*.5+ffSeed[i]*3)*.012;}
+      ffGeo.attributes.position.needsUpdate=true;
+      flies.material.opacity=.4+.4*Math.abs(Math.sin(t*.8));}
+    if(emberOn){const arr=emberGeo.attributes.position.array;
+      for(let i=0;i<emberN;i++){arr[i*3+1]+=dt*(.6+Math.sin(emberPhase[i])*.3);
+        if(arr[i*3+1]>5)arr[i*3+1]=.2;}
+      emberGeo.attributes.position.needsUpdate=true;}
+    Object.values(riteMarks).forEach((m,i)=>{m.material.opacity=.1+.08*Math.abs(Math.sin(t*1.5+i));});
+    for(const k in riteMarks)if(S.rites[k]!==undefined)riteMarks[k].material.opacity=0;
+    shadowMark.material.opacity=(S.solved.s2&&S.rites.r7===undefined)?.12+.08*Math.abs(Math.sin(t*1.2)):0;
+
+    /* Lunaris */
+    const lv=lunarisMoon()&&S.stage>=3&&!S.solved.s2;
+    lun.g.visible=lv;
+    if(lv){lun.g.position.y=.2+Math.sin(t*1.5)*.12;
+      lun.g.rotation.y=Math.atan2(S.px-L.lunaris.x,S.pz-L.lunaris.z);}
+
+    /* Bahal shadow */
+    if(S.solved.s2&&S.rites.r7===undefined)bahalMode='wait';
+    if(bahalMode==='wait'){bahal.g.visible=true;
+      bahal.g.position.set(L.shadowSpot.x,Math.sin(t*1.1)*.06,L.shadowSpot.z);
+      bahal.g.rotation.y=Math.atan2(S.px-L.shadowSpot.x,S.pz-L.shadowSpot.z);}
+    else if(bahalMode==='walk'){bahal.g.visible=true;
+      const tx2=S.px-Math.sin(meshAng)*2.6+Math.cos(meshAng)*1.2,
+            tz2=S.pz-Math.cos(meshAng)*2.6-Math.sin(meshAng)*1.2;
+      bahal.g.position.x+=(tx2-bahal.g.position.x)*dt*2.2;
+      bahal.g.position.z+=(tz2-bahal.g.position.z)*dt*2.2;
+      bahal.g.rotation.y=meshAng;
+      const bs=Math.sin(walkT)*.4;
+      bahal.parts.legL.rotation.x=bs;bahal.parts.legR.rotation.x=-bs;}
+    else bahal.g.visible=false;
+
+    /* MC Noctornus */
+    if(Game.running&&!Game.modal){
+      const hunting=!S.flags.noctPeace;
+      const na=t*.16;
+      let nx2,nz2;
+      if(hunting){
+        nx2=L.blackdisk.x+Math.cos(na)*16;nz2=L.blackdisk.z+Math.sin(na*1.3)*13;
+        const pd=Math.hypot(S.px-noct.g.position.x,S.pz-noct.g.position.z);
+        if(pd<14&&S.lucidity<70){
+          nx2=noct.g.position.x+(S.px-noct.g.position.x)*dt*.5;
+          nz2=noct.g.position.z+(S.pz-noct.g.position.z)*dt*.5;
+          S.lucidity=Math.max(3,S.lucidity-dt*3.2);
+          if(now-noctWarn>9000){noctWarn=now;
+            UI.toast('A beat you cannot hear is circling you. MC Noctornus hunts the unsteady — walk up sober (lucidity 70+), or keep moving.');}}
+      }else{nx2=L.blackdisk.x+Math.cos(na*.3)*6;nz2=L.blackdisk.z+18+Math.sin(na*.4)*3;}
+      noct.g.position.x+=(nx2-noct.g.position.x)*Math.min(1,dt*3);
+      noct.g.position.z+=(nz2-noct.g.position.z)*Math.min(1,dt*3);
+      W3.noctPos.x=noct.g.position.x;W3.noctPos.z=noct.g.position.z;
+      noct.g.rotation.y=Math.atan2(S.px-noct.g.position.x,S.pz-noct.g.position.z);
+      const nsw=Math.sin(t*6)*.4;
+      noct.parts.legL.rotation.x=nsw;noct.parts.legR.rotation.x=-nsw;
+      if(S.lucidity<=3.01){S.lucidity=60;S.px=190;S.pz=243;
+        aeliusCard('You went under. The Institute reeled you back to the facility — they always do. Lucidity is a leash, IT-041. Hold it. (There is a payphone in the garden. Gravity answers.)');
+        refreshHud();save();}
+    }
+    document.getElementById('dmg').style.opacity=S.lucidity<35?(35-S.lucidity)/40:0;
+
+    /* beacon */
+    const wp=Game.running?waypoint():null;
+    beacon.visible=!!wp;
+    if(wp){beacon.position.set(wp.x,35,wp.z);
+      beacon.material.opacity=.15+Math.abs(Math.sin(t*2))*.1;}
+
+    /* HUD */
+    if(Game.running){
+      if(!Game.modal){
+        const it=interactTarget();
+        const pr=UI.el('prompt');
+        if(it){pr.textContent='[E] '+it[0];pr.style.display='block';}
+        else pr.style.display='none';
+        UI.el('lucbar').style.width=S.lucidity+'%';
+      }else UI.el('prompt').style.display='none';
+      drawMini();
+      saveT+=dt;if(saveT>5){saveT=0;save();}
+    }
+    renderer.render(scene,camera);
+  }
+  requestAnimationFrame(animate);
+})();
+
+/* ---------------- Minimap ---------------- */
+const MM=document.getElementById('minimap'),mctx=MM.getContext('2d');
+function drawMiniBase(ctx,w,h){
+  ctx.fillStyle='rgba(5,6,10,.9)';ctx.fillRect(0,0,w,h);
+  const sx=w/WX,sz=h/WZ;
+  ZONES.forEach(z=>{ctx.fillStyle='rgba(127,212,193,.10)';
+    ctx.beginPath();ctx.arc(z.x*sx,z.z*sz,z.r*sx,0,7);ctx.fill();});
+  ctx.fillStyle='rgba(157,140,201,.7)';
+  RITE_SITES.forEach((k,i)=>{if(S.rites['r'+(i+1)]===undefined)ctx.fillRect(L[k].x*sx-1.5,L[k].z*sz-1.5,3,3);});
+}
+function drawMini(){
+  const w=MM.width,h=MM.height,sx=w/WX,sz=h/WZ;
+  drawMiniBase(mctx,w,h);
+  const wp=waypoint();
+  if(wp){mctx.fillStyle='#cdb878';mctx.beginPath();mctx.arc(wp.x*sx,wp.z*sz,3,0,7);mctx.fill();}
+  mctx.save();mctx.translate(S.px*sx,S.pz*sz);mctx.rotate(S.heading);
+  mctx.fillStyle='#e8e4d4';
+  mctx.beginPath();mctx.moveTo(0,-5);mctx.lineTo(3.5,4);mctx.lineTo(-3.5,4);mctx.closePath();mctx.fill();
+  mctx.restore();
+}
+function drawBigMap(){
+  const c=document.getElementById('bigmap');
+  c.width=Math.min(innerWidth*.9,900);c.height=c.width*WZ/WX;
+  const ctx=c.getContext('2d'),sx=c.width/WX,sz=c.height/WZ;
+  drawMiniBase(ctx,c.width,c.height);
+  ctx.font='11px monospace';ctx.textAlign='center';ctx.fillStyle='#9aa7c4';
+  ZONES.forEach(z=>ctx.fillText(z.name,z.x*sx,z.z*sz-z.r*sx-4));
+  ctx.fillText('GATE OF MIRRORS',L.gate.x*sx,L.gate.z*sz-12);
+  ctx.fillStyle='#9d8cc9';
+  ctx.fillText('◈ violet = rites (yours)',c.width/2,c.height-30);
+  const wp=waypoint();
+  if(wp){ctx.fillStyle='#cdb878';ctx.beginPath();ctx.arc(wp.x*sx,wp.z*sz,5,0,7);ctx.fill();
+    ctx.fillText('◆ OBJECTIVE',wp.x*sx,wp.z*sz+18);}
+  ctx.fillStyle='#e8e4d4';ctx.beginPath();ctx.arc(S.px*sx,S.pz*sz,5,0,7);ctx.fill();
+  ctx.fillStyle='#7fd4c1';ctx.fillText('YOU',S.px*sx,S.pz*sz-10);
+  ctx.fillText('— PRESS [M] TO CLOSE —',c.width/2,c.height-14);
+}
+document.getElementById('bigmapWrap').addEventListener('click',()=>Game.toggleMap());
+/* film grain */
+(function(){const c=document.getElementById('grain'),x=c.getContext('2d');
+  const d=x.createImageData(128,128);
+  for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255|0;
+    d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255;}
+  x.putImageData(d,0,0);})();
+</script>
+</body>
+</html>
