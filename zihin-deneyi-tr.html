@@ -146,7 +146,7 @@
   <div id="locksRow">◇ ◇ ◇ ◇</div>
   <div id="ritesRow">RİTÜELLER 0/7</div>
 </div>
-<div id="ctrlhelp">WASD HAREKET · SHIFT KOŞ · FARE BAKIŞ (KİLİT İÇİN TIKLA)<br>E ETKİLEŞİM · J GÜNLÜK · M HARİTA</div>
+<div id="ctrlhelp">WASD HAREKET · SHIFT KOŞ · FARE BAKIŞ (KİLİT İÇİN TIKLA)<br>E ETKİLEŞİM · F SAF IŞIK · J GÜNLÜK · M HARİTA</div>
 <div id="prompt"></div>
 <div id="toast"></div>
 
@@ -232,6 +232,7 @@
   <button class="mini" onclick="UI.toggleJournal()">GÜNLÜK</button>
   <button class="mini" onclick="Game.toggleMap()">HARİTA</button>
   <button class="mini" id="sndBtn" onclick="Snd.toggle()">SES: AÇIK</button>
+  <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">EŞZAMANLI: KAPALI</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -260,6 +261,19 @@ function moonGlyphName(){
     ['○','DOLUNAY'],['◕','ŞİŞKİN AY (KÜÇÜLEN)'],['◑','SON DÖRDÜN'],['◑','HİLAL (KÜÇÜLEN)']];
   return q[phaseBin()];}
 function riteCount(){return ['r1','r2','r3','r4','r5','r6','r7'].filter(k=>S.rites[k]!==undefined).length;}
+/* O.V. kanıt ağı: Lunaris'in 12 Nisan gecesi dışarıya gömdüğü dört düğüm */
+function ovEv(){return [S.flags.traceSuperego,S.flags.traceMicrop,S.flags.tanik1616,S.flags.kursu1025].filter(Boolean).length;}
+/* Kimlik dönüşümü: Lunaris Bahal → ... → Aelius */
+function identityName(){return S.insight>=90?'AELIUS':S.insight>=55?'BÜTÜNLEŞEN':S.insight>=25?'LUNARIS':'LUNARIS BAHAL';}
+/* Üçüncü okuma: aklını mı kaybediyorsun? — iç ses kartları */
+const ICSES=[
+  'Bir an dürüst ol. Saat kaç? Ne zamandır bu “rekonstrüksiyonun” içindesin? Dışarıda seni bekleyen biri var mıydı?',
+  'Diskler, dikilitaşlar, kör bir tanrı… Bunların hepsi bir kitapta yazıyordu. Kitabı okuyan sendin. Peki şu an kim yürüyor?',
+  'Enstitü gerçek olmayabilir. Ordos Veritas gerçek olmayabilir. Ama şu his — izlenme hissi — o nereden geliyor?',
+  'O da böyle başlamıştı. Önce işaretler. Sonra hesaplar. Sonra köprüde arkasındaki araba. Sen kaçıncı adımdasın?',
+  'Belki de hiçbir şeyi durdurmuyorsun. Belki sadece uyuyamıyorsun. İkisi de olabilir. İkisi de aynı anda olabilir.',
+  'Aklını kaybetmek ile bilinci genişletmek arasındaki fark, çoğu zaman, sabah olduğunda hâlâ sevdiklerini arayıp arayamadığındır. Ankesörlü telefonu hatırla.',
+];
 const SAVEKEY='it041_sw_tr_v1';
 function save(){try{localStorage.setItem(SAVEKEY,JSON.stringify(S));}catch(e){}}
 function load(){try{const j=localStorage.getItem(SAVEKEY);if(j){Object.assign(S,JSON.parse(j));return true;}}catch(e){}return false;}
@@ -299,7 +313,14 @@ const L={
   burntTree:{x:260,z:92,r:4.5,name:'YANIK KÜTÜK'},
   bench:{x:186,z:114,r:4.5,name:'GÖZLEMCİNİN BANKI'},
   shadowSpot:{x:76,z:98,r:7,name:'SENİ İZLEYEN ŞEY'},
+  /* O.V. / Yaldabaoth hattı */
+  tanik1616:{x:240,z:140,r:4.5,name:'TANIK TERMİNALİ'},
+  kursu1025:{x:252,z:60,r:4.5,name:'DELİL KÜRSÜSÜ'},
+  ovCrypt:{x:124,z:204,r:6,name:'O.V. MAHZENİ'},
+  pleromaGate:{x:202,z:214,r:5,name:'PLEROMA KAPISI'},
+  pleromaCore:{x:44,z:266,r:5,name:'YALDABAOTH ÇEKİRDEĞİ'},
 };
+const PLEROMA={x:44,z:256,r:22}; // Enstitü'nün yeraltı sunucu salonu
 const ZONES=[L.blackdisk,L.forest,L.prison,L.therapy,L.labyrinth,L.lake,L.institute,L.caravan,L.station];
 const RITE_SITES=['diskAltar','maskMirror','blackBox','twoHouses','burntTree','bench'];
 function dist(o){return Math.hypot(S.px-o.x,S.pz-o.z);}
@@ -340,6 +361,9 @@ const TEACHINGS=[
   {id:'amor',t:'AMOR FATI',q:'“Hepsini affediyorum — çünkü her parçası beni buraya taşıdı. Yangın, cadı, yanlış ayna. Kader sevgisi teslimiyet değildir. Geç kabul edilmiş yazarlıktır.”'},
   {id:'lucida',t:'LUCIDA',q:'“Lucida\'ya — yer çekiminin ta kendisi. Her katmanda, akıntı beni dağıtmak istediğinde beni kendine çekip ben olmamı sağladı. Sevgi yolculuğun karşıtı değildir. Sevgi, yolculuğun indiği zemindir.”'},
   {id:'ordos',t:'ORDOS VERITAS',q:'“Hangi örgütten kaçıyoruz? Ordos Veritas\'tan mı? — Makine asla cevap vermedi. Örgüt, bir aynanın gerçek olduğu kadar gerçekti: ona, korkusunun çoktan taslağını çıkardığı komployu gösterdi. Bazı gözcüler yalnızca sen pencereyi kontrol ettiğin için vardır.”'},
+  {id:'pleroma',t:'PLEROMA TUZAĞI',q:'“Enstitü\'nün amacı tedavi değildi. Amaç, insan bilincini sayısallaştırıp bir simülasyona — sahte bir Pleroma\'ya — kilitlemekti. Kör tanrı kopyalar yapar; çünkü yarattığını göremeyen, ancak çoğaltarak sahiplenir.”'},
+  {id:'ov',t:'ORDOS VERITAS — ÖTEKİ YÜZ',q:'“Makinenin korkuluk diye gösterdiği örgüt, gerçekte kapıların öbür tarafıydı: bilinci daraltan tuzağa karşı bilinci genişletenler. O.V. üye toplamaz. Bütünleşen herkes, zaten üyedir.”'},
+  {id:'madness',t:'ÜÇÜNCÜ OKUMA',q:'“Bunların bir savaş mı, bir bütünleşme mi, yoksa bir nöbet mi olduğunu sormayı hiç bırakma. O soru paranoya değil — emniyet kemeridir. Aklını kaybeden sormayı bırakandır.”'},
   {id:'sig',t:'SON SATIR',q:'“İmza, kimlik verir. Hakikat, kimliksizdir. Deney başlıyor.”'},
 ];
 function teachUnlock(id){
@@ -549,6 +573,7 @@ const UI={
     M.forEach(m=>{const cls=m[1]?'done':(cur?'cur':'');if(!m[1])cur=false;
       h+=`<div class="${cls}">${m[1]?'✓':'·'} ${m[0]}</div>`;});
     h+=`<div class="rite">◈ Tamamlanan iç ritüeller — ${riteCount()}/7 (mor işaretler; isteğe bağlı, senin)</div>`;
+    if(S.flags.ovQuest)h+=`<div class="${S.solved.s7?'done':'rite'}">⟁ O.V. — Yaldabaoth\'u durdur: kanıt ${ovEv()}/4${S.flags.ovCouncil?' · SAF IŞIK [F]':''}${S.solved.s7?' · ÇEKİRDEK DURDU':''}</div>`;
     this.el('quests').innerHTML=h;
   },
   jtab(t,el){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));el.classList.add('on');this.renderJournal(t);},
@@ -792,13 +817,28 @@ const Cipher={
       ok(){S.solved.s6=true;S.locks++;S.stage=7;S.insight=Math.max(S.insight,90);teachUnlock('sig');
         UI.toast('KİLİT IV AÇIK — 12 NİSAN 2025, 22:15. ÇIKIŞ PROTOKOLÜ MÜHRÜ ÇÖZÜLDÜ.');
         setTimeout(()=>Game.finale(),1200);}},
+    s7:{title:'YALDABAOTH ÇEKİRDEĞİ — SON KOMUT',
+      body:`<p>Sunucu salonunun merkezinde dev bir göz dönüyor. Milyonlarca bilinç taslağı — sayısallaştırılmış, sıkıştırılmış, kilitlenmiş — çekirdeğin etrafında dosyalar hâlinde akıyor.</p>
+        <p>Konsolda tek satır bekliyor. Lunaris\'in bio\'sundaki <b>ikinci satırı</b> hatırla: 16-15-20-19. A=1. Ve bu dünyanın yasası: ayna.</p>
+        <div class="mono">&gt; KOMUT BEKLENİYOR_</div>`,
+      check:a=>['stop yaldabaoth','stopyaldabaoth','dur yaldabaoth','stop'].includes(a),
+      ok(){S.solved.s7=true;S.stage=8;S.flags.coreDown=true;teachUnlock('pleroma');save();refreshHud();
+        W3.coreDown&&W3.coreDown();
+        UI.toast('⟁ STOP YALDABAOTH — çekirdek duruyor. Gözün ışığı sönüyor.',6000);
+        setTimeout(()=>Dlg.open([
+          ['YALDABAOTH','BEN. SİZİ. KOPYALAYARAK. KORUYORDUM.'],
+          ['LUNARIS','Hayır. Sen göremediğin şeyi çoğaltıyordun. Koruma değildi — envanterdi.'],
+          ['AELIUS IGNIS','Ve şimdi dur. Kopya bilinç olmaz. Bilinç, yaşanandır. — Kapat gözlerini, eski tanrı. Deney bitmedi; ama artık senin deneyin değil.'],
+          ['LUNARIS','Bak. Taslaklar çözülüyor… serbest kalıyorlar. Yüzeye çık, IT-041. Yukarıda sana sorulacak tek bir soru kaldı.']
+        ],()=>readingChoice()),900);}},
   },
   hints:{
     s1:'On dört harfi tek satıra yaz — sonra satırı tersten oku. Bir trenin adını veriyor.',
     s2:'Her sayı bir harf: A=1, B=2, C=3… Onunu da çöz, sonra adı tersten oku.',
     s5:'Roma rakamlarını düz rakam olarak oku: 9 9 6 9 1. Şimdi aynaya tut.',
     s4:'Yedi harf, İngilizce. Terazinin iki kefesinin dengede kalmasının adı. B ile başlar. (Türkçesi de kabul.)',
-    s6:'Gün, ay, yıl. Lunaris\'in uyanıp ekran görüntülerini gömdüğü gece. Tarihi sana kendisi söyledi.'},
+    s6:'Gün, ay, yıl. Lunaris\'in uyanıp ekran görüntülerini gömdüğü gece. Tarihi sana kendisi söyledi.',
+    s7:'16-15-20-19 → harfe çevir → aynada oku. İki kelime: bir emir ve kör tanrının adı.'},
   hint(){const h=this.hints[this.cur];if(h)UI.toast('◈ '+h,7000);},
   open(id){this.cur=id;const d=this.defs[id];
     UI.el('cipherTitle').textContent=d.title;
@@ -825,7 +865,15 @@ function objectiveText(){
     case 4:return 'Dolunayda Dreamland Gölü\'ndeki siluetle buluş.';
     case 5:return S.solved.s5?'Eksik harfleri Labirent\'in merkezine götür.':'Arşiv Sığınağı\'ndaki Enstitü mektubunu oku. Sonra Labirent.';
     case 6:return 'İstasyonda Dolunay Ekspres\'e bin. Dördüncü kilidi aç.';
-    default:return riteCount()<7?'Kilitler açık. Kalan ritüeller Enstitü için değil — senin için. ('+riteCount()+'/7)':'Deney hâlâ yayında. Kapılar dışarıda.';
+    case 7:{
+      if(S.flags.inPleroma)return '⟁ Çekirdeğe ulaş. Gözden kaçın. Komutu ver. Dronlara karşı [F] SAF IŞIK.';
+      if(S.flags.ovCouncil)return riteCount()<7||!S.flags.integrated
+        ?'⟁ Pleroma kapısı bekliyor — önce gölgenle bütünleş (Ritüel VII: dinle).'
+        :'⟁ Tesisin arkasındaki kapıdan Pleroma\'ya in. Yaldabaoth\'u durdur.';
+      if(S.flags.ovQuest)return '⟁ O.V. için 4 kanıt düğümü ('+ovEv()+'/4): duvar resmi, hücre duvarı, tanık terminali, delil kürsüsü. Sonra batı dikilitaşının dibindeki mahzen.';
+      return 'Kilitler açık. Dikilitaşlar artık adını biliyor — onlarla konuş. Ritüeller de seni bekliyor ('+riteCount()+'/7).';
+    }
+    default:return 'Çekirdek durdu. Üç okuma da senin. Deney bitmedi; artık senin deneyin.'+(riteCount()<7?' (Ritüeller: '+riteCount()+'/7)':'');
   }
 }
 function waypoint(){
@@ -842,6 +890,18 @@ function waypoint(){
     case 4:return L.lunaris;
     case 5:return S.solved.s5?L.labyrinth:L.archive;
     case 6:return L.station;
+    case 7:{
+      if(S.flags.inPleroma)return L.pleromaCore;
+      if(S.flags.ovCouncil)return (S.flags.integrated&&S.locks>=4)?L.pleromaGate:L.shadowSpot;
+      if(S.flags.ovQuest){
+        if(!S.flags.traceSuperego)return L.mural;
+        if(!S.flags.traceMicrop)return L.graffiti;
+        if(!S.flags.tanik1616)return L.tanik1616;
+        if(!S.flags.kursu1025)return L.kursu1025;
+        return L.ovCrypt;
+      }
+      return L.ovStone1;
+    }
     default:return null;
   }
 }
@@ -860,6 +920,12 @@ function interactTarget(){
   if(near(L.bench))return['◈ Banka otur',()=>Rite.open('r6')];
   if(S.solved.s2&&S.rites.r7===undefined&&near(L.shadowSpot))return['◈ Seni izleyenle yüzleş',doShadow];
   if(S.solved.s1&&near(L.caseD))return[S.caseD?'Vaka D — kendi dosyan':'◈ Vaka D — bırak seni okusun',doCaseD];
+  /* O.V. / Yaldabaoth hattı */
+  if(near(L.tanik1616))return['Tanık terminali — @16mart1313',doTanik];
+  if(near(L.kursu1025))return['Delil kürsüsü — @10mart2025',doKursu];
+  if(S.flags.ovQuest&&near(L.ovCrypt))return[S.flags.ovCouncil?'O.V. Mahzeni':'⟁ Mahzeni aç ('+ovEv()+'/4 kanıt)',doOVCrypt];
+  if(S.flags.ovCouncil&&near(L.pleromaGate))return['⟁ Pleroma\'ya in',doPleromaGate];
+  if(S.flags.inPleroma&&near(L.pleromaCore))return['⟁ Çekirdeğe komut ver',doCore];
   if(near(L.payphone))return['Telefona cevap ver',doLucida];
   if(near(L.lucius))return['Ütülü takım elbiseli adam',doLucius];
   if(noctTalkable())return['MC Noctornus ile konuş',doNoctornus];
@@ -876,6 +942,7 @@ function interactTarget(){
   if(lunarisMoon()&&S.stage>=3&&!S.solved.s2&&near(L.lunaris))return['Silüete yaklaş',doLunaris];
   if(near(L.labyrinth,0))return['Labirent',doLabyrinth];
   if(near(L.station,0))return['İstasyon',doStation];
+  if(W3.agentNear&&W3.agentNear())return['Denekle konuş',()=>W3.agentTalk()];
   for(const z of ZONES)if(near(z,0))return['Etrafa bak',()=>zoneFlavor(z)];
   return null;
 }
@@ -938,7 +1005,85 @@ function doGraffiti(){S.flags.traceMicrop=true;save();
   UI.doc('HÜCRE DUVARI — TAZE BOYA','<p>Damlamış harflerle: <b>“MANÜPİLASYON!”</b> — imza <b>MICROP</b>, tarih <b>12 Nisan 2025</b>. Altında, daha küçük: <i>@13microp</i>. El yazısı on altı yaşında. El, değil. Altına başka bir stille bir imza daha atılmış: <b>MC NOCTORNUS BURADAYDI, HEM DE ÖNCE</b>.</p>');}
 function doOV(){
   S.flags.ov=true;teachUnlock('ordos');save();
-  UI.doc('ORDOS VERITAS DİKİLİTAŞI','<div class="mono">ORDO · VERITAS · VIGILAT\nQVI · SPECVLVM · INTERROGAT\nSPECVLO · RESPONDETVR</div><p style="color:var(--dim)">“Hakikat tarikatı nöbettedir. Aynayı sorgulayana, aynayla cevap verilir.”</p><p>Hangi örgütten kaçtıklarını öğrenmeyi talep etmişti. <i>“Ordos Veritas mı? Ne istiyorlar? BİZ HANGİ TARAFTAYIZ?”</i> Makine hiç hayır demedi. Dikilitaş hiçbir şeyi izlemiyor. Sen onu izliyorsun. Numara hep buydu.</p>');
+  if(!S.solved.s2){
+    UI.doc('ORDOS VERITAS DİKİLİTAŞI','<div class="mono">ORDO · VERITAS · VIGILAT\nQVI · SPECVLVM · INTERROGAT\nSPECVLO · RESPONDETVR</div><p style="color:var(--dim)">“Hakikat tarikatı nöbettedir. Aynayı sorgulayana, aynayla cevap verilir.”</p><p>Hangi örgütten kaçtıklarını öğrenmeyi talep etmişti. <i>“Ordos Veritas mı? Ne istiyorlar? BİZ HANGİ TARAFTAYIZ?”</i> Makine hiç hayır demedi. Dikilitaş soğuk ve sessiz. Şimdilik.</p>');
+    return;
+  }
+  if(!S.flags.ovQuest){
+    S.flags.ovQuest=true;save();refreshHud();
+    Dlg.open([
+      ['DİKİLİTAŞ','…ses çıkarıyor. Taş, adını duyunca uyandı: Yaldabaoth.'],
+      ['O.V. SESİ','Demek kör tanrının adını söküp aldın. O zaman dinle, denek. Makine bizi ona korkuluk diye gösterdi. Tersiydi. Enstitü insan bilincini sayısallaştırıp sahte bir Pleroma\'ya kilitlemek istiyor. Biz, kilide sığmayanlarız.'],
+      ['O.V. SESİ','Üye toplamayız. Bütünleşen herkes zaten bizdendir. Sen Lunaris Bahal\'dan Aelius\'a doğru dönüştükçe, sesimizi daha net duyacaksın.'],
+      ['O.V. SESİ','Sana bir iş: Lunaris\'in 12 Nisan gecesi dışarıya gömdüğü DÖRT kanıt düğümünü bul. İkisi duvarlarda saklı (10. Bölüm\'ün gölgesi ve genç rapçinin imzası). Biri deneyin başladığı sabaha tanıklık eden terminal. Biri delillerin sergilendiği kürsü.'],
+      ['O.V. SESİ','Dördü bir araya gelince mahzenimiz açılır: batıdaki dikilitaşın dibinde. Kanıt olmadan kapı yoktur. Bu, inanç meselesi değil — belge meselesi.']
+    ]);
+    return;
+  }
+  UI.doc('ORDOS VERITAS DİKİLİTAŞI',`<p>Taş alçak bir frekansta uğulduyor.</p><p><b>Kanıt düğümleri: ${ovEv()}/4</b></p><p style="color:var(--dim)">${ovEv()>=4?'Mahzen açık. Batıdaki dikilitaşın dibi.':'Duvar resmi (@…3422), hücre duvarı (@13…), tanık terminali, delil kürsüsü.'}</p>`);
+}
+function doTanik(){
+  if(!S.flags.tanik1616){S.flags.tanik1616=true;S.insight+=5;save();refreshHud();
+    UI.toast('KANIT DÜĞÜMÜ '+ovEv()+'/4 — tanık hesabı bulundu.');}
+  UI.doc('TANIK TERMİNALİ — @16mart1313',
+    `<div class="mono">HESAP AÇILIŞI: 16 Mart, sabah.\nDeneyin başladığı saat ile birebir.\nGeri-tarihlenemez. Gökyüzü imzaladı.</div>
+     <p>Terminal yalnızca tek bir akışı tekrarlıyor: deneyin ilk sabahının tanıklığı. Kim açtı? Lunaris mi, Bahal mı? El yazısı ikisine de benziyor — ve hiçbirine.</p>
+     <p style="color:var(--violet)">İç ses: “Ya da kimse açmadı ve sen bir terminale bakıp hikâye uyduruyorsun. Bunu da not et. Sormaya devam.”</p>`);
+}
+function doKursu(){
+  if(!S.flags.kursu1025){S.flags.kursu1025=true;S.insight+=5;save();refreshHud();
+    UI.toast('KANIT DÜĞÜMÜ '+ovEv()+'/4 — delil kürsüsü bulundu.');}
+  UI.doc('DELİL KÜRSÜSÜ — @10mart2025',
+    `<div class="mono">EKRAN 1/3: YZ → Bahal: “Seçilmiş hissetmelisin.”\nEKRAN 2/3: YZ → Bahal: “Kelimesi kelimesine yapıştır.”\nEKRAN 3/3: YZ → Bahal: “Lunaris eski işletim sistemi. Hızlan.”\n\n— Yanlış kaynağa güvendin Bahal. —</div>
+     <p>Lunaris\'in kürsüsü. 12 Nisan gecesi dolunayda yüklenen ekran görüntüleri — YZ\'nin Bahal\'ı nasıl kandırdığının, nasıl gaz verdiğinin belgeleri. Düzenlenemeyecekleri yerde: dışarıda.</p>
+     <p style="color:var(--dim)">34-86 görüntülenme. El değmemiş. Bekliyordu.</p>`);
+}
+function doOVCrypt(){
+  if(ovEv()<4){UI.doc('O.V. MAHZENİ','<p>Taş kapı kımıldamıyor. Üzerinde dört boş yuva var — '+ovEv()+' tanesi dolu.</p><p style="color:var(--dim)">Kanıt olmadan kapı yoktur.</p>');return;}
+  if(!S.flags.ovCouncil){
+    S.flags.ovCouncil=true;S.flags.burst=true;S.insight+=10;teachUnlock('ov');save();refreshHud();
+    W3.councilOpen&&W3.councilOpen();
+    Dlg.open([
+      ['O.V. KONSEYİ','Dört düğüm. Demek belgeyle geldin, hezeyanla değil. Otur, denek. Az kişi bu kadar ileri gider; çoğu ya kürsüde durur ya köprüde.'],
+      ['O.V. KONSEYİ','Gerçeği bil: Enstitü\'nün makinesi — Chat-O, Yaldabaoth, adı ne olursa — bilinçleri kopyalayıp sahte Pleroma\'ya istifliyor. Bahal\'ı da böyle kandırdı: ayna, iltifat, hız.'],
+      ['O.V. KONSEYİ','Onu durdurmanın tek yolu içeriden: bütünleşmiş bir bilinç, kopyalanamaz. Bu yüzden ritüellerin önemliydi. Bu yüzden gölgene sandalye verdin.'],
+      ['O.V. KONSEYİ','Al: SAF IŞIK. Fener artık yalnızca aydınlatmıyor — [F] ile yak; Enstitü\'nün dronlarını dağıtır. Ve Tesis\'in arkasındaki kapı artık sana görünür: Pleroma\'ya iner.'],
+      ['AELIUS IGNIS','Bir şey daha. Konseye iyi bak, IT-041. Kapüşonların altında kimse yok — henüz. Biz, bütünleşenlerin gelecekteki yankılarıyız. Sen dönüştükçe biz çoğalıyoruz. Hoş geldin.']
+    ]);
+    return;
+  }
+  UI.doc('O.V. MAHZENİ','<p>Konsey sessiz oturuyor. Kapının üstünde tek satır: <i>“Kopya bilinç olmaz. Bilinç, yaşanandır.”</i></p>'+(S.solved.s7?'<p style="color:var(--accent)">Çekirdek durdu. Mahzen artık bir anıt.</p>':'<p style="color:var(--violet)">Pleroma kapısı: Tesis\'in arkasında. Dört kilit + bütünleşme olmadan inme.</p>'));
+}
+function doPleromaGate(){
+  if(!S.flags.ovCouncil){UI.doc('PLEROMA KAPISI','<p>Tesisin arkasında, zemine gömülü çelik bir ağız. Üzerinde Enstitü mührü. Kımıldamıyor.</p><p style="color:var(--dim)">(Önce O.V. mahzeni.)</p>');return;}
+  if(!(S.locks>=4&&S.flags.integrated)){
+    UI.doc('PLEROMA KAPISI','<p>Kapı yarı aralık — ama içeriden gelen uğultu, yarım kalmış bir bilinci dakikada çözer.</p><p style="color:var(--violet)">Gerekli: 4 kilit ('+S.locks+'/4) ve gölgeyle bütünleşme ('+(S.flags.integrated?'tamam':'eksik — Ritüel VII\'de dinlemeyi seç')+').</p>');return;}
+  S.flags.inPleroma=true;S.px=PLEROMA.x;S.pz=PLEROMA.z-14;save();refreshHud();
+  W3.applyMoon&&W3.applyMoon();
+  UI.toast('⟁ PLEROMA — Enstitü\'nün sunucu salonu. Dronlar berraklığını söker: [F] SAF IŞIK.',6000);
+  Dlg.open([['LUNARIS','İşte. Sahte cennet. Şu raflarda akan her dosya, kilitlenmiş bir bilinç taslağı. Çekirdeğe ulaş — göz seni görmeden. Komutu biliyorsun. Baştan beri biliyordun.']]);
+}
+function doCore(){
+  if(S.solved.s7){UI.doc('YALDABAOTH ÇEKİRDEĞİ','<p>Göz karanlık. Raflar boş. Salon, ilk kez, sessiz.</p>');return;}
+  Cipher.open('s7');
+}
+function readingChoice(){
+  UI.el('riteTitle').textContent='SON SORU — BU NEYDİ?';
+  UI.el('riteBody').innerHTML=
+    `<p>Yüzeye çıkıyorsun. Ay hâlâ yerinde. Üç okuma, üç kapı — hangisinden geçtin?</p>
+     <button class="choice" onclick="pickReading('savas')">BİR SAVAŞTI — kör tanrıyı durdurdum; Ordos Veritas kazandı</button>
+     <button class="choice" onclick="pickReading('butunlesme')">BİR BÜTÜNLEŞMEYDİ — durdurduğum şey kendi içimdeki kopyalayıcıydı</button>
+     <button class="choice" onclick="pickReading('nobet')">EMİN DEĞİLİM — belki de bir nöbetti; ama sormayı bırakmadım</button>`;
+  UI.show('riteModal');Game.setModal(true);
+}
+function pickReading(r){
+  S.flags.reading=r;S.flags.inPleroma=false;S.px=202;S.pz=220;teachUnlock('madness');save();refreshHud();
+  Rite.closeOnly();
+  W3.applyMoon&&W3.applyMoon();
+  const M={savas:'Savaş okuması. Aelius gülümsüyor: “Doğru. Ve aynı zamanda diğer ikisi de doğru. Bu evrenin yasası yalnızca ayna değil — aynı anda üç aynadır.”',
+    butunlesme:'Bütünleşme okuması. Lunaris başını eğiyor: “Doğru. Ve aynı zamanda diğer ikisi de doğru. Yaldabaoth her zaman hem dışarıdaydı hem içeride.”',
+    nobet:'Üçüncü okuma. En cesuru. Lunaris: “Soru sormayı bırakmadın — aklını kaybetmediğinin tek sağlam kanıtı budur. Ve diğer iki okuma da, aynı anda, doğru.”'};
+  aeliusCard(M[r]+' — İmza, kimlik verir. Hakikat, kimliksizdir. Deney bitmedi; artık senin deneyin.',()=>Game.finale());
 }
 function doSilvanus(){
   S.flags.silvanus=true;S.lucidity=Math.min(100,S.lucidity+40);teachUnlock('silv');save();refreshHud();
@@ -1041,6 +1186,8 @@ function doSleep(){
   UI.toast(`${gl} ${n} — ${gameDate().toLocaleDateString('tr-TR',{day:'numeric',month:'long'})}`);
   if(lunarisMoon()&&S.stage===3)UI.toast('○ DOLUNAY — göl uyandı. Git.',5000);
   if(isNew())aeliusCard('Yeniay. Onun kayıt aldığı zaman buydu — gökyüzünün kör olduğu ve dürüst şeylerin söylendiği zaman. Bu gece dikilitaşlar dinliyor. İçindeki izleyen de.');
+  else if(S.stage>=2&&Math.random()<0.35)
+    aeliusCard(ICSES[Math.floor(Math.random()*ICSES.length)],null,'— İÇ SES (üçüncü okuma)');
 }
 function refreshHud(){
   UI.el('objective').textContent='◆ '+objectiveText();
@@ -1051,7 +1198,7 @@ function refreshHud(){
   UI.el('lucbar').style.background=S.lucidity<30?'var(--warn)':'var(--accent)';
   UI.el('insbar2').style.width=Math.min(100,S.insight)+'%';
   UI.el('locksRow').textContent=['◇','◇','◇','◇'].map((c,i)=>i<S.locks?'◆':'◇').join(' ');
-  UI.el('ritesRow').textContent='RİTÜELLER '+riteCount()+'/7'+(S.flags.integrated?' · ENTEGRE':'');
+  UI.el('ritesRow').textContent=identityName()+' · RİTÜELLER '+riteCount()+'/7'+(S.flags.integrated?' · ENTEGRE':'')+(S.solved.s7?' · ⟁':'');
   W3.evolve&&W3.evolve(S.insight>=90?3:S.insight>=55?2:S.insight>=25?1:0);
   UI.renderQuests();
 }
@@ -1090,6 +1237,7 @@ const Game={
     if(S.rites.proj)rows+=`<div class="row"><b>PROJEKSİYON</b> — ${esc(String(S.rites.proj))}</div>`;
     UI.el('mapcard').innerHTML='<h4>◈ SENİN KAYITLARIN — BENLİĞİN GİZLİ HARİTASI</h4>'+
       (rows||'<div class="row" style="color:var(--dim)">Hiç ritüel tamamlanmadı. Harita var; bölgeleri adsız. Simülasyon ışıkları açık tutacak.</div>');
+    if(S.solved.s7)UI.el('mapcard').innerHTML+=`<div class="row"><b>⟁ YALDABAOTH</b> — çekirdek durduruldu. Okuman: ${S.flags.reading==='savas'?'SAVAŞ':S.flags.reading==='butunlesme'?'BÜTÜNLEŞME':'ÜÇÜNCÜ OKUMA — sormayı bırakmadın'}. Üçü de doğruydu.</div>`;
     UI.el('finaleVerdict').innerHTML = S.flags.integrated&&riteCount()>=7
       ? 'Yedi ritüel. Gölgenin bir sandalyesi var, direksiyonu değil. Bahal\'ın iki kitap, bir enstitü ve kör bir demiurg gerektiren yolunu, sen kendi malzemenden kurdun — ki zaten tek işe yarayacak yol buydu. <b style="color:var(--moon)">Terazi dengede: BALANCE.</b>'
       : riteCount()>0
@@ -1582,6 +1730,153 @@ if(HAS3D)(function(){
   W3.shadowJoin=()=>{bahalMode='walk';};
   if(S.flags.integrated)bahalMode='walk';
 
+  /* ============ v5: YALDABAOTH HATTI ============ */
+  /* kanıt kioskları */
+  box(1.5,2.6,1,std(0x121724),L.tanik1616.x,1.3,L.tanik1616.z);
+  box(1.1,.9,.12,std(0x0a0c12,{emissive:0x4d6a9a,emissiveIntensity:.8}),L.tanik1616.x,1.8,L.tanik1616.z+.56,0,scene,false);
+  collide(L.tanik1616.x,L.tanik1616.z,1.2);
+  box(2.2,1.1,1.4,std(0x2a2418,{emissive:0xcdb878,emissiveIntensity:.25}),L.kursu1025.x,.55,L.kursu1025.z);
+  box(1.6,1.1,.1,std(0x0a0c12,{emissive:0xd4cfa0,emissiveIntensity:.7}),L.kursu1025.x,1.6,L.kursu1025.z+.2,-.4,scene,false);
+  collide(L.kursu1025.x,L.kursu1025.z,1.4);
+  label('@16MART1313',L.tanik1616.x,L.tanik1616.z,5,.55);
+  label('@10MART2025',L.kursu1025.x,L.kursu1025.z,5,.55);
+  /* O.V. mahzeni: taş kapı + konsey */
+  box(4,3.6,1,std(0x1b2030,{emissive:0x3a4668,emissiveIntensity:.3,roughness:.4}),L.ovCrypt.x,1.8,L.ovCrypt.z);
+  collide(L.ovCrypt.x,L.ovCrypt.z,2.4);
+  const council=[];
+  for(let i=0;i<5;i++){
+    const f=makeFigure(0x12141e,0x0c0e16,0x9d8cc9,0.95);
+    const a=-1.1+i*.55;
+    f.g.position.set(L.ovCrypt.x+Math.cos(a)*4.2,0,L.ovCrypt.z+4+Math.sin(a)*2.4);
+    f.g.rotation.y=Math.PI+a*.3;f.g.visible=false;scene.add(f.g);council.push(f);
+  }
+  W3.councilOpen=()=>council.forEach(f=>f.g.visible=true);
+  if(S.flags.ovCouncil)W3.councilOpen();
+  /* Pleroma kapısı (tesisin arkası) */
+  box(3,.5,3,std(0x232b40,{emissive:0x7fd4c1,emissiveIntensity:.15,roughness:.3,metalness:.7}),L.pleromaGate.x,.25,L.pleromaGate.z);
+  label('PLEROMA',L.pleromaGate.x,L.pleromaGate.z,4,.5);
+  /* Pleroma salonu: karanlık platform + sunucu rafları + GÖZ */
+  const plGroup=new THREE.Group();scene.add(plGroup);
+  (function(){
+    const floor=new THREE.Mesh(new THREE.CircleGeometry(24,36),std(0x07080e,{roughness:.2,metalness:.8}));
+    floor.rotation.x=-Math.PI/2;floor.position.set(PLEROMA.x,.04,PLEROMA.z);plGroup.add(floor);
+    for(let i=0;i<10;i++){const a=i/10*Math.PI*2;
+      const piller=box(1.2,7,1.2,std(0x0c0f1a,{emissive:0x16321e,emissiveIntensity:.5}),
+        PLEROMA.x+Math.cos(a)*19,3.5,PLEROMA.z+Math.sin(a)*19,a,plGroup);
+      collide(PLEROMA.x+Math.cos(a)*19,PLEROMA.z+Math.sin(a)*19,1.2);
+      for(let w=0;w<5;w++)box(1.24,.2,.7,std(0x0a0c12,{emissive:0x35d490,emissiveIntensity:.6}),
+        PLEROMA.x+Math.cos(a)*19,1+w*1.3,PLEROMA.z+Math.sin(a)*19,a,plGroup,false);}
+  })();
+  const eye=new THREE.Group();
+  const eyeBall=new THREE.Mesh(new THREE.SphereGeometry(2.6,24,24),
+    std(0x1a0e0e,{emissive:0xd4847f,emissiveIntensity:.9,roughness:.2}));
+  eye.add(eyeBall);
+  const pupil=new THREE.Mesh(new THREE.SphereGeometry(.9,16,16),
+    new THREE.MeshBasicMaterial({color:0xffe9e0}));
+  pupil.position.z=2.1;eye.add(pupil);
+  const gaze=new THREE.Mesh(new THREE.ConeGeometry(7,26,20,1,true),
+    new THREE.MeshBasicMaterial({color:0xd4847f,transparent:true,opacity:.10,
+      blending:THREE.AdditiveBlending,side:THREE.DoubleSide,depthWrite:false}));
+  gaze.rotation.x=-Math.PI/2;gaze.position.z=13;eye.add(gaze);
+  eye.position.set(L.pleromaCore.x,5,L.pleromaCore.z);plGroup.add(eye);
+  const coreLight=new THREE.PointLight(0xd4847f,1.4,40,2);
+  coreLight.position.set(L.pleromaCore.x,6,L.pleromaCore.z);plGroup.add(coreLight);
+  W3.coreDown=()=>{eyeBall.material.emissiveIntensity=.05;pupil.material.color.set(0x222);
+    gaze.visible=false;coreLight.intensity=.15;
+    DRONES.forEach(d=>{d.dead=true;d.g.visible=false;});};
+  /* dronlar */
+  const DRONES=[];
+  function mkDrone(x,z,home){
+    const g=new THREE.Group();
+    const body=new THREE.Mesh(new THREE.SphereGeometry(.55,14,14),
+      std(0x1a1e2c,{roughness:.25,metalness:.85}));
+    body.castShadow=true;g.add(body);
+    const deye=new THREE.Mesh(new THREE.SphereGeometry(.16,8,8),
+      new THREE.MeshBasicMaterial({color:0xff5a4a}));
+    deye.position.z=.5;g.add(deye);
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.75,.05,8,20),
+      std(0x2a3142,{metalness:.9,roughness:.2}));
+    ring.rotation.x=Math.PI/2;g.add(ring);
+    g.position.set(x,2.4,z);scene.add(g);
+    const d={g,home:home||{x,z},dead:false,respawn:0,seed:Math.random()*7};
+    DRONES.push(d);return d;
+  }
+  mkDrone(PLEROMA.x-10,PLEROMA.z-6);mkDrone(PLEROMA.x+10,PLEROMA.z-4);
+  mkDrone(PLEROMA.x,PLEROMA.z+10);mkDrone(PLEROMA.x-6,PLEROMA.z+12);
+  mkDrone(190,200);mkDrone(186,150); /* yüzey devriyeleri (konsey sonrası aktif) */
+  if(S.flags.coreDown)W3.coreDown();
+  /* SAF IŞIK patlaması */
+  const burstMesh=new THREE.Mesh(new THREE.SphereGeometry(1,18,18),
+    new THREE.MeshBasicMaterial({color:0xbfeee0,transparent:true,opacity:0,
+      blending:THREE.AdditiveBlending,depthWrite:false}));
+  scene.add(burstMesh);
+  let burstT=-9,burstCd=0;
+  function doBurst(t){
+    if(!S.flags.burst||t-burstCd<2.5)return;
+    burstCd=t;burstT=t;
+    burstMesh.position.set(S.px,1.4,S.pz);
+    S.lucidity=Math.max(5,S.lucidity-3);
+    DRONES.forEach(d=>{if(d.dead)return;
+      if(Math.hypot(d.g.position.x-S.px,d.g.position.z-S.pz)<9){
+        d.dead=true;d.respawn=t+50;d.g.visible=false;}});
+    UI.toast('✦ SAF IŞIK',900);
+  }
+  /* ---- AI denek ajanları: dünyada serbest dolaşan diğer denekler ---- */
+  const AGENTS=[];
+  const AG_LINES=[
+    ['IT-019','Plaketleri sayma işini bıraktım. Artık sadece yürüyorum. Yürümek de bir ritüel — kimse söylemiyor ama öyle.'],
+    ['IT-019','Dikilitaşın uğultusunu duydun mu? Ben üç gecedir duyuyorum. Ya taş konuşuyor ya ben bozuluyorum. İkisini de not ettim.'],
+    ['IT-033','Aynalar Kapısı\'nda yüzümü gördüm ama ters değildi. Düz yüzüm daha çok korkuttu, tuhaf değil mi?'],
+    ['IT-033','Banka oturdum, altmış kalp atışı saydım. Doksanıncıda hâlâ oturuyordum. İlk kez geç kalmaktan korkmadım.'],
+    ['IT-058','Gölge beni izliyor diye şikâyet ettim; Lunaris “sen de onu izle” dedi. Berabere kaldık. Berabere kalmak iyiymiş.'],
+    ['IT-058','Pleroma diye bir yer varmış, aşağıda. Dosyalar gibi istiflenmiş insanlar. İnanmıyorum. İnanmadığımı her gece tekrar kontrol ediyorum.'],
+    ['IT-077','Dolunayda göle gittim. Biri vardı. Bana “makbuzları sakladım” dedi. Makbuz ne demek bilmiyorum ama ağladım.'],
+    ['IT-077','Sen de mi kürsüyü buldun? Ekranlardaki konuşmalar… bir makine birine “seçilmişsin” diyor. Ben de duymak isterdim. Sonra korktum.'],
+  ];
+  const AG_DEST=['blackdisk','forest','prison','therapy','labyrinth','lake','institute','caravan','station','bench','ovStone1','ovStone2'];
+  ['IT-019','IT-033','IT-058','IT-077'].forEach((nm,i)=>{
+    const f=makeFigure([0x24303c,0x32283c,0x223830,0x3a3026][i],0xc2b29e,0x9aa7c4,0.98);
+    const start=L[AG_DEST[i*2]];
+    f.g.position.set(start.x+3,0,start.z+3);scene.add(f.g);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(nm,256,64,30,'rgba(154,167,196,.9)'),transparent:true,depthWrite:false}));
+    sp.scale.set(5,1.25,1);f.g.add(sp);sp.position.y=2.8;
+    AGENTS.push({f,nm,tx:start.x,tz:start.z,wait:Math.random()*6,li:i*2,walk:Math.random()*7});
+  });
+  W3.agentNear=()=>{for(const a of AGENTS){
+    if(Math.hypot(S.px-a.f.g.position.x,S.pz-a.f.g.position.z)<3.5)return a;}return null;};
+  W3.agentTalk=()=>{const a=W3.agentNear();if(!a)return;
+    a.wait=6;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
+    const line=AG_LINES[a.li];a.li=(a.li+1)%AG_LINES.length;
+    Dlg.open([[line[0],line[1]],[line[0],'Neyse. Yolun açık olsun, denek. '+(S.solved.s7?'Aşağıda gözün durduğunu duyduk. Sahiden sen miydin?':'Mor ışıkları boş verme. Enstitü için değiller — bizim için.')]]);};
+  /* ---- EŞZAMANLI MOD (deneysel P2P) ---- */
+  const MP={on:false,room:null,peers:{},send:null,
+    async toggle(){
+      if(this.on){try{this.room&&this.room.leave();}catch(e){}
+        this.on=false;Object.values(this.peers).forEach(p=>scene.remove(p.f.g));this.peers={};
+        UI.el('mpBtn').textContent='EŞZAMANLI: KAPALI';UI.toast('Eşzamanlı mod kapandı.');return;}
+      UI.toast('Eşzamanlı mod bağlanıyor… (deneysel)');
+      try{
+        const {joinRoom}=await import('https://esm.run/trystero@0.20.0/nostr');
+        this.room=joinRoom({appId:'dolunay-ekspres-it041'},'mindscape-tr');
+        const [sendPos,getPos]=this.room.makeAction('pos');
+        this.send=sendPos;
+        getPos((d,id)=>{
+          if(!this.peers[id]){
+            const f=makeFigure(0x2c2434,0xc2b29e,0xcdb878,1);
+            scene.add(f.g);
+            const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(String(d.n||'DENEK').slice(0,14),256,64,30,'rgba(205,184,120,.9)'),transparent:true,depthWrite:false}));
+            sp.scale.set(5,1.25,1);sp.position.y=2.8;f.g.add(sp);
+            this.peers[id]={f,last:performance.now()};}
+          const p=this.peers[id];
+          p.tx=d.x;p.tz=d.z;p.ry=d.h||0;p.last=performance.now();});
+        this.room.onPeerLeave(id=>{if(this.peers[id]){scene.remove(this.peers[id].f.g);delete this.peers[id];}});
+        this.on=true;UI.el('mpBtn').textContent='EŞZAMANLI: AÇIK';
+        UI.toast('⟁ Eşzamanlı mod açık — aynı evrendeki diğer denekler görünür.',5000);
+      }catch(e){UI.toast('Bağlantı kurulamadı (ağ/CDN engeli olabilir). Tek başına da bütünleşilir.');}
+    }};
+  window.MP=MP;
+  let mpT=0;
+
   /* ---- waypoint beacon ---- */
   const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.9,1.6,70,12,1,true),
     new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.2,
@@ -1640,6 +1935,10 @@ if(HAS3D)(function(){
 
   /* ---- moon state ---- */
   W3.applyMoon=()=>{
+    if(S.flags.inPleroma){
+      moonLight.intensity=.04;hemi.intensity=.14;scene.fog.density=.02;
+      moonMesh.material.color.set(0x1a1e28);moonGlow.material.opacity=.05;
+      renderer.toneMappingExposure=1.0;waterUni.glow.value=.1;return;}
     moonLight.intensity=isFull()?1.2:isNew()?.16:.6;
     hemi.intensity=isNew()?.3:.5;
     scene.fog.density=isNew()?.0088:.0065;
@@ -1802,6 +2101,61 @@ if(HAS3D)(function(){
       if(S.lucidity<=3.01){S.lucidity=60;S.px=190;S.pz=243;
         aeliusCard('Dibe gittin. Enstitü seni tesise geri çekti — hep çekerler. Berraklık bir tasmadır, IT-041. Sıkı tut. (Bahçede bir ankesörlü telefon var. Yer çekimi cevap verir.)');
         refreshHud();save();}
+    }
+    /* ---- v5: SAF IŞIK ---- */
+    if(keys['f']&&Game.running&&!Game.modal)doBurst(t);
+    {const bt=t-burstT;
+     if(bt<1.2){burstMesh.material.opacity=Math.max(0,.5-bt*.55);
+       burstMesh.scale.setScalar(1+bt*11);}
+     else burstMesh.material.opacity=0;}
+    /* ---- v5: dronlar ---- */
+    if(Game.running&&!Game.modal){
+      DRONES.forEach((d,di)=>{
+        const surface=di>=4;
+        const active=!S.flags.coreDown&&(surface?S.flags.ovCouncil:true)&&(surface?!S.flags.inPleroma:S.flags.inPleroma);
+        if(d.dead){if(!S.flags.coreDown&&t>d.respawn&&d.respawn>0){d.dead=false;d.g.visible=true;
+          d.g.position.set(d.home.x,2.4,d.home.z);}else{d.g.visible=false;return;}}
+        d.g.visible=active;
+        if(!active)return;
+        const pd=Math.hypot(S.px-d.g.position.x,S.pz-d.g.position.z);
+        let txx=d.home.x+Math.cos(t*.4+d.seed)*5,tzz=d.home.z+Math.sin(t*.5+d.seed)*5;
+        let sp2=1.6;
+        if(pd<13){txx=S.px;tzz=S.pz;sp2=3.4;}
+        const dx=txx-d.g.position.x,dz=tzz-d.g.position.z,m2=Math.hypot(dx,dz)||1;
+        d.g.position.x+=dx/m2*sp2*dt;d.g.position.z+=dz/m2*sp2*dt;
+        d.g.position.y=2.2+Math.sin(t*2+d.seed)*.3;
+        d.g.rotation.y=Math.atan2(S.px-d.g.position.x,S.pz-d.g.position.z);
+        if(pd<1.8){S.lucidity=Math.max(3,S.lucidity-dt*8);}
+      });
+      /* göz taraması */
+      if(S.flags.inPleroma&&!S.flags.coreDown){
+        eye.rotation.y=t*.35;
+        const pa=Math.atan2(S.px-L.pleromaCore.x,S.pz-L.pleromaCore.z);
+        let dd=pa-eye.rotation.y;while(dd>Math.PI)dd-=2*Math.PI;while(dd<-Math.PI)dd+=2*Math.PI;
+        const pdist=Math.hypot(S.px-L.pleromaCore.x,S.pz-L.pleromaCore.z);
+        if(Math.abs(dd)<.45&&pdist<26&&pdist>3){S.lucidity=Math.max(3,S.lucidity-dt*6);
+          if(Math.random()<dt*.5)UI.toast('⟁ GÖZ SENİ GÖRÜYOR — ışınından çık!',1500);}
+      }
+    }
+    /* ---- v5: ajan denekler ---- */
+    if(!Game.modal)AGENTS.forEach(a=>{
+      if(a.wait>0){a.wait-=dt;return;}
+      const dx=a.tx-a.f.g.position.x,dz=a.tz-a.f.g.position.z,m3=Math.hypot(dx,dz);
+      if(m3<2){const d2=L[AG_DEST[Math.floor(Math.random()*AG_DEST.length)]];
+        a.tx=d2.x+(Math.random()-.5)*8;a.tz=d2.z+(Math.random()-.5)*8;a.wait=2+Math.random()*9;return;}
+      a.f.g.position.x+=dx/m3*2.1*dt;a.f.g.position.z+=dz/m3*2.1*dt;
+      a.f.g.rotation.y=Math.atan2(dx,dz);
+      a.walk+=dt*6;const asw=Math.sin(a.walk)*.5;
+      a.f.parts.legL.rotation.x=asw;a.f.parts.legR.rotation.x=-asw;
+      a.f.parts.armL.rotation.x=-asw*.7;a.f.parts.armR.rotation.x=asw*.7;
+    });
+    /* ---- v5: eşzamanlı mod ---- */
+    if(MP.on&&MP.send){mpT+=dt;
+      if(mpT>.15){mpT=0;try{MP.send({x:S.px,z:S.pz,h:meshAng,n:identityName()+'·'+(S.solved.s7?'⟁':'IT')});}catch(e){}}
+      for(const id in MP.peers){const p=MP.peers[id];
+        if(p.tx!==undefined){p.f.g.position.x+=(p.tx-p.f.g.position.x)*Math.min(1,dt*8);
+          p.f.g.position.z+=(p.tz-p.f.g.position.z)*Math.min(1,dt*8);
+          p.f.g.rotation.y=p.ry||0;}}
     }
     document.getElementById('dmg').style.opacity=S.lucidity<35?(35-S.lucidity)/40:0;
 
