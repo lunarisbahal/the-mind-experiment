@@ -117,7 +117,7 @@
     border:1px solid var(--accent);color:var(--accent);background:rgba(8,10,17,.7);
     border-radius:50%;font-size:18px;align-items:center;justify-content:center;}
   @media (pointer:coarse){#stick{display:block;}#ebtn{display:flex;}#ctrlhelp{display:none;}}
-  #menuBtns{position:fixed;bottom:64px;right:14px;z-index:40;display:flex;flex-direction:column;gap:6px;}
+  #menuBtns{position:fixed;bottom:64px;right:14px;z-index:40;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
   @media (pointer:coarse){#menuBtns{bottom:130px;}}
   .mini{background:rgba(8,10,17,.85);border:1px solid var(--line);color:var(--dim);
     padding:7px 10px;font-family:inherit;font-size:10px;letter-spacing:.15em;cursor:pointer;border-radius:3px;}
@@ -137,8 +137,8 @@
   <button class="mini" onclick="UI.toggleQuests()">İLERLEME ▾</button>
 </div>
 <div id="hudTR">
-  <canvas id="minimap" width="200" height="156"></canvas>
-  <div class="chip" id="moonchip"><b id="moonGlyph">○</b> <span id="moonName"></span><br><span id="dateStr"></span></div>
+  <canvas id="minimap" width="138" height="106"></canvas>
+  <div class="chip" id="moonchip" style="font-size:10px;padding:4px 8px;margin-top:4px;"><b id="moonGlyph">○</b> <span id="moonName"></span> · <span id="dateStr"></span></div>
 </div>
 <div id="hudBL">
   <div class="lbl">BERRAKLIK</div><div class="bar"><i id="lucbar" style="width:100%"></i></div>
@@ -229,12 +229,15 @@
 <div id="stick"><div id="knob"></div></div>
 <div id="ebtn">E</div>
 <div id="menuBtns">
-  <button class="mini" onclick="UI.toggleJournal()">GÜNLÜK</button>
-  <button class="mini" onclick="Game.toggleMap()">HARİTA</button>
-  <button class="mini" id="sndBtn" onclick="Snd.toggle()">SES: AÇIK</button>
-  <button class="mini" id="radBtn" onclick="Snd.toggleRadio()">RADYO: AÇIK</button>
-  <button class="mini" id="tapBtn" onclick="Snd.toggleTapes()">KAYITLAR: AÇIK</button>
-  <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">EŞZAMANLI: KAPALI</button>
+  <div id="menuPanel" style="display:none;flex-direction:column;gap:6px;">
+    <button class="mini" onclick="UI.toggleJournal()">GÜNLÜK [J]</button>
+    <button class="mini" onclick="Game.toggleMap()">HARİTA [M]</button>
+    <button class="mini" id="sndBtn" onclick="Snd.toggle()">SES: AÇIK</button>
+    <button class="mini" id="radBtn" onclick="Snd.toggleRadio()">RADYO: AÇIK</button>
+    <button class="mini" id="tapBtn" onclick="Snd.toggleTapes()">KAYITLAR: AÇIK</button>
+    <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">EŞZAMANLI: KAPALI</button>
+  </div>
+  <button class="mini" id="menuToggle" onclick="(function(){const p=document.getElementById('menuPanel');p.style.display=p.style.display==='none'?'flex':'none';})()">☰ MENÜ</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
