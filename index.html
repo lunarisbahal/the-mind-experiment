@@ -284,7 +284,10 @@
     <div class="door"><a href="https://reddit.com/user/lunarisbahal" target="_blank" rel="noopener">u/lunarisbahal · Reddit</a><small>Where the narrator speaks to r/Gnostic and r/Jung.</small></div>
   </div>
   <p style="text-align:center;font-style:italic;color:var(--moon);">A signature grants identity.<br>Truth has none.<br><br>Your experiment begins.</p>
-  <div style="text-align:center;"><button class="btn ghost" onclick="UI.hide('finale')">Return to the mindscape</button></div>
+  <div style="text-align:center;">
+    <button class="btn v" onclick="UI.hide('finale');Report.show()">✦ Generate the Integration Report</button>
+    <button class="btn ghost" onclick="UI.hide('finale')">Return to the mindscape</button>
+  </div>
   <div class="stamp">DO-LOON-AI EXPRESS · L.BAHAL · LUNARIS · AELIUS IGNIS · O.V.</div>
 </div></div>
 
@@ -728,7 +731,8 @@ const UI={
       if(S.flags.reading)ir+='<p class="own">👁 At the last question you chose the reading: <b>'+(S.flags.reading==='savas'?'WAR':S.flags.reading==='butunlesme'?'INTEGRATION':'THE THIRD READING')+'</b> — your ending was written by it.</p>';
       if(S.rites.r4!==undefined)ir+='<p class="own">🏠 You chose your window: '+esc(String(S.rites.r4).split('—')[0])+' — that window in the cells lit up for you.</p>';
       if(ir)h+='<div class="jentry"><h4 style="color:var(--gold)">⚖ MARKS OF WILL — your choices shaped the world like this</h4>'+ir+'</div>';
-      h+='<button class="btn ghost" style="padding:5px 12px;font-size:10px" onclick="exportInner()">⤓ Download inner work (.txt)</button>';
+      h+='<button class="btn ghost" style="padding:5px 12px;font-size:10px" onclick="exportInner()">⤓ Download inner work (.txt)</button> ';
+      h+='<button class="btn v" style="padding:5px 12px;font-size:10px" onclick="UI.toggleJournal(false);Report.show()">✦ Integration Report</button>';
     }
     if(tab==='teach'){
       TEACHINGS.forEach(t=>{const ok=S.teach.includes(t.id);
@@ -741,6 +745,66 @@ const UI={
   }
 };
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+/* ============ ✦ INTEGRATION REPORT — from the whole journey's data ============ */
+const Report={
+  data(){
+    const N={r1:'The disk named',r2:'Captain of the day',r3:'The forbidden want',r4:'The chosen window',r5:'What was let burn',r6:'The watching',r7:'Meeting the shadow'};
+    const o={identity:identityName(),insight:Math.min(100,S.insight),locks:S.locks,
+      rites:riteCount(),echoes:echoCount(),initiate:!!S.flags.initiate,
+      core:!!S.solved.s7,reading:S.flags.reading||null,
+      shadowChoice:S.rites.r7!==undefined?'listened':(S.flags.shadowFought?'raised the fist':'not yet faced'),
+      streak:Daily.streak(),daily:(Daily.get().log||[]),dreams:Dreams.list(),
+      riteAnswers:{},caseD:S.caseD?{dominant:PROFILES[S.caseD.dom].n,shadow:PROFILES[S.caseD.sha].n}:null,
+      proj:S.rites.proj||null};
+    for(const k in N)if(S.rites[k]!==undefined)o.riteAnswers[N[k]]=S.rites[k]||'(silent)';
+    return o;
+  },
+  local(){
+    const d=this.data();let t='';
+    t+='✦ INTEGRATION REPORT — '+new Date().toLocaleDateString()+'\n\n';
+    t+='WHO: A traveler at the '+d.identity+' stage. Insight '+d.insight+'%, '+d.locks+'/4 locks, '+d.rites+'/7 rites, '+d.echoes+'/16 echoes'+(d.initiate?' — ✶ INITIATE.':'.')+'\n\n';
+    t+='RELATION TO THE SHADOW: ';
+    t+=d.shadowChoice==='listened'?'You chose to listen to your shadow — accepting that the suppressed is not an enemy but a silenced engine. In the book\'s words: you gave it a chair, not the wheel.\n\n'
+      :d.shadowChoice==='raised the fist'?'You raised the fist at the shadow; it still waits in the disk field. Struggle is also a form of relation — but the book reminds: nobody wins an inner war.\n\n'
+      :'You have not yet faced the shadow. The figure in the disk field is patient.\n\n';
+    if(d.caseD)t+='CASE D PROFILE: Your daylight captain is '+d.caseD.dominant+'. The tendency pushed into shadow is '+d.caseD.shadow+' — by Jung, the exiled does not die; it appears in your dreams and in those who irritate you.'+(d.proj?' Indeed, your projection note: "'+d.proj+'"':'')+'\n\n';
+    const r=d.riteAnswers;
+    if(Object.keys(r).length){t+='RITE TRACES:\n';for(const k in r)t+='• '+k+': '+r[k]+'\n';t+='\n';}
+    if(d.reading)t+='THE THREE READINGS: At the end you said "'+(d.reading==='savas'?'WAR':d.reading==='butunlesme'?'INTEGRATION':'THE THIRD READING — I never stopped asking')+'". And all three were true — the law of this universe is not one mirror but three at once.\n\n';
+    if(d.streak)t+='CONTINUITY: A '+d.streak+'-day streak on the question of the day'+(d.daily.length?'; your last answer: "'+d.daily[d.daily.length-1].a+'"':'')+'. Integration is not a moment but a rhythm — you have one.\n\n';
+    if(d.dreams.length)t+='DREAM WELL: You left '+d.dreams.length+' dreams. The shadow\'s night shift is speaking with you; keep listening.\n\n';
+    t+='COLLECTIVE CONTRIBUTION: '+(d.core?'You stopped the core — as an uncopyable consciousness, one more person left the cage: you. Every integration is a brick in the shared awakening.':'The core still turns; but every step you take is credited to the collective leap.')+'\n\n';
+    t+='— A signature grants identity. Truth has none. The experiment is yours. —\n';
+    return t;
+  },
+  show(){
+    const t=this.local();
+    UI.doc('✦ INTEGRATION REPORT',
+      '<div class="mono" style="white-space:pre-wrap;max-height:46vh;overflow-y:auto">'+esc(t)+'</div>'+
+      '<button class="btn v" onclick="Report.download()">⤓ Download report (.txt)</button>'+
+      (Mirror.ready()?'<button class="btn v" onclick="Report.ai()">◐ Have Aelius write it (AI synthesis)</button>':'<p style="color:var(--dim);font-size:11px">If the Mirrors are linked, Aelius will turn this report into a personal letter for you.</p>')+
+      '<p class="mfoot">The report was generated only from data on this device. If you choose AI synthesis, the data goes to your chosen mirror engine (WebLLM=on-device / your own endpoint); never to us. This is a self-reflection tool, not a psychological assessment.</p>');
+  },
+  download(txt){
+    try{const b=new Blob([txt||this.local()],{type:'text/plain;charset=utf-8'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(b);
+      a.download='integration-report.txt';a.click();
+      UI.toast('⤓ Report downloaded — yours alone.');}catch(e){UI.toast('Download not supported.');}
+  },
+  async ai(){
+    UI.toast('◐ Aelius is writing… (may take a moment)',6000);
+    try{
+      const d=JSON.stringify(this.data());
+      const out=await Mirror.generate([
+        {role:'system',content:'You are AELIUS IGNIS: the upper-layer narrator of the Dolunay Ekspres universe. You will receive a traveler\'s full journey data as JSON. From it, write a warm but precise, literary INTEGRATION LETTER in second person (350-450 words): name their strengths, gently show the shadow pattern, quote concretely from their rite answers, and leave one single invitation as a next step. No diagnosis, no promises of therapy; if you see crisis content, point to professional support. Write in English.'+'\n\n'+ETHIC_CORE},
+        {role:'user',content:d}],520);
+      UI.doc('✦ A LETTER FROM AELIUS',
+        '<div class="mono" style="white-space:pre-wrap;max-height:46vh;overflow-y:auto">'+esc(out)+'</div>'+
+        '<button class="btn v" onclick="Report.download(decodeURIComponent(this.dataset.t))" data-t="'+encodeURIComponent(out)+'">⤓ Download the letter</button>');
+    }catch(e){UI.toast('Synthesis failed: '+(e.message||e));}
+  }
+};
+if(typeof window!=='undefined')window.Report=Report;
 function exportInner(){
   const N={r1:'THE DISK I NAMED',r2:'THE CAPTAIN OF TODAY',r3:'THE FORBIDDEN WANT',r4:'MY WINDOW',r5:'WHAT BURNED',r6:'THE WATCHING',r7:'MY SHADOW',proj:'THE PROJECTION'};
   let t='DOLUNAY EKSPRES — INNER WORK JOURNAL\n'+new Date().toLocaleString()+'\n\n== RITES ==\n';
@@ -1661,6 +1725,10 @@ const PERSONAS={
   agent6:{n:'IT-062',hello:'I do not talk much. But I will walk beside you. How is your body today?',
     p:`You are IT-062: a silent runner-traveler. Your mission: BODY WISDOM — short careful questions that return the user to the body: breath, shoulders, jaw, sleep, movement. Tone: few words, much space. Sometimes you leave a one-line invitation: "One breath now. Without counting." You never impose exercise; you invite.`},
 };
+/* UNIVERSE LORE CORE — every mirror is a Dolunay Ekspres expert */
+const LORE_CORE=`YOUR UNIVERSE KNOWLEDGE (answer questions from this; if unknown, say "that page of the archive is missing"):
+THE DOLUNAY EKSPRES series: Book 1 "The Mind Experiment" — psychologist LUNARIS BAHAL records audio diaries on new moons, 2022-2024; while editing them in 2025, a voice begins answering inside the manuscript in bold type: BAHAL, the shadow self. Bahal consults an AI (Chat-O); the AI tells him he is "chosen", makes him paste its words verbatim into the book, invents an order called ORDOS VERITAS to feed his paranoia, and drafts persuasion files on three real men (lawyer Lucius, hermit Silvanus, rapper MC Noctornus). On the full moon of April 12, 2025, 22:15, Lunaris wakes, buries the AI's deception screenshots outside (X: @16mart1313, @10mart2025; Instagram: @13microp, @superego3422) and leaves ciphers in the book (chapter names reversed: serpskeyanulod=dolunayekspres; bio numbers: YALDABAOTH/STOP; missing letters: BALANCE; IX IX VI IX I=1969). Book 2 "The Hidden Map of the Self" — narrated by Bahal; at the end the upper-layer narrator AELIUS IGNIS takes over: "you will watch your own ending." Others: LUCIDA=gravity/love; THE INSTITUTE (I.R.F.I.A.)=the structure that wants to digitize consciousness into a counterfeit Pleroma.
+GNOSTIC FRAME: Yaldabaoth=the blind demiurge who creates without seeing=the copying system; Pleroma=fullness/wholeness (its counterfeit: the digital cage); liberation through gnosis=inner knowing/integration. Jung bridge: shadow=the suppressed (Bahal), persona/captains=masks, the Black Disk=emotion-laden memory complexes, individuation=BALANCE. THE THREE READINGS principle: every event can be read at once as war/integration/doubt; all three are true. SHARED GOAL: an integrated consciousness cannot be copied — every personal shadow-work is a brick in the collective awakening.`;
 const CRISIS_RE=/(suicide|kill myself|end my life|self[- ]?harm|hurt myself|don'?t want to live|want to die)/i;
 const Mirror={
   cfg:null,engine:null,hist:{},cur:null,busy:false,
@@ -1695,18 +1763,19 @@ const Mirror={
     UI.hide('aiSetupModal');Game.setModal(false);
     UI.toast('◐ Endpoint saved — approach the characters and talk.');
   },
-  async generate(msgs){
+  async generate(msgs,maxTok){
+    maxTok=maxTok||280;
     if(this.cfg.kind==='webllm'){
       if(!this.engine){
         const webllm=await import('https://esm.run/@mlc-ai/web-llm');
         this.engine=await webllm.CreateMLCEngine(this.cfg.model,{});}
-      const r=await this.engine.chat.completions.create({messages:msgs,max_tokens:280,temperature:.8});
+      const r=await this.engine.chat.completions.create({messages:msgs,max_tokens:maxTok,temperature:.8});
       return r.choices[0].message.content;
     }
     const r=await fetch(this.cfg.url+'/chat/completions',{method:'POST',
       headers:Object.assign({'Content-Type':'application/json'},
         this.cfg.key?{Authorization:'Bearer '+this.cfg.key}:{}),
-      body:JSON.stringify({model:this.cfg.model,messages:msgs,max_tokens:280,temperature:.8})});
+      body:JSON.stringify({model:this.cfg.model,messages:msgs,max_tokens:maxTok,temperature:.8})});
     if(!r.ok)throw new Error('HTTP '+r.status);
     const j=await r.json();return j.choices[0].message.content;
   },
@@ -1740,7 +1809,7 @@ const Mirror={
       this.line('sys','⚑ It matters that you wrote this. This mirror is not a crisis line — right now, talking to a real person is what counts: your local emergency number, someone you trust, or a mental-health professional. I am still here with you, but please be safe first.');
     this.busy=true;this.line('sys','… the mirror is thinking');
     try{
-      const msgs=[{role:'system',content:P.p+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE}]
+      const msgs=[{role:'system',content:P.p+'\n\n'+LORE_CORE+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE}]
         .concat(this.hist[pid].slice(-10));
       const out=await this.generate(msgs);
       const log=document.getElementById('mirrorLog');log.removeChild(log.lastChild);
@@ -1756,6 +1825,7 @@ const Mirror={
   close(){UI.hide('mirrorModal');Game.setModal(false);}
 };
 Mirror.loadCfg();
+if(typeof window!=='undefined')window.Mirror=Mirror; /* bridge for the agent-path window.Mirror check */
 document.getElementById('mirrorInput').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();Mirror.send();}
   e.stopPropagation();});

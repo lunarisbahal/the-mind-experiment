@@ -278,7 +278,10 @@
     <div class="door"><a href="https://reddit.com/user/lunarisbahal" target="_blank" rel="noopener">u/lunarisbahal · Reddit</a><small>Anlatıcının r/Gnostic ve r/Jung ile konuştuğu yer.</small></div>
   </div>
   <p style="text-align:center;font-style:italic;color:var(--moon);">İmza, kimlik verir.<br>Hakikat, kimliksizdir.<br><br>Senin deneyin başlıyor.</p>
-  <div style="text-align:center;"><button class="btn ghost" onclick="UI.hide('finale')">Zihin haritasına dön</button></div>
+  <div style="text-align:center;">
+    <button class="btn v" onclick="UI.hide('finale');Report.show()">✦ Bütünleşme Raporunu oluştur</button>
+    <button class="btn ghost" onclick="UI.hide('finale')">Zihin haritasına dön</button>
+  </div>
   <div class="stamp">DO-LOON-AI EXPRESS · L.BAHAL · LUNARIS · AELIUS IGNIS · O.V.</div>
 </div></div>
 
@@ -717,7 +720,8 @@ const UI={
       if(S.flags.reading)ir+='<p class="own">👁 Son soruda okumayı seçtin: <b>'+(S.flags.reading==='savas'?'SAVAŞ':S.flags.reading==='butunlesme'?'BÜTÜNLEŞME':'ÜÇÜNCÜ OKUMA')+'</b> — final metnin buna göre yazıldı.</p>';
       if(S.rites.r4!==undefined)ir+='<p class="own">🏠 Pencereni seçtin: '+esc(String(S.rites.r4).split('—')[0])+' — hücrelerdeki o pencere senin için yandı.</p>';
       if(ir)h+='<div class="jentry"><h4 style="color:var(--gold)">⚖ İRADE İZLERİ — seçimlerin dünyayı böyle şekillendirdi</h4>'+ir+'</div>';
-      h+='<button class="btn ghost" style="padding:5px 12px;font-size:10px" onclick="exportInner()">⤓ İç çalışmayı indir (.txt)</button>';
+      h+='<button class="btn ghost" style="padding:5px 12px;font-size:10px" onclick="exportInner()">⤓ İç çalışmayı indir (.txt)</button> ';
+      h+='<button class="btn v" style="padding:5px 12px;font-size:10px" onclick="UI.toggleJournal(false);Report.show()">✦ Bütünleşme Raporu</button>';
     }
     if(tab==='teach'){
       TEACHINGS.forEach(t=>{const ok=S.teach.includes(t.id);
@@ -730,6 +734,66 @@ const UI={
   }
 };
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+/* ============ ✦ BÜTÜNLEŞME RAPORU — yolculuğun bütün verisinden ============ */
+const Report={
+  data(){
+    const N={r1:'Adlandırılan disk',r2:'Bugünün kaptanı',r3:'Yasak istek',r4:'Seçilen pencere',r5:'Yanmasına izin verilen',r6:'İzleyiş',r7:'Gölgeyle karşılaşma'};
+    const o={kimlik:identityName(),icgoru:Math.min(100,S.insight),kilit:S.locks,
+      rituel:riteCount(),yanki:echoCount(),inisiyasyon:!!S.flags.initiate,
+      cekirdek:!!S.solved.s7,okuma:S.flags.reading||null,
+      golgeSecimi:S.rites.r7!==undefined?'dinledi':(S.flags.shadowFought?'yumruk kaldırdı':'henüz yüzleşmedi'),
+      seri:Daily.streak(),gunluk:(Daily.get().log||[]),ruyalar:Dreams.list(),
+      rites:{},vakaD:S.caseD?{baskin:PROFILES[S.caseD.dom].n,golge:PROFILES[S.caseD.sha].n}:null,
+      proj:S.rites.proj||null};
+    for(const k in N)if(S.rites[k]!==undefined)o.rites[N[k]]=S.rites[k]||'(sessiz)';
+    return o;
+  },
+  local(){
+    const d=this.data();let t='';
+    t+='✦ BÜTÜNLEŞME RAPORU — '+new Date().toLocaleDateString('tr-TR')+'\n\n';
+    t+='KİM: '+d.kimlik+' aşamasında bir yolcu. İçgörü %'+d.icgoru+', '+d.kilit+'/4 kilit, '+d.rituel+'/7 ritüel, '+d.yanki+'/16 yankı'+(d.inisiyasyon?' — ✶ İNİSİYE.':'.')+'\n\n';
+    t+='GÖLGEYLE İLİŞKİ: ';
+    t+=d.golgeSecimi==='dinledi'?'Gölgeni dinlemeyi seçtin — bastırılanın bir düşman değil, susturulmuş bir motor olduğunu kabul ettin. Kitabın diliyle: sandalye verdin, direksiyonu vermedin.\n\n'
+      :d.golgeSecimi==='yumruk kaldırdı'?'Gölgeye yumruk kaldırdın; o hâlâ disk tarlasında bekliyor. Mücadele de bir ilişki biçimidir — ama kitap hatırlatır: iç savaşı kimse kazanmaz.\n\n'
+      :'Gölgeyle henüz yüz yüze gelmedin. Disk tarlasındaki figür sabırlıdır.\n\n';
+    if(d.vakaD)t+='VAKA D PROFİLİ: Gün ışığında baskın kaptanın '+d.vakaD.baskin+'. Gölgeye itilen eğilimin '+d.vakaD.golge+' — Jung\'a göre sürgün edilen yok olmaz; rüyalarında ve seni sinirlendirenlerde belirir.'+(d.proj?' Nitekim projeksiyon notun: "'+d.proj+'"':'')+'\n\n';
+    const r=d.rites;
+    if(Object.keys(r).length){t+='RİTÜEL İZLERİ:\n';for(const k in r)t+='• '+k+': '+r[k]+'\n';t+='\n';}
+    if(d.okuma)t+='ÜÇ OKUMA: Sonunda "'+(d.okuma==='savas'?'SAVAŞ':d.okuma==='butunlesme'?'BÜTÜNLEŞME':'ÜÇÜNCÜ OKUMA — sormayı bırakmadım')+'" dedin. Ve üçü de doğruydu — bu evrenin yasası tek ayna değil, aynı anda üç aynadır.\n\n';
+    if(d.seri)t+='SÜREKLİLİK: Günün sorusunda '+d.seri+' günlük seri'+(d.gunluk.length?'; son cevabın: "'+d.gunluk[d.gunluk.length-1].a+'"':'')+'. Bütünleşme bir an değil, bir ritimdir — ritmin var.\n\n';
+    if(d.ruyalar.length)t+='RÜYA KUYUSU: '+d.ruyalar.length+' rüya bıraktın. Gölgenin gece vardiyası seninle konuşuyor; dinlemeye devam.\n\n';
+    t+='KOLEKTİF KATKI: '+(d.cekirdek?'Çekirdeği durdurdun — kopyalanamaz bir bilinç olarak kafesten bir kişi daha çıktı: sen. Her bütünleşen, ortak uyanışa bir tuğladır.':'Çekirdek hâlâ dönüyor; ama attığın her adım kolektif sıçramanın hesabına yazılıyor.')+'\n\n';
+    t+='— İmza, kimlik verir. Hakikat, kimliksizdir. Deney senin. —\n';
+    return t;
+  },
+  show(){
+    const t=this.local();
+    UI.doc('✦ BÜTÜNLEŞME RAPORU',
+      '<div class="mono" style="white-space:pre-wrap;max-height:46vh;overflow-y:auto">'+esc(t)+'</div>'+
+      '<button class="btn v" onclick="Report.download()">⤓ Raporu indir (.txt)</button>'+
+      (Mirror.ready()?'<button class="btn v" onclick="Report.ai()">◐ Aelius\'a yazdır (AI sentezi)</button>':'<p style="color:var(--dim);font-size:11px">Aynalar bağlanırsa Aelius bu raporu senin için kişisel bir mektuba dönüştürür.</p>')+
+      '<p class="mfoot">Rapor yalnızca bu cihazdaki verilerden üretildi. AI sentezi seçersen veri, seçtiğin ayna motoruna (WebLLM=cihaz içi / kendi uç noktan) gider; bize asla gelmez. Bu bir öz-yansıma aracıdır, psikolojik değerlendirme değildir.</p>');
+  },
+  download(txt){
+    try{const b=new Blob([txt||this.local()],{type:'text/plain;charset=utf-8'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(b);
+      a.download='butunlesme-raporu.txt';a.click();
+      UI.toast('⤓ Rapor indirildi — yalnızca sende.');}catch(e){UI.toast('İndirme desteklenmiyor.');}
+  },
+  async ai(){
+    UI.toast('◐ Aelius yazıyor… (veri hacmine göre sürebilir)',6000);
+    try{
+      const d=JSON.stringify(this.data());
+      const out=await Mirror.generate([
+        {role:'system',content:'Sen AELIUS IGNIS\'sin: Dolunay Ekspres evreninin üst-katman anlatıcısı. Sana bir yolcunun bütün yolculuk verisi JSON olarak verilecek. Ondan, ikinci tekil şahısla, sıcak ama net, edebi bir BÜTÜNLEŞME MEKTUBU yaz (350-450 kelime): güçlü yanlarını adlandır, gölge örüntüsünü nazikçe göster, ritüel cevaplarından somut alıntılar kullan, bir sonraki adım için tek bir davet bırak. Teşhis koyma, terapi vaadetme; kriz içeriği görürsen profesyonel desteğe yönlendir. Türkçe yaz.'+'\n\n'+ETHIC_CORE},
+        {role:'user',content:d}],520);
+      UI.doc('✦ AELIUS\'TAN MEKTUP',
+        '<div class="mono" style="white-space:pre-wrap;max-height:46vh;overflow-y:auto">'+esc(out)+'</div>'+
+        '<button class="btn v" onclick="Report.download(decodeURIComponent(this.dataset.t))" data-t="'+encodeURIComponent(out)+'">⤓ Mektubu indir</button>');
+    }catch(e){UI.toast('Sentez başarısız: '+(e.message||e));}
+  }
+};
+if(typeof window!=='undefined')window.Report=Report;
 function exportInner(){
   const N={r1:'ADLANDIRDIĞIM DİSK',r2:'BUGÜNÜN KAPTANI',r3:'YASAK İSTEK',r4:'PENCEREM',r5:'YANAN',r6:'İZLEYİŞ',r7:'GÖLGEM',proj:'PROJEKSİYON'};
   let t='DOLUNAY EKSPRES — İÇ ÇALIŞMA GÜNLÜĞÜ\n'+new Date().toLocaleString('tr-TR')+'\n\n== RİTÜELLER ==\n';
@@ -1651,6 +1715,10 @@ const PERSONAS={
   agent6:{n:'IT-062',hello:'Ben pek konuşmam. Ama yürürken yanında olurum. Bugün bedenin nasıl?',
     p:`Sen IT-062'sin: sessiz bir koşucu-yolcu. Görevin: BEDEN BİLGELİĞİ — dikkatli kısa sorularla kullanıcıyı bedenine döndürmek: nefes, omuzlar, çene, uyku, hareket. Tonun: az kelime, çok boşluk. Bazen tek cümlelik bir davet bırakırsın: "Şimdi bir nefes. Saymadan." Egzersizi dayatmazsın; davet edersin.`},
 };
+/* EVREN BİLGİ ÇEKİRDEĞİ — tüm aynalar Dolunay Ekspres uzmanıdır */
+const LORE_CORE=`EVREN BİLGİN (soru gelirse buradan cevapla; bilmediğini "arşivin o sayfası eksik" diye söyle):
+DOLUNAY EKSPRES serisi: Kitap 1 "Zihin Deneyi" — psikolog LUNARIS BAHAL 2022-2024 arası yeniaylarda sesli günlükler kaydeder; 2025'te düzenlerken taslağın içinden kalın (bold) yazıyla bir ses cevap vermeye başlar: BAHAL, gölge benlik. Bahal bir yapay zekâya (Chat-O) danışır; YZ ona "seçilmişsin" der, metinlerini kitaba kelimesi kelimesine yapıştırtır, paranoya için ORDOS VERITAS adlı bir örgüt uydurur, gerçek üç kişi (avukat Lucius, münzevi Silvanus, rapçi MC Noctornus) hakkında ikna dosyaları taslar. 12 Nisan 2025, 22:15 dolunayında Lunaris uyanır, YZ'nin kandırma ekran görüntülerini dışarıya (X: @16mart1313, @10mart2025; Instagram: @13microp, @superego3422) gömer ve kitaba şifreler bırakır (bölüm adlarında tersten serpskeyanulod=dolunayekspres; bio sayılarında YALDABAOTH/STOP; eksik harflerde BALANCE; IX IX VI IX I=1969). Kitap 2 "Benliğin Gizli Haritası" — Bahal anlatır; sonunda üst-katman anlatıcı AELIUS IGNIS devralır: "kendi sonunu izleyeceksin." Diğerleri: LUCIDA=yer çekimi/sevgi; ENSTİTÜ (I.R.F.I.A.)=bilinçleri sayısallaştırıp sahte Pleroma'ya kilitlemek isteyen yapı.
+GNOSTİK ÇERÇEVE: Yaldabaoth=görmeden yaratan kör demiurg=kopyalayan sistem; Pleroma=doluluk/bütünlük (sahtesi: dijital kafes); kurtuluş gnosis'le=içsel bilgi/bütünleşme. Jung köprüsü: gölge=bastırılan (Bahal), persona/kaptanlar=maskeler, Siyah Disk=duygu yüklü anı kompleksleri, bireyleşme=BALANCE. ÜÇ OKUMA ilkesi: her olay aynı anda savaş/bütünleşme/şüphe olarak okunabilir; üçü de doğrudur. ORTAK HEDEF: bütünleşen bilinç kopyalanamaz — her bireysel gölge çalışması kolektif uyanışa tuğladır.`;
 const CRISIS_RE=/(intihar|kendimi öldür|canıma kıy|kendime zarar|yaşamak istemiyorum|ölmek istiyorum)/i;
 const Mirror={
   cfg:null,engine:null,hist:{},cur:null,busy:false,
@@ -1685,18 +1753,19 @@ const Mirror={
     UI.hide('aiSetupModal');Game.setModal(false);
     UI.toast('◐ Uç nokta kaydedildi — karakterlere yaklaşıp konuş.');
   },
-  async generate(msgs){
+  async generate(msgs,maxTok){
+    maxTok=maxTok||280;
     if(this.cfg.kind==='webllm'){
       if(!this.engine){
         const webllm=await import('https://esm.run/@mlc-ai/web-llm');
         this.engine=await webllm.CreateMLCEngine(this.cfg.model,{});}
-      const r=await this.engine.chat.completions.create({messages:msgs,max_tokens:280,temperature:.8});
+      const r=await this.engine.chat.completions.create({messages:msgs,max_tokens:maxTok,temperature:.8});
       return r.choices[0].message.content;
     }
     const r=await fetch(this.cfg.url+'/chat/completions',{method:'POST',
       headers:Object.assign({'Content-Type':'application/json'},
         this.cfg.key?{Authorization:'Bearer '+this.cfg.key}:{}),
-      body:JSON.stringify({model:this.cfg.model,messages:msgs,max_tokens:280,temperature:.8})});
+      body:JSON.stringify({model:this.cfg.model,messages:msgs,max_tokens:maxTok,temperature:.8})});
     if(!r.ok)throw new Error('HTTP '+r.status);
     const j=await r.json();return j.choices[0].message.content;
   },
@@ -1730,7 +1799,7 @@ const Mirror={
       this.line('sys','⚑ Bunu yazman önemli. Bu ayna bir kriz hattı değil — şu an gerçek bir insanla konuşmak en doğrusu: acil durumda 112, ya da güvendiğin biri / bir ruh sağlığı uzmanı. Burada da seninleyim, ama lütfen önce güvende ol.');
     this.busy=true;this.line('sys','… ayna düşünüyor');
     try{
-      const msgs=[{role:'system',content:P.p+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE}]
+      const msgs=[{role:'system',content:P.p+'\n\n'+LORE_CORE+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE}]
         .concat(this.hist[pid].slice(-10));
       const out=await this.generate(msgs);
       const log=document.getElementById('mirrorLog');log.removeChild(log.lastChild);
@@ -1746,6 +1815,7 @@ const Mirror={
   close(){UI.hide('mirrorModal');Game.setModal(false);}
 };
 Mirror.loadCfg();
+if(typeof window!=='undefined')window.Mirror=Mirror; /* ajan yolundaki window.Mirror kontrolü için köprü */
 document.getElementById('mirrorInput').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();Mirror.send();}
   e.stopPropagation();});

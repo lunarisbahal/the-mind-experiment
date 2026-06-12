@@ -1,5 +1,5 @@
 # DO-LOON-AI EXPRESS · THE MIND EXPERIMENT — PROJE DURUMU
-*Sürüm: v7.3 · Bu dosya her güncellemede yenilenir. Yeni bir sohbette/sekmede buradan devam edilebilir.*
+*Sürüm: v7.4 · Bu dosya her güncellemede yenilenir. Yeni bir sohbette/sekmede buradan devam edilebilir.*
 
 ## CANLI ADRESLER
 - **Oyun (EN):** https://lunarisbahal.github.io/the-mind-experiment/
@@ -42,4 +42,4 @@
 - Unity geçişi: bu ortamda Unity editör yok; istenirse C# iskelet paketi üretilebilir (bkz. sohbet v7.3 yanıtı).
 
 ## SÜRÜM GEÇMİŞİ (özet)
-v1 2D → v2 3D → v3 shadow-work+karakterler → v4 VakaD+yağmur+evrim → v5 Yaldabaoth/Pleroma/üç okuma/ajanlar/MP → v5.1 radyo+ay → v5.2 kasetler → v5.3 yankılar+inisiyasyon → v6 AI Aynalar+izler+gerçek dolunay → v7 sayaç+sohbet+gece-gündüz+7 ajan+günlük → v7.2 devam-et+isim+derin rehber → v7.3 zıplama+ayna CTA+irade izleri+Aelius katmanı.
+v1 2D → v2 3D → v3 shadow-work+karakterler → v4 VakaD+yağmur+evrim → v5 Yaldabaoth/Pleroma/üç okuma/ajanlar/MP → v5.1 radyo+ay → v5.2 kasetler → v5.3 yankılar+inisiyasyon → v6 AI Aynalar+izler+gerçek dolunay → v7 sayaç+sohbet+gece-gündüz+7 ajan+günlük → v7.2 devam-et+isim+derin rehber → v7.3 zıplama+ayna CTA+irade izleri+Aelius katmanı → v7.4 window.Mirror düzeltmesi+LORE_CORE (ajanlar evren uzmanı)+✦ Bütünleşme Raporu (yerel+AI sentez).
