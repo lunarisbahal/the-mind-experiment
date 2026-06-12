@@ -239,6 +239,7 @@
   <button class="mini" onclick="Game.toggleMap()">MAP</button>
   <button class="mini" id="sndBtn" onclick="Snd.toggle()">SOUND: ON</button>
   <button class="mini" id="radBtn" onclick="Snd.toggleRadio()">RADIO: ON</button>
+  <button class="mini" id="tapBtn" onclick="Snd.toggleTapes()">TAPES: ON</button>
   <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">SYNC: OFF</button>
 </div>
 
@@ -1360,6 +1361,54 @@ const Snd={
   toggleRadio(){this.radioOn=!this.radioOn;this.init();
     document.getElementById('radBtn').textContent='RADIO: '+(this.radioOn?'ON':'OFF');
     if(!this.radioOn&&this.radioGain)this.radioGain.gain.value=0;},
+  /* ---- THE TAPES — audiobook recordings ----
+     They rise from under the static, as if from the old recorder; the right chapters in the right places.
+     Excerpts loop: "the tape rewinds". With fade in/out. */
+  tapesOn:true,tapeIdx:-1,_tapes:{},_zoneWant:-1,
+  TAPE_BASE:'https://lunarisbahal.github.io/the-mind-experiment/audio/',
+  TAPE_NAME:['tape rolling — Chapters 1-6','tape rolling — Chapters 6-12','tape rolling — Chapters 12-16',
+    'tape rolling — Chapters 16-25','tape rolling — Chapters 25-38','tape rolling — Chapters 38-49 · the ending'],
+  ensureTape(i){
+    if(this._tapes[i])return this._tapes[i];
+    if(!this.ac)return null;
+    try{
+      const el=new Audio(this.TAPE_BASE+'tape'+(i+1)+'.mp3');
+      el.crossOrigin='anonymous';el.loop=true;el.preload='none';
+      const src=this.ac.createMediaElementSource(el);
+      const hp=this.ac.createBiquadFilter();hp.type='highpass';hp.frequency.value=280;
+      const lp=this.ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=3200;
+      const g=this.ac.createGain();g.gain.value=0;
+      src.connect(hp);hp.connect(lp);lp.connect(g);g.connect(this.master);
+      this._tapes[i]={el,g};return this._tapes[i];
+    }catch(e){return null;}
+  },
+  zoneTape(want){
+    if(!this.started)return;
+    const i=this.tapesOn?want:-1;
+    if(i===this.tapeIdx)return;
+    const ac=this.ac;
+    if(this.tapeIdx>=0&&this._tapes[this.tapeIdx]){
+      const old=this._tapes[this.tapeIdx];
+      try{const n=ac.currentTime;
+        old.g.gain.cancelScheduledValues(n);
+        old.g.gain.setValueAtTime(old.g.gain.value,n);
+        old.g.gain.linearRampToValueAtTime(0,n+1.6);}catch(e){}
+      setTimeout(()=>{try{if(old.g.gain.value<.03)old.el.pause();}catch(e){}},1900);
+    }
+    this.tapeIdx=i;
+    if(i>=0){
+      const t=this.ensureTape(i);if(!t)return;
+      try{t.el.play().catch(()=>{});
+        const n=ac.currentTime;
+        t.g.gain.cancelScheduledValues(n);
+        t.g.gain.setValueAtTime(t.g.gain.value,n);
+        t.g.gain.linearRampToValueAtTime(.42,n+2.2);}catch(e){}
+      UI.toast('▸ '+this.TAPE_NAME[i],2600);
+    }
+  },
+  toggleTapes(){this.tapesOn=!this.tapesOn;this.init();
+    document.getElementById('tapBtn').textContent='TAPES: '+(this.tapesOn?'ON':'OFF');
+    const w=this._zoneWant;this.tapeIdx=-2;this.zoneTape(w);},
   toggle(){this.on=!this.on;
     document.getElementById('sndBtn').textContent='SOUND: '+(this.on?'ON':'OFF');
     if(this.on){this.init();if(this.master)this.master.gain.value=.5;}
@@ -2053,7 +2102,7 @@ if(HAS3D)(function(){
   addEventListener('touchend',e=>{for(const t of e.changedTouches)if(t.identifier===lookId)lookId=null;},{passive:true});
 
   /* ---- loop ---- */
-  let walkT=0,meshAng=0,last=performance.now(),saveT=0,noctWarn=0,fovKick=0,gameT=0;
+  let walkT=0,meshAng=0,last=performance.now(),saveT=0,noctWarn=0,fovKick=0,gameT=0,tapeChk=0;
   W3.noctPos={x:L.blackdisk.x,z:L.blackdisk.z};
   function lerpAng(a,b,t){let d=b-a;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return a+d*t;}
   function animate(now){
@@ -2245,6 +2294,18 @@ if(HAS3D)(function(){
     }
     /* radyo yakınlık sesi */
     Snd.setProx&&Snd.setProx(Math.hypot(S.px-L.radio.x,S.pz-L.radio.z));
+    /* audiobook tapes: zone-based, with fades */
+    tapeChk+=dt;
+    if(tapeChk>.5){tapeChk=0;
+      let want=-1;
+      if(!S.flags.inPleroma){
+        const TZ=[['blackdisk',0],['prison',1],['therapy',2],['labyrinth',3],['forest',4],['lake',5]];
+        for(const[k,ti]of TZ){const z=L[k];
+          if(Math.hypot(S.px-z.x,S.pz-z.z)<z.r+4){want=ti;break;}}
+      }
+      Snd._zoneWant=want;
+      Snd.zoneTape&&Snd.zoneTape(want);
+    }
     document.getElementById('dmg').style.opacity=S.lucidity<35?(35-S.lucidity)/40:0;
 
     /* beacon */
