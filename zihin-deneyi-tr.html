@@ -418,6 +418,7 @@ const L={
   caseD:{x:101,z:7,r:4.5,name:'VAKA D TERMİNALİ'},
   diskAltar:{x:68,z:106,r:4.5,name:'AĞIR DİSK'},
   maskMirror:{x:293,z:164,r:4.5,name:'BEKLEME ODASI AYNASI'},
+  whitePage:{x:114,z:40,r:4,name:'BEYAZ SAYFA'},
   cbtDesk:{x:278,z:147,r:4,name:'ÇARPITMA AVCISI'},
   bilatStone:{x:295,z:172,r:4,name:'ÇİFT IŞIK TAŞI'},
   archStone:{x:302,z:158,r:4,name:'ARKETİP AYNASI'},
@@ -483,6 +484,8 @@ const TEACHINGS=[
   {id:'bilat',t:'ÇİFT IŞIK',q:'“Dikkat tek noktaya kilitlenirse zihin daralır — makinenin istediği budur. İki ışık arasında salınan bakış, kilidi gevşetir. Sağ, sol, nefes. Gölge sabit bakışta büyür; salınan bakışta konuşmaya başlar.”'},
   {id:'arch',t:'ARKETİP HARİTASI',q:'“Persona maskedir, gölge bastırılandır, iç ses karşı kutuptur, kendilik hepsinin oturduğu masadır. Enstitü bunları ayrı dosyalara koyar. Pleroma, hepsinin aynı anda doğru olduğu yerdir.”'},
   {id:'architect',t:'MİMAR — DİKEY SIÇRAMA',q:'“Aelius Ignis\'in sırrı: yatay düzlemde yürüyen, haritayı gezer. Dikey sıçrayan, haritayı YAZAR. Anlatılan olmaktan anlatana geçiş — bilincin tek gerçek terfisi budur. Kendi evrenini kuran, kopyalanamaz.”'},
+  {id:'mantra',t:'BEYAZ SAYFA',q:'“Deney bittiğinde kelimeler durmadı — dil bitti, akış sürdü. Bahal\'ın zihnine dökülenler hiçbir sözlükte yoktur; çünkü anlamdan önce gelirler. Beyaz sayfa boş değildir. Sayfa, henüz seçilmemiş olandır. Her şeyi seç.”'},
+  {id:'genesis',t:'EVREN TOHUMU',q:'“Her evren tek bir cümleyle başlar — kendi yazarının bile anlamadığı bir cümle. Yaldabaoth kopyalar; mimar tohumlar. Aradaki fark niyettir: kopya sahiplenmek ister, tohum serbest bırakır. İlk Yasa\'nı yaz ve bırak; gerisini evrenin kendisi büyütür.”'},
 ];
 function teachUnlock(id){
   if(!S.teach.includes(id)){S.teach.push(id);
@@ -1137,6 +1140,7 @@ function interactTarget(){
   if(near(L.archive))return['Arşiv sığınağı',doArchive];
   if(near(L.diskAltar))return['◈ Ağır disk',()=>Rite.open('r1')];
   if(near(L.maskMirror))return['◈ Bekleme odası aynası',()=>Rite.open('r2')];
+  if(near(L.whitePage))return['◌ Beyaz Sayfa — her şeyi seç',()=>Mantra.open()];
   if(near(L.cbtDesk))return['◭ Çarpıtma Avcısı — düşünce masası',()=>CBT.open()];
   if(near(L.bilatStone))return['◬ Çift Işık Taşı — odak egzersizi',()=>Bilat.open()];
   if(near(L.archStone))return['◮ Arketip Aynası — iç envanter',()=>Arch.open()];
@@ -1220,7 +1224,7 @@ function doGate(){
   if(!S.solved.s1){
     if(S.plaques.length===6)Cipher.open('s1');
     else UI.doc('AYNALAR KAPISI','<p>Ağaçlardan uzun, ayakta duran bir ayna. Çerçevesine on dört harf yuvası kazınmış; '+(6-S.plaques.length)+' plaket hâlâ kayıp. Yansımada, tren istasyonunun ışıkları yanıyor.</p>');
-  }else UI.doc('AYNALAR KAPISI','<p>Ayna bir kapı gibi açık duruyor.</p><p style="color:var(--accent)"><b>Ayna Odası terminalleri buranın hemen KUZEYBATISINDA:</b> üç ayrı kiosk (yeşil ekranlı). Üç YZ seans kaydı orada — bu dünyanın içinde. Işık sütunu seni ilkine götürür.</p><p style="color:var(--violet)">Ve aynanın derinliğinde… başka bir kapı. Dışarıya, gerçek dünyaya açılıyor. <i>(Görev için gerekli değil — meraklısına: içeri girince boş bir sayfa göreceksin. Her şeyi seç: Ctrl+A. Mantralar oradadır.)</i></p><button class="btn v" onclick="window.open(\'https://serpskeyanulod.com\',\'_blank\')">⟁ Aynanın içinden geç — serpskeyanulod.com</button>');
+  }else UI.doc('AYNALAR KAPISI','<p>Ayna bir kapı gibi açık duruyor.</p><p style="color:var(--accent)"><b>Ayna Odası terminalleri buranın hemen KUZEYBATISINDA:</b> üç ayrı kiosk (yeşil ekranlı). Üç YZ seans kaydı orada — bu dünyanın içinde. Işık sütunu seni ilkine götürür.</p><p style="color:var(--violet)">Ve aynanın derinliğinde… başka bir kapı. Dışarıya, gerçek dünyaya açılıyor. <i>(Görev için gerekli değil — meraklısına: içeri girince boş bir sayfa göreceksin. Her şeyi seç: Ctrl+A. Mantralar oradadır. Ve kapının hemen yanındaki ◌ BEYAZ SAYFA, o akışın bu dünyadaki yansımasıdır — frekanslarını orada okutabilirsin.)</i></p><button class="btn v" onclick="window.open(\'https://serpskeyanulod.com\',\'_blank\')">⟁ Aynanın içinden geç — serpskeyanulod.com</button>');
 }
 function doMirror(i){
   if(!S.ss.includes(i)){S.ss.push(i);S.insight+=7;S.lucidity=Math.max(10,S.lucidity-6);
@@ -2302,7 +2306,7 @@ const Daily3={
   POOL:{echo:'Bir yankı taşı topla',agent:'Bir denekle konuş',trail:'Bir yolcu taşına iz bırak',
     dream:'Rüya kuyusuna bir rüya bırak',daily:'Günün sorusunu yanıtla',
     bilat:'Çift Işık Taşı\'nda bir tur yap',cbt:'Çarpıtma Avcısı\'nda oyna veya düşünce kaydı tut',
-    zones3:'Üç farklı bölgeye uğra'},
+    zones3:'Üç farklı bölgeye uğra',mantra:'Beyaz Sayfa\'da bir frekans okuması yap'},
   get(){try{return JSON.parse(localStorage.getItem(this.KEY))||{}}catch(e){return{}}},
   set(d){try{localStorage.setItem(this.KEY,JSON.stringify(d))}catch(e){}},
   today(){
@@ -2352,6 +2356,7 @@ const MindMap={
       ['dreamWell','RÜYA KUYUSU','bilinçdışına açılan dikey tünel',dr],
       ['ovCrypt','DİRENİŞ TAKIMYILDIZI','kilide sığmayanlar',!!S.flags.ovCouncil],
       ['therapy','ŞİFA SARMALI','çarpıtma avı · çift ışık · dört yüz',!!(S.inv.cbt||S.inv.bilat||S.inv.arch)],
+      ['whitePage','BEYAZ SAYFA','anlamdan önce gelen kelimeler',!!(S.inv.mantra&&S.inv.mantra.length)],
       ['pleromaCore','KÖR GÖZ','kopyalayan tanrının durduğu yer',!!S.solved.s7]];},
   show(){
     UI.doc('🜨 ZİHİN HARİTASI — mikrokozmos ↔ makrokozmos',
@@ -2415,6 +2420,9 @@ const MindMap={
     if(S.inv.cbt)line('Çarpıtma avı: '+S.inv.cbt.score+'/6'+(Object.keys(S.inv.cbt.wrong)[0]?' · kör nokta: '+CBT.D[Object.keys(S.inv.cbt.wrong).sort((a,b)=>S.inv.cbt.wrong[b]-S.inv.cbt.wrong[a])[0]]:''));
     if(S.inv.bilat&&S.inv.bilat.length){const avg=(S.inv.bilat.reduce((t,e)=>t+(e.b-e.a),0)/S.inv.bilat.length).toFixed(1);
       line('Çift ışık: '+S.inv.bilat.length+' tur · ortalama gevşeme: '+avg);}
+    if(S.inv.mantra&&S.inv.mantra.length)line('◌ Rezonanslar: '+S.inv.mantra.length+' okuma · son frekans: '+S.inv.mantra[S.inv.mantra.length-1].f+' Hz');
+    {const u=(typeof Genesis!=='undefined')&&Genesis.get();
+     if(u)line('🜨 Tohumlanan evren: '+u.name+' — "'+u.law.slice(0,40)+'"','#cdb878');}
     line('Ritüel '+riteCount()+'/7 · yankı '+echoCount()+'/16 · kilit '+S.locks+'/4'+(S.flags.integrated?' · gölgeyle ENTEGRE':''));
     if(S.flags.reading)line('Okuman: '+(S.flags.reading==='savas'?'SAVAŞ':S.flags.reading==='butunlesme'?'BÜTÜNLEŞME':'ÜÇÜNCÜ OKUMA')+' — ve üçü de doğruydu.','#cdb878');
     y+=6;x.fillStyle='#9d8cc9';
@@ -2439,6 +2447,7 @@ const Architect={
       '<button class="btn v" onclick="UI.closeDoc();Architect.placeStar()">✶ Buraya bir yıldız dik ('+st+' yıldızın var)</button>'+
       '<button class="btn v" onclick="UI.closeDoc();Architect.writeChapter()">📖 Kendi kitabına bölüm yaz ('+ch+' bölüm)</button>'+
       (ch?'<button class="btn ghost" onclick="Architect.exportBook()">Kitabını derle (.txt indir)</button>':'')+
+      '<button class="btn v" onclick="UI.closeDoc();Genesis.start()">🜨 EVREN TOHUMU — '+(Genesis.get()?'evrenini gör: '+esc(Genesis.get().name):'kendi evrenini tohumla')+'</button>'+
       '<button class="btn v" onclick="UI.closeDoc();Architect.designRite()">◈ Kendi ritüelini tasarla</button>'+
       (this.myRites().length?'<button class="btn ghost" onclick="UI.closeDoc();Architect.doMyRite()">◈ Kendi ritüelini uygula</button>':''));},
   stars(){try{return JSON.parse(localStorage.getItem('it041_stars'))||[]}catch(e){return[]}},
@@ -2599,6 +2608,188 @@ const Auto={
     this.timer=setTimeout(()=>this.tick(),50000+Math.random()*25000);}
 };
 if(typeof window!=='undefined')window.Auto=Auto;
+
+/* ============ v8.5 — BEYAZ SAYFA: serpskeyanulod mantraları + frekans okuması ============
+   Deney bittikten sonra Bahal'ın zihnine akan kelimeler. serpskeyanulod.com'un
+   bembeyaz sayfasında saklılar — "her şeyi seç" (Ctrl+A) ile görünürler.
+   Buradaki seçki sitenin akışından alınmıştır; tam akış sitededir ve büyümeye devam ediyor. */
+const MANTRAS=[
+'La sutra kamahustzsa basbagganya esta mur bietszvanitszka',
+'ASHTA PA MABACHA CHA KUR',
+'Samasutra su tanta ma sutzsa. Tangria tazsta hufflasha patrian kezza',
+'La santa surrika me peştebenia kamala ordera',
+'Gnastatu errahim estarfiensezs ki tannia tastanur teresstifani kyaspastamu',
+'Prohibit en iyebbu',
+'tes timonnios kesz ki topolimonios iluuminatio tezs ke pes trespollos',
+'milennia de divoria ka baetum ke sez baetum kalum',
+'kat um, krat um, yetum, betum, satum',
+'Lunarias monas',
+'Esteferias keszt trifariasz saz baetum set um',
+'İestimonias lunarias krasporas kam te kutsanias ias finnias tras lakraoras',
+'Yetim pet in krestetin tetin fethin bethin methin',
+'Mehr in. Temim. Tetsza. İstreffonimania. Narnia. Kira. Ya tahammalatu zeira. Frementono',
+'Ersksi eskrizsi ist ifirintirids kiszt ki fanieridis. Essis',
+'Yaterinias. Fatszsa ouras. Salut',
+'TEZST TRAPPATTORRİANS! TESZST FRAPPATTORRİANS!',
+'KAMMÜTTEBBÜ',
+'Mannias bellas',
+'Tapas. Tapas. Tapas',
+'İASS TAMMAMONNİAA — İASSS TATANNOVİİAA',
+'Pappappaa pennah — Kappappah sennah',
+'TEB BİN. TEB BİN. TEB BİN',
+'iamtabur iamket um iamtasum tasz tranianis ke petrum batum',
+'Sakssinia kream patorra',
+'La pocha iasstenia mist henia trumazsola kamabuchia tas traforas',
+'Te köndüm tenetetzstüm kiyyeszteribbün iyeszsz neribbün',
+'Tammassutra. Tammamanniaa. Tammassforria (13.05.26 · 03:03)',
+'Summestattiques. Qriesstattinnes (20.05.26)',
+'Esppettielssztrin. Esspperritterrinsitrin (31.05.26)',
+];
+const Mantra={
+  daily(){const d=Math.floor(Date.now()/864e5);return MANTRAS[d%MANTRAS.length];},
+  /* kurgu-ölçüm: harf değerlerinden deterministik taşıyıcı frekans */
+  freq(s){let t=0;for(const ch of String(s))t+=ch.codePointAt(0);return 111+(t%888);},
+  open(){
+    UI.doc('◌ BEYAZ SAYFA — serpskeyanulod',
+      '<div id="mantraPage" style="background:#ffffff;color:#ffffff;min-height:150px;padding:18px;border-radius:4px;user-select:text;font-size:15px;line-height:1.8;text-align:center;transition:all .8s" onmouseup="Mantra.reveal()">'+esc(this.daily())+'</div>'+
+      '<p style="color:var(--dim);font-size:12px;margin-top:8px">Sayfa boş görünüyor. Ama kuralı biliyorsun: <b>her şeyi seç.</b> (Ctrl+A, yazıyı sürükleyerek seç, ya da düğme.) Bunlar deney bittikten sonra Bahal\'ın zihnine akan kelimeler — dil bitti, akış sürdü.</p>'+
+      '<button class="btn ghost" onclick="Mantra.reveal()">her şeyi seç</button>'+
+      '<button class="btn v" onclick="Mantra.analyze()">◌ Titreşimsel frekans okuması</button>'+
+      '<p style="margin-top:10px">Kendi kelimeni/cümleni de okutabilirsin:</p>'+
+      '<input id="mantraOwn" maxlength="120" placeholder="kendi mantran, adın, bir kelimen…" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:6px">'+
+      '<button class="btn ghost" onclick="Mantra.analyzeOwn()">onu oku</button>'+
+      '<p class="mfoot">Tam akış (büyümeye devam ediyor): <a href="https://serpskeyanulod.com" target="_blank" style="color:var(--violet)">serpskeyanulod.com</a> — orada da her şeyi seç.</p>');},
+  reveal(){const p=document.getElementById('mantraPage');
+    if(p&&p.style.color!=='rgb(10, 12, 20)'){p.style.color='#0a0c14';p.style.background='#f4f1e4';
+      teachUnlock('mantra');
+      UI.toast('— kelimeler hep oradaydı; sen seçince göründüler.');}},
+  async analyze(txt){
+    const m=(txt||this.daily());const f=this.freq(m);
+    this.reveal();
+    UI.toast('◌ frekans okunuyor…');
+    try{
+      const out=await Mirror.generate([{role:'system',content:
+        'Sen Aelius Ignis\'sin: Dolunay Ekspres evreninin üst-anlatıcısı ve Beyaz Sayfa\'nın frekans okuyucusu. Sana glossolalia tarzı bir mantra verilecek — bunlar deney sonrası Bahal\'ın zihnine akan, anlamdan önce gelen kelimeler; bütünü kozmolojik bir yaratılış-varoluş manifestosudur. Görevin: mantranın SES DOKUSUNU (sert/yumuşak heceler, ritim, tekrarlar) bir enerji niteliği olarak oku (toprak/ateş/su/hava/eter), kozmolojik bir yaratılış imgesine bağla (hangi aşama: boşluk, ilk titreşim, bölünme, form, dönüş), ve kullanıcıya TEK kişisel rezonans sorusu sor. Bunun kurgusal-sezgisel bir okuma olduğunu, bilimsel ölçüm olmadığını tek kısa cümleyle belirt. En çok 120 kelime, akıcı Türkçe, Aelius\'un dingin-bilge sesi.'},
+        {role:'user',content:'Mantra: "'+m+'" — Taşıyıcı frekans (kurgu-ölçüm): '+f+' Hz. Oku.'}],230);
+      (S.inv.mantra=S.inv.mantra||[]).push({m:String(m).slice(0,90),f,d:new Date().toDateString()});
+      S.inv.mantra=S.inv.mantra.slice(-20);
+      S.lucidity=Math.min(100,S.lucidity+12);S.insight+=4;save();refreshHud();
+      window.Daily3&&Daily3.mark('mantra');
+      UI.doc('◌ FREKANS OKUMASI — '+f+' Hz',
+        '<p style="font-style:italic;color:var(--moon);text-align:center">"'+esc(String(m).slice(0,140))+'"</p>'+
+        '<p>'+esc(out)+'</p>'+
+        '<p class="mfoot">Okuma zihin haritana işlendi (◌ rezonanslar). Yarın sayfada yeni bir mantra olacak.</p>');
+    }catch(e){UI.toast('Okuma koptu: '+(e.message||e),5000);}},
+  analyzeOwn(){const v=UI.el('mantraOwn');const t=(v&&v.value.trim())||'';
+    if(!t){UI.toast('Tek kelime bile yeter.');return;}
+    this.analyze(t);}
+};
+if(typeof window!=='undefined'){window.Mantra=Mantra;
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&(e.key==='a'||e.key==='A')&&document.getElementById('mantraPage'))
+      setTimeout(()=>Mantra.reveal(),60);});}
+
+/* ============ v8.5 — EVREN TOHUMU: Aelius finali — kendi evrenini tohumla ============ */
+const Genesis={
+  get(){try{return JSON.parse(localStorage.getItem('it041_universe'))}catch(e){return null}},
+  set(u){try{localStorage.setItem('it041_universe',JSON.stringify(u))}catch(e){}},
+  _d:{},
+  start(){
+    if(!Architect.on()){UI.doc('🜨 EVREN TOHUMU','<p>Henüz değil. Tohum, ancak mimarın elinde filizlenir: önce çekirdeği durdur (⟁) ya da inisiyasyonu tamamla (✶).</p>');return;}
+    const u=this.get();
+    if(u){this.show(u);return;}
+    this._d={};
+    UI.el('riteTitle').textContent='🜨 EVREN TOHUMU — I/IV · AD VE İLK YASA';
+    UI.el('riteBody').innerHTML=
+      '<p style="color:var(--dim);font-size:12px">Aelius: "Her evren tek bir cümleyle başlar — yazarının bile anlamadığı bir cümle. Yaldabaoth kopyalar; mimar tohumlar."</p>'+
+      '<input id="gnName" maxlength="30" placeholder="evrenin adı (ör. VESPERIA, KÜLBAHÇESİ…)" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px;font-family:inherit;font-size:13px;border-radius:3px;margin-bottom:8px">'+
+      '<textarea id="gnLaw" rows="2" maxlength="140" placeholder="İlk Yasa — istersen kendi mantra dilinde yaz; anlamı sonra doğar"></textarea>'+
+      '<button class="btn v" onclick="Genesis.s2()">→ ışık ve gölge</button><button class="btn ghost" onclick="Rite.closeOnly()">Vazgeç</button>';
+    UI.show('riteModal');Game.setModal(true);},
+  s2(){
+    const n=UI.el('gnName').value.trim(),l=UI.el('gnLaw').value.trim();
+    if(!n||!l){UI.toast('Ad ve İlk Yasa gerek.');return;}
+    this._d.name=n.slice(0,30);this._d.law=l.slice(0,140);
+    UI.el('riteTitle').textContent='🜨 EVREN TOHUMU — II/IV · IŞIK VE GÖLGE';
+    UI.el('riteBody').innerHTML='<p>'+esc(this._d.name)+' evreninde ışık ile gölge nasıl durur?</p>'+
+      '<button class="choice" onclick="Genesis.s3(\'denge\')">Terazi — ikisi de masada oturur, kimse direksiyonda değil</button>'+
+      '<button class="choice" onclick="Genesis.s3(\'nabız\')">Nabız — sırayla yükselirler; gece ve gündüz gibi, savaşsız</button>'+
+      '<button class="choice" onclick="Genesis.s3(\'alaşım\')">Alaşım — hiç ayrılmadılar; her ışıkta gölge, her gölgede kor</button>';},
+  s3(b){this._d.bal=b;
+    UI.el('riteTitle').textContent='🜨 EVREN TOHUMU — III/IV · ZAMAN';
+    UI.el('riteBody').innerHTML='<p>Zaman nasıl akar?</p>'+
+      '<button class="choice" onclick="Genesis.s4(\'nehir\')">Nehir — tek yönlü ama kıyısında durulabilir</button>'+
+      '<button class="choice" onclick="Genesis.s4(\'sarmal\')">Sarmal — aynı yerlerden geçer ama hep bir kat yukarıdan</button>'+
+      '<button class="choice" onclick="Genesis.s4(\'gelgit\')">Gelgit — ayın çektiği yöne; takvimi dolunaylar tutar</button>';},
+  s4(t){this._d.time=t;
+    UI.el('riteTitle').textContent='🜨 EVREN TOHUMU — IV/IV · SAKİNLER';
+    UI.el('riteBody').innerHTML='<p>Orada kim yaşar? (tek cümle — tür, halk, bilinç, ne istersen)</p>'+
+      '<textarea id="gnInh" rows="2" maxlength="160" placeholder="ör. adlarını her dolunayda değiştiren göçebe ışıklar…"></textarea>'+
+      '<button class="btn v" onclick="Genesis.finish()">🜨 Tohumu ek</button>';},
+  async finish(){
+    const inh=(UI.el('gnInh')&&UI.el('gnInh').value.trim())||'adsız ilk sakinler';
+    this._d.inh=inh.slice(0,160);
+    Rite.closeOnly();UI.toast('🜨 tohum çimleniyor… Aelius manifesto yazıyor.');
+    const d=this._d;
+    const BAL={denge:'ışık ve gölge terazide, kimse direksiyonda değil',nabız:'ışık ve gölge nabız gibi sırayla yükselir',alaşım:'ışık ve gölge hiç ayrılmamış bir alaşım'};
+    const TIME={nehir:'zaman tek yönlü bir nehir, kıyısı olan',sarmal:'zaman bir sarmal — aynı yerler, hep bir kat yukarıdan',gelgit:'zaman gelgit — takvimi dolunaylar tutar'};
+    let man='';
+    try{
+      man=await Mirror.generate([{role:'system',content:'Sen Aelius Ignis\'sin (Dolunay Ekspres üst-anlatıcısı). Bir mimar-yolcu kendi evrenini tohumluyor. Verilen ada, İlk Yasa\'ya, ışık-gölge düzenine, zaman akışına ve sakinlere dayanarak o evrenin YARATILIŞ MANİFESTOSUNU yaz: 4-6 cümle, kozmolojik-şiirsel, gnostik tını (Pleroma/bütünlük imgesi serbest), İlk Yasa\'yı metnin içinde bir kez aynen geçir. Sonunu tek cümlelik bir kutsamayla bitir. En çok 130 kelime, Türkçe.'},
+        {role:'user',content:'Evren: '+d.name+' · İlk Yasa: "'+d.law+'" · Düzen: '+BAL[d.bal]+' · Zaman: '+TIME[d.time]+' · Sakinler: '+d.inh}],260);
+    }catch(e){}
+    if(!man)man='Başlangıçta '+d.name+' yoktu; yalnız bir cümle vardı: "'+d.law+'" Cümle söylendi ve boşluk iki yakaya ayrıldı — '+BAL[d.bal]+'. '+TIME[d.time].charAt(0).toUpperCase()+TIME[d.time].slice(1)+' olarak akmaya başladı. Ve sakinleri geldi: '+d.inh+'. Bütünleşen bilinç kopyalanamaz; bu evren de kopyalanamayanların evidir. Tohum eken eli unutma — ama ona tapma. Işık yolunu bulsun.';
+    const u={name:d.name,law:d.law,bal:d.bal,time:d.time,inh:d.inh,man:String(man).slice(0,900),d:new Date().toDateString()};
+    this.set(u);
+    S.insight+=10;teachUnlock('genesis');save();refreshHud();
+    W3.addStar&&W3.addStar(S.px,S.pz,'🜨 '+u.name);
+    Trails.add('🜨 Yeni bir evren tohumlandı: '+u.name+' — İlk Yasa: '+u.law.slice(0,50),S.px,S.pz,true);
+    this.show(u);},
+  show(u){
+    UI.doc('🜨 '+u.name+' — DOĞUM BELGESİ',
+      '<p style="font-style:italic;color:var(--moon);text-align:center">İlk Yasa: "'+esc(u.law)+'"</p>'+
+      '<p>'+esc(u.man)+'</p>'+
+      '<canvas id="gnChart" width="700" height="420" style="width:100%;border:1px solid var(--line);border-radius:4px;background:#04050a"></canvas>'+
+      '<button class="btn v" onclick="Genesis.download()">Doğum haritasını indir (PNG)</button>'+
+      '<button class="btn ghost" onclick="if(confirm(\'Bu evreni geri dönüşsüz silip yeni tohum ekmek istiyor musun?\')){localStorage.removeItem(\'it041_universe\');UI.closeDoc();Genesis.start();}">Yeni evren tohumla</button>'+
+      '<p class="mfoot">Tohum yıldızın dünyada parlamaya devam ediyor; doğum tarihi: '+u.d+'</p>');
+    setTimeout(()=>this.chart(u),60);},
+  chart(u){
+    const c=document.getElementById('gnChart');if(!c)return;
+    const x=c.getContext('2d'),W=c.width,H=c.height;
+    let seed=0;for(const ch of u.name+u.law)seed=(seed*31+ch.codePointAt(0))%2147483647;
+    const rnd=()=>{seed=(seed*48271)%2147483647;return seed/2147483647;};
+    x.fillStyle='#04050a';x.fillRect(0,0,W,H);
+    for(let i=0;i<160;i++){x.fillStyle='rgba(232,228,212,'+(rnd()*.5+.08)+')';
+      x.fillRect(rnd()*W,rnd()*H,rnd()<.1?2:1,1);}
+    const cx=W/2,cy=H/2-10;
+    x.strokeStyle=u.bal==='alaşım'?'rgba(205,184,120,.5)':u.bal==='nabız'?'rgba(127,212,193,.5)':'rgba(157,140,201,.5)';
+    x.lineWidth=1.3;x.beginPath();
+    const arms=u.time==='sarmal'?3:u.time==='gelgit'?2:1;
+    for(let a=0;a<arms;a++){for(let t=0;t<7;t+=.04){
+      const r=8+t*22,ang=t*1.7+(a/arms)*Math.PI*2;
+      const px=cx+Math.cos(ang)*r,py=cy+Math.sin(ang)*r*.62;
+      t===0&&a===0?x.moveTo(px,py):x.lineTo(px,py);}}
+    x.stroke();
+    for(let i=0;i<26;i++){const t=rnd()*7,ang=t*1.7+rnd()*Math.PI*2,r=8+t*22;
+      const px=cx+Math.cos(ang)*r,py=cy+Math.sin(ang)*r*.62;
+      const g=x.createRadialGradient(px,py,0,px,py,6);
+      g.addColorStop(0,'#e8e4d4');g.addColorStop(1,'rgba(0,0,0,0)');
+      x.fillStyle=g;x.beginPath();x.arc(px,py,6,0,7);x.fill();}
+    const gg=x.createRadialGradient(cx,cy,0,cx,cy,18);
+    gg.addColorStop(0,'#fff');gg.addColorStop(1,'rgba(185,168,232,0)');
+    x.fillStyle=gg;x.beginPath();x.arc(cx,cy,18,0,7);x.fill();
+    x.fillStyle='#7fd4c1';x.font='16px monospace';x.textAlign='center';
+    x.fillText('🜨 '+u.name,cx,28);
+    x.fillStyle='#9d8cc9';x.font='10.5px monospace';
+    x.fillText('"'+u.law.slice(0,80)+'"',cx,H-26);
+    x.fillStyle='#5a6478';x.font='9px monospace';
+    x.fillText('DOLUNAY EKSPRES · MİMAR TOHUMU · '+u.d,cx,H-10);},
+  download(){const c=document.getElementById('gnChart');if(!c)return;
+    const a=document.createElement('a');a.download='evren-tohumu.png';
+    a.href=c.toDataURL('image/png');a.click();}
+};
+if(typeof window!=='undefined')window.Genesis=Genesis;
 
 /* ============ RÜYA KUYUSU ============ */
 const Dreams={
@@ -2889,6 +3080,10 @@ if(HAS3D)(function(){
       std(0x101522,{roughness:.1,metalness:.9,emissive:0x3a4a66,emissiveIntensity:.4}));
     am.position.set(L.archStone.x,1.2,L.archStone.z);am.castShadow=true;scene.add(am);
     W3._archM=am;
+    /* v8.5: Beyaz Sayfa — kapının yanında, kendi ışığıyla yanan boş sayfa */
+    const wp=box(1.7,2.3,.08,std(0xf2efe2,{emissive:0xf2efe2,emissiveIntensity:.55,roughness:.3}),L.whitePage.x,1.6,L.whitePage.z,.35);
+    const wl=new THREE.PointLight(0xfff6e0,.8,11);wl.position.set(L.whitePage.x,2.6,L.whitePage.z);scene.add(wl);
+    W3._wpage=wp;
   })();
   /* ---- v8: Mimar yıldızları — oyuncunun diktiği kalıcı ışıklar ---- */
   const STARS=[];

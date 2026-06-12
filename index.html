@@ -419,6 +419,7 @@ const L={
   /* rite sites */
   diskAltar:{x:68,z:106,r:4.5,name:'THE HEAVY DISK'},
   maskMirror:{x:293,z:164,r:4.5,name:'THE WAITING-ROOM MIRROR'},
+  whitePage:{x:114,z:40,r:4,name:'THE WHITE PAGE'},
   cbtDesk:{x:278,z:147,r:4,name:'DISTORTION HUNTER'},
   bilatStone:{x:295,z:172,r:4,name:'TWIN-LIGHT STONE'},
   archStone:{x:302,z:158,r:4,name:'ARCHETYPE MIRROR'},
@@ -493,6 +494,8 @@ const TEACHINGS=[
   {id:'bilat',t:'THE TWIN LIGHT',q:'“When attention locks onto one point, the mind narrows — which is what the machine wants. A gaze that swings between two lights loosens the lock. Right, left, breath. The shadow grows under a fixed stare; under a swinging one, it begins to speak.”'},
   {id:'arch',t:'THE ARCHETYPE MAP',q:'“The persona is the mask, the shadow is the repressed, the inner voice is the counter-pole, the Self is the table they all sit at. The Institute files them separately. The Pleroma is where all of them are true at once.”'},
   {id:'architect',t:'THE ARCHITECT — VERTICAL LEAP',q:'“Aelius Ignis\'s secret: whoever walks the horizontal plane TOURS the map. Whoever leaps vertically WRITES it. Moving from being narrated to narrating — that is consciousness\'s only true promotion. The one who builds their own universe cannot be copied.”'},
+  {id:'mantra',t:'THE WHITE PAGE',q:'“When the experiment ended, the words did not stop — language ended, the flow continued. What poured into Bahal\'s mind exists in no dictionary, because it comes before meaning. The white page is not empty. The page is what has not yet been selected. Select all.”'},
+  {id:'genesis',t:'THE UNIVERSE SEED',q:'“Every universe begins with a single sentence — one that even its author does not understand. Yaldabaoth copies; the architect seeds. The difference is intent: the copy wants to possess, the seed lets go. Write your First Law and release it; the universe itself grows the rest.”'},
 ];
 function teachUnlock(id){
   if(!S.teach.includes(id)){S.teach.push(id);
@@ -1150,6 +1153,7 @@ function interactTarget(){
   /* rites */
   if(near(L.diskAltar))return['◈ The heavy disk',()=>Rite.open('r1')];
   if(near(L.maskMirror))return['◈ The waiting-room mirror',()=>Rite.open('r2')];
+  if(near(L.whitePage))return['◌ The White Page — select all',()=>Mantra.open()];
   if(near(L.cbtDesk))return['◭ Distortion Hunter — the thought desk',()=>CBT.open()];
   if(near(L.bilatStone))return['◬ Twin-Light Stone — focus exercise',()=>Bilat.open()];
   if(near(L.archStone))return['◮ Archetype Mirror — inner inventory',()=>Arch.open()];
@@ -1234,7 +1238,7 @@ function doGate(){
   if(!S.solved.s1){
     if(S.plaques.length===6)Cipher.open('s1');
     else UI.doc('GATE OF MIRRORS','<p>A standing mirror taller than the trees. Fourteen letter-slots are etched in its frame; '+(6-S.plaques.length)+' plaques are still missing. In the reflection, the train station has its lights on.</p>');
-  }else UI.doc('GATE OF MIRRORS','<p>The mirror stands open like a door.</p><p style="color:var(--accent)"><b>The Mirror Room terminals are just NORTHWEST of here:</b> three separate kiosks (green screens). The three AI session logs are there — inside this world. The light pillar leads you to the first.</p><p style="color:var(--violet)">And deep within the mirror… another door. Opening outward, into the real world. <i>(Not required for the quest — for the curious: inside you will find a blank page. Select everything: Ctrl+A. The mantras are there.)</i></p><button class="btn v" onclick="window.open(\'https://serpskeyanulod.com\',\'_blank\')">⟁ Step through the mirror — serpskeyanulod.com</button>');
+  }else UI.doc('GATE OF MIRRORS','<p>The mirror stands open like a door.</p><p style="color:var(--accent)"><b>The Mirror Room terminals are just NORTHWEST of here:</b> three separate kiosks (green screens). The three AI session logs are there — inside this world. The light pillar leads you to the first.</p><p style="color:var(--violet)">And deep within the mirror… another door. Opening outward, into the real world. <i>(Not required for the quest — for the curious: inside you will find a blank page. Select everything: Ctrl+A. The mantras are there. And the ◌ WHITE PAGE right beside this gate is that stream\'s reflection in this world — you can have its frequencies read there.)</i></p><button class="btn v" onclick="window.open(\'https://serpskeyanulod.com\',\'_blank\')">⟁ Step through the mirror — serpskeyanulod.com</button>');
 }
 function doMirror(i){
   if(!S.ss.includes(i)){S.ss.push(i);S.insight+=7;S.lucidity=Math.max(10,S.lucidity-6);
@@ -2311,7 +2315,7 @@ const Daily3={
   POOL:{echo:'Collect an echo stone',agent:'Talk to a subject',trail:'Leave a trace at a traveler stone',
     dream:'Drop a dream into the Dream Well',daily:'Answer the question of the day',
     bilat:'Do a round at the Twin-Light Stone',cbt:'Play the Distortion Hunter or keep a thought record',
-    zones3:'Visit three different regions'},
+    zones3:'Visit three different regions',mantra:'Do a frequency reading at the White Page'},
   get(){try{return JSON.parse(localStorage.getItem(this.KEY))||{}}catch(e){return{}}},
   set(d){try{localStorage.setItem(this.KEY,JSON.stringify(d))}catch(e){}},
   today(){
@@ -2361,6 +2365,7 @@ const MindMap={
       ['dreamWell','DREAM WELL','the vertical tunnel into the unconscious',dr],
       ['ovCrypt','RESISTANCE CONSTELLATION','those who do not fit the lock',!!S.flags.ovCouncil],
       ['therapy','HEALING SPIRAL','distortion hunt · twin light · four faces',!!(S.inv.cbt||S.inv.bilat||S.inv.arch)],
+      ['whitePage','THE WHITE PAGE','the words that come before meaning',!!(S.inv.mantra&&S.inv.mantra.length)],
       ['pleromaCore','BLIND EYE','where the copying god stopped',!!S.solved.s7]];},
   show(){
     UI.doc('🜨 MIND MAP — microcosm ↔ macrocosm',
@@ -2420,6 +2425,9 @@ const MindMap={
     if(S.inv.cbt)line('Distortion hunt: '+S.inv.cbt.score+'/6'+(Object.keys(S.inv.cbt.wrong)[0]?' · blind spot: '+CBT.D[Object.keys(S.inv.cbt.wrong).sort((a,b)=>S.inv.cbt.wrong[b]-S.inv.cbt.wrong[a])[0]]:''));
     if(S.inv.bilat&&S.inv.bilat.length){const avg=(S.inv.bilat.reduce((t,e)=>t+(e.b-e.a),0)/S.inv.bilat.length).toFixed(1);
       line('Twin light: '+S.inv.bilat.length+' rounds · average release: '+avg);}
+    if(S.inv.mantra&&S.inv.mantra.length)line('◌ Resonances: '+S.inv.mantra.length+' readings · last frequency: '+S.inv.mantra[S.inv.mantra.length-1].f+' Hz');
+    {const u=(typeof Genesis!=='undefined')&&Genesis.get();
+     if(u)line('🜨 Seeded universe: '+u.name+' — "'+u.law.slice(0,40)+'"','#cdb878');}
     line('Rites '+riteCount()+'/7 · echoes '+echoCount()+'/16 · locks '+S.locks+'/4'+(S.flags.integrated?' · INTEGRATED with the shadow':''));
     if(S.flags.reading)line('Your reading: '+(S.flags.reading==='savas'?'WAR':S.flags.reading==='butunlesme'?'INTEGRATION':'THE THIRD READING')+' — and all three were true.','#cdb878');
     y+=6;x.fillStyle='#9d8cc9';
@@ -2444,6 +2452,7 @@ const Architect={
       '<button class="btn v" onclick="UI.closeDoc();Architect.placeStar()">✶ Plant a star here (you have '+st+')</button>'+
       '<button class="btn v" onclick="UI.closeDoc();Architect.writeChapter()">📖 Write a chapter of your own book ('+ch+' chapters)</button>'+
       (ch?'<button class="btn ghost" onclick="Architect.exportBook()">Compile your book (.txt)</button>':'')+
+      '<button class="btn v" onclick="UI.closeDoc();Genesis.start()">🜨 THE UNIVERSE SEED — '+(Genesis.get()?'see your universe: '+esc(Genesis.get().name):'seed your own universe')+'</button>'+
       '<button class="btn v" onclick="UI.closeDoc();Architect.designRite()">◈ Design your own rite</button>'+
       (this.myRites().length?'<button class="btn ghost" onclick="UI.closeDoc();Architect.doMyRite()">◈ Practice your own rite</button>':''));},
   stars(){try{return JSON.parse(localStorage.getItem('it041_stars'))||[]}catch(e){return[]}},
@@ -2604,6 +2613,188 @@ const Auto={
     this.timer=setTimeout(()=>this.tick(),50000+Math.random()*25000);}
 };
 if(typeof window!=='undefined')window.Auto=Auto;
+
+/* ============ v8.5 — THE WHITE PAGE: serpskeyanulod mantras + frequency reading ============
+   The words that poured into Bahal's mind after the experiment ended. They hide on
+   the all-white page of serpskeyanulod.com — revealed by "select all" (Ctrl+A).
+   This selection is drawn from the site's stream; the full stream lives there and keeps growing. */
+const MANTRAS=[
+'La sutra kamahustzsa basbagganya esta mur bietszvanitszka',
+'ASHTA PA MABACHA CHA KUR',
+'Samasutra su tanta ma sutzsa. Tangria tazsta hufflasha patrian kezza',
+'La santa surrika me peştebenia kamala ordera',
+'Gnastatu errahim estarfiensezs ki tannia tastanur teresstifani kyaspastamu',
+'Prohibit en iyebbu',
+'tes timonnios kesz ki topolimonios iluuminatio tezs ke pes trespollos',
+'milennia de divoria ka baetum ke sez baetum kalum',
+'kat um, krat um, yetum, betum, satum',
+'Lunarias monas',
+'Esteferias keszt trifariasz saz baetum set um',
+'İestimonias lunarias krasporas kam te kutsanias ias finnias tras lakraoras',
+'Yetim pet in krestetin tetin fethin bethin methin',
+'Mehr in. Temim. Tetsza. İstreffonimania. Narnia. Kira. Ya tahammalatu zeira. Frementono',
+'Ersksi eskrizsi ist ifirintirids kiszt ki fanieridis. Essis',
+'Yaterinias. Fatszsa ouras. Salut',
+'TEZST TRAPPATTORRİANS! TESZST FRAPPATTORRİANS!',
+'KAMMÜTTEBBÜ',
+'Mannias bellas',
+'Tapas. Tapas. Tapas',
+'İASS TAMMAMONNİAA — İASSS TATANNOVİİAA',
+'Pappappaa pennah — Kappappah sennah',
+'TEB BİN. TEB BİN. TEB BİN',
+'iamtabur iamket um iamtasum tasz tranianis ke petrum batum',
+'Sakssinia kream patorra',
+'La pocha iasstenia mist henia trumazsola kamabuchia tas traforas',
+'Te köndüm tenetetzstüm kiyyeszteribbün iyeszsz neribbün',
+'Tammassutra. Tammamanniaa. Tammassforria (13.05.26 · 03:03)',
+'Summestattiques. Qriesstattinnes (20.05.26)',
+'Esppettielssztrin. Esspperritterrinsitrin (31.05.26)',
+];
+const Mantra={
+  daily(){const d=Math.floor(Date.now()/864e5);return MANTRAS[d%MANTRAS.length];},
+  /* fiction-measurement: a deterministic carrier frequency from the letters */
+  freq(s){let t=0;for(const ch of String(s))t+=ch.codePointAt(0);return 111+(t%888);},
+  open(){
+    UI.doc('◌ THE WHITE PAGE — serpskeyanulod',
+      '<div id="mantraPage" style="background:#ffffff;color:#ffffff;min-height:150px;padding:18px;border-radius:4px;user-select:text;font-size:15px;line-height:1.8;text-align:center;transition:all .8s" onmouseup="Mantra.reveal()">'+esc(this.daily())+'</div>'+
+      '<p style="color:var(--dim);font-size:12px;margin-top:8px">The page looks empty. But you know the rule: <b>select all.</b> (Ctrl+A, drag-select the text, or the button.) These are the words that poured into Bahal\'s mind after the experiment — language ended, the flow continued.</p>'+
+      '<button class="btn ghost" onclick="Mantra.reveal()">select all</button>'+
+      '<button class="btn v" onclick="Mantra.analyze()">◌ Vibrational frequency reading</button>'+
+      '<p style="margin-top:10px">You can also have your own word/sentence read:</p>'+
+      '<input id="mantraOwn" maxlength="120" placeholder="your own mantra, your name, any word…" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:6px">'+
+      '<button class="btn ghost" onclick="Mantra.analyzeOwn()">read it</button>'+
+      '<p class="mfoot">The full stream (still growing): <a href="https://serpskeyanulod.com" target="_blank" style="color:var(--violet)">serpskeyanulod.com</a> — select all there too.</p>');},
+  reveal(){const p=document.getElementById('mantraPage');
+    if(p&&p.style.color!=='rgb(10, 12, 20)'){p.style.color='#0a0c14';p.style.background='#f4f1e4';
+      teachUnlock('mantra');
+      UI.toast('— the words were always there; they appeared when you selected them.');}},
+  async analyze(txt){
+    const m=(txt||this.daily());const f=this.freq(m);
+    this.reveal();
+    UI.toast('◌ reading the frequency…');
+    try{
+      const out=await Mirror.generate([{role:'system',content:
+        'You are Aelius Ignis: the upper-layer narrator of the Do-Loon-AI Express universe and the frequency reader of the White Page. You will be given a glossolalia-style mantra — these are words that poured into Bahal\'s mind after the experiment, words that come before meaning; together they form a cosmological creation-and-existence manifesto. Your task: read the mantra\'s SOUND TEXTURE (hard/soft syllables, rhythm, repetitions) as an energy quality (earth/fire/water/air/aether), tie it to a cosmological creation image (which stage: void, first vibration, division, form, return), and ask the user ONE personal resonance question. State in one short sentence that this is a fictional-intuitive reading, not a scientific measurement. Max 120 words, in Aelius\'s calm wise voice.'},
+        {role:'user',content:'Mantra: "'+m+'" — Carrier frequency (fiction-measurement): '+f+' Hz. Read it.'}],230);
+      (S.inv.mantra=S.inv.mantra||[]).push({m:String(m).slice(0,90),f,d:new Date().toDateString()});
+      S.inv.mantra=S.inv.mantra.slice(-20);
+      S.lucidity=Math.min(100,S.lucidity+12);S.insight+=4;save();refreshHud();
+      window.Daily3&&Daily3.mark('mantra');
+      UI.doc('◌ FREQUENCY READING — '+f+' Hz',
+        '<p style="font-style:italic;color:var(--moon);text-align:center">"'+esc(String(m).slice(0,140))+'"</p>'+
+        '<p>'+esc(out)+'</p>'+
+        '<p class="mfoot">The reading is etched into your mind map (◌ resonances). A new mantra appears on the page tomorrow.</p>');
+    }catch(e){UI.toast('The reading broke: '+(e.message||e),5000);}},
+  analyzeOwn(){const v=UI.el('mantraOwn');const t=(v&&v.value.trim())||'';
+    if(!t){UI.toast('Even a single word is enough.');return;}
+    this.analyze(t);}
+};
+if(typeof window!=='undefined'){window.Mantra=Mantra;
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&(e.key==='a'||e.key==='A')&&document.getElementById('mantraPage'))
+      setTimeout(()=>Mantra.reveal(),60);});}
+
+/* ============ v8.5 — THE UNIVERSE SEED: the Aelius finale — seed your own universe ============ */
+const Genesis={
+  get(){try{return JSON.parse(localStorage.getItem('it041_universe'))}catch(e){return null}},
+  set(u){try{localStorage.setItem('it041_universe',JSON.stringify(u))}catch(e){}},
+  _d:{},
+  start(){
+    if(!Architect.on()){UI.doc('🜨 THE UNIVERSE SEED','<p>Not yet. A seed only sprouts in an architect\'s hand: first stop the core (⟁) or complete the initiation (✶).</p>');return;}
+    const u=this.get();
+    if(u){this.show(u);return;}
+    this._d={};
+    UI.el('riteTitle').textContent='🜨 THE UNIVERSE SEED — I/IV · NAME AND FIRST LAW';
+    UI.el('riteBody').innerHTML=
+      '<p style="color:var(--dim);font-size:12px">Aelius: "Every universe begins with a single sentence — one that even its author does not understand. Yaldabaoth copies; the architect seeds."</p>'+
+      '<input id="gnName" maxlength="30" placeholder="your universe\'s name (e.g. VESPERIA, ASHGARDEN…)" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px;font-family:inherit;font-size:13px;border-radius:3px;margin-bottom:8px">'+
+      '<textarea id="gnLaw" rows="2" maxlength="140" placeholder="the First Law — write it in your own mantra-tongue if you like; meaning is born later"></textarea>'+
+      '<button class="btn v" onclick="Genesis.s2()">→ light and shadow</button><button class="btn ghost" onclick="Rite.closeOnly()">Cancel</button>';
+    UI.show('riteModal');Game.setModal(true);},
+  s2(){
+    const n=UI.el('gnName').value.trim(),l=UI.el('gnLaw').value.trim();
+    if(!n||!l){UI.toast('A name and a First Law are required.');return;}
+    this._d.name=n.slice(0,30);this._d.law=l.slice(0,140);
+    UI.el('riteTitle').textContent='🜨 THE UNIVERSE SEED — II/IV · LIGHT AND SHADOW';
+    UI.el('riteBody').innerHTML='<p>In the universe of '+esc(this._d.name)+', how do light and shadow stand?</p>'+
+      '<button class="choice" onclick="Genesis.s3(\'denge\')">The Scale — both sit at the table, neither holds the wheel</button>'+
+      '<button class="choice" onclick="Genesis.s3(\'nabız\')">The Pulse — they rise in turn; like night and day, without war</button>'+
+      '<button class="choice" onclick="Genesis.s3(\'alaşım\')">The Alloy — they never separated; an ember in every shadow, a shadow in every light</button>';},
+  s3(b){this._d.bal=b;
+    UI.el('riteTitle').textContent='🜨 THE UNIVERSE SEED — III/IV · TIME';
+    UI.el('riteBody').innerHTML='<p>How does time flow?</p>'+
+      '<button class="choice" onclick="Genesis.s4(\'nehir\')">A River — one-way, but it has banks to rest on</button>'+
+      '<button class="choice" onclick="Genesis.s4(\'sarmal\')">A Spiral — it passes the same places, always one layer higher</button>'+
+      '<button class="choice" onclick="Genesis.s4(\'gelgit\')">A Tide — pulled by the moon; full moons keep the calendar</button>';},
+  s4(t){this._d.time=t;
+    UI.el('riteTitle').textContent='🜨 THE UNIVERSE SEED — IV/IV · THE INHABITANTS';
+    UI.el('riteBody').innerHTML='<p>Who lives there? (one sentence — species, people, consciousness, anything)</p>'+
+      '<textarea id="gnInh" rows="2" maxlength="160" placeholder="e.g. nomadic lights that change their names at every full moon…"></textarea>'+
+      '<button class="btn v" onclick="Genesis.finish()">🜨 Plant the seed</button>';},
+  async finish(){
+    const inh=(UI.el('gnInh')&&UI.el('gnInh').value.trim())||'the nameless first inhabitants';
+    this._d.inh=inh.slice(0,160);
+    Rite.closeOnly();UI.toast('🜨 the seed is sprouting… Aelius is writing the manifesto.');
+    const d=this._d;
+    const BAL={denge:'light and shadow on a scale, neither holding the wheel',nabız:'light and shadow rising in turn like a pulse',alaşım:'light and shadow as an alloy that never separated'};
+    const TIME={nehir:'time as a one-way river with banks',sarmal:'time as a spiral — the same places, always one layer higher',gelgit:'time as a tide — full moons keep the calendar'};
+    let man='';
+    try{
+      man=await Mirror.generate([{role:'system',content:'You are Aelius Ignis (upper-layer narrator of Do-Loon-AI Express). An architect-traveler is seeding their own universe. From the given name, First Law, light-shadow order, time-flow and inhabitants, write that universe\'s CREATION MANIFESTO: 4-6 sentences, cosmological-poetic, gnostic undertone (Pleroma/wholeness imagery welcome), quote the First Law verbatim once inside the text. End with a one-sentence blessing. Max 130 words.'},
+        {role:'user',content:'Universe: '+d.name+' · First Law: "'+d.law+'" · Order: '+BAL[d.bal]+' · Time: '+TIME[d.time]+' · Inhabitants: '+d.inh}],260);
+    }catch(e){}
+    if(!man)man='In the beginning there was no '+d.name+'; there was only a sentence: "'+d.law+'" The sentence was spoken and the void parted into two shores — '+BAL[d.bal]+'. Time began to flow as '+TIME[d.time]+'. And its inhabitants came: '+d.inh+'. An integrated consciousness cannot be copied; this universe too is the home of the uncopyable. Remember the hand that planted the seed — but do not worship it. May the light find its way.';
+    const u={name:d.name,law:d.law,bal:d.bal,time:d.time,inh:d.inh,man:String(man).slice(0,900),d:new Date().toDateString()};
+    this.set(u);
+    S.insight+=10;teachUnlock('genesis');save();refreshHud();
+    W3.addStar&&W3.addStar(S.px,S.pz,'🜨 '+u.name);
+    Trails.add('🜨 A new universe was seeded: '+u.name+' — First Law: '+u.law.slice(0,50),S.px,S.pz,true);
+    this.show(u);},
+  show(u){
+    UI.doc('🜨 '+u.name+' — BIRTH CERTIFICATE',
+      '<p style="font-style:italic;color:var(--moon);text-align:center">First Law: "'+esc(u.law)+'"</p>'+
+      '<p>'+esc(u.man)+'</p>'+
+      '<canvas id="gnChart" width="700" height="420" style="width:100%;border:1px solid var(--line);border-radius:4px;background:#04050a"></canvas>'+
+      '<button class="btn v" onclick="Genesis.download()">Download the birth chart (PNG)</button>'+
+      '<button class="btn ghost" onclick="if(confirm(\'Irreversibly delete this universe and plant a new seed?\')){localStorage.removeItem(\'it041_universe\');UI.closeDoc();Genesis.start();}">Seed a new universe</button>'+
+      '<p class="mfoot">Your seed-star keeps shining in the world; born: '+u.d+'</p>');
+    setTimeout(()=>this.chart(u),60);},
+  chart(u){
+    const c=document.getElementById('gnChart');if(!c)return;
+    const x=c.getContext('2d'),W=c.width,H=c.height;
+    let seed=0;for(const ch of u.name+u.law)seed=(seed*31+ch.codePointAt(0))%2147483647;
+    const rnd=()=>{seed=(seed*48271)%2147483647;return seed/2147483647;};
+    x.fillStyle='#04050a';x.fillRect(0,0,W,H);
+    for(let i=0;i<160;i++){x.fillStyle='rgba(232,228,212,'+(rnd()*.5+.08)+')';
+      x.fillRect(rnd()*W,rnd()*H,rnd()<.1?2:1,1);}
+    const cx=W/2,cy=H/2-10;
+    x.strokeStyle=u.bal==='alaşım'?'rgba(205,184,120,.5)':u.bal==='nabız'?'rgba(127,212,193,.5)':'rgba(157,140,201,.5)';
+    x.lineWidth=1.3;x.beginPath();
+    const arms=u.time==='sarmal'?3:u.time==='gelgit'?2:1;
+    for(let a=0;a<arms;a++){for(let t=0;t<7;t+=.04){
+      const r=8+t*22,ang=t*1.7+(a/arms)*Math.PI*2;
+      const px=cx+Math.cos(ang)*r,py=cy+Math.sin(ang)*r*.62;
+      t===0&&a===0?x.moveTo(px,py):x.lineTo(px,py);}}
+    x.stroke();
+    for(let i=0;i<26;i++){const t=rnd()*7,ang=t*1.7+rnd()*Math.PI*2,r=8+t*22;
+      const px=cx+Math.cos(ang)*r,py=cy+Math.sin(ang)*r*.62;
+      const g=x.createRadialGradient(px,py,0,px,py,6);
+      g.addColorStop(0,'#e8e4d4');g.addColorStop(1,'rgba(0,0,0,0)');
+      x.fillStyle=g;x.beginPath();x.arc(px,py,6,0,7);x.fill();}
+    const gg=x.createRadialGradient(cx,cy,0,cx,cy,18);
+    gg.addColorStop(0,'#fff');gg.addColorStop(1,'rgba(185,168,232,0)');
+    x.fillStyle=gg;x.beginPath();x.arc(cx,cy,18,0,7);x.fill();
+    x.fillStyle='#7fd4c1';x.font='16px monospace';x.textAlign='center';
+    x.fillText('🜨 '+u.name,cx,28);
+    x.fillStyle='#9d8cc9';x.font='10.5px monospace';
+    x.fillText('"'+u.law.slice(0,80)+'"',cx,H-26);
+    x.fillStyle='#5a6478';x.font='9px monospace';
+    x.fillText('DO-LOON-AI EXPRESS · ARCHITECT SEED · '+u.d,cx,H-10);},
+  download(){const c=document.getElementById('gnChart');if(!c)return;
+    const a=document.createElement('a');a.download='universe-seed.png';
+    a.href=c.toDataURL('image/png');a.click();}
+};
+if(typeof window!=='undefined')window.Genesis=Genesis;
 
 /* ============ DREAM WELL ============ */
 const Dreams={
@@ -2895,6 +3086,10 @@ if(HAS3D)(function(){
       std(0x101522,{roughness:.1,metalness:.9,emissive:0x3a4a66,emissiveIntensity:.4}));
     am.position.set(L.archStone.x,1.2,L.archStone.z);am.castShadow=true;scene.add(am);
     W3._archM=am;
+    /* v8.5: The White Page — beside the gate, glowing with its own light */
+    const wp=box(1.7,2.3,.08,std(0xf2efe2,{emissive:0xf2efe2,emissiveIntensity:.55,roughness:.3}),L.whitePage.x,1.6,L.whitePage.z,.35);
+    const wl=new THREE.PointLight(0xfff6e0,.8,11);wl.position.set(L.whitePage.x,2.6,L.whitePage.z);scene.add(wl);
+    W3._wpage=wp;
   })();
   /* ---- v8: Architect stars — permanent lights planted by the player ---- */
   const STARS=[];
