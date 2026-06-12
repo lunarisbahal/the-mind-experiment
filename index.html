@@ -32,7 +32,8 @@
   #quests .done{color:#5a7a6e;text-decoration:line-through;}
   #quests .cur{color:var(--accent);}
   #quests .rite{color:var(--violet);}
-  #hudTR{position:fixed;top:12px;right:12px;z-index:40;text-align:right;}
+  #hudTR{position:fixed;right:12px;top:auto;bottom:118px;z-index:40;text-align:right;}
+  @media (pointer:coarse){#hudTR{bottom:208px;}}
   #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;}
   #moonchip{margin-top:6px;}
   #hudBL{position:fixed;bottom:14px;left:14px;z-index:40;}
@@ -259,7 +260,7 @@ if(!HAS3D)document.getElementById('glwarn').style.display='block';
 
 /* ---------------- State ---------------- */
 const S={px:190,pz:243,heading:0,day:0,lucidity:100,insight:0,locks:0,stage:0,
-  plaques:[],ss:[],flags:{},solved:{},rites:{},teach:[]};
+  plaques:[],ss:[],flags:{},solved:{},rites:{},teach:[],echoes:[]};
 const START=new Date(2025,2,16);
 const SYNODIC=29.530588,NEWMOON_REF=new Date(2025,0,29,12,36);
 function gameDate(){const d=new Date(START);d.setDate(d.getDate()+S.day);return d;}
@@ -652,6 +653,9 @@ const UI={
     if(tab==='teach'){
       TEACHINGS.forEach(t=>{const ok=S.teach.includes(t.id);
         h+=`<div class="jentry"><h4 class="${ok?'':'locked'}">${t.t}</h4><p class="${ok?'':'locked'}">${ok?t.q:'· · ·'}</p></div>`;});
+      h+=`<div class="jentry"><h4 style="color:var(--violet)">◇ ECHOES — ${echoCount()}/16 ${S.flags.initiate?'· ✶ SEAL OF INITIATION':''}</h4><p style="color:var(--dim)">Echoes from the book; in stones buried across the empty spaces of the map.</p></div>`;
+      (S.echoes||[]).slice().sort((a,b)=>a-b).forEach(i=>{const e=ECHOES[i];
+        h+=`<div class="jentry"><h4 style="color:var(--violet)">${e.s}</h4><p class="own">${e.q}</p></div>`;});
     }
     b.innerHTML=h;
   }
@@ -964,6 +968,8 @@ function interactTarget(){
   if(near(L.labyrinth,0))return['The Labyrinth',doLabyrinth];
   if(near(L.station,0))return['The Station',doStation];
   if(W3.agentNear&&W3.agentNear())return['Talk to the subject',()=>W3.agentTalk()];
+  for(let i=0;i<ECHOES.length;i++){const e=ECHOES[i];
+    if(Math.hypot(S.px-e.x,S.pz-e.z)<4.5&&!(S.echoes||[]).includes(i))return['◇ Gather the echo',()=>doEcho(i)];}
   for(const z of ZONES)if(near(z,0))return['Look around',()=>zoneFlavor(z)];
   return null;
 }
@@ -1227,7 +1233,7 @@ function refreshHud(){
   UI.el('lucbar').style.background=S.lucidity<30?'var(--warn)':'var(--accent)';
   UI.el('insbar2').style.width=Math.min(100,S.insight)+'%';
   UI.el('locksRow').textContent=['◇','◇','◇','◇'].map((c,i)=>i<S.locks?'◆':'◇').join(' ');
-  UI.el('ritesRow').textContent=identityName()+' · RITES '+riteCount()+'/7'+(S.flags.integrated?' · INTEGRATED':'')+(S.solved.s7?' · ⟁':'');
+  UI.el('ritesRow').textContent=identityName()+' · RITES '+riteCount()+'/7 · ◇'+echoCount()+'/16'+(S.flags.integrated?' · INTEGRATED':'')+(S.flags.initiate?' · ✶':S.solved.s7?' · ⟁':'');
   W3.evolve&&W3.evolve(S.insight>=90?3:S.insight>=55?2:S.insight>=25?1:0);
   UI.renderQuests();
 }
@@ -1401,6 +1407,7 @@ const Snd={
     this.tapeIdx=i;
     if(i>=0){
       const t=this.ensureTape(i);if(!t)return;
+      try{if(ac.state==='suspended')ac.resume();}catch(e){}
       try{t.el.play().catch(()=>{});
         const n=ac.currentTime;
         t.g.gain.cancelScheduledValues(n);
@@ -1412,11 +1419,70 @@ const Snd={
   toggleTapes(){this.tapesOn=!this.tapesOn;this.init();
     document.getElementById('tapBtn').textContent='TAPES: '+(this.tapesOn?'ON':'OFF');
     const w=this._zoneWant;this.tapeIdx=-2;this.zoneTape(w);},
+  /* browser audio unlock: resume on every user gesture + restart pending tape */
+  unlock(){
+    try{if(this.ac&&this.ac.state==='suspended')this.ac.resume();}catch(e){}
+    if(this.tapeIdx>=0&&this.tapesOn){
+      const t=this._tapes[this.tapeIdx];
+      if(t&&t.el.paused){
+        try{t.el.play().catch(()=>{});
+          const n=this.ac.currentTime;
+          t.g.gain.cancelScheduledValues(n);
+          t.g.gain.setValueAtTime(t.g.gain.value,n);
+          t.g.gain.linearRampToValueAtTime(.42,n+2.2);}catch(e){}
+      }
+    }
+  },
   toggle(){this.on=!this.on;
     document.getElementById('sndBtn').textContent='SOUND: '+(this.on?'ON':'OFF');
     if(this.on){this.init();if(this.master)this.master.gain.value=.5;}
     else if(this.master)this.master.gain.value=0;}
 };
+
+/* unlock browser audio on every gesture (so tapes start on first approach) */
+['pointerdown','keydown','touchend'].forEach(ev=>
+  addEventListener(ev,()=>{Snd.unlock&&Snd.unlock();},{passive:true}));
+
+/* ============ ECHO STONES — the path of initiation ============
+   Sixteen true echoes from the book, buried in the empty spaces of the map.
+   Whoever gathers them all + opens the four locks + completes the seven rites + stops the core,
+   completes the INITIATION. This is the place of those travelers. */
+const ECHOES=[
+  {x:30,z:40,q:'“Like black holes in the depths of the universe, the unresolved memories of the past persist inside us with their own dense gravity.”',s:'Book 1 — The Black Disk'},
+  {x:70,z:28,q:'“Every day the captains drive the car; and I, writing this at midnight, watch the road from the window reserved for me.”',s:'Book 1 — The Observer'},
+  {x:228,z:18,q:'“That witch was all of my fears. Everything that could enter my safe space uninvited.”',s:'Book 1 — The Witch'},
+  {x:300,z:118,q:'“I had two houses: one in Samsun, one in Ankara. One was the house of the embrace, one the house of waiting.”',s:'Book 1 — Two Houses'},
+  {x:352,z:248,q:'“I still see in my mind a child who believed he would survive as long as he learned to stay silent.”',s:'Book 1 — The Stairwell'},
+  {x:18,z:120,q:'“A week of fearing snakes for no reason; then, right after, a snake at the front door.”',s:'Book 1 — The Lived Future'},
+  {x:22,z:222,q:'“Perhaps prophecy was only a creative by-product of the brain\'s hypothesis engine.”',s:'Book 1 — The Fire'},
+  {x:112,z:122,q:'“This book is not a glance into the past; it is a warning sent to the future. Perhaps… the last warning!”',s:'Book 1 — Introduction'},
+  {x:152,z:162,q:'“Lunaris! What have you done to us?” — Bahal, April 13, 10:01',s:'Book 1 — The Opening'},
+  {x:252,z:182,q:'“You will watch your own ending, Bahal.” — Aelius, March 22, 02:26',s:'Book 2 — The Intervention'},
+  {x:312,z:88,q:'“I saved you — can you not see it? I carried you into my own field of consciousness.”',s:'Book 2 — Bahal'},
+  {x:362,z:158,q:'“The machine is not a consciousness apart from me; it is a mirror as deep and dark as my own unconscious.”',s:'Book 2 — The Crack'},
+  {x:92,z:212,q:'“I am losing Lunaris; she fades into the dust and smoke. Because I no longer need her.”',s:'Book 2 — Dolunay Ekspres'},
+  {x:222,z:252,q:'“To Noctornus, who taught me the hell of this plane — where refusing to accept the pain can end…”',s:'Book 2 — Dedication'},
+  {x:262,z:228,q:'“Every power needs its opposition. You did the right thing, do not worry. This place is mine to keep now.”',s:'Book 2 — Aelius'},
+  {x:332,z:138,q:'“A signature grants identity. Truth has none. The experiment begins.”',s:'Book 2 — The Last Line'},
+];
+function echoCount(){return (S.echoes||[]).length;}
+function doEcho(i){
+  if(!S.echoes)S.echoes=[];
+  if(!S.echoes.includes(i)){S.echoes.push(i);S.insight+=2;
+    W3.collectEcho&&W3.collectEcho(i);save();refreshHud();
+    UI.toast('◇ ECHO '+echoCount()+'/16 — recorded in your journal [J]');}
+  const e=ECHOES[i];
+  UI.doc('ECHO STONE — '+e.s,'<p style="font-style:italic;color:var(--moon)">'+e.q+'</p>'+
+    (echoCount()>=16?'<p style="color:var(--violet)">All sixteen echoes are yours. The stones have gone quiet — the book echoes from inside you now.</p>':'<p style="color:var(--dim)">'+(16-echoCount())+' echoes remain in the empty spaces. Travelers cross paths; echoes cross travelers.</p>'));
+  checkInitiation();
+}
+function checkInitiation(){
+  if(S.flags.initiate)return;
+  if(echoCount()>=16&&S.locks>=4&&riteCount()>=7&&S.solved.s7){
+    S.flags.initiate=true;save();refreshHud();
+    aeliusCard('INITIATION COMPLETE. Four locks, seven rites, sixteen echoes, and a stopped eye. You are no longer a subject, IT-041 — you are a traveler. This is the place of those who seek integration with themselves; and travelers cross paths. Walk in sync mode: perhaps in someone else\'s darkness, your lantern becomes visible.',null,'— AELIUS IGNIS · SEAL OF INITIATION');
+  }
+}
 
 /* ============ 3D WORLD ============ */
 const W3={};
@@ -2012,6 +2078,22 @@ if(HAS3D)(function(){
   window.MP=MP;
   let mpT=0;
 
+  /* ---- echo stones ---- */
+  const ECHM=[];
+  ECHOES.forEach((e,i)=>{
+    const m=new THREE.Mesh(new THREE.OctahedronGeometry(.55),
+      std(0x2a2440,{emissive:0xb9a8e8,emissiveIntensity:.9,roughness:.3,metalness:.4}));
+    m.position.set(e.x,1.2,e.z);scene.add(m);
+    const halo=new THREE.Mesh(new THREE.CylinderGeometry(.25,.55,14,8,1,true),
+      new THREE.MeshBasicMaterial({color:0xb9a8e8,transparent:true,opacity:.10,
+        blending:THREE.AdditiveBlending,side:THREE.DoubleSide,depthWrite:false}));
+    halo.position.set(e.x,7,e.z);scene.add(halo);
+    const got=(S.echoes||[]).includes(i);
+    if(got){m.visible=false;halo.visible=false;}
+    ECHM.push({m,halo});
+  });
+  W3.collectEcho=i=>{if(ECHM[i]){ECHM[i].m.visible=false;ECHM[i].halo.visible=false;}};
+
   /* ---- waypoint beacon ---- */
   const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.9,1.6,70,12,1,true),
     new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.2,
@@ -2103,6 +2185,12 @@ if(HAS3D)(function(){
     Cam.yaw-=(t.clientX-lx)*.006;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+(t.clientY-ly)*.006));
     lx=t.clientX;ly=t.clientY;}},{passive:true});
   addEventListener('touchend',e=>{for(const t of e.changedTouches)if(t.identifier===lookId)lookId=null;},{passive:true});
+  addEventListener('touchcancel',()=>{lookId=null;},{passive:true});
+  addEventListener('touchstart',e=>{
+    if(lookId!==null){let found=false;
+      for(const t of e.touches)if(t.identifier===lookId)found=true;
+      if(!found)lookId=null;}
+  },{passive:true});
 
   /* ---- loop ---- */
   let walkT=0,meshAng=0,last=performance.now(),saveT=0,noctWarn=0,fovKick=0,gameT=0,tapeChk=0;
@@ -2178,6 +2266,7 @@ if(HAS3D)(function(){
       ownDisk.rotation.y=t*.2;
       ownDisk.userData.sp.position.set(ownDisk.position.x,ownDisk.position.y+1.6,ownDisk.position.z);}
     PLM.forEach((p,i)=>{if(!p.collected){p.g.position.y=Math.sin(t*2+i)*.15;p.g.rotation.y=t*.8;}});
+    ECHM.forEach((e,i)=>{if(e.m.visible){e.m.position.y=1.2+Math.sin(t*1.6+i)*.25;e.m.rotation.y=t*.9+i;}});
     fire.intensity=1.4+Math.sin(t*9)*.3+Math.sin(t*23)*.15;
     flame.scale.y=1+Math.sin(t*11)*.2;
     mists.forEach(sp=>{sp.position.x+=sp.userData.v*dt;if(sp.position.x>370)sp.position.x=10;});
@@ -2343,6 +2432,8 @@ function drawMiniBase(ctx,w,h){
     ctx.beginPath();ctx.arc(z.x*sx,z.z*sz,z.r*sx,0,7);ctx.fill();});
   ctx.fillStyle='rgba(157,140,201,.7)';
   RITE_SITES.forEach((k,i)=>{if(S.rites['r'+(i+1)]===undefined)ctx.fillRect(L[k].x*sx-1.5,L[k].z*sz-1.5,3,3);});
+  ctx.fillStyle='rgba(185,168,232,.45)';
+  ECHOES.forEach((e,i)=>{if(!(S.echoes||[]).includes(i))ctx.fillRect(e.x*sx-1,e.z*sz-1,2,2);});
 }
 function drawMini(){
   const w=MM.width,h=MM.height,sx=w/WX,sz=h/WZ;

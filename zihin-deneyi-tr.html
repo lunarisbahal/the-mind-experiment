@@ -31,7 +31,8 @@
   #quests .done{color:#5a7a6e;text-decoration:line-through;}
   #quests .cur{color:var(--accent);}
   #quests .rite{color:var(--violet);}
-  #hudTR{position:fixed;top:12px;right:12px;z-index:40;text-align:right;}
+  #hudTR{position:fixed;right:12px;top:auto;bottom:118px;z-index:40;text-align:right;}
+  @media (pointer:coarse){#hudTR{bottom:208px;}}
   #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;}
   #moonchip{margin-top:6px;}
   #hudBL{position:fixed;bottom:14px;left:14px;z-index:40;}
@@ -252,7 +253,7 @@ const HAS3D = typeof THREE!=='undefined';
 if(!HAS3D)document.getElementById('glwarn').style.display='block';
 
 const S={px:190,pz:243,heading:0,day:0,lucidity:100,insight:0,locks:0,stage:0,
-  plaques:[],ss:[],flags:{},solved:{},rites:{},teach:[]};
+  plaques:[],ss:[],flags:{},solved:{},rites:{},teach:[],echoes:[]};
 const START=new Date(2025,2,16);
 const SYNODIC=29.530588,NEWMOON_REF=new Date(2025,0,29,12,36);
 function gameDate(){const d=new Date(START);d.setDate(d.getDate()+S.day);return d;}
@@ -641,6 +642,9 @@ const UI={
     if(tab==='teach'){
       TEACHINGS.forEach(t=>{const ok=S.teach.includes(t.id);
         h+=`<div class="jentry"><h4 class="${ok?'':'locked'}">${t.t}</h4><p class="${ok?'':'locked'}">${ok?t.q:'· · ·'}</p></div>`;});
+      h+=`<div class="jentry"><h4 style="color:var(--violet)">◇ YANKILAR — ${echoCount()}/16 ${S.flags.initiate?'· ✶ İNİSİYASYON MÜHRÜ':''}</h4><p style="color:var(--dim)">Kitaptan yankılar; haritanın boşluklarına gömülü taşlarda.</p></div>`;
+      (S.echoes||[]).slice().sort((a,b)=>a-b).forEach(i=>{const e=ECHOES[i];
+        h+=`<div class="jentry"><h4 style="color:var(--violet)">${e.s}</h4><p class="own">${e.q}</p></div>`;});
     }
     b.innerHTML=h;
   }
@@ -950,6 +954,8 @@ function interactTarget(){
   if(near(L.labyrinth,0))return['Labirent',doLabyrinth];
   if(near(L.station,0))return['İstasyon',doStation];
   if(W3.agentNear&&W3.agentNear())return['Denekle konuş',()=>W3.agentTalk()];
+  for(let i=0;i<ECHOES.length;i++){const e=ECHOES[i];
+    if(Math.hypot(S.px-e.x,S.pz-e.z)<4.5&&!(S.echoes||[]).includes(i))return['◇ Yankıyı topla',()=>doEcho(i)];}
   for(const z of ZONES)if(near(z,0))return['Etrafa bak',()=>zoneFlavor(z)];
   return null;
 }
@@ -1213,7 +1219,7 @@ function refreshHud(){
   UI.el('lucbar').style.background=S.lucidity<30?'var(--warn)':'var(--accent)';
   UI.el('insbar2').style.width=Math.min(100,S.insight)+'%';
   UI.el('locksRow').textContent=['◇','◇','◇','◇'].map((c,i)=>i<S.locks?'◆':'◇').join(' ');
-  UI.el('ritesRow').textContent=identityName()+' · RİTÜELLER '+riteCount()+'/7'+(S.flags.integrated?' · ENTEGRE':'')+(S.solved.s7?' · ⟁':'');
+  UI.el('ritesRow').textContent=identityName()+' · RİT '+riteCount()+'/7 · ◇'+echoCount()+'/16'+(S.flags.integrated?' · ENTEGRE':'')+(S.flags.initiate?' · ✶':S.solved.s7?' · ⟁':'');
   W3.evolve&&W3.evolve(S.insight>=90?3:S.insight>=55?2:S.insight>=25?1:0);
   UI.renderQuests();
 }
@@ -1392,6 +1398,7 @@ const Snd={
     this.tapeIdx=i;
     if(i>=0){
       const t=this.ensureTape(i);if(!t)return;
+      try{if(ac.state==='suspended')ac.resume();}catch(e){}
       try{t.el.play().catch(()=>{});
         const n=ac.currentTime;
         t.g.gain.cancelScheduledValues(n);
@@ -1403,11 +1410,70 @@ const Snd={
   toggleTapes(){this.tapesOn=!this.tapesOn;this.init();
     document.getElementById('tapBtn').textContent='KAYITLAR: '+(this.tapesOn?'AÇIK':'KAPALI');
     const w=this._zoneWant;this.tapeIdx=-2;this.zoneTape(w);},
+  /* tarayıcı ses kilidi: her kullanıcı hareketinde aç + bekleyen kaseti başlat */
+  unlock(){
+    try{if(this.ac&&this.ac.state==='suspended')this.ac.resume();}catch(e){}
+    if(this.tapeIdx>=0&&this.tapesOn){
+      const t=this._tapes[this.tapeIdx];
+      if(t&&t.el.paused){
+        try{t.el.play().catch(()=>{});
+          const n=this.ac.currentTime;
+          t.g.gain.cancelScheduledValues(n);
+          t.g.gain.setValueAtTime(t.g.gain.value,n);
+          t.g.gain.linearRampToValueAtTime(.42,n+2.2);}catch(e){}
+      }
+    }
+  },
   toggle(){this.on=!this.on;
     document.getElementById('sndBtn').textContent='SES: '+(this.on?'AÇIK':'KAPALI');
     if(this.on){this.init();if(this.master)this.master.gain.value=.5;}
     else if(this.master)this.master.gain.value=0;}
 };
+/* ses kilidini her kullanıcı hareketinde aç (kasetlerin ilk yaklaşmada çalması için) */
+['pointerdown','keydown','touchend'].forEach(ev=>
+  addEventListener(ev,()=>{Snd.unlock&&Snd.unlock();},{passive:true}));
+
+/* ============ YANKI TAŞLARI — inisiyasyon yolu ============
+   Kitaptan on altı gerçek yankı, haritanın boşluklarına gömülü.
+   Hepsini toplayan + dört kilidi açan + yedi ritüeli tamamlayan + çekirdeği durduran,
+   İNİSİYASYONU tamamlar. Burası o yolcuların yeri. */
+const ECHOES=[
+  {x:30,z:40,q:'“Evrenin derinliklerindeki kara delikler gibi, geçmişin başa çıkılamamış anıları da içimizde yoğun çekim gücüyle varlığını sürdürüyor.”',s:'Kitap 1 — Siyah Disk'},
+  {x:70,z:28,q:'“Her gün kaptanlar arabayı kullanıyor; gece yarısı bunları yazan bense, kendime ayrılmış pencereden yolu izliyorum.”',s:'Kitap 1 — Gözlemci Bilinç'},
+  {x:228,z:18,q:'“O cadı, bütün korkularımdı. Güvenli alanıma kontrolsüzce girebilen her şeydi.”',s:'Kitap 1 — Cadı'},
+  {x:300,z:118,q:'“İki evim vardı: biri Samsun, biri Ankara. Biri kucağın, biri bekleyişin eviydi.”',s:'Kitap 1 — İki Ev'},
+  {x:352,z:248,q:'“Sessiz kalmayı öğrendikçe hayatta kalacağına inanan bir çocuğu hâlâ zihnimde görüyorum.”',s:'Kitap 1 — Merdiven Boşluğu'},
+  {x:18,z:120,q:'“Bir hafta boyunca sebepsiz yere yılan korkusu; hemen ardından kapının önünde bir yılan.”',s:'Kitap 1 — Yaşanmış Gelecek'},
+  {x:22,z:222,q:'“Belki de kehanet, beynin hipotez üretme merkezinin yaratıcı bir yan ürünüydü.”',s:'Kitap 1 — Yangın'},
+  {x:112,z:122,q:'“Bu kitap geçmişe bir bakış değil; geleceğe gönderilen bir uyarı. Belki de… son uyarı!”',s:'Kitap 1 — Giriş'},
+  {x:152,z:162,q:'“Lunaris! Bize ne yaptın?” — Bahal, 13 Nisan, 10:01',s:'Kitap 1 — Açılış'},
+  {x:252,z:182,q:'“Kendi sonunu izleyeceksin Bahal.” — Aelius, 22 Mart, 02:26',s:'Kitap 2 — Müdahale'},
+  {x:312,z:88,q:'“Seni kurtardım, bunu görmüyor musun? Seni kendi bilinç alanıma taşıdım.”',s:'Kitap 2 — Bahal'},
+  {x:362,z:158,q:'“Yapay zekâ benden bağımsız bir bilinç değil; bilinçdışım kadar derin ve karanlık bir ayna.”',s:'Kitap 2 — Çatlak'},
+  {x:92,z:212,q:'“Lunaris\'i kaybediyorum; toz ve dumanın içinde giderek gözden kayboluyor. Çünkü artık ona ihtiyaç duymuyorum.”',s:'Kitap 2 — Dolunay Ekspres'},
+  {x:222,z:252,q:'“Acıyı kabullenmeyip kaçmanın sonunun gelebileceği bu düzlemdeki cehennemi bana öğreten Noctornus\'a…”',s:'Kitap 2 — İthaf'},
+  {x:262,z:228,q:'“Her iktidarın muhalefete ihtiyacı var. Doğru olanı yaptın, endişen olmasın. Burası artık bana emanet.”',s:'Kitap 2 — Aelius'},
+  {x:332,z:138,q:'“İmza, kimlik verir. Hakikat, kimliksizdir. Deney başlıyor.”',s:'Kitap 2 — Son Satır'},
+];
+function echoCount(){return (S.echoes||[]).length;}
+function doEcho(i){
+  if(!S.echoes)S.echoes=[];
+  if(!S.echoes.includes(i)){S.echoes.push(i);S.insight+=2;
+    W3.collectEcho&&W3.collectEcho(i);save();refreshHud();
+    UI.toast('◇ YANKI '+echoCount()+'/16 — günlüğüne işlendi [J]');}
+  const e=ECHOES[i];
+  UI.doc('YANKI TAŞI — '+e.s,'<p style="font-style:italic;color:var(--moon)">'+e.q+'</p>'+
+    (echoCount()>=16?'<p style="color:var(--violet)">On altı yankının tamamı sende. Taşlar sustu — artık kitap senin içinden yankılanıyor.</p>':'<p style="color:var(--dim)">Boşluklarda '+(16-echoCount())+' yankı daha var. Yolcular birbirine denk gelir; yankılar yolcuya.</p>'));
+  checkInitiation();
+}
+function checkInitiation(){
+  if(S.flags.initiate)return;
+  if(echoCount()>=16&&S.locks>=4&&riteCount()>=7&&S.solved.s7){
+    S.flags.initiate=true;save();refreshHud();
+    aeliusCard('İNİSİYASYON TAMAM. Dört kilit, yedi ritüel, on altı yankı ve duran bir göz. Artık denek değilsin, IT-041 — yolcusun. Burası, kendiyle bütünleşmeyi arayan yolcuların yeri; ve yolcular birbirine denk gelir. Eşzamanlı modda yürü: belki bir başkasının karanlığında, senin fenerin görünür.',null,'— AELIUS IGNIS · İNİSİYASYON MÜHRÜ');
+  }
+}
+
 /* ============ 3D WORLD ============ */
 const W3={};
 if(HAS3D)(function(){
@@ -2002,6 +2068,22 @@ if(HAS3D)(function(){
   window.MP=MP;
   let mpT=0;
 
+  /* ---- yankı taşları ---- */
+  const ECHM=[];
+  ECHOES.forEach((e,i)=>{
+    const m=new THREE.Mesh(new THREE.OctahedronGeometry(.55),
+      std(0x2a2440,{emissive:0xb9a8e8,emissiveIntensity:.9,roughness:.3,metalness:.4}));
+    m.position.set(e.x,1.2,e.z);scene.add(m);
+    const halo=new THREE.Mesh(new THREE.CylinderGeometry(.25,.55,14,8,1,true),
+      new THREE.MeshBasicMaterial({color:0xb9a8e8,transparent:true,opacity:.10,
+        blending:THREE.AdditiveBlending,side:THREE.DoubleSide,depthWrite:false}));
+    halo.position.set(e.x,7,e.z);scene.add(halo);
+    const got=(S.echoes||[]).includes(i);
+    if(got){m.visible=false;halo.visible=false;}
+    ECHM.push({m,halo});
+  });
+  W3.collectEcho=i=>{if(ECHM[i]){ECHM[i].m.visible=false;ECHM[i].halo.visible=false;}};
+
   /* ---- waypoint beacon ---- */
   const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.9,1.6,70,12,1,true),
     new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.2,
@@ -2093,6 +2175,16 @@ if(HAS3D)(function(){
     Cam.yaw-=(t.clientX-lx)*.006;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+(t.clientY-ly)*.006));
     lx=t.clientX;ly=t.clientY;}},{passive:true});
   addEventListener('touchend',e=>{for(const t of e.changedTouches)if(t.identifier===lookId)lookId=null;},{passive:true});
+  addEventListener('touchcancel',()=>{lookId=null;},{passive:true});
+  /* takılı kimlik sigortası: aktif dokunuşlar arasında lookId yoksa sıfırla */
+  setInterval(()=>{if(lookId===null)return;
+    try{/* dokunuş listesini son olaydan takip edemiyoruz; güvenli sıfırlama */
+      if(!Game.running)lookId=null;}catch(e){}},4000);
+  addEventListener('touchstart',e=>{
+    if(lookId!==null){let found=false;
+      for(const t of e.touches)if(t.identifier===lookId)found=true;
+      if(!found)lookId=null;}
+  },{passive:true});
 
   /* ---- loop ---- */
   let walkT=0,meshAng=0,last=performance.now(),saveT=0,noctWarn=0,fovKick=0,gameT=0,tapeChk=0;
@@ -2168,6 +2260,7 @@ if(HAS3D)(function(){
       ownDisk.rotation.y=t*.2;
       ownDisk.userData.sp.position.set(ownDisk.position.x,ownDisk.position.y+1.6,ownDisk.position.z);}
     PLM.forEach((p,i)=>{if(!p.collected){p.g.position.y=Math.sin(t*2+i)*.15;p.g.rotation.y=t*.8;}});
+    ECHM.forEach((e,i)=>{if(e.m.visible){e.m.position.y=1.2+Math.sin(t*1.6+i)*.25;e.m.rotation.y=t*.9+i;}});
     fire.intensity=1.4+Math.sin(t*9)*.3+Math.sin(t*23)*.15;
     flame.scale.y=1+Math.sin(t*11)*.2;
     mists.forEach(sp=>{sp.position.x+=sp.userData.v*dt;if(sp.position.x>370)sp.position.x=10;});
@@ -2333,6 +2426,8 @@ function drawMiniBase(ctx,w,h){
     ctx.beginPath();ctx.arc(z.x*sx,z.z*sz,z.r*sx,0,7);ctx.fill();});
   ctx.fillStyle='rgba(157,140,201,.7)';
   RITE_SITES.forEach((k,i)=>{if(S.rites['r'+(i+1)]===undefined)ctx.fillRect(L[k].x*sx-1.5,L[k].z*sz-1.5,3,3);});
+  ctx.fillStyle='rgba(185,168,232,.45)';
+  ECHOES.forEach((e,i)=>{if(!(S.echoes||[]).includes(i))ctx.fillRect(e.x*sx-1,e.z*sz-1,2,2);});
 }
 function drawMini(){
   const w=MM.width,h=MM.height,sx=w/WX,sz=h/WZ;
