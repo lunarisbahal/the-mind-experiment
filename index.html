@@ -245,6 +245,11 @@
       <input id="aiCKey" placeholder="sk-ant-…  (your Anthropic API key)" type="password">
       <button class="btn v" onclick="Mirror.setupClaude()">C — Connect Claude (smartest)</button>
     </div>
+    <div style="border:1px solid var(--line);border-radius:4px;padding:10px;margin-bottom:10px">
+      <p style="color:var(--accent);font-size:12px;margin:0 0 8px">⚡ <b>Groq — FREE · 70B</b>: No credit card. console.groq.com → API Keys → grab a free key, paste it here. Llama-3.3-70B: vastly smarter than in-browser models.</p>
+      <input id="aiGKey" placeholder="gsk_…  (your free Groq key)" type="password">
+      <button class="btn v" onclick="Mirror.setupGroq()">⚡ Connect Groq (free · strong)</button>
+    </div>
     <select id="aiWModel" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:9px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:8px;">
       <option value="Llama-3.2-3B-Instruct-q4f16_1-MLC" selected>Llama-3.2-3B — ~1.8 GB · solid default</option>
       <option value="Llama-3.1-8B-Instruct-q4f16_1-MLC">Llama-3.1-8B — strong PC · ~4.6 GB · much better</option>
@@ -1824,8 +1829,11 @@ const Mirror={
   loadCfg(){try{const j=localStorage.getItem(this.CKEY);if(j)this.cfg=JSON.parse(j);}catch(e){}
     this.refreshBtn();},
   saveCfg(){try{localStorage.setItem(this.CKEY,JSON.stringify(this.cfg));}catch(e){}this.refreshBtn();},
+  modelLabel(){if(!this.cfg)return '';
+    return this.cfg.kind==='claude'?'CLAUDE ◆':this.cfg.label?this.cfg.label:
+      this.cfg.kind==='webllm'?('WebLLM '+String(this.cfg.model||'').split('-')[1]):'ENDPOINT';},
   refreshBtn(){const b=document.getElementById('aiBtn');
-    if(b)b.textContent='MIRRORS: '+(this.cfg?(this.cfg.kind==='webllm'?'WebLLM':this.cfg.kind==='claude'?'CLAUDE ◆':'ENDPOINT'):'NOT LINKED');},
+    if(b)b.textContent='MIRRORS: '+(this.cfg?this.modelLabel():'NOT LINKED');},
   openSetup(){UI.show('aiSetupModal');Game.setModal(true);},
   /* v8.2 — Option C: Claude API (your own key, directly from the browser) */
   async setupClaude(){
@@ -1840,6 +1848,20 @@ const Mirror={
       UI.toast('◐ CLAUDE LINKED — the characters are now guides with full command of the universe.',6000);
       setTimeout(()=>{UI.hide('aiSetupModal');Game.setModal(false);},900);
     }catch(e){this.cfg=old;pr.textContent='Could not connect: '+(e.message||e)+' — check your key and quota.';}
+  },
+  /* v8.3 — Groq preset: free 70B (OpenAI-compatible endpoint) */
+  async setupGroq(){
+    const key=((UI.el('aiGKey')&&UI.el('aiGKey').value)||'').trim();
+    if(!/^gsk_/.test(key)){UI.toast('A valid Groq key is required (starts with gsk_) — free at console.groq.com.');return;}
+    const pr=UI.el('aiProgress');pr.textContent='Testing the Groq connection…';
+    const old=this.cfg;
+    this.cfg={kind:'endpoint',url:'https://api.groq.com/openai/v1',model:'llama-3.3-70b-versatile',key,label:'GROQ 70B'};
+    try{
+      await this.generate([{role:'system',content:'Answer in one word.'},{role:'user',content:'ready?'}],12);
+      this.saveCfg();pr.textContent='Connected ✓ A 70B consciousness is awake — for free.';
+      UI.toast('⚡ GROQ LINKED — the mirrors now speak with 70B parameters.',6000);
+      setTimeout(()=>{UI.hide('aiSetupModal');Game.setModal(false);},900);
+    }catch(e){this.cfg=old;pr.textContent='Could not connect: '+(e.message||e)+' — check the key.';}
   },
   async setupWebLLM(){
     const pr=document.getElementById('aiProgress');
@@ -1911,7 +1933,7 @@ const Mirror={
         const webllm=await import('https://esm.run/@mlc-ai/web-llm');
         this.engine=await webllm.CreateMLCEngine(this.cfg.model,{});}
       const r=await this.engine.chat.completions.create({messages:msgs,max_tokens:maxTok,
-        temperature:.7,frequency_penalty:.6,presence_penalty:.4});
+        temperature:.55,frequency_penalty:.6,presence_penalty:.4}); /* v8.3: lower temp = steadier small-model output */
       return r.choices[0].message.content;
     }
     const r=await fetch(this.cfg.url+'/chat/completions',{method:'POST',
@@ -1926,9 +1948,11 @@ const Mirror={
     if(!this.ready()){this.openSetup();return;}
     this.cur=pid;const P=PERSONAS[pid];
     if(!this.hist[pid])this.hist[pid]=[];
-    document.getElementById('mirrorTitle').textContent='MIRROR — '+P.n;
+    document.getElementById('mirrorTitle').textContent='MIRROR — '+P.n+'  ·  '+this.modelLabel();
     const log=document.getElementById('mirrorLog');log.innerHTML='';
     this.line('sys','The mirror is open. This is an AI; not a therapist. You may step back at any moment.');
+    if(this.cfg&&this.cfg.kind==='webllm')
+      this.line('sys','⚠ Small in-browser model: replies may be rough. For fluent, intelligent dialogue connect ⚡ Groq (free, 70B) or Claude via MENU → MIRRORS.');
     if(this.hist[pid].length===0)this.line('them',P.hello,P.n);
     else this.hist[pid].forEach(m=>this.line(m.role==='user'?'you':'them',m.content,P.n));
     UI.show('mirrorModal');Game.setModal(true);
@@ -1974,10 +1998,10 @@ const Mirror={
 };
 Mirror.loadCfg();
 if(typeof window!=='undefined')window.Mirror=Mirror; /* bridge for the agent-path window.Mirror check */
-/* one-time tip for users still on the weak 1B model from older setups */
-try{if(Mirror.cfg&&Mirror.cfg.kind==='webllm'&&/1B/.test(Mirror.cfg.model||'')&&!localStorage.getItem('it041_1b_warn')){
-  localStorage.setItem('it041_1b_warn','1');
-  setTimeout(()=>UI.toast('◐ If mirror replies feel weak: MENU → MIRRORS → download Llama-3.2-3B (recommended).',9000),15000);
+/* v8.3: one-time upgrade tip for anyone on a webllm setup */
+try{if(Mirror.cfg&&Mirror.cfg.kind==='webllm'&&!localStorage.getItem('it041_groq_warn')){
+  localStorage.setItem('it041_groq_warn','1');
+  setTimeout(()=>UI.toast('⚡ If mirror replies feel rough: MENU → MIRRORS → connect Groq (FREE 70B) or Claude — night-and-day difference.',10000),15000);
 }}catch(e){}
 document.getElementById('mirrorInput').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();Mirror.send();}

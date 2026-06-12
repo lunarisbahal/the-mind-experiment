@@ -239,6 +239,11 @@
       <input id="aiCKey" placeholder="sk-ant-…  (Anthropic API anahtarın)" type="password">
       <button class="btn v" onclick="Mirror.setupClaude()">C — Claude'u bağla (en zeki)</button>
     </div>
+    <div style="border:1px solid var(--line);border-radius:4px;padding:10px;margin-bottom:10px">
+      <p style="color:var(--accent);font-size:12px;margin:0 0 8px">⚡ <b>Groq — ÜCRETSİZ · 70B</b>: Kredi kartı istemez. console.groq.com → API Keys → ücretsiz anahtar al, buraya yapıştır. Llama-3.3-70B: akıcı Türkçe, tarayıcı modellerinden kat kat zeki.</p>
+      <input id="aiGKey" placeholder="gsk_…  (ücretsiz Groq anahtarın)" type="password">
+      <button class="btn v" onclick="Mirror.setupGroq()">⚡ Groq'u bağla (ücretsiz · güçlü)</button>
+    </div>
     <select id="aiWModel" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:9px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:8px;">
       <option value="Qwen2.5-3B-Instruct-q4f16_1-MLC" selected>Qwen2.5-3B — ~2.1 GB · küçüklerin en iyi Türkçesi</option>
       <option value="Qwen2.5-7B-Instruct-q4f16_1-MLC">Qwen2.5-7B — güçlü PC · ~5.1 GB · çok daha iyi Türkçe</option>
@@ -1814,8 +1819,11 @@ const Mirror={
   loadCfg(){try{const j=localStorage.getItem(this.CKEY);if(j)this.cfg=JSON.parse(j);}catch(e){}
     this.refreshBtn();},
   saveCfg(){try{localStorage.setItem(this.CKEY,JSON.stringify(this.cfg));}catch(e){}this.refreshBtn();},
+  modelLabel(){if(!this.cfg)return '';
+    return this.cfg.kind==='claude'?'CLAUDE ◆':this.cfg.label?this.cfg.label:
+      this.cfg.kind==='webllm'?('WebLLM '+String(this.cfg.model||'').split('-')[1]):'UÇ NOKTA';},
   refreshBtn(){const b=document.getElementById('aiBtn');
-    if(b)b.textContent='AYNALAR: '+(this.cfg?(this.cfg.kind==='webllm'?'WebLLM':this.cfg.kind==='claude'?'CLAUDE ◆':'UÇ NOKTA'):'BAĞLI DEĞİL');},
+    if(b)b.textContent='AYNALAR: '+(this.cfg?this.modelLabel():'BAĞLI DEĞİL');},
   openSetup(){UI.show('aiSetupModal');Game.setModal(true);},
   /* v8.2 — Seçenek C: Claude API (kendi anahtarınla, tarayıcıdan doğrudan) */
   async setupClaude(){
@@ -1830,6 +1838,20 @@ const Mirror={
       UI.toast('◐ CLAUDE BAĞLI — karakterler artık evrenin tamamına hâkim birer rehber.',6000);
       setTimeout(()=>{UI.hide('aiSetupModal');Game.setModal(false);},900);
     }catch(e){this.cfg=old;pr.textContent='Bağlanamadı: '+(e.message||e)+' — anahtarı ve kotanı kontrol et.';}
+  },
+  /* v8.3 — Groq hazır ayarı: ücretsiz 70B (OpenAI-uyumlu uç nokta) */
+  async setupGroq(){
+    const key=((UI.el('aiGKey')&&UI.el('aiGKey').value)||'').trim();
+    if(!/^gsk_/.test(key)){UI.toast('Geçerli bir Groq anahtarı gerek (gsk_ ile başlar) — console.groq.com\'dan ücretsiz.');return;}
+    const pr=UI.el('aiProgress');pr.textContent='Groq bağlantısı sınanıyor…';
+    const old=this.cfg;
+    this.cfg={kind:'endpoint',url:'https://api.groq.com/openai/v1',model:'llama-3.3-70b-versatile',key,label:'GROQ 70B'};
+    try{
+      await this.generate([{role:'system',content:'Tek kelimeyle yanıtla.'},{role:'user',content:'hazır mısın?'}],12);
+      this.saveCfg();pr.textContent='Bağlandı ✓ 70B bilinç uyanık — ücretsiz.';
+      UI.toast('⚡ GROQ BAĞLI — aynalar artık 70B parametreyle, akıcı Türkçeyle konuşuyor.',6000);
+      setTimeout(()=>{UI.hide('aiSetupModal');Game.setModal(false);},900);
+    }catch(e){this.cfg=old;pr.textContent='Bağlanamadı: '+(e.message||e)+' — anahtarı kontrol et.';}
   },
   async setupWebLLM(){
     const pr=document.getElementById('aiProgress');
@@ -1901,7 +1923,7 @@ const Mirror={
         const webllm=await import('https://esm.run/@mlc-ai/web-llm');
         this.engine=await webllm.CreateMLCEngine(this.cfg.model,{});}
       const r=await this.engine.chat.completions.create({messages:msgs,max_tokens:maxTok,
-        temperature:.7,frequency_penalty:.6,presence_penalty:.4});
+        temperature:.55,frequency_penalty:.6,presence_penalty:.4}); /* v8.3: düşük sıcaklık = küçük modelde daha tutarlı TR */
       return r.choices[0].message.content;
     }
     const r=await fetch(this.cfg.url+'/chat/completions',{method:'POST',
@@ -1916,9 +1938,11 @@ const Mirror={
     if(!this.ready()){this.openSetup();return;}
     this.cur=pid;const P=PERSONAS[pid];
     if(!this.hist[pid])this.hist[pid]=[];
-    document.getElementById('mirrorTitle').textContent='AYNA — '+P.n;
+    document.getElementById('mirrorTitle').textContent='AYNA — '+P.n+'  ·  '+this.modelLabel();
     const log=document.getElementById('mirrorLog');log.innerHTML='';
     this.line('sys','Ayna açık. Bu bir yapay zekâ; terapist değil. İstediğin an çekilebilirsin.');
+    if(this.cfg&&this.cfg.kind==='webllm')
+      this.line('sys','⚠ Tarayıcı-içi küçük model: Türkçesi bozuk olabilir. Akıcı ve zeki diyalog için MENÜ → AYNALAR\'dan ⚡ Groq (ücretsiz, 70B) ya da Claude bağla.');
     if(this.hist[pid].length===0)this.line('them',P.hello,P.n);
     else this.hist[pid].forEach(m=>this.line(m.role==='user'?'you':'them',m.content,P.n));
     UI.show('mirrorModal');Game.setModal(true);
@@ -1964,10 +1988,10 @@ const Mirror={
 };
 Mirror.loadCfg();
 if(typeof window!=='undefined')window.Mirror=Mirror; /* ajan yolundaki window.Mirror kontrolü için köprü */
-/* eski kurulumda zayıf 1B modeli kalanlara tek seferlik öneri */
-try{if(Mirror.cfg&&Mirror.cfg.kind==='webllm'&&/1B/.test(Mirror.cfg.model||'')&&!localStorage.getItem('it041_1b_uyari')){
-  localStorage.setItem('it041_1b_uyari','1');
-  setTimeout(()=>UI.toast('◐ Aynaların Türkçesi zayıfsa: MENÜ → AYNALAR → Qwen2.5-3B modelini indir (önerilen).',9000),15000);
+/* v8.3: webllm kurulumu olan herkese tek seferlik yükseltme önerisi */
+try{if(Mirror.cfg&&Mirror.cfg.kind==='webllm'&&!localStorage.getItem('it041_groq_uyari')){
+  localStorage.setItem('it041_groq_uyari','1');
+  setTimeout(()=>UI.toast('⚡ Aynaların Türkçesi bozuksa: MENÜ → AYNALAR → Groq (ÜCRETSİZ 70B) ya da Claude bağla — fark gece ile gündüz.',10000),15000);
 }}catch(e){}
 document.getElementById('mirrorInput').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();Mirror.send();}
