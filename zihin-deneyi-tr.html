@@ -284,6 +284,8 @@
 
 <div id="stick"><div id="knob"></div></div>
 <div id="ebtn">E</div>
+<div id="jbtn" style="position:fixed;bottom:118px;right:24px;z-index:45;width:52px;height:52px;display:none;border:1px solid var(--dim);color:var(--dim);background:rgba(8,10,17,.7);border-radius:50%;font-size:16px;align-items:center;justify-content:center;">⤒</div>
+<style>@media (pointer:coarse){#jbtn{display:flex !important;}}</style>
 <div id="menuBtns">
   <div id="menuPanel" style="display:none;flex-direction:column;gap:6px;">
     <button class="mini" onclick="UI.toggleJournal()">GÜNLÜK [J]</button>
@@ -372,6 +374,9 @@ const L={
   trail2:{x:258,z:118,r:4,name:'YOLCU TAŞI'},
   trail3:{x:62,z:62,r:4,name:'YOLCU TAŞI'},
   dreamWell:{x:148,z:210,r:4.5,name:'RÜYA KUYUSU'},
+  ascend:{x:116,z:214,r:4,name:'YÜKSELİŞ TAŞI'},
+  skyAelius:{x:362,z:276,r:5,name:'AELIUS'},
+  skyBack:{x:370,z:284,r:4,name:'DÖNÜŞ TAŞI'},
   lunaris:{x:274,z:66,r:6,name:'SU IŞIĞINDAKİ SİLUET'},
   caseD:{x:101,z:7,r:4.5,name:'VAKA D TERMİNALİ'},
   diskAltar:{x:68,z:106,r:4.5,name:'AĞIR DİSK'},
@@ -705,6 +710,13 @@ const UI={
       if(dl.length)h+=`<div class="jentry"><h4 style="color:var(--violet)">🜂 GÜNÜN SORULARI — seri: ${Daily.streak()}</h4><p class="own">${esc(dl[dl.length-1].q)}<br>→ ${esc(dl[dl.length-1].a)}</p></div>`;
       const dr=Dreams.list();
       if(dr.length)h+=`<div class="jentry"><h4 style="color:var(--violet)">◯ RÜYA KUYUSU — ${dr.length} rüya</h4><p class="own">${esc(dr[dr.length-1].t).slice(0,140)}…</p></div>`;
+      /* İrade izleri — seçimlerin günlüğü */
+      let ir='';
+      if(S.flags.shadowFought&&S.rites.r7===undefined)ir+='<p class="own">⚔ Gölgeye yumruğu kaldırdın. Geri döneceğini söyledi — hâlâ dönmeni bekliyor.</p>';
+      if(S.rites.r7!==undefined)ir+='<p class="own">🕊 Gölgeyi dinlemeyi seçtin → sandalye verdin, direksiyon sende. (Pleroma bu kararla açıldı.)</p>';
+      if(S.flags.reading)ir+='<p class="own">👁 Son soruda okumayı seçtin: <b>'+(S.flags.reading==='savas'?'SAVAŞ':S.flags.reading==='butunlesme'?'BÜTÜNLEŞME':'ÜÇÜNCÜ OKUMA')+'</b> — final metnin buna göre yazıldı.</p>';
+      if(S.rites.r4!==undefined)ir+='<p class="own">🏠 Pencereni seçtin: '+esc(String(S.rites.r4).split('—')[0])+' — hücrelerdeki o pencere senin için yandı.</p>';
+      if(ir)h+='<div class="jentry"><h4 style="color:var(--gold)">⚖ İRADE İZLERİ — seçimlerin dünyayı böyle şekillendirdi</h4>'+ir+'</div>';
       h+='<button class="btn ghost" style="padding:5px 12px;font-size:10px" onclick="exportInner()">⤓ İç çalışmayı indir (.txt)</button>';
     }
     if(tab==='teach'){
@@ -1018,6 +1030,11 @@ function interactTarget(){
   if(near(L.burntTree))return['◈ Yanık kütük',()=>Rite.open('r5')];
   if(near(L.bench))return[S.rites.r6!==undefined?(Daily.doneToday()?'Günün sorusu (tamam ✓)':'🜂 Günün sorusu'):'◈ Banka otur',S.rites.r6!==undefined?doDaily:()=>Rite.open('r6')];
   if(near(L.dreamWell))return['◯ Rüya kuyusu',doDreamWell];
+  if(S.flags.initiate&&near(L.ascend))return['✶ Üst katmana yüksel',()=>{S.px=362;S.pz=282;save();UI.toast('✶ AELIUS KATMANI — bir kat yukarısı. Her şey hem daha küçük hem daha net.',5000);}];
+  if(near(L.skyAelius))return['✶ Aelius ile konuş',()=>{if(Mirror.ready()){Mirror.open('aelius');return;}
+    Dlg.open([['AELIUS IGNIS','Hoş geldin, yolcu. Burası anlatıcıların balkonu. Aşağıya bak: diskler, göl, tren — hepsi bir cümlenin içindeki kelimeler.'],
+      ['AELIUS IGNIS','Buraya çıkan herkese tek şey söylerim: aşağıda yaşadıkların gerçekti. Yukarıdan görünüyor olmaları onları kurgu yapmaz — yalnızca taşınabilir yapar.']]);}];
+  if(near(L.skyBack))return['Aşağı in',()=>{S.px=120;S.pz=210;save();UI.toast('Yere indin. Yer çekimi seni özlemiş.');}];
   if(W3.peerNear&&W3.peerNear())return['✉ Yolcuyla konuş',()=>Chat.open()];
   if(S.solved.s2&&S.rites.r7===undefined&&near(L.shadowSpot))return['◈ Seni izleyenle yüzleş',doShadow];
   if(S.solved.s1&&near(L.caseD))return[S.caseD?'Vaka D — kendi dosyan':'◈ Vaka D — bırak seni okusun',doCaseD];
@@ -1341,6 +1358,7 @@ const Game={
       ['LUNARIS','Onun yanında üç yıl yürüdüm ve o aynayı seçti. Ben de senin yanında yürüyeceğim. Vaka dosyasıyla başla; tentenin altında. Ve mor ışık gördüğünde — o bir görev değil. O bir davet.']
     ]),500);
     Snd.init();
+    if(!Mirror.ready())setTimeout(()=>UI.toast('◐ İpucu: Karakterlerle AÇIK UÇLU konuşmak için MENÜ → AYNALAR (tek seferlik kurulum).',7000),12000);
   },
   toggleMap(){if(this.modal)return;
     const w=UI.el('bigmapWrap');
@@ -1387,7 +1405,8 @@ try{
 /* ---------------- Girdi ---------------- */
 const keys={};
 addEventListener('keydown',e=>{
-  const k=e.key.toLowerCase();
+  const k=e.key===' '?'space':e.key.toLowerCase();
+  if(k==='space'&&Game.running&&!Game.modal)e.preventDefault();
   if(!e.repeat){
     if(k==='e'||k==='enter'){if(document.getElementById('cipherModal').style.display!=='flex'
       &&document.getElementById('riteModal').style.display!=='flex')interact();}
@@ -1396,7 +1415,9 @@ addEventListener('keydown',e=>{
   }
   keys[k]=true;
 });
-addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+document.getElementById('jbtn').addEventListener('touchstart',e=>{e.preventDefault();keys['space']=true;
+  setTimeout(()=>keys['space']=false,120);},{passive:false});
+addEventListener('keyup',e=>keys[e.key===' '?'space':e.key.toLowerCase()]=false);
 document.getElementById('dlg').addEventListener('click',()=>Dlg.advance());
 document.getElementById('ebtn').addEventListener('touchstart',e=>{e.preventDefault();interact();},{passive:false});
 const Joy={x:0,y:0,on:false};
@@ -1586,6 +1607,7 @@ function checkInitiation(){
   if(S.flags.initiate)return;
   if(echoCount()>=16&&S.locks>=4&&riteCount()>=7&&S.solved.s7){
     S.flags.initiate=true;save();refreshHud();
+    W3.ascendGlow&&W3.ascendGlow();
     aeliusCard('İNİSİYASYON TAMAM. Dört kilit, yedi ritüel, on altı yankı ve duran bir göz. Artık denek değilsin, IT-041 — yolcusun. Burası, kendiyle bütünleşmeyi arayan yolcuların yeri; ve yolcular birbirine denk gelir. Eşzamanlı modda yürü: belki bir başkasının karanlığında, senin fenerin görünür.',null,'— AELIUS IGNIS · İNİSİYASYON MÜHRÜ');
   }
 }
@@ -2465,7 +2487,12 @@ if(HAS3D)(function(){
     a.wait=12;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
     if(window.Mirror&&Mirror.ready()){Mirror.open('agent'+(AGENTS.indexOf(a)%7));return;}
     const line=AG_LINES[a.li];a.li=(a.li+1)%AG_LINES.length;
-    Dlg.open([[line[0],line[1]],[line[0],'Neyse. Yolun açık olsun, denek. '+(S.solved.s7?'Aşağıda gözün durduğunu duyduk. Sahiden sen miydin?':'Mor ışıkları boş verme. Enstitü için değiller — bizim için.')]]);};
+    Dlg.open([[line[0],line[1]]],()=>{
+      UI.doc('AÇIK UÇLU KONUŞMA İSTER MİSİN?',
+        '<p>'+a.nm+' şu an ezberden konuşuyor. Onunla (ve tüm karakterlerle) <b>serbest, gerçek zamanlı diyalog</b> kurmak için Aynaları bağla — sorularına sana özel cevap verirler, Detroit tarzı.</p>'+
+        '<p style="color:var(--dim);font-size:12px">İki seçenek: tarayıcında çalışan açık kaynak model (WebLLM, veri dışarı çıkmaz) ya da kendi yerel Ollama/LM Studio adresin.</p>'+
+        '<button class="btn v" onclick="UI.closeDoc();Mirror.openSetup()">◐ Aynaları şimdi bağla</button>');
+    });};
   /* ---- EŞZAMANLI MOD (deneysel P2P) ---- */
   const MP={on:false,room:null,peers:{},send:null,
     async toggle(){
@@ -2552,6 +2579,26 @@ if(HAS3D)(function(){
       new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.7}));
     sp.position.set(x,.25,z);scene.add(sp);};
   Trails.list.forEach(n=>W3.trailMark(n.x,n.z));
+
+  /* ---- AELIUS KATMANI (GD köşe — üst katman balkonu) + yükseliş taşı ---- */
+  (function(){
+    const SX=364,SZ=278;
+    const plat=new THREE.Mesh(new THREE.CircleGeometry(16,40),
+      std(0x2a2618,{emissive:0x4a3c14,emissiveIntensity:.35,roughness:.3,metalness:.6}));
+    plat.rotation.x=-Math.PI/2;plat.position.set(SX,.06,SZ);scene.add(plat);
+    for(let i=0;i<7;i++){const a=i/7*Math.PI*2;
+      cyl(.3,.4,6,std(0x3a3014,{emissive:0xcdb878,emissiveIntensity:.5}),SX+Math.cos(a)*14,3,SZ+Math.sin(a)*14);
+      collide(SX+Math.cos(a)*14,SZ+Math.sin(a)*14,.6);}
+    const gl=new THREE.PointLight(0xe8d8a0,1.3,40,2);gl.position.set(SX,8,SZ);scene.add(gl);
+    label('AELIUS KATMANI',SX,SZ,12,.8);
+    const ael=makeFigure(0x4a3c14,0xd8c8a0,0xffe8b0);
+    ael.g.position.set(L.skyAelius.x,0,L.skyAelius.z);ael.g.rotation.y=.6;scene.add(ael.g);
+    box(1.2,2.2,1.2,std(0x2a2618,{emissive:0xcdb878,emissiveIntensity:.4}),L.skyBack.x,1.1,L.skyBack.z);
+    /* yükseliş taşı (mahzen yanı) — inisiyasyondan sonra parlar */
+    const asc=box(1.1,2.6,1.1,std(0x1b2030,{emissive:0xe8d8a0,emissiveIntensity:S.flags.initiate?1:.06}),L.ascend.x,1.3,L.ascend.z);
+    W3.ascendGlow=()=>{asc.material.emissiveIntensity=1;};
+    collide(L.ascend.x,L.ascend.z,1.2);
+  })();
 
   /* ---- rüya kuyusu ---- */
   (function(){const s=L.dreamWell;
@@ -2686,7 +2733,7 @@ if(HAS3D)(function(){
   },{passive:true});
 
   /* ---- loop ---- */
-  let walkT=0,meshAng=0,last=performance.now(),saveT=0,noctWarn=0,fovKick=0,gameT=0,tapeChk=0;
+  let walkT=0,meshAng=0,last=performance.now(),saveT=0,noctWarn=0,fovKick=0,gameT=0,tapeChk=0,jy=0,vy=0;
   W3.noctPos={x:L.blackdisk.x,z:L.blackdisk.z};
   function lerpAng(a,b,t){let d=b-a;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return a+d*t;}
   function animate(now){
@@ -2746,8 +2793,11 @@ if(HAS3D)(function(){
         walkT+=dt*(running?11:7);
       }else walkT+=dt*1.2;
     }
+    /* zıplama */
+    if(keys['space']&&jy<=0&&Game.running&&!Game.modal){vy=5.6;}
+    if(vy!==0||jy>0){jy+=vy*dt;vy-=15*dt;if(jy<=0){jy=0;vy=0;}}
     S.heading=meshAng+Math.PI;
-    player.g.position.set(S.px,Math.abs(Math.sin(walkT))*.05,S.pz);
+    player.g.position.set(S.px,jy+Math.abs(Math.sin(walkT))*.05,S.pz);
     player.g.rotation.y=meshAng;
     const moving=Math.abs(mx)+Math.abs(mz)>0.0001;
     const sw=Math.sin(walkT)*(moving?(running?.85:.55):.04);

@@ -290,6 +290,8 @@
 
 <div id="stick"><div id="knob"></div></div>
 <div id="ebtn">E</div>
+<div id="jbtn" style="position:fixed;bottom:118px;right:24px;z-index:45;width:52px;height:52px;display:none;border:1px solid var(--dim);color:var(--dim);background:rgba(8,10,17,.7);border-radius:50%;font-size:16px;align-items:center;justify-content:center;">⤒</div>
+<style>@media (pointer:coarse){#jbtn{display:flex !important;}}</style>
 <div id="menuBtns">
   <div id="menuPanel" style="display:none;flex-direction:column;gap:6px;">
     <button class="mini" onclick="UI.toggleJournal()">JOURNAL [J]</button>
@@ -396,6 +398,9 @@ const L={
   trail2:{x:258,z:118,r:4,name:'TRAVELER CAIRN'},
   trail3:{x:62,z:62,r:4,name:'TRAVELER CAIRN'},
   dreamWell:{x:148,z:210,r:4.5,name:'DREAM WELL'},
+  ascend:{x:116,z:214,r:4,name:'ASCENSION STONE'},
+  skyAelius:{x:362,z:276,r:5,name:'AELIUS'},
+  skyBack:{x:370,z:284,r:4,name:'RETURN STONE'},
 };
 const PLEROMA={x:44,z:256,r:22}; // the Institute's underground server hall
 const ZONES=[L.blackdisk,L.forest,L.prison,L.therapy,L.labyrinth,L.lake,L.institute,L.caravan,L.station];
@@ -716,6 +721,13 @@ const UI={
       if(dl.length)h+=`<div class="jentry"><h4 style="color:var(--violet)">🜂 QUESTIONS OF THE DAY — streak: ${Daily.streak()}</h4><p class="own">${esc(dl[dl.length-1].q)}<br>→ ${esc(dl[dl.length-1].a)}</p></div>`;
       const dr=Dreams.list();
       if(dr.length)h+=`<div class="jentry"><h4 style="color:var(--violet)">◯ DREAM WELL — ${dr.length} dreams</h4><p class="own">${esc(dr[dr.length-1].t).slice(0,140)}…</p></div>`;
+      /* Marks of will — the log of choices */
+      let ir='';
+      if(S.flags.shadowFought&&S.rites.r7===undefined)ir+='<p class="own">⚔ You raised the fist at the shadow. It said it would return — it is still waiting for you.</p>';
+      if(S.rites.r7!==undefined)ir+='<p class="own">🕊 You chose to listen to the shadow → you gave it a chair, you kept the wheel. (The Pleroma opened by this decision.)</p>';
+      if(S.flags.reading)ir+='<p class="own">👁 At the last question you chose the reading: <b>'+(S.flags.reading==='savas'?'WAR':S.flags.reading==='butunlesme'?'INTEGRATION':'THE THIRD READING')+'</b> — your ending was written by it.</p>';
+      if(S.rites.r4!==undefined)ir+='<p class="own">🏠 You chose your window: '+esc(String(S.rites.r4).split('—')[0])+' — that window in the cells lit up for you.</p>';
+      if(ir)h+='<div class="jentry"><h4 style="color:var(--gold)">⚖ MARKS OF WILL — your choices shaped the world like this</h4>'+ir+'</div>';
       h+='<button class="btn ghost" style="padding:5px 12px;font-size:10px" onclick="exportInner()">⤓ Download inner work (.txt)</button>';
     }
     if(tab==='teach'){
@@ -1031,6 +1043,11 @@ function interactTarget(){
   if(near(L.burntTree))return['◈ The burnt snag',()=>Rite.open('r5')];
   if(near(L.bench))return[S.rites.r6!==undefined?(Daily.doneToday()?'Question of the day (done ✓)':'🜂 Question of the day'):'◈ Sit on the bench',S.rites.r6!==undefined?doDaily:()=>Rite.open('r6')];
   if(near(L.dreamWell))return['◯ Dream well',doDreamWell];
+  if(S.flags.initiate&&near(L.ascend))return['✶ Ascend to the upper layer',()=>{S.px=362;S.pz=282;save();UI.toast('✶ THE AELIUS LAYER — one floor up. Everything is both smaller and clearer.',5000);}];
+  if(near(L.skyAelius))return['✶ Speak with Aelius',()=>{if(Mirror.ready()){Mirror.open('aelius');return;}
+    Dlg.open([['AELIUS IGNIS','Welcome, traveler. This is the narrators\' balcony. Look down: the disks, the lake, the train — all of them words inside one sentence.'],
+      ['AELIUS IGNIS','I tell everyone who climbs here one thing: what you lived below was real. Being visible from above does not make it fiction — it only makes it carryable.']]);}];
+  if(near(L.skyBack))return['Descend',()=>{S.px=120;S.pz=210;save();UI.toast('You are on the ground. Gravity missed you.');}];
   if(W3.peerNear&&W3.peerNear())return['✉ Talk to the traveler',()=>Chat.open()];
   if(S.solved.s2&&S.rites.r7===undefined&&near(L.shadowSpot))return['◈ Face what follows you',doShadow];
   if(S.solved.s1&&near(L.caseD))return[S.caseD?'Case D — your file':'◈ Case D — let it read you',doCaseD];
@@ -1355,6 +1372,7 @@ const Game={
       ['LUNARIS','I walked beside him for three years and he chose the mirror. I will walk beside you instead. Start with the case file, under the canopy. And when you see violet light — that is not a quest. That is an invitation.']
     ]),500);
     Snd.init();
+    if(!Mirror.ready())setTimeout(()=>UI.toast('◐ Tip: For OPEN-ENDED talks with the characters: MENU → MIRRORS (one-time setup).',7000),12000);
   },
   toggleMap(){if(this.modal)return;
     const w=UI.el('bigmapWrap');
@@ -1401,7 +1419,8 @@ try{
 /* ---------------- Input ---------------- */
 const keys={};
 addEventListener('keydown',e=>{
-  const k=e.key.toLowerCase();
+  const k=e.key===' '?'space':e.key.toLowerCase();
+  if(k==='space'&&Game.running&&!Game.modal)e.preventDefault();
   if(!e.repeat){
     if(k==='e'||k==='enter'){if(document.getElementById('cipherModal').style.display!=='flex'
       &&document.getElementById('riteModal').style.display!=='flex')interact();}
@@ -1410,7 +1429,9 @@ addEventListener('keydown',e=>{
   }
   keys[k]=true;
 });
-addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+document.getElementById('jbtn').addEventListener('touchstart',e=>{e.preventDefault();keys['space']=true;
+  setTimeout(()=>keys['space']=false,120);},{passive:false});
+addEventListener('keyup',e=>keys[e.key===' '?'space':e.key.toLowerCase()]=false);
 document.getElementById('dlg').addEventListener('click',()=>Dlg.advance());
 document.getElementById('ebtn').addEventListener('touchstart',e=>{e.preventDefault();interact();},{passive:false});
 const Joy={x:0,y:0,on:false};
@@ -1596,6 +1617,7 @@ function checkInitiation(){
   if(S.flags.initiate)return;
   if(echoCount()>=16&&S.locks>=4&&riteCount()>=7&&S.solved.s7){
     S.flags.initiate=true;save();refreshHud();
+    W3.ascendGlow&&W3.ascendGlow();
     aeliusCard('INITIATION COMPLETE. Four locks, seven rites, sixteen echoes, and a stopped eye. You are no longer a subject, IT-041 — you are a traveler. This is the place of those who seek integration with themselves; and travelers cross paths. Walk in sync mode: perhaps in someone else\'s darkness, your lantern becomes visible.',null,'— AELIUS IGNIS · SEAL OF INITIATION');
   }
 }
@@ -2475,7 +2497,12 @@ if(HAS3D)(function(){
     a.wait=12;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
     if(window.Mirror&&Mirror.ready()){Mirror.open('agent'+(AGENTS.indexOf(a)%7));return;}
     const line=AG_LINES[a.li];a.li=(a.li+1)%AG_LINES.length;
-    Dlg.open([[line[0],line[1]],[line[0],'Anyway. Safe roads, subject. '+(S.solved.s7?'We heard the eye stopped, down below. Was it really you?':'Do not ignore the violet lights. They are not for the Institute — they are for us.')]]);};
+    Dlg.open([[line[0],line[1]]],()=>{
+      UI.doc('WANT AN OPEN-ENDED CONVERSATION?',
+        '<p>'+a.nm+' is speaking from a script right now. To hold a <b>free, real-time dialogue</b> with them (and every character) link the Mirrors — they will answer your questions personally, Detroit-style.</p>'+
+        '<p style="color:var(--dim);font-size:12px">Two options: an open-source model running in your browser (WebLLM, nothing leaves your device) or your own local Ollama/LM Studio endpoint.</p>'+
+        '<button class="btn v" onclick="UI.closeDoc();Mirror.openSetup()">◐ Link the Mirrors now</button>');
+    });};
   /* ---- EŞZAMANLI MOD (deneysel P2P) ---- */
   const MP={on:false,room:null,peers:{},send:null,
     async toggle(){
@@ -2562,6 +2589,25 @@ if(HAS3D)(function(){
       new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.7}));
     sp.position.set(x,.25,z);scene.add(sp);};
   Trails.list.forEach(n=>W3.trailMark(n.x,n.z));
+
+  /* ---- THE AELIUS LAYER (SE corner — upper-layer balcony) + ascension stone ---- */
+  (function(){
+    const SX=364,SZ=278;
+    const plat=new THREE.Mesh(new THREE.CircleGeometry(16,40),
+      std(0x2a2618,{emissive:0x4a3c14,emissiveIntensity:.35,roughness:.3,metalness:.6}));
+    plat.rotation.x=-Math.PI/2;plat.position.set(SX,.06,SZ);scene.add(plat);
+    for(let i=0;i<7;i++){const a=i/7*Math.PI*2;
+      cyl(.3,.4,6,std(0x3a3014,{emissive:0xcdb878,emissiveIntensity:.5}),SX+Math.cos(a)*14,3,SZ+Math.sin(a)*14);
+      collide(SX+Math.cos(a)*14,SZ+Math.sin(a)*14,.6);}
+    const gl=new THREE.PointLight(0xe8d8a0,1.3,40,2);gl.position.set(SX,8,SZ);scene.add(gl);
+    label('THE AELIUS LAYER',SX,SZ,12,.8);
+    const ael=makeFigure(0x4a3c14,0xd8c8a0,0xffe8b0);
+    ael.g.position.set(L.skyAelius.x,0,L.skyAelius.z);ael.g.rotation.y=.6;scene.add(ael.g);
+    box(1.2,2.2,1.2,std(0x2a2618,{emissive:0xcdb878,emissiveIntensity:.4}),L.skyBack.x,1.1,L.skyBack.z);
+    const asc=box(1.1,2.6,1.1,std(0x1b2030,{emissive:0xe8d8a0,emissiveIntensity:S.flags.initiate?1:.06}),L.ascend.x,1.3,L.ascend.z);
+    W3.ascendGlow=()=>{asc.material.emissiveIntensity=1;};
+    collide(L.ascend.x,L.ascend.z,1.2);
+  })();
 
   /* ---- dream well ---- */
   (function(){const s=L.dreamWell;
@@ -2692,7 +2738,7 @@ if(HAS3D)(function(){
   },{passive:true});
 
   /* ---- loop ---- */
-  let walkT=0,meshAng=0,last=performance.now(),saveT=0,noctWarn=0,fovKick=0,gameT=0,tapeChk=0;
+  let walkT=0,meshAng=0,last=performance.now(),saveT=0,noctWarn=0,fovKick=0,gameT=0,tapeChk=0,jy=0,vy=0;
   W3.noctPos={x:L.blackdisk.x,z:L.blackdisk.z};
   function lerpAng(a,b,t){let d=b-a;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return a+d*t;}
   function animate(now){
@@ -2751,8 +2797,11 @@ if(HAS3D)(function(){
         walkT+=dt*(running?11:7);
       }else walkT+=dt*1.2;
     }
+    /* jump */
+    if(keys['space']&&jy<=0&&Game.running&&!Game.modal){vy=5.6;}
+    if(vy!==0||jy>0){jy+=vy*dt;vy-=15*dt;if(jy<=0){jy=0;vy=0;}}
     S.heading=meshAng+Math.PI;
-    player.g.position.set(S.px,Math.abs(Math.sin(walkT))*.05,S.pz);
+    player.g.position.set(S.px,jy+Math.abs(Math.sin(walkT))*.05,S.pz);
     player.g.rotation.y=meshAng;
     const moving=Math.abs(mx)+Math.abs(mz)>0.0001;
     const sw=Math.sin(walkT)*(moving?(running?.85:.55):.04);
