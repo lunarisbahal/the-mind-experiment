@@ -33,7 +33,12 @@
   #quests .rite{color:var(--violet);}
   #hudTR{position:fixed;right:12px;top:auto;bottom:118px;z-index:40;text-align:right;}
   @media (pointer:coarse){#hudTR{bottom:208px;}}
-  #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;}
+  #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;transition:opacity .3s;}
+  /* v8.6 mobil: mini harita küçük + saydam — oyunu engellemez; menüden tamamen gizlenebilir */
+  @media (pointer:coarse){#minimap{width:96px;height:74px;opacity:.5;}}
+  body.mmHide #minimap{display:none;}
+  #musicPanel{position:fixed;left:12px;bottom:64px;z-index:45;width:min(330px,82vw);}
+  @media (pointer:coarse){#musicPanel{bottom:200px;width:min(300px,74vw);}}
   #moonchip{margin-top:6px;}
   #hudBL{position:fixed;bottom:14px;left:14px;z-index:40;}
   .bar{width:150px;height:7px;background:#141927;border:1px solid var(--line);margin:4px 0 8px;}
@@ -142,6 +147,7 @@
 <body class="scan">
 <div id="gl"></div>
 <canvas id="grain" width="128" height="128"></canvas>
+<div id="musicPanel" style="display:none"></div>
 <div id="dmg"></div><div id="calm"></div><div id="flash"></div>
 
 <div id="hudTL">
@@ -227,11 +233,12 @@
 <div class="modal" id="aiSetupModal"><div class="panel">
   <h2 class="v">AYNALAR — KURULUM</h2>
   <p>Evrendeki karakterler, <b>açık kaynak</b> yapay zekâ bilinçlerine bağlanabilir. Her aynanın bir görevi var: Lunaris adlandırır, Silvanus kabullendirir, Lucida yere indirir, Bahal dürtüyü gösterir, Aelius perspektif verir. Sorularına gerçek zamanlı, sana özel yanıt verirler.</p>
-  <p style="color:var(--accent)"><b>⚡ VARSAYILAN: ORTAK AYNA HATTI</b> — hiçbir kurulum gerekmez; aynalar herkes için 70B bilinçle açık. Aşağıdaki seçenekler yalnızca kendi anahtarınla yükseltmek isteyenler için.</p>
-  <p style="color:var(--moon)">Seçenek C — <b>Claude API · EN ZEKİ</b>: Evrenin tamamına hâkim, gerçek rehber seviyesi. Kendi Anthropic anahtarınla (console.anthropic.com → API keys); anahtar yalnız bu cihazda saklanır.</p>
-  <p style="color:var(--violet)">Seçenek A — <b>WebLLM</b> (ücretsiz, gizli): Açık kaynak model tarayıcında çalışır, hiçbir veri cihazından çıkmaz. WebGPU gerekli (masaüstü Chrome/Edge). Küçük modellerin Türkçesi sınırlıdır — derin sohbet için C önerilir.</p>
-  <p style="color:var(--violet)">Seçenek B — <b>Kendi uç noktan</b>: OpenAI-uyumlu sunucu (yerel Ollama / LM Studio).</p>
+  <p style="color:var(--accent)"><b>⚡ AYNALAR ZATEN AÇIK.</b> Hiçbir kurulum gerekmez — herkes en iyi ücretsiz seviyeyle (Ortak Hat · 70B) bağlı başlar. Bu ekran yalnızca isteğe bağlı yükseltmeler içindir.</p>
   <div id="aiSetupBody">
+    <button class="btn v" onclick="Mirror.useRelay()">⚡ Ortak hat (varsayılan) — kapat ve oyna</button>
+    <button class="btn ghost" onclick="(function(){const a=UI.el('aiAdv');a.style.display=a.style.display==='none'?'block':'none';})()">Gelişmiş: kendi anahtarınla yükselt (isteğe bağlı) ▾</button>
+    <div id="aiAdv" style="display:none;margin-top:10px">
+    <p style="color:var(--moon);font-size:12px">Seçenek C — <b>Claude API · EN ZEKİ</b>: kendi Anthropic anahtarınla (console.anthropic.com); anahtar yalnız bu cihazda saklanır.</p>
     <div style="border:1px solid var(--line);border-radius:4px;padding:10px;margin-bottom:10px">
       <select id="aiCModel" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:9px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:8px;">
         <option value="claude-haiku-4-5" selected>Claude Haiku 4.5 — hızlı · ekonomik · ÖNERİLEN</option>
@@ -257,9 +264,9 @@
       <input id="aiUrl" placeholder="Uç nokta (örn. http://localhost:11434/v1)">
       <input id="aiModel" placeholder="Model (örn. llama3.2)">
       <input id="aiKey" placeholder="API anahtarı (Ollama için boş bırak)" type="password">
-      <button class="btn v" onclick="Mirror.setupEndpoint()">B — Uç noktaya bağlan</button>
+      <button class="btn v" onclick="Mirror.setupEndpoint()">B — Uç noktaya bağlan (OpenAI-uyumlu / Ollama)</button>
     </div>
-    <button class="btn ghost" style="margin-top:10px" onclick="Mirror.useRelay()">⚡ Ortak hatta dön (varsayılan — kurulumsuz)</button>
+    </div><!-- /aiAdv -->
     <div id="aiProgress" style="color:var(--dim);font-size:12px;margin-top:8px;"></div>
   </div>
   <div class="mfoot"><b>Onay:</b> Bağlanarak şunları kabul edersin: (1) Aynalar terapi/tıbbi hizmet değildir; ciddi sıkıntıda profesyonel destek esastır. (2) 18 yaş altıysan bir yetişkinle kullan. (3) Yasalara ve etik kurallara aykırı içerik üretimi engellenir. (4) Konuşmalar tarafımızca saklanmaz; B seçeneğinde veriler seçtiğin sağlayıcıya, C seçeneğinde Anthropic API'ye gider; anahtarın yalnız bu cihazda saklanır.</div>
@@ -324,6 +331,8 @@
     <button class="mini" onclick="Architect.menu()">✶ MİMAR MODU</button>
     <button class="mini" onclick="Auto.open()">◍ OTONOM DENEK</button>
     <button class="mini" id="watchBtn" onclick="Watch.toggle()">SİNYAL: AÇIK</button>
+    <button class="mini" id="muzBtn" onclick="Music.toggle()">🎵 MÜZİK: KAPALI</button>
+    <button class="mini" id="mmBtn" onclick="MM2.toggle()">MİNİ HARİTA: AÇIK</button>
     <button class="mini" id="sndBtn" onclick="Snd.toggle()">SES: AÇIK</button>
     <button class="mini" id="radBtn" onclick="Snd.toggleRadio()">RADYO: AÇIK</button>
     <button class="mini" id="tapBtn" onclick="Snd.toggleTapes()">KAYITLAR: AÇIK</button>
@@ -1826,7 +1835,9 @@ const Mirror={
   CKEY:'it041_mirror_cfg',
   ready(){return !!this.cfg;},
   loadCfg(){try{const j=localStorage.getItem(this.CKEY);if(j)this.cfg=JSON.parse(j);}catch(e){}
-    if(!this.cfg)this.cfg={kind:'relay'}; /* v8.4: varsayılan = ortak hat */
+    /* v8.6: herkes EN İYİ ücretsiz seviyeyle başlar — eski webllm kurulumları da ortak hatta taşınır
+       (bilinçli seçilen Claude/Groq/uç nokta korunur) */
+    if(!this.cfg||this.cfg.kind==='webllm')this.cfg={kind:'relay'};
     this.refreshBtn();},
   useRelay(){try{localStorage.removeItem(this.CKEY);}catch(e){}
     this.cfg={kind:'relay'};this.refreshBtn();
@@ -1924,10 +1935,17 @@ const Mirror={
   async generate(msgs,maxTok){
     maxTok=maxTok||280;
     if(this.cfg.kind==='relay'){
+      /* v8.6 adil kullanım: kişi başı günlük limit — %70'te uyarı, dolunca yarına kadar
+         o kullanıcı kendi (ücretsiz) anahtarına yönlendirilir. Ortak hat herkesin. */
+      const CAP=80;let q;try{q=JSON.parse(localStorage.getItem('it041_relay_q'))||{}}catch(e){q={}}
+      const today=new Date().toDateString();if(q.d!==today)q={d:today,n:0};
+      if(q.n>=CAP)throw new Error('bugünlük ortak hat hakkın doldu (adil kullanım, '+CAP+' mesaj/gün). Yarın yenilenir — ya da 2 dakikada kendi ÜCRETSİZ Groq anahtarını bağla (MENÜ → AYNALAR → Gelişmiş): sınırsız olur.');
       const r=await fetch(RELAY_URL,{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({messages:msgs,max_tokens:maxTok,temperature:.7})});
-      if(r.status===429)throw new Error('ortak hat şu an yoğun — birkaç dakika sonra dene, ya da MENÜ → AYNALAR\'dan kendi (ücretsiz Groq) anahtarını bağla');
+      if(r.status===429)throw new Error('ortak hat şu an yoğun — birkaç dakika sonra dene, ya da kendi (ücretsiz Groq) anahtarını bağla (MENÜ → AYNALAR → Gelişmiş)');
       if(!r.ok)throw new Error('HTTP '+r.status);
+      q.n++;try{localStorage.setItem('it041_relay_q',JSON.stringify(q));}catch(e){}
+      if(q.n===Math.floor(CAP*.7))UI.toast('⚡ Bugünkü ortak hat hakkının %70\'ini kullandın ('+q.n+'/'+CAP+'). Sınırsız istersen: MENÜ → AYNALAR → Gelişmiş → ücretsiz Groq anahtarı.',8000);
       const j=await r.json();return j.choices[0].message.content;
     }
     if(this.cfg.kind==='claude'){
@@ -2791,6 +2809,29 @@ const Genesis={
 };
 if(typeof window!=='undefined')window.Genesis=Genesis;
 
+/* ============ v8.6 — MÜZİK (Spotify listesi) + MİNİ HARİTA anahtarı ============ */
+const Music={
+  on:false,
+  SRC:'https://open.spotify.com/embed/playlist/7jP0jZ8fYpqDXM9iLHPWvI?utm_source=generator&theme=0',
+  toggle(){
+    const p=document.getElementById('musicPanel');
+    this.on=!this.on;
+    if(this.on&&!p.innerHTML)
+      p.innerHTML='<iframe style="border-radius:10px;border:1px solid var(--line)" src="'+this.SRC+'" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>';
+    p.style.display=this.on?'block':'none';
+    const b=UI.el('muzBtn');if(b)b.textContent='🎵 MÜZİK: '+(this.on?'AÇIK':'KAPALI');
+    if(this.on)UI.toast('🎵 Dolunay Ekspres listesi — çalmak için panelde ▶ (Spotify hesabıyla tam parça).');}
+};
+const MM2={
+  hidden:false,
+  toggle(){this.hidden=!this.hidden;
+    document.body.classList.toggle('mmHide',this.hidden);
+    try{localStorage.setItem('it041_mmhide',this.hidden?'1':'0');}catch(e){}
+    const b=UI.el('mmBtn');if(b)b.textContent='MİNİ HARİTA: '+(this.hidden?'GİZLİ':'AÇIK');}
+};
+if(typeof window!=='undefined'){window.Music=Music;window.MM2=MM2;
+  try{if(localStorage.getItem('it041_mmhide')==='1')MM2.toggle();}catch(e){}}
+
 /* ============ RÜYA KUYUSU ============ */
 const Dreams={
   KEY:'it041_dreams',
@@ -3478,7 +3519,7 @@ if(HAS3D)(function(){
             sp.scale.set(5,1.25,1);sp.position.y=2.8;f.g.add(sp);
             this.peers[id]={f,last:performance.now()};}
           const p=this.peers[id];
-          p.tx=d.x;p.tz=d.z;p.ry=d.h||0;p.last=performance.now();});
+          p.tx=d.x;p.tz=d.z;p.ry=d.h||0;p.nm=String(d.n||'yolcu').slice(0,14);p.last=performance.now();});
         this.room.onPeerLeave(id=>{if(this.peers[id]){scene.remove(this.peers[id].f.g);delete this.peers[id];}});
         this.on=true;UI.el('mpBtn').textContent='EŞZAMANLI: AÇIK';
         UI.toast('⟁ Eşzamanlı mod açık — aynı evrendeki diğer denekler görünür.',5000);
@@ -3673,7 +3714,7 @@ if(HAS3D)(function(){
   let lookId=null,lx=0,ly=0,lookMoved=false;
   addEventListener('touchstart',e=>{for(const t of e.changedTouches){
     const tg=t.target; /* UI öğelerine dokunuş bakışı tetiklemesin */
-    if(tg&&tg.closest&&tg.closest('button,textarea,input,.panel,.modal,#dlg,#stick,#ebtn,#menuBtns,#hudTR,#hudTL'))continue;
+    if(tg&&tg.closest&&tg.closest('button,textarea,input,.panel,.modal,#dlg,#stick,#ebtn,#menuBtns,#hudTR,#hudTL,#musicPanel,iframe'))continue;
     if(t.clientX>innerWidth*.45&&lookId===null){lookId=t.identifier;lx=t.clientX;ly=t.clientY;lookMoved=false;}}},{passive:true});
   addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===lookId){
     const ddx=t.clientX-lx,ddy=t.clientY-ly;
@@ -3723,8 +3764,8 @@ if(HAS3D)(function(){
       moonGlow.material.opacity=(W3._glowOp||.5)*(1-sun);
     }
     /* harita noktaları için konum yayını */
-    window.__mmA=AGENTS.map(a=>({x:a.f.g.position.x,z:a.f.g.position.z}));
-    window.__mmP=window.MP&&MP.on?Object.values(MP.peers).filter(p=>p.tx!==undefined).map(p=>({x:p.tx,z:p.tz})):[];
+    window.__mmA=AGENTS.map(a=>({x:a.f.g.position.x,z:a.f.g.position.z,nm:a.nm}));
+    window.__mmP=window.MP&&MP.on?Object.values(MP.peers).filter(p=>p.tx!==undefined).map(p=>({x:p.tx,z:p.tz,n:p.nm||'yolcu'})):[];
 
     let mx=0,mz=0,running=false;
     if(Game.running&&!Game.modal&&!Game.sitting){
@@ -3972,7 +4013,10 @@ function drawMiniBase(ctx,w,h){
   ctx.fillStyle='rgba(110,210,220,.85)';
   (window.__mmA||[]).forEach(a=>ctx.fillRect(a.x*sx-1.5,a.z*sz-1.5,3,3));
   ctx.fillStyle='rgba(230,195,110,.95)';
-  (window.__mmP||[]).forEach(p=>{ctx.beginPath();ctx.arc(p.x*sx,p.z*sz,2.4,0,7);ctx.fill();});
+  (window.__mmP||[]).forEach(p=>{ctx.beginPath();ctx.arc(p.x*sx,p.z*sz,2.4,0,7);ctx.fill();
+    /* v8.6: çevrimiçi yolcu adları (altın) */
+    if(p.n){ctx.font='7px monospace';ctx.textAlign='center';
+      ctx.fillText(String(p.n).slice(0,10),p.x*sx,p.z*sz-4);ctx.textAlign='left';}});
 }
 function drawMini(){
   const w=MM.width,h=MM.height,sx=w/WX,sz=h/WZ;
@@ -3992,6 +4036,19 @@ function drawBigMap(){
   ctx.font='11px monospace';ctx.textAlign='center';ctx.fillStyle='#9aa7c4';
   ZONES.forEach(z=>ctx.fillText(z.name,z.x*sx,z.z*sz-z.r*sx-4));
   ctx.fillText('AYNALAR KAPISI',L.gate.x*sx,L.gate.z*sz-12);
+  /* v8.6: karakterler (yeşilimsi), ajanlar (camgöbeği), yolcular (altın) — adlarıyla */
+  ctx.font='10px monospace';
+  ctx.fillStyle='rgba(127,212,193,.9)';
+  ctx.fillText('SILVANUS',L.caravan.x*sx,L.caravan.z*sz-8);
+  ctx.fillText('LUCIUS',L.lucius.x*sx,L.lucius.z*sz-8);
+  ctx.fillText('LUCIDA ☎',L.payphone.x*sx,L.payphone.z*sz-8);
+  if(!S.flags.integrated)ctx.fillText('BAHAL ⟁',L.shadowSpot.x*sx,L.shadowSpot.z*sz+16);
+  if(W3.noctPos)ctx.fillText('MC NOCTORNUS',W3.noctPos.x*sx,W3.noctPos.z*sz-8);
+  if(lunarisMoon()&&!S.solved.s2)ctx.fillText('LUNARIS ☽',L.lunaris.x*sx,L.lunaris.z*sz-8);
+  ctx.fillStyle='rgba(110,210,220,.9)';ctx.font='9px monospace';
+  (window.__mmA||[]).forEach(a=>{if(a.nm)ctx.fillText(a.nm,a.x*sx,a.z*sz-6);});
+  ctx.fillStyle='rgba(230,195,110,.95)';ctx.font='10px monospace';
+  (window.__mmP||[]).forEach(p=>{if(p.n)ctx.fillText(p.n,p.x*sx,p.z*sz-8);});
   ctx.fillStyle='#9d8cc9';
   ctx.fillText('◈ mor = ritüeller (senin)',c.width/2,c.height-30);
   const wp=waypoint();

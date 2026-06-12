@@ -34,7 +34,12 @@
   #quests .rite{color:var(--violet);}
   #hudTR{position:fixed;right:12px;top:auto;bottom:118px;z-index:40;text-align:right;}
   @media (pointer:coarse){#hudTR{bottom:208px;}}
-  #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;}
+  #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;transition:opacity .3s;}
+  /* v8.6 mobile: minimap small + translucent; fully hideable from the menu */
+  @media (pointer:coarse){#minimap{width:96px;height:74px;opacity:.5;}}
+  body.mmHide #minimap{display:none;}
+  #musicPanel{position:fixed;left:12px;bottom:64px;z-index:45;width:min(330px,82vw);}
+  @media (pointer:coarse){#musicPanel{bottom:200px;width:min(300px,74vw);}}
   #moonchip{margin-top:6px;}
   #hudBL{position:fixed;bottom:14px;left:14px;z-index:40;}
   .bar{width:150px;height:7px;background:#141927;border:1px solid var(--line);margin:4px 0 8px;}
@@ -148,6 +153,7 @@
 <body class="scan">
 <div id="gl"></div>
 <canvas id="grain" width="128" height="128"></canvas>
+<div id="musicPanel" style="display:none"></div>
 <div id="dmg"></div><div id="calm"></div><div id="flash"></div>
 
 <div id="hudTL">
@@ -233,11 +239,12 @@
 <div class="modal" id="aiSetupModal"><div class="panel">
   <h2 class="v">MIRRORS — SETUP</h2>
   <p>The characters of this universe can connect to <b>open-source</b> AI consciousnesses. Each mirror carries a mission: Lunaris names, Silvanus accepts, Lucida grounds, Bahal reveals the drive, Aelius gives perspective. They respond to your questions in real time.</p>
-  <p style="color:var(--accent)"><b>⚡ DEFAULT: THE SHARED MIRROR LINE</b> — no setup needed; the mirrors are open for everyone with a 70B consciousness. The options below are only for upgrading with your own key.</p>
-  <p style="color:var(--moon)">Option C — <b>Claude API · SMARTEST</b>: full command of the universe, true guide level. With your own Anthropic key (console.anthropic.com → API keys); the key is stored on this device only.</p>
-  <p style="color:var(--violet)">Option A — <b>WebLLM</b> (free, private): an open-source model runs inside your browser; nothing leaves your device. WebGPU required (desktop Chrome/Edge). Small models are limited — for deep talks, Option C is recommended.</p>
-  <p style="color:var(--violet)">Option B — <b>Your own endpoint</b>: any OpenAI-compatible server (local Ollama / LM Studio).</p>
+  <p style="color:var(--accent)"><b>⚡ THE MIRRORS ARE ALREADY OPEN.</b> No setup needed — everyone starts connected at the best free level (Shared Line · 70B). This screen is only for optional upgrades.</p>
   <div id="aiSetupBody">
+    <button class="btn v" onclick="Mirror.useRelay()">⚡ Shared line (default) — close and play</button>
+    <button class="btn ghost" onclick="(function(){const a=UI.el('aiAdv');a.style.display=a.style.display==='none'?'block':'none';})()">Advanced: upgrade with your own key (optional) ▾</button>
+    <div id="aiAdv" style="display:none;margin-top:10px">
+    <p style="color:var(--moon);font-size:12px">Option C — <b>Claude API · SMARTEST</b>: with your own Anthropic key (console.anthropic.com); stored on this device only.</p>
     <div style="border:1px solid var(--line);border-radius:4px;padding:10px;margin-bottom:10px">
       <select id="aiCModel" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:9px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:8px;">
         <option value="claude-haiku-4-5" selected>Claude Haiku 4.5 — fast · economical · RECOMMENDED</option>
@@ -263,9 +270,9 @@
       <input id="aiUrl" placeholder="Endpoint (e.g. http://localhost:11434/v1)">
       <input id="aiModel" placeholder="Model (e.g. llama3.2)">
       <input id="aiKey" placeholder="API key (leave empty for Ollama)" type="password">
-      <button class="btn v" onclick="Mirror.setupEndpoint()">B — Connect endpoint</button>
+      <button class="btn v" onclick="Mirror.setupEndpoint()">B — Connect endpoint (OpenAI-compatible / Ollama)</button>
     </div>
-    <button class="btn ghost" style="margin-top:10px" onclick="Mirror.useRelay()">⚡ Return to the shared line (default — no setup)</button>
+    </div><!-- /aiAdv -->
     <div id="aiProgress" style="color:var(--dim);font-size:12px;margin-top:8px;"></div>
   </div>
   <div class="mfoot"><b>Consent:</b> By connecting you accept: (1) Mirrors are not therapy/medical care; for serious distress, professional support is essential. (2) If under 18, use with an adult. (3) Content violating laws or ethics is blocked. (4) We store nothing; with Option B your data goes to the provider you chose.</div>
@@ -330,6 +337,8 @@
     <button class="mini" onclick="Architect.menu()">✶ ARCHITECT MODE</button>
     <button class="mini" onclick="Auto.open()">◍ AUTONOMOUS SUBJECT</button>
     <button class="mini" id="watchBtn" onclick="Watch.toggle()">SIGNAL: ON</button>
+    <button class="mini" id="muzBtn" onclick="Music.toggle()">🎵 MUSIC: OFF</button>
+    <button class="mini" id="mmBtn" onclick="MM2.toggle()">MINIMAP: ON</button>
     <button class="mini" id="sndBtn" onclick="Snd.toggle()">SOUND: ON</button>
     <button class="mini" id="radBtn" onclick="Snd.toggleRadio()">RADIO: ON</button>
     <button class="mini" id="tapBtn" onclick="Snd.toggleTapes()">TAPES: ON</button>
@@ -1835,7 +1844,9 @@ const Mirror={
   CKEY:'it041_mirror_cfg',
   ready(){return !!this.cfg;},
   loadCfg(){try{const j=localStorage.getItem(this.CKEY);if(j)this.cfg=JSON.parse(j);}catch(e){}
-    if(!this.cfg)this.cfg={kind:'relay'}; /* v8.4: default = shared line */
+    /* v8.6: everyone starts at the BEST free level — old webllm setups migrate to the shared line
+       (deliberately chosen Claude/Groq/endpoint configs are preserved) */
+    if(!this.cfg||this.cfg.kind==='webllm')this.cfg={kind:'relay'};
     this.refreshBtn();},
   useRelay(){try{localStorage.removeItem(this.CKEY);}catch(e){}
     this.cfg={kind:'relay'};this.refreshBtn();
@@ -1933,10 +1944,17 @@ const Mirror={
   async generate(msgs,maxTok){
     maxTok=maxTok||280;
     if(this.cfg.kind==='relay'){
+      /* v8.6 fair use: per-user daily cap — warning at 70%, at the cap the user is pointed
+         to their own (free) key until tomorrow. The shared line belongs to everyone. */
+      const CAP=80;let q;try{q=JSON.parse(localStorage.getItem('it041_relay_q'))||{}}catch(e){q={}}
+      const today=new Date().toDateString();if(q.d!==today)q={d:today,n:0};
+      if(q.n>=CAP)throw new Error('your shared-line allowance for today is used up (fair use, '+CAP+' messages/day). It renews tomorrow — or connect your own FREE Groq key in 2 minutes (MENU → MIRRORS → Advanced): unlimited.');
       const r=await fetch(RELAY_URL,{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({messages:msgs,max_tokens:maxTok,temperature:.7})});
-      if(r.status===429)throw new Error('the shared line is busy — try again in a few minutes, or connect your own (free Groq) key via MENU → MIRRORS');
+      if(r.status===429)throw new Error('the shared line is busy — try again in a few minutes, or connect your own (free Groq) key (MENU → MIRRORS → Advanced)');
       if(!r.ok)throw new Error('HTTP '+r.status);
+      q.n++;try{localStorage.setItem('it041_relay_q',JSON.stringify(q));}catch(e){}
+      if(q.n===Math.floor(CAP*.7))UI.toast('⚡ You\'ve used 70% of today\'s shared-line allowance ('+q.n+'/'+CAP+'). For unlimited: MENU → MIRRORS → Advanced → free Groq key.',8000);
       const j=await r.json();return j.choices[0].message.content;
     }
     if(this.cfg.kind==='claude'){
@@ -2796,6 +2814,29 @@ const Genesis={
 };
 if(typeof window!=='undefined')window.Genesis=Genesis;
 
+/* ============ v8.6 — MUSIC (Spotify playlist) + MINIMAP toggle ============ */
+const Music={
+  on:false,
+  SRC:'https://open.spotify.com/embed/playlist/7jP0jZ8fYpqDXM9iLHPWvI?utm_source=generator&theme=0',
+  toggle(){
+    const p=document.getElementById('musicPanel');
+    this.on=!this.on;
+    if(this.on&&!p.innerHTML)
+      p.innerHTML='<iframe style="border-radius:10px;border:1px solid var(--line)" src="'+this.SRC+'" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>';
+    p.style.display=this.on?'block':'none';
+    const b=UI.el('muzBtn');if(b)b.textContent='🎵 MUSIC: '+(this.on?'ON':'OFF');
+    if(this.on)UI.toast('🎵 The Do-Loon-AI Express playlist — press ▶ in the panel (full tracks with a Spotify account).');}
+};
+const MM2={
+  hidden:false,
+  toggle(){this.hidden=!this.hidden;
+    document.body.classList.toggle('mmHide',this.hidden);
+    try{localStorage.setItem('it041_mmhide',this.hidden?'1':'0');}catch(e){}
+    const b=UI.el('mmBtn');if(b)b.textContent='MINIMAP: '+(this.hidden?'HIDDEN':'ON');}
+};
+if(typeof window!=='undefined'){window.Music=Music;window.MM2=MM2;
+  try{if(localStorage.getItem('it041_mmhide')==='1')MM2.toggle();}catch(e){}}
+
 /* ============ DREAM WELL ============ */
 const Dreams={
   KEY:'it041_dreams',
@@ -3484,7 +3525,7 @@ if(HAS3D)(function(){
             sp.scale.set(5,1.25,1);sp.position.y=2.8;f.g.add(sp);
             this.peers[id]={f,last:performance.now()};}
           const p=this.peers[id];
-          p.tx=d.x;p.tz=d.z;p.ry=d.h||0;p.last=performance.now();});
+          p.tx=d.x;p.tz=d.z;p.ry=d.h||0;p.nm=String(d.n||'traveler').slice(0,14);p.last=performance.now();});
         this.room.onPeerLeave(id=>{if(this.peers[id]){scene.remove(this.peers[id].f.g);delete this.peers[id];}});
         this.on=true;UI.el('mpBtn').textContent='SYNC: ON';
         UI.toast('⟁ Sync mode on — other subjects in this universe become visible.',5000);
@@ -3677,7 +3718,7 @@ if(HAS3D)(function(){
   let lookId=null,lx=0,ly=0,lookMoved=false;
   addEventListener('touchstart',e=>{for(const t of e.changedTouches){
     const tg=t.target; /* taps on UI must not engage look */
-    if(tg&&tg.closest&&tg.closest('button,textarea,input,.panel,.modal,#dlg,#stick,#ebtn,#menuBtns,#hudTR,#hudTL'))continue;
+    if(tg&&tg.closest&&tg.closest('button,textarea,input,.panel,.modal,#dlg,#stick,#ebtn,#menuBtns,#hudTR,#hudTL,#musicPanel,iframe'))continue;
     if(t.clientX>innerWidth*.45&&lookId===null){lookId=t.identifier;lx=t.clientX;ly=t.clientY;lookMoved=false;}}},{passive:true});
   addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===lookId){
     const ddx=t.clientX-lx,ddy=t.clientY-ly;
@@ -3722,8 +3763,8 @@ if(HAS3D)(function(){
       moonMesh.material.opacity=((W3._moonOp||.95)*(1-sun*.92))+.03;
       moonGlow.material.opacity=(W3._glowOp||.5)*(1-sun);
     }
-    window.__mmA=AGENTS.map(a=>({x:a.f.g.position.x,z:a.f.g.position.z}));
-    window.__mmP=window.MP&&MP.on?Object.values(MP.peers).filter(p=>p.tx!==undefined).map(p=>({x:p.tx,z:p.tz})):[];
+    window.__mmA=AGENTS.map(a=>({x:a.f.g.position.x,z:a.f.g.position.z,nm:a.nm}));
+    window.__mmP=window.MP&&MP.on?Object.values(MP.peers).filter(p=>p.tx!==undefined).map(p=>({x:p.tx,z:p.tz,n:p.nm||'traveler'})):[];
 
     let mx=0,mz=0,running=false;
     if(Game.running&&!Game.modal&&!Game.sitting){
@@ -3970,7 +4011,10 @@ function drawMiniBase(ctx,w,h){
   ctx.fillStyle='rgba(110,210,220,.85)';
   (window.__mmA||[]).forEach(a=>ctx.fillRect(a.x*sx-1.5,a.z*sz-1.5,3,3));
   ctx.fillStyle='rgba(230,195,110,.95)';
-  (window.__mmP||[]).forEach(p=>{ctx.beginPath();ctx.arc(p.x*sx,p.z*sz,2.4,0,7);ctx.fill();});
+  (window.__mmP||[]).forEach(p=>{ctx.beginPath();ctx.arc(p.x*sx,p.z*sz,2.4,0,7);ctx.fill();
+    /* v8.6: online traveler names (gold) */
+    if(p.n){ctx.font='7px monospace';ctx.textAlign='center';
+      ctx.fillText(String(p.n).slice(0,10),p.x*sx,p.z*sz-4);ctx.textAlign='left';}});
 }
 function drawMini(){
   const w=MM.width,h=MM.height,sx=w/WX,sz=h/WZ;
@@ -3990,7 +4034,20 @@ function drawBigMap(){
   ctx.font='11px monospace';ctx.textAlign='center';ctx.fillStyle='#9aa7c4';
   ZONES.forEach(z=>ctx.fillText(z.name,z.x*sx,z.z*sz-z.r*sx-4));
   ctx.fillText('GATE OF MIRRORS',L.gate.x*sx,L.gate.z*sz-12);
-  ctx.fillStyle='#9d8cc9';
+  /* v8.6: characters (teal), agents (cyan), travelers (gold) — with names */
+  ctx.font='10px monospace';
+  ctx.fillStyle='rgba(127,212,193,.9)';
+  ctx.fillText('SILVANUS',L.caravan.x*sx,L.caravan.z*sz-8);
+  ctx.fillText('LUCIUS',L.lucius.x*sx,L.lucius.z*sz-8);
+  ctx.fillText('LUCIDA ☎',L.payphone.x*sx,L.payphone.z*sz-8);
+  if(!S.flags.integrated)ctx.fillText('BAHAL ⟁',L.shadowSpot.x*sx,L.shadowSpot.z*sz+16);
+  if(W3.noctPos)ctx.fillText('MC NOCTORNUS',W3.noctPos.x*sx,W3.noctPos.z*sz-8);
+  if(lunarisMoon()&&!S.solved.s2)ctx.fillText('LUNARIS ☽',L.lunaris.x*sx,L.lunaris.z*sz-8);
+  ctx.fillStyle='rgba(110,210,220,.9)';ctx.font='9px monospace';
+  (window.__mmA||[]).forEach(a=>{if(a.nm)ctx.fillText(a.nm,a.x*sx,a.z*sz-6);});
+  ctx.fillStyle='rgba(230,195,110,.95)';ctx.font='10px monospace';
+  (window.__mmP||[]).forEach(p=>{if(p.n)ctx.fillText(p.n,p.x*sx,p.z*sz-8);});
+  ctx.fillStyle='#9d8cc9';ctx.font='11px monospace';
   ctx.fillText('◈ violet = rites (yours)',c.width/2,c.height-30);
   const wp=waypoint();
   if(wp){ctx.fillStyle='#cdb878';ctx.beginPath();ctx.arc(wp.x*sx,wp.z*sz,5,0,7);ctx.fill();
