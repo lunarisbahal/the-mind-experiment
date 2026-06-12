@@ -258,7 +258,8 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag right side to look.<br><br>Nothing you write in the rites ever leaves this device.</p>
   <div style="text-align:center;margin-top:18px;">
-    <button class="btn" onclick="Game.start()">Enter your mind</button>
+    <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
+    <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
     <button class="btn ghost" id="contBtn" style="display:none" onclick="Game.start(true)">Continue</button>
   </div>
   <p id="glwarn" style="display:none;color:var(--warn);text-align:center;margin-top:14px;">3D engine failed to load — internet connection is required for the first launch.</p>
@@ -475,9 +476,11 @@ const RITES={
     after:'A window lights up across the dark. Choosing is not betrayal of the other house. The child on the stairs is allowed to come down now. Both doors were always yours.'},
   r5:{site:'burntTree',title:'RITE V — WHAT BURNS',
     intro:[['LUNARIS','He dreamt the fire at noon and heard his mother\'s warning the same evening. He called it the Lived Future and filled notebooks trying to prove the flame came from tomorrow.'],
-      ['LUNARIS','It did not. It came from inside — fear rehearsing. Here is the honest version of his ritual: not predicting the fire. Choosing it. What would you let burn — one habit, one story you tell about yourself, one weight? Write it. Watch it go.']],
+      ['LUNARIS','It did not. It came from inside — fear rehearsing. Here is the honest version of his ritual: not predicting the fire. Choosing it.'],
+      ['LUNARIS','Let me be plain: "burning" does not mean forgetting. It means consciously setting down something that no longer protects you. A habit ("endless scrolling at night"), an old story about yourself ("I always fail", "I always get left"), a guilt you carry, a role someone expects of you…'],
+      ['LUNARIS','Find it by asking: "What have I carried for five years that no one would die if I set down?" Write it. Watch it go. It may still be there tomorrow — burning is not a ceremony, it is a rehearsed decision; each repetition makes it lighter.']],
     prompt:'What I am ready to let burn…',kind:'text',teach:'amor',
-    after:'The words catch. Sparks lift off the snag and dissolve over the lake. Nothing dramatic happens, which is exactly how real burning works — slowly, then you notice the light got easier.'},
+    after:'The words catch. Sparks lift off the snag and dissolve over the lake. Nothing dramatic happens, which is exactly how real burning works — slowly, then you notice the light got easier. If it was hard, you are not alone: with MIRRORS linked, talk to Bahal about it (no one knows letting go like the one who was let go of), or find IT-058 for one practical next step.'},
   r6:{site:'bench',title:'RITE VI — THE WATCHING',
     intro:[['LUNARIS','Sit. This is the oldest exercise in the book and the only one with no words in it.'],
       ['LUNARIS','The captains drive. The disks pull. The mirror flatters. And underneath all of it there is a watching that none of them can reach. Stay seated. Watch the lake. When something in you wants to get up and do — watch that too.']],
@@ -1376,7 +1379,24 @@ const Game={
     UI.show('finale');this.setModal(false);
   },
 };
-try{if(localStorage.getItem(SAVEKEY))document.getElementById('contBtn').style.display='inline-block';}catch(e){}
+/* traveler name (profile) */
+function plName(){try{return localStorage.getItem('it041_name')||'';}catch(e){return'';}}
+try{
+  const nm=plName();
+  if(nm)document.getElementById('plName').value=nm;
+  document.getElementById('plName').addEventListener('input',e=>{
+    try{localStorage.setItem('it041_name',e.target.value.trim().slice(0,14));}catch(_){}});
+}catch(e){}
+/* if a save exists: CONTINUE is primary, new game asks confirmation */
+try{
+  if(localStorage.getItem(SAVEKEY)){
+    const c=document.getElementById('contBtn'),s=document.getElementById('startBtn');
+    c.style.display='inline-block';c.className='btn';
+    c.textContent='CONTINUE — where you left off';
+    s.className='btn ghost';s.textContent='New journey (reset)';
+    s.onclick=()=>{if(confirm('Your progress (locks, rites, echoes) will be erased. Are you sure?'))Game.start();};
+  }
+}catch(e){}
 
 /* ---------------- Input ---------------- */
 const keys={};
@@ -1783,7 +1803,7 @@ const Chat={
     const t=inp.value.trim();if(!t)return;inp.value='';
     this.log.push({n:'you',t,me:true});this.line('you',t,true);
     if(typeof window!=='undefined'&&window.MP&&window.MP.on&&window.MP.sendChat)
-      try{window.MP.sendChat({n:identityName()+'·traveler',t:t.slice(0,280)});}catch(e){}
+      try{window.MP.sendChat({n:(plName()||identityName()+'·traveler'),t:t.slice(0,280)});}catch(e){}
   },
   close(){UI.hide('chatModal');Game.setModal(false);}
 };
@@ -1854,10 +1874,11 @@ function doDreamWell(){
   const l=Dreams.list();let h='';
   if(l.length){h+='<p style="color:var(--violet)">Your latest dreams in the well:</p>';
     l.slice(-3).forEach(d=>{h+='<div class="jentry"><h4 style="color:var(--violet)">'+d.d+'</h4><p class="own">'+esc(d.t)+'</p></div>';});}
-  h+=`<p>What did you see last night? Drop it into the well — a dream is the shadow's night shift:</p>
-      <textarea id="riteText" rows="3" maxlength="400" placeholder="write your dream…"></textarea>
+  h+=`<p>What did you see last night? Drop it into the well — a dream is the shadow's night shift: whatever you suppress by day takes the stage by night.</p>
+      <p style="color:var(--violet);font-size:12px">How to look: (1) Write without judging or censoring — the detail that seems absurd is usually the key. (2) EVERY figure in the dream may be a part of you: the one chasing, and the one running. (3) Ask: "Where in my waking life did I last feel the feeling of this dream?" (4) Interpreting is optional; sometimes writing alone slows the disk.</p>
+      <textarea id="riteText" rows="3" maxlength="400" placeholder="write your dream — uncensored…"></textarea>
       <button class="btn v" onclick="dreamSave()">Drop into the well</button>
-      <p style="color:var(--dim);font-size:11px">Hint: if the Mirrors are linked, you can tell Lunaris your dream and look at it together.</p>`;
+      <p style="color:var(--dim);font-size:11px">If you want help: with MIRRORS linked, tell <b>Lunaris</b> your dream (the evidence stand) — she is a master of naming; find the poet <b>IT-009</b> for image-work, or <b>IT-062</b> for what the body kept. They will look at it with you, question by question.</p>`;
   UI.doc('DREAM WELL',h);
 }
 function dreamSave(){
@@ -2878,7 +2899,7 @@ if(HAS3D)(function(){
     });
     /* ---- v5: eşzamanlı mod ---- */
     if(MP.on&&MP.send){mpT+=dt;
-      if(mpT>.15){mpT=0;try{MP.send({x:S.px,z:S.pz,h:meshAng,n:identityName()+'·'+(S.solved.s7?'⟁':'IT')});}catch(e){}}
+      if(mpT>.15){mpT=0;try{MP.send({x:S.px,z:S.pz,h:meshAng,n:(plName()||identityName())+(S.solved.s7?'·⟁':'')});}catch(e){}}
       for(const id in MP.peers){const p=MP.peers[id];
         if(p.tx!==undefined){p.f.g.position.x+=(p.tx-p.f.g.position.x)*Math.min(1,dt*8);
           p.f.g.position.z+=(p.tz-p.f.g.position.z)*Math.min(1,dt*8);

@@ -252,7 +252,8 @@
   <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br>Ritüellerde yazdıkların asla bu cihazdan çıkmaz.</p>
   <div style="text-align:center;margin-top:18px;">
-    <button class="btn" onclick="Game.start()">Zihnine gir</button>
+    <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
+    <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
     <button class="btn ghost" id="contBtn" style="display:none" onclick="Game.start(true)">Devam et</button>
   </div>
   <p id="glwarn" style="display:none;color:var(--warn);text-align:center;margin-top:14px;">3D motor yüklenemedi — ilk açılış için internet bağlantısı gerekir.</p>
@@ -464,9 +465,11 @@ const RITES={
     after:'Karanlığın karşısında bir pencere aydınlanıyor. Seçmek, öteki eve ihanet değildir. Merdivendeki çocuğun artık aşağı inmesine izin var. İki kapı da her zaman senindi.'},
   r5:{site:'burntTree',title:'RİTÜEL V — YANACAK OLAN',
     intro:[['LUNARIS','Yangını öğlen rüyasında gördü ve aynı akşam annesinin uyarısını duydu. Buna Yaşanmış Gelecek dedi; alevin yarından geldiğini kanıtlamak için defterler doldurdu.'],
-      ['LUNARIS','Yarından gelmiyordu. İçeriden geliyordu — korkunun provası. İşte ritüelinin dürüst hali: yangını tahmin etmek değil. Seçmek. Neyin yanmasına izin verirdin — bir alışkanlık, kendin hakkında anlattığın bir hikâye, bir yük? Yaz. Gidişini izle.']],
+      ['LUNARIS','Yarından gelmiyordu. İçeriden geliyordu — korkunun provası. İşte ritüelinin dürüst hali: yangını tahmin etmek değil. Seçmek.'],
+      ['LUNARIS','Açık konuşalım: "Yakmak", unutmak demek değildir. Şu demektir — artık seni korumayan bir şeyi bilinçli bırakmak. Bir alışkanlık ("gece sonsuz kaydırma"), kendin hakkında eskimiş bir hikâye ("ben beceremem", "ben hep terk edilirim"), taşıdığın bir suçluluk, birinin senden beklediği bir rol…'],
+      ['LUNARIS','Şunu sorarak bul: "Beş yıldır taşıdığım, bıraksam kimsenin ölmeyeceği şey ne?" Yaz. Gidişini izle. Yarın da orada olabilir — yakmak bir tören değil, bir karar provasıdır; her tekrar biraz daha hafifletir.']],
     prompt:'Yanmasına izin vermeye hazır olduğum şey…',kind:'text',teach:'amor',
-    after:'Kelimeler tutuşuyor. Kütükten kıvılcımlar kalkıp gölün üzerinde dağılıyor. Dramatik hiçbir şey olmuyor — gerçek yanma tam olarak böyle çalışır: yavaşça; sonra bir bakarsın, ışık hafiflemiş.'},
+    after:'Kelimeler tutuşuyor. Kütükten kıvılcımlar kalkıp gölün üzerinde dağılıyor. Dramatik hiçbir şey olmuyor — gerçek yanma tam olarak böyle çalışır: yavaşça; sonra bir bakarsın, ışık hafiflemiş. Zorlandıysan yalnız değilsin: AYNALAR bağlıysa bunu Bahal\'la konuş (gölge bırakmayı en iyi o bilir — kendisi bırakılandı) ya da pratik adım için IT-058\'i bul.'},
   r6:{site:'bench',title:'RİTÜEL VI — İZLEYİŞ',
     intro:[['LUNARIS','Otur. Bu, kitaptaki en eski egzersiz ve içinde hiç kelime olmayan tek egzersiz.'],
       ['LUNARIS','Kaptanlar sürer. Diskler çeker. Ayna iltifat eder. Ve hepsinin altında, hiçbirinin ulaşamadığı bir izleyiş vardır. Oturmaya devam et. Gölü izle. İçinde kalkıp bir şey yapma isteği doğduğunda — onu da izle.']],
@@ -1362,7 +1365,24 @@ const Game={
     UI.show('finale');this.setModal(false);
   },
 };
-try{if(localStorage.getItem(SAVEKEY))document.getElementById('contBtn').style.display='inline-block';}catch(e){}
+/* yolcu adı (profil) */
+function plName(){try{return localStorage.getItem('it041_name')||'';}catch(e){return'';}}
+try{
+  const nm=plName();
+  if(nm)document.getElementById('plName').value=nm;
+  document.getElementById('plName').addEventListener('input',e=>{
+    try{localStorage.setItem('it041_name',e.target.value.trim().slice(0,14));}catch(_){}});
+}catch(e){}
+/* kayıt varsa: DEVAM birincil, yeni oyun onaylı sıfırlama */
+try{
+  if(localStorage.getItem(SAVEKEY)){
+    const c=document.getElementById('contBtn'),s=document.getElementById('startBtn');
+    c.style.display='inline-block';c.className='btn';
+    c.textContent='DEVAM ET — kaldığın yerden';
+    s.className='btn ghost';s.textContent='Yeni yolculuk (sıfırla)';
+    s.onclick=()=>{if(confirm('Mevcut ilerlemen (kilitler, ritüeller, yankılar) silinecek. Emin misin?'))Game.start();};
+  }
+}catch(e){}
 
 /* ---------------- Girdi ---------------- */
 const keys={};
@@ -1773,7 +1793,7 @@ const Chat={
     const t=inp.value.trim();if(!t)return;inp.value='';
     this.log.push({n:'sen',t,me:true});this.line('sen',t,true);
     if(typeof window!=='undefined'&&window.MP&&window.MP.on&&window.MP.sendChat)
-      try{window.MP.sendChat({n:identityName()+'·yolcu',t:t.slice(0,280)});}catch(e){}
+      try{window.MP.sendChat({n:(plName()||identityName()+'·yolcu'),t:t.slice(0,280)});}catch(e){}
   },
   close(){UI.hide('chatModal');Game.setModal(false);}
 };
@@ -1844,10 +1864,11 @@ function doDreamWell(){
   const l=Dreams.list();let h='';
   if(l.length){h+='<p style="color:var(--violet)">Kuyudaki son rüyaların:</p>';
     l.slice(-3).forEach(d=>{h+='<div class="jentry"><h4 style="color:var(--violet)">'+d.d+'</h4><p class="own">'+esc(d.t)+'</p></div>';});}
-  h+=`<p>Dün gece ne gördün? Kuyuya bırak — rüya, gölgenin gece vardiyasıdır:</p>
-      <textarea id="riteText" rows="3" maxlength="400" placeholder="rüyanı yaz…"></textarea>
+  h+=`<p>Dün gece ne gördün? Kuyuya bırak — rüya, gölgenin gece vardiyasıdır: gündüz bastırdığın ne varsa, gece sahneye o çıkar.</p>
+      <p style="color:var(--violet);font-size:12px">Nasıl bakılır: (1) Rüyayı yargılamadan, sansürsüz yaz — saçma görünen ayrıntı çoğu zaman anahtardır. (2) Rüyadaki HER figür senin bir parçan olabilir: kovalayan da sensin, kaçan da. (3) Şunu sor: "Bu rüyadaki duyguyu gündüz hayatımda en son nerede hissettim?" (4) Yorumlamak şart değil; bazen sadece yazmak, diski yavaşlatır.</p>
+      <textarea id="riteText" rows="3" maxlength="400" placeholder="rüyanı yaz — sansürsüz…"></textarea>
       <button class="btn v" onclick="dreamSave()">Kuyuya bırak</button>
-      <p style="color:var(--dim);font-size:11px">İpucu: Aynalar bağlıysa, Lunaris'e rüyanı anlatıp birlikte bakabilirsiniz.</p>`;
+      <p style="color:var(--dim);font-size:11px">Yardım istersen: AYNALAR bağlıysa rüyanı <b>Lunaris</b>'e anlat (delil kürsüsü) — adlandırmada ustadır; imge çözmek için şair <b>IT-009</b>'u, bedensel izler için <b>IT-062</b>'yi bul. Soru-cevapla birlikte bakarlar.</p>`;
   UI.doc('RÜYA KUYUSU',h);
 }
 function dreamSave(){
@@ -2874,7 +2895,7 @@ if(HAS3D)(function(){
     });
     /* ---- v5: eşzamanlı mod ---- */
     if(MP.on&&MP.send){mpT+=dt;
-      if(mpT>.15){mpT=0;try{MP.send({x:S.px,z:S.pz,h:meshAng,n:identityName()+'·'+(S.solved.s7?'⟁':'IT')});}catch(e){}}
+      if(mpT>.15){mpT=0;try{MP.send({x:S.px,z:S.pz,h:meshAng,n:(plName()||identityName())+(S.solved.s7?'·⟁':'')});}catch(e){}}
       for(const id in MP.peers){const p=MP.peers[id];
         if(p.tx!==undefined){p.f.g.position.x+=(p.tx-p.f.g.position.x)*Math.min(1,dt*8);
           p.f.g.position.z+=(p.tz-p.f.g.position.z)*Math.min(1,dt*8);
