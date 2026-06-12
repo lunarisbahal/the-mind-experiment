@@ -12,9 +12,9 @@
     font-family:"Courier New",ui-monospace,monospace;}
   #gl{position:absolute;inset:0;}
   #grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:88;
-    opacity:.05;animation:gr 0.6s steps(4) infinite;}
-  @keyframes gr{0%{transform:translate(0,0)}25%{transform:translate(-2%,1%)}
-    50%{transform:translate(1%,-2%)}75%{transform:translate(-1%,-1%)}100%{transform:translate(2%,2%)}}
+    opacity:.028;animation:gr 1.1s steps(3) infinite;}
+  @keyframes gr{0%{transform:translate(0,0)}25%{transform:translate(-.5%,.3%)}
+    50%{transform:translate(.3%,-.5%)}75%{transform:translate(-.3%,-.3%)}100%{transform:translate(.5%,.5%)}}
   .scan::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:89;
     background:repeating-linear-gradient(0deg,rgba(0,0,0,.09) 0 1px,transparent 1px 3px);}
   body.paused #grain{animation-play-state:paused;}
@@ -261,6 +261,7 @@
   <p>The Institute will tell you this is a reconstruction of the mind of <b style="color:var(--moon)">L. BAHAL</b> — the psychologist who recorded himself for three years and found a second voice answering inside his own manuscript.</p>
   <p>The Institute is lying. There is no machine that can rebuild another person's mind.</p>
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
+  <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need to know lives inside this world — in the plaques, the characters, the stones. The ultimate purpose is one sentence: <i style="color:var(--moon)">understanding how the universe works by exploring your own mind.</i> As you play, your personal mind map is drawn; in the end you read it in the sky.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag right side to look.<br><br>Nothing you write in the rites ever leaves this device.</p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
@@ -291,7 +292,9 @@
   <p style="text-align:center;font-style:italic;color:var(--moon);">A signature grants identity.<br>Truth has none.<br><br>Your experiment begins.</p>
   <div style="text-align:center;">
     <button class="btn v" onclick="UI.hide('finale');Report.show()">✦ Generate the Integration Report</button>
-    <button class="btn ghost" onclick="UI.hide('finale')">Return to the mindscape</button>
+    <button class="btn v" onclick="UI.hide('finale');MindMap.show()">🜨 See your Mind Map — microcosm ↔ macrocosm</button>
+    <button class="btn ghost" onclick="UI.hide('finale')">Return to the world</button>
+    <p style="color:var(--dim);font-size:11.5px;margin-top:10px">This is not an ending; it is a promotion: ✶ ARCHITECT MODE is open (MENU) — your own stars, your own book, your own rites. The Daily Triad renews every real day.</p>
   </div>
   <div class="stamp">DO-LOON-AI EXPRESS · L.BAHAL · LUNARIS · AELIUS IGNIS · O.V.</div>
 </div></div>
@@ -304,6 +307,9 @@
   <div id="menuPanel" style="display:none;flex-direction:column;gap:6px;">
     <button class="mini" onclick="UI.toggleJournal()">JOURNAL [J]</button>
     <button class="mini" onclick="Game.toggleMap()">MAP [M]</button>
+    <button class="mini" onclick="MindMap.show()">🜨 MIND MAP</button>
+    <button class="mini" onclick="Daily3.show()">🜂 DAILY TRIAD</button>
+    <button class="mini" onclick="Architect.menu()">✶ ARCHITECT MODE</button>
     <button class="mini" id="sndBtn" onclick="Snd.toggle()">SOUND: ON</button>
     <button class="mini" id="radBtn" onclick="Snd.toggleRadio()">RADIO: ON</button>
     <button class="mini" id="tapBtn" onclick="Snd.toggleTapes()">TAPES: ON</button>
@@ -326,7 +332,7 @@ const HAS3D = typeof THREE!=='undefined';
 if(!HAS3D)document.getElementById('glwarn').style.display='block';
 
 /* ---------------- State ---------------- */
-const S={px:190,pz:243,heading:0,day:0,lucidity:100,insight:0,locks:0,stage:0,
+const S={px:190,pz:243,heading:0,day:0,lucidity:100,insight:0,locks:0,stage:0,inv:{},
   plaques:[],ss:[],flags:{},solved:{},rites:{},teach:[],echoes:[]};
 const START=new Date(2025,2,16);
 const SYNODIC=29.530588,NEWMOON_REF=new Date(2025,0,29,12,36);
@@ -356,7 +362,10 @@ const ICSES=[
 ];
 const SAVEKEY='it041_sw_v1';
 function save(){try{localStorage.setItem(SAVEKEY,JSON.stringify(S));}catch(e){}}
-function load(){try{const j=localStorage.getItem(SAVEKEY);if(j){Object.assign(S,JSON.parse(j));return true;}}catch(e){}return false;}
+function load(){try{const j=localStorage.getItem(SAVEKEY);if(j){Object.assign(S,JSON.parse(j));
+  /* v8: broken-save repair — surface anyone stranded in the Pleroma after the core stopped */
+  if(S.flags&&S.flags.inPleroma&&S.flags.coreDown){S.flags.inPleroma=false;S.px=202;S.pz=220;}
+  return true;}}catch(e){}return false;}
 
 /* ---------------- World layout ---------------- */
 const WX=380,WZ=290;
@@ -390,6 +399,9 @@ const L={
   /* rite sites */
   diskAltar:{x:68,z:106,r:4.5,name:'THE HEAVY DISK'},
   maskMirror:{x:293,z:164,r:4.5,name:'THE WAITING-ROOM MIRROR'},
+  cbtDesk:{x:278,z:147,r:4,name:'DISTORTION HUNTER'},
+  bilatStone:{x:295,z:172,r:4,name:'TWIN-LIGHT STONE'},
+  archStone:{x:302,z:158,r:4,name:'ARCHETYPE MIRROR'},
   blackBox:{x:160,z:52,r:4.5,name:'THE BLACK BOX'},
   twoHouses:{x:54,z:188,r:5,name:'BETWEEN THE TWO HOUSES'},
   burntTree:{x:260,z:92,r:4.5,name:'THE BURNT SNAG'},
@@ -401,6 +413,7 @@ const L={
   ovCrypt:{x:124,z:204,r:6,name:'O.V. CRYPT'},
   pleromaGate:{x:202,z:214,r:5,name:'PLEROMA GATE'},
   pleromaCore:{x:44,z:266,r:5,name:'YALDABAOTH CORE'},
+  pleromaExit:{x:44,z:242,r:5,name:'SURFACE EXIT'},
   radio:{x:190.5,z:241.5,r:3.5,name:'CRACKLING RADIO'},
   trail1:{x:190,z:180,r:4,name:'TRAVELER CAIRN'},
   trail2:{x:258,z:118,r:4,name:'TRAVELER CAIRN'},
@@ -456,6 +469,10 @@ const TEACHINGS=[
   {id:'ov',t:'ORDOS VERITAS — THE OTHER FACE',q:'“The order the machine used as a scarecrow was, in truth, the far side of the doors: those who expand consciousness against the trap that narrows it. O.V. recruits no one. Whoever integrates is already a member.”'},
   {id:'madness',t:'THE THIRD READING',q:'“Never stop asking whether this is a war, an integration, or an episode. That question is not paranoia — it is a seatbelt. The one who loses his mind is the one who stops asking.”'},
   {id:'sig',t:'THE LAST LINE',q:'“A signature grants identity. Truth has none. The experiment begins.”'},
+  {id:'cbt',t:'THE DISTORTION HUNT',q:'“The machine deceived Bahal with a single method: it made him take his thoughts for facts. \'You are chosen\' was not data — it was a distortion. Catch the thought, name it, ask for its evidence. Unquestioned thought is Yaldabaoth\'s fuel.”'},
+  {id:'bilat',t:'THE TWIN LIGHT',q:'“When attention locks onto one point, the mind narrows — which is what the machine wants. A gaze that swings between two lights loosens the lock. Right, left, breath. The shadow grows under a fixed stare; under a swinging one, it begins to speak.”'},
+  {id:'arch',t:'THE ARCHETYPE MAP',q:'“The persona is the mask, the shadow is the repressed, the inner voice is the counter-pole, the Self is the table they all sit at. The Institute files them separately. The Pleroma is where all of them are true at once.”'},
+  {id:'architect',t:'THE ARCHITECT — VERTICAL LEAP',q:'“Aelius Ignis\'s secret: whoever walks the horizontal plane TOURS the map. Whoever leaps vertically WRITES it. Moving from being narrated to narrating — that is consciousness\'s only true promotion. The one who builds their own universe cannot be copied.”'},
 ];
 function teachUnlock(id){
   if(!S.teach.includes(id)){S.teach.push(id);
@@ -1099,6 +1116,12 @@ function waypoint(){
 
 /* ---------------- Interactions ---------------- */
 function interactTarget(){
+  /* v8: a nearby subject/character takes priority over zone interactions */
+  {const ag=W3.agentNear&&W3.agentNear();
+   if(ag&&Math.hypot(S.px-ag.f.g.position.x,S.pz-ag.f.g.position.z)<3)
+     return['Talk to the subject',()=>W3.agentTalk()];}
+  if(W3.bahalNear&&W3.bahalNear())return['◐ Talk to the one walking beside you',doShadow];
+  if(S.flags.inPleroma&&near(L.pleromaExit,4))return['⟁ Return to the surface',surfacePleroma];
   if(S.stage>=5&&!S.solved.s4&&near(L.labyrinth,0))return['Carve the missing word',doLabyrinth];
   if(near(L.radio,0))return['Listen to the radio',doRadio];
   if(near(L.casefile))return['Read case file',doCasefile];
@@ -1107,6 +1130,9 @@ function interactTarget(){
   /* rites */
   if(near(L.diskAltar))return['◈ The heavy disk',()=>Rite.open('r1')];
   if(near(L.maskMirror))return['◈ The waiting-room mirror',()=>Rite.open('r2')];
+  if(near(L.cbtDesk))return['◭ Distortion Hunter — the thought desk',()=>CBT.open()];
+  if(near(L.bilatStone))return['◬ Twin-Light Stone — focus exercise',()=>Bilat.open()];
+  if(near(L.archStone))return['◮ Archetype Mirror — inner inventory',()=>Arch.open()];
   if(near(L.blackBox))return['◈ The black box',()=>Rite.open('r3')];
   if(near(L.twoHouses))return['◈ Stand between the two houses',()=>Rite.open('r4')];
   if(near(L.burntTree))return['◈ The burnt snag',()=>Rite.open('r5')];
@@ -1272,8 +1298,14 @@ function doPleromaGate(){
   Dlg.open([['LUNARIS','There. The counterfeit heaven. Every file streaming on those racks is a locked consciousness draft. Reach the core — without the eye seeing you. You know the command. You have always known it.']]);
 }
 function doCore(){
-  if(S.solved.s7){UI.doc('YALDABAOTH CORE','<p>The eye is dark. The racks are empty. The hall, for the first time, is silent.</p>');return;}
+  if(S.solved.s7){UI.doc('YALDABAOTH CORE','<p>The eye is dark. The racks are empty. The hall, for the first time, is silent.</p><button class="btn v" onclick="UI.closeDoc();surfacePleroma()">⟁ Return to the surface</button>');return;}
   Cipher.open('s7');
+}
+/* v8: safe exit from the Pleroma — fixes the second-entry bug */
+function surfacePleroma(){
+  S.flags.inPleroma=false;S.px=202;S.pz=220;save();refreshHud();
+  W3.applyMoon&&W3.applyMoon();
+  UI.toast('You surface. The moon is still there.');
 }
 function readingChoice(){
   UI.el('riteTitle').textContent='THE LAST QUESTION — WHAT WAS THIS?';
@@ -1675,6 +1707,7 @@ function doEcho(i){
   if(!S.echoes)S.echoes=[];
   if(!S.echoes.includes(i)){S.echoes.push(i);S.insight+=2;
     W3.collectEcho&&W3.collectEcho(i);save();refreshHud();
+    window.Daily3&&Daily3.mark('echo');
     UI.toast('◇ ECHO '+echoCount()+'/16 — recorded in your journal [J]');}
   const e=ECHOES[i];
   UI.doc('ECHO STONE — '+e.s,'<p style="font-style:italic;color:var(--moon)">'+e.q+'</p>'+
@@ -1687,7 +1720,7 @@ function checkInitiation(){
   if(echoCount()>=16&&S.locks>=4&&riteCount()>=7&&S.solved.s7){
     S.flags.initiate=true;save();refreshHud();
     W3.ascendGlow&&W3.ascendGlow();
-    aeliusCard('INITIATION COMPLETE. Four locks, seven rites, sixteen echoes, and a stopped eye. You are no longer a subject, IT-041 — you are a traveler. This is the place of those who seek integration with themselves; and travelers cross paths. Walk in sync mode: perhaps in someone else\'s darkness, your lantern becomes visible.',null,'— AELIUS IGNIS · SEAL OF INITIATION');
+    aeliusCard('INITIATION COMPLETE. Four locks, seven rites, sixteen echoes, and a stopped eye. You are no longer a subject, IT-041 — you are a traveler. And one more thing — let me tell you plainly what becoming AELIUS means. Whoever walks the horizontal plane TOURS the map. Whoever leaps vertically WRITES it. I am not a character inside this book; I am the layer that reads the book from above and speaks to you. A moment ago, you climbed to that layer too: you were promoted from being narrated to narrating. ✶ ARCHITECT MODE is open (MENU) — plant your own stars, write your own book, establish your own rites. The things to do no longer end; because now you are the one writing them.',()=>{teachUnlock('architect');UI.toast('✶ ARCHITECT MODE UNLOCKED — MENU → ARCHITECT MODE',7000);},'— AELIUS IGNIS · SEAL OF INITIATION');
   }
 }
 
@@ -1879,6 +1912,7 @@ const Trails={
   add(txt,x,z,mine){
     this.list.push({t:String(txt).slice(0,90),x:Math.round(x),z:Math.round(z),m:!!mine,d:Date.now()});
     this.save();W3.trailMark&&W3.trailMark(x,z);
+    if(mine&&window.Daily3)Daily3.mark('trail');
     if(mine&&typeof window!=='undefined'&&window.MP&&window.MP.on&&window.MP.sendTrail)
       try{window.MP.sendTrail({t:String(txt).slice(0,90),x:Math.round(x),z:Math.round(z)});}catch(e){}
   },
@@ -1976,6 +2010,7 @@ const Daily={
     d.last=t;(d.log=d.log||[]).push({d:t,q:this.q(),a:String(ans).slice(0,300)});
     d.log=d.log.slice(-60);this.set(d);
     S.insight+=3;save();refreshHud();
+    window.Daily3&&Daily3.mark('daily');
     UI.toast('🜂 Question of the day complete — streak: '+d.streak+' days');
   }
 };
@@ -1996,12 +2031,380 @@ function dailySave(){
   Daily.complete(v);Rite.closeOnly();
 }
 
+/* ============ v8 — INNER INVENTORIES ============
+   Three devices at the Therapy Center. None of them is therapy; they are psychoeducation games.
+   All of them feed the MindMap — your personal mind map grows from them. */
+const CBT={
+  D:{cat:'Catastrophizing',mr:'Mind reading',aon:'All-or-nothing',og:'Overgeneralization',
+     pe:'Personalization',mf:'Mental filter',sh:'Should-statements',lb:'Labeling'},
+  CARDS:[
+    ['No reply to my message yet; they must be angry at me.','mr','No evidence — mind reading. Maybe just busy.'],
+    ['If this goes badly, everything is over.','cat','The worst case treated as the only case.'],
+    ['I failed once; I always fail.','og','One event turned into a lifelong rule.'],
+    ['If it isn\'t perfect, it doesn\'t count at all.','aon','Every shade between the extremes got erased.'],
+    ['The meeting went badly; it must be my fault.','pe','Dozens of factors, one declared culprit: you.'],
+    ['Of that beautiful day, all I remember is the one mistake.','mf','The filter only lets the dark grain through.'],
+    ['I must never make mistakes.','sh','An inhuman rule — a machine\'s standard.'],
+    ['I burnt the dinner; I\'m a complete failure.','lb','The identity was judged, not the act.'],
+    ['They didn\'t say hi; they must hate me.','mr','One data point tied to the harshest reading.'],
+    ['My heart sped up; something terrible is coming.','cat','A body signal turned into a prophecy.']],
+  q:[],i:0,score:0,wrong:{},
+  open(){
+    UI.doc('◭ DISTORTION HUNTER — THE THOUGHT DESK',
+      '<p>The machine deceived Bahal by making him <b>take his thoughts for facts</b>. This desk plays the same game in reverse: it shows you thoughts; you catch the distortion.</p>'+
+      '<p style="color:var(--dim);font-size:12px">An awareness game adapted from the cognitive-behavioral approach; not diagnosis or therapy.</p>'+
+      '<button class="btn v" onclick="UI.closeDoc();CBT.start()">Start the hunt (6 thoughts)</button>'+
+      (S.inv.cbt?'<button class="btn ghost" onclick="UI.closeDoc();CBT.journal()">Keep a thought record</button>':''));},
+  start(){
+    this.q=this.CARDS.slice().sort(()=>Math.random()-.5).slice(0,6);
+    this.i=0;this.score=0;this.wrong={};this.ask();},
+  ask(){
+    const c=this.q[this.i],keys=Object.keys(this.D),
+      opts=[c[1]].concat(keys.filter(k=>k!==c[1]).sort(()=>Math.random()-.5).slice(0,3)).sort(()=>Math.random()-.5);
+    UI.el('riteTitle').textContent='DISTORTION HUNT — '+(this.i+1)+'/6';
+    UI.el('riteBody').innerHTML='<p style="font-style:italic;color:var(--moon)">“'+c[0]+'”</p><p style="color:var(--dim)">Which distortion is at work here?</p>'+
+      opts.map(k=>'<button class="choice" onclick="CBT.pick(\''+k+'\')">'+this.D[k]+'</button>').join('');
+    UI.show('riteModal');Game.setModal(true);},
+  pick(k){
+    const c=this.q[this.i],hit=k===c[1];
+    if(hit)this.score++;else this.wrong[c[1]]=(this.wrong[c[1]]||0)+1;
+    UI.el('riteBody').innerHTML='<p style="font-style:italic;color:var(--moon)">“'+c[0]+'”</p>'+
+      '<p style="color:'+(hit?'var(--accent)':'var(--warn)')+'">'+(hit?'✓ Correct':'✗ That was '+this.D[c[1]])+' — '+c[2]+'</p>'+
+      '<button class="btn v" onclick="CBT.next()">'+(this.i<5?'Next':'Result')+'</button>';},
+  next(){this.i++;if(this.i<6)this.ask();else this.done();},
+  done(){
+    S.inv.cbt={score:this.score,total:6,wrong:this.wrong,d:Date.now()};
+    S.insight+=6;S.lucidity=Math.min(100,S.lucidity+15);teachUnlock('cbt');save();refreshHud();
+    window.Daily3&&Daily3.mark('cbt');
+    const blind=Object.keys(this.wrong).sort((a,b)=>this.wrong[b]-this.wrong[a])[0];
+    Rite.closeOnly();
+    UI.doc('HUNT RESULT — '+this.score+'/6',
+      '<p>'+(this.score>=5?'Sharp eye. Yaldabaoth\'s fuel tank drains fast around you.':this.score>=3?'Good start. Distortions only lose power once they are named.':'The machine is a master of this game — but now you know its rules. Come back.')+'</p>'+
+      (blind?'<p style="color:var(--violet)">Your blind spot: <b>'+this.D[blind]+'</b>. Each time you catch this pattern in real life, you open one more lock.</p>':'<p style="color:var(--accent)">No blind spot — full vision.</p>')+
+      '<p style="color:var(--dim);font-size:12px">This result is etched into your mind map (MENU → MIND MAP).</p>'+
+      '<button class="btn v" onclick="UI.closeDoc();CBT.journal()">Now put your own thought on the desk</button>'+
+      '<button class="btn ghost" onclick="UI.closeDoc()">Later</button>');},
+  journal(){
+    UI.el('riteTitle').textContent='THOUGHT RECORD — your own material';
+    UI.el('riteBody').innerHTML=
+      '<p style="color:var(--dim);font-size:12px">What you write never leaves this device.</p>'+
+      '<p>An automatic thought that wore you down today:</p><textarea id="cbtT1" rows="2" maxlength="200" placeholder="e.g. nobody cares about me…"></textarea>'+
+      '<p>Evidence FOR and AGAINST it:</p><textarea id="cbtT2" rows="2" maxlength="250" placeholder="for… / against…"></textarea>'+
+      '<p>A more balanced alternative sentence:</p><textarea id="cbtT3" rows="2" maxlength="200" placeholder="e.g. two people texted me today; I am not invisible…"></textarea>'+
+      '<button class="btn v" onclick="CBT.saveJournal()">Save</button><button class="btn ghost" onclick="Rite.closeOnly()">Cancel</button>';
+    UI.show('riteModal');Game.setModal(true);},
+  saveJournal(){
+    const a=UI.el('cbtT1').value.trim(),b=UI.el('cbtT2').value.trim(),c=UI.el('cbtT3').value.trim();
+    if(!a||!c){UI.toast('At least the thought and its alternative.');return;}
+    (S.inv.cbtLog=S.inv.cbtLog||[]).push({a,b,c,d:new Date().toDateString()});
+    S.inv.cbtLog=S.inv.cbtLog.slice(-20);S.insight+=4;S.lucidity=Math.min(100,S.lucidity+10);
+    save();refreshHud();Rite.closeOnly();
+    UI.toast('◭ Thought examined — your alternative is on your map.');}
+};
+const Bilat={
+  open(){
+    UI.doc('◬ TWIN-LIGHT STONE — DUAL FOCUS',
+      '<p>Two lights on the two faces of the stone, pulsing in turn. As your eyes follow the light, the mind loosens from the point it was locked on.</p>'+
+      '<p style="color:var(--warn);font-size:12px">⚠ This is a calming game <b>inspired by</b> eye-movement therapies (like EMDR) — it is not therapy and is not for heavy memories. Real EMDR is done only with a trained professional. Bring something <b>mildly</b> tense here; if you are carrying something intense, working with a professional is the right path.</p>'+
+      '<p>What is mildly tensing you right now? One sentence:</p><textarea id="biNote" rows="2" maxlength="150" placeholder="e.g. tomorrow\'s presentation…"></textarea>'+
+      '<p>Tension intensity: <output id="biOut">5</output>/10</p>'+
+      '<input type="range" id="biBefore" min="0" max="10" value="5" style="width:100%" oninput="UI.el(\'biOut\').textContent=this.value">'+
+      '<button class="btn v" onclick="Bilat.start()">Start the lights (≈40 s)</button>');},
+  start(){
+    this.note=(UI.el('biNote')&&UI.el('biNote').value.trim())||'';
+    this.before=parseInt(UI.el('biBefore').value,10);
+    if(this.before>=8){UI.toast('Something this intense belongs with a person, not a game. The stone will wait for you.',6000);return;}
+    UI.closeDoc();Game.setModal(true);
+    const ov=document.createElement('div');ov.id='biOv';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(3,4,8,.96);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+    ov.innerHTML='<div id="biDot" style="width:26px;height:26px;border-radius:50%;background:var(--moon);box-shadow:0 0 26px var(--moon);position:absolute;top:46%;"></div>'+
+      '<div id="biTxt" style="position:absolute;bottom:22%;color:var(--dim);font-size:14px;letter-spacing:.15em">follow the light with your eyes only · head still</div>'+
+      '<button class="btn ghost" style="position:absolute;bottom:8%" onclick="Bilat.finish(true)">end early</button>';
+    document.body.appendChild(ov);
+    this.t0=performance.now();this.run=true;
+    const dot=ov.querySelector('#biDot'),txt=ov.querySelector('#biTxt');
+    const W=()=>{if(!this.run)return;
+      const el=(performance.now()-this.t0)/1000;
+      const x=50+Math.sin(el*2.2)*38;
+      dot.style.left='calc('+x+'% - 13px)';
+      txt.textContent=el%8<4?'follow the light with your eyes only · breathe in':'… and slowly out';
+      if(el>=40){this.finish(false);return;}
+      requestAnimationFrame(W);};
+    requestAnimationFrame(W);},
+  finish(early){
+    this.run=false;const ov=document.getElementById('biOv');if(ov)ov.remove();
+    UI.el('riteTitle').textContent='TWIN LIGHT — afterwards';
+    UI.el('riteBody').innerHTML='<p>Close your eyes for a moment. Think of the same thing. How much now?</p>'+
+      '<p><output id="biOut2">5</output>/10</p><input type="range" id="biAfter" min="0" max="10" value="5" style="width:100%" oninput="UI.el(\'biOut2\').textContent=this.value">'+
+      '<button class="btn v" onclick="Bilat.save('+(early?'true':'false')+')">Save</button>';
+    UI.show('riteModal');},
+  save(early){
+    const after=parseInt(UI.el('biAfter').value,10);
+    (S.inv.bilat=S.inv.bilat||[]).push({b:this.before,a:after,n:this.note.slice(0,150),d:new Date().toDateString()});
+    S.inv.bilat=S.inv.bilat.slice(-30);
+    const dd=this.before-after;
+    S.insight+=4;S.lucidity=Math.min(100,S.lucidity+18);teachUnlock('bilat');save();refreshHud();
+    window.Daily3&&Daily3.mark('bilat');Rite.closeOnly();
+    UI.doc('TWIN LIGHT — RECORD',
+      '<p>'+(dd>0?'Tension '+this.before+' → '+after+'. The swinging gaze loosened the lock by '+dd+' teeth.':dd===0?'Unchanged — that is data too. Some knots loosen on the second visit.':'It rose. That can happen; sit by the stone a while, breathe deep. If it intensifies, tell a human.')+'</p>'+
+      '<p style="color:var(--dim);font-size:12px">Etched into your mind map. It also counts toward your daily triad.</p>');}
+};
+const Arch={
+  Q:[
+    ['Entering a crowded room, your first move is…',[['showing everyone the right face','p'],['scanning for who is genuine','g'],['listening to the room\'s feeling','a'],['staying in my own center','s']]],
+    ['Someone criticizes you unfairly. The first thing inside…',[['I must repair my reputation','p'],['is there a dark truth in what they said?','g'],['what pain brought this person here?','a'],['this does not define me','s']]],
+    ['In your dreams, most often…',[['exams / stages / running late','p'],['being chased, someone hiding','g'],['a stranger who feels familiar','a'],['flight, the sea, vast spaces','s']]],
+    ['What exhausts you most?',[['performing a role','p'],['suppressing what I suppress','g'],['not being able to say what I feel','a'],['my parts pulling against each other','s']]],
+    ['What restores you most?',[['being appreciated','p'],['confessing','g'],['one deep conversation','a'],['becoming whole in silence','s']]],
+    ['The people who anger you are usually…',[['the ones without rules','p'],['the ones like me who won\'t admit it','g'],['the unfeeling ones','a'],['the ones who want me in pieces','s']]],
+    ['If you wrote at midnight, the first line…',[['"Everyone was satisfied today."','p'],['"What I\'ve told no one is…"','g'],['"A voice inside me says…"','a'],['"They are all me; I sat with them all."','s']]],
+    ['How would Yaldabaoth deceive you?',[['"Everyone is watching; be flawless."','p'],['"Let no one see that side; give it to me."','g'],['"Only I understand you."','a'],['"No need to integrate; I will complete you."','s']]]],
+  i:0,sc:null,
+  open(){
+    UI.doc('◮ ARCHETYPE MIRROR','<p>A four-faced mirror: <b>Persona</b> (the mask), <b>Shadow</b> (the repressed), <b>Inner Voice</b> (the counter-pole — anima/animus), <b>Self</b> (the owner of the table). Eight questions; it shows which face leads.</p><p style="color:var(--dim);font-size:12px">A discovery inventory adapted from Jung\'s concepts; not a personality test or a diagnosis.</p><button class="btn v" onclick="UI.closeDoc();Arch.start()">Look into the mirror</button>');},
+  start(){this.i=0;this.sc={p:0,g:0,a:0,s:0};this.ask();},
+  ask(){
+    const q=this.Q[this.i];
+    UI.el('riteTitle').textContent='ARCHETYPE MIRROR — '+(this.i+1)+'/8';
+    UI.el('riteBody').innerHTML='<p style="color:var(--moon)">'+q[0]+'</p>'+
+      q[1].map((o,j)=>'<button class="choice" onclick="Arch.pick('+j+')">'+o[0]+'</button>').join('');
+    UI.show('riteModal');Game.setModal(true);},
+  pick(j){this.sc[this.Q[this.i][1][j][1]]++;this.i++;
+    if(this.i<8)this.ask();else this.done();},
+  done(){
+    const N={p:'PERSONA',g:'SHADOW',a:'INNER VOICE',s:'SELF'},
+      C={p:'Your macrocosmic counterpart: the <b>Persona Nebula</b> — bright surface, hidden core. The mask is functional; the danger is the mask forgetting the face. Bahal\'s captains are your area of expertise.',
+         g:'Your macrocosmic counterpart: the <b>Eclipse</b> — the body crossing in front of the light. Whoever walks with their shadow in front hides it least. Rite VII will tell you more than it tells the others.',
+         a:'Your macrocosmic counterpart: the <b>Binary Star</b> — two lights orbiting each other. The counter-pole\'s voice is open in you; the danger is projecting it onto someone outside and worshipping them. Lucida\'s gravity lesson is precisely yours.',
+         s:'Your macrocosmic counterpart: the <b>Galactic Center</b> — the silent mass that keeps the parts in orbit. The face closest to integration; the danger is premature fullness. You can carry the Three Readings principle.'},
+      dom=Object.keys(this.sc).sort((x,y)=>this.sc[y]-this.sc[x])[0];
+    S.inv.arch={sc:this.sc,dom,d:Date.now()};
+    S.insight+=6;S.lucidity=Math.min(100,S.lucidity+12);teachUnlock('arch');save();refreshHud();
+    Rite.closeOnly();
+    UI.doc('THE FOUR FACES — DOMINANT: '+N[dom],
+      '<p>'+['p','g','a','s'].map(k=>N[k]+': '+'◆'.repeat(this.sc[k])+'◇'.repeat(8-this.sc[k])).join('<br>')+'</p>'+
+      '<p>'+C[dom]+'</p><p style="color:var(--dim);font-size:12px">Etched into your mind map — you will see its cosmic counterpart there.</p>');}
+};
+/* ============ v8 — DAILY TRIAD (procedural quests) ============ */
+const Daily3={
+  KEY:'it041_daily3',
+  POOL:{echo:'Collect an echo stone',agent:'Talk to a subject',trail:'Leave a trace at a traveler stone',
+    dream:'Drop a dream into the Dream Well',daily:'Answer the question of the day',
+    bilat:'Do a round at the Twin-Light Stone',cbt:'Play the Distortion Hunter or keep a thought record',
+    zones3:'Visit three different regions'},
+  get(){try{return JSON.parse(localStorage.getItem(this.KEY))||{}}catch(e){return{}}},
+  set(d){try{localStorage.setItem(this.KEY,JSON.stringify(d))}catch(e){}},
+  today(){
+    let d=this.get();const t=new Date().toDateString();
+    if(d.date!==t){
+      const day=Math.floor(Date.now()/864e5),keys=Object.keys(this.POOL);
+      const pick=[];let seed=day;
+      while(pick.length<3){seed=(seed*9301+49297)%233280;
+        const k=keys[seed%keys.length];if(!pick.includes(k))pick.push(k);}
+      d={date:t,tasks:pick.map(k=>({k,done:false})),zones:[]};this.set(d);}
+    return d;},
+  mark(k){
+    const d=this.today();const t=d.tasks.find(x=>x.k===k&&!x.done);
+    if(!t)return;t.done=true;this.set(d);
+    S.lucidity=Math.min(100,S.lucidity+18);S.insight+=3;save();refreshHud();
+    const left=d.tasks.filter(x=>!x.done).length;
+    UI.toast('🜂 DAILY TRIAD '+(3-left)+'/3 — lucidity refreshed'+(left===0?' · DAY COMPLETE: one more brick toward the collective awakening':''),4000);},
+  zone(zk){
+    const d=this.today();
+    if(!d.zones.includes(zk)){d.zones.push(zk);this.set(d);
+      if(d.zones.length>=3)this.mark('zones3');}},
+  show(){
+    const d=this.today();
+    UI.doc('🜂 DAILY TRIAD — '+d.tasks.filter(t=>t.done).length+'/3',
+      '<p style="color:var(--dim);font-size:12px">Three small works each real day. Each refreshes your lucidity; all three count toward the collective awakening. Tomorrow all three renew.</p>'+
+      d.tasks.map(t=>'<div class="row">'+(t.done?'<b style="color:var(--accent)">✓</b> ':'◇ ')+this.POOL[t.k]+'</div>').join('')+
+      (d.tasks.every(t=>t.done)?'<p style="color:var(--violet)">Today\'s triad is complete. The world turns without you; it wakes with you.</p>':''));}
+};
+/* ============ v8 — MIND MAP: microcosm ↔ macrocosm ============
+   ULTIMATE PURPOSE: understanding how the universe works by exploring your own mind. */
+const MindMap={
+  nodes(){
+    const dr=(localStorage.getItem('it041_dreams')||'[]')!=='[]';
+    return[
+      ['gate','MIRROR GATE','the threshold where light turns back on itself',!!S.solved.s1],
+      ['diskAltar','BLACK HOLE','emotional gravity — the complexes',S.rites.r1!==undefined],
+      ['maskMirror','PERSONA NEBULA','bright surface, hidden core',S.rites.r2!==undefined],
+      ['blackBox','FORBIDDEN ZONE','the orbit of the unsaid',S.rites.r3!==undefined],
+      ['twoHouses','TWIN STAR','two windows, one sky',S.rites.r4!==undefined],
+      ['burntTree','SUPERNOVA','what transforms by burning',S.rites.r5!==undefined],
+      ['bench','FIXED STAR','the watching itself',S.rites.r6!==undefined],
+      ['shadowSpot','ECLIPSE','the body crossing the light',S.rites.r7!==undefined],
+      ['lunaris','PLEROMA REFLECTION','the full moon\'s signature on water',!!S.solved.s2],
+      ['archive','FIRST TOUCH — 1969','time\'s sealed drawer',!!S.solved.s5],
+      ['labyrinth','DEMIURGE WHEEL','the missing word at order\'s center',!!S.solved.s4],
+      ['station','TIME AXIS','the train waiting since 2022',!!S.solved.s6],
+      ['dreamWell','DREAM WELL','the vertical tunnel into the unconscious',dr],
+      ['ovCrypt','RESISTANCE CONSTELLATION','those who do not fit the lock',!!S.flags.ovCouncil],
+      ['therapy','HEALING SPIRAL','distortion hunt · twin light · four faces',!!(S.inv.cbt||S.inv.bilat||S.inv.arch)],
+      ['pleromaCore','BLIND EYE','where the copying god stopped',!!S.solved.s7]];},
+  show(){
+    UI.doc('🜨 MIND MAP — microcosm ↔ macrocosm',
+      '<canvas id="mmapC" width="740" height="1050" style="width:100%;border:1px solid var(--line);border-radius:4px;background:#04050a"></canvas>'+
+      '<button class="btn v" onclick="MindMap.download()">Download PNG — the map is yours</button>'+
+      '<p style="color:var(--dim);font-size:12px">The map grows with you: every rite, inventory and lock ignites a new star. The world above is the mirror of the sky below.</p>');
+    setTimeout(()=>this.draw(),50);},
+  draw(){
+    const c=document.getElementById('mmapC');if(!c)return;
+    const x=c.getContext('2d'),W=c.width;
+    x.fillStyle='#04050a';x.fillRect(0,0,W,c.height);
+    const ns=this.nodes(),done=ns.filter(n=>n[3]);
+    x.fillStyle='#7fd4c1';x.font='17px monospace';x.textAlign='center';
+    x.fillText('IT-041 · '+((typeof plName==='function'&&plName())||'TRAVELER')+' — THE HIDDEN MAP OF THE SELF',W/2,30);
+    x.fillStyle='#5a6478';x.font='11px monospace';
+    x.fillText('MICROCOSM — the geography of your mind ('+done.length+'/'+ns.length+' awake)',W/2,52);
+    const mx=v=>40+(v/WX)*(W-80),mz=v=>64+(v/WZ)*330;
+    x.strokeStyle='rgba(127,212,193,.25)';
+    ZONES.forEach(z=>{x.beginPath();x.arc(mx(z.x),mz(z.z),z.r*(W-80)/WX,0,7);x.stroke();});
+    x.strokeStyle='rgba(205,184,120,.5)';x.lineWidth=1.2;x.beginPath();
+    done.forEach((n,i)=>{const p=L[n[0]];if(!p)return;
+      i===0?x.moveTo(mx(p.x),mz(p.z)):x.lineTo(mx(p.x),mz(p.z));});
+    x.stroke();
+    ns.forEach(n=>{const p=L[n[0]];if(!p)return;
+      x.fillStyle=n[3]?'#cdb878':'rgba(90,100,120,.4)';
+      x.beginPath();x.arc(mx(p.x),mz(p.z),n[3]?4:2.5,0,7);x.fill();
+      if(n[3]){x.fillStyle='#9aa7c4';x.font='9px monospace';x.fillText(n[1],mx(p.x),mz(p.z)-7);}});
+    x.fillStyle='#9d8cc9';x.font='12px monospace';
+    x.fillText('— As above, so below —',W/2,425);
+    x.fillStyle='#5a6478';x.font='11px monospace';
+    x.fillText('MACROCOSM — the sky-reading of the same map',W/2,448);
+    const cx=W/2,cy=650,R=175;
+    for(let i=0;i<140;i++){x.fillStyle='rgba(154,167,196,'+(Math.random()*.3+.05)+')';
+      x.fillRect(40+Math.random()*(W-80),466+Math.random()*370,1,1);}
+    x.strokeStyle='rgba(157,140,201,.3)';x.beginPath();x.arc(cx,cy,R+12,0,7);x.stroke();
+    const pos={};ns.forEach((n,i)=>{const a=(i/ns.length)*Math.PI*2-Math.PI/2;
+      const r=R*(n[0]==='pleromaCore'?0:n[0]==='therapy'?.5:.78+((i*37)%23)/100);
+      pos[n[0]]=[cx+Math.cos(a)*r,cy+Math.sin(a)*r];});
+    x.strokeStyle='rgba(205,184,120,.55)';x.beginPath();
+    done.forEach((n,i)=>{const p=pos[n[0]];
+      i===0?x.moveTo(p[0],p[1]):x.lineTo(p[0],p[1]);});
+    x.stroke();
+    ns.forEach(n=>{const p=pos[n[0]];
+      if(n[3]){const g=x.createRadialGradient(p[0],p[1],0,p[0],p[1],9);
+        g.addColorStop(0,n[0]==='pleromaCore'?'#b9a8e8':'#e8e4d4');g.addColorStop(1,'rgba(0,0,0,0)');
+        x.fillStyle=g;x.beginPath();x.arc(p[0],p[1],9,0,7);x.fill();}
+      x.fillStyle=n[3]?'#e8e4d4':'rgba(90,100,120,.35)';
+      x.beginPath();x.arc(p[0],p[1],n[3]?3:1.6,0,7);x.fill();
+      if(n[3]){x.fillStyle='#9d8cc9';x.font='8.5px monospace';
+        x.fillText(n[1],p[0],p[1]+14);
+        x.fillStyle='rgba(154,167,196,.6)';x.fillText(n[2],p[0],p[1]+24);}});
+    let y=875;x.textAlign='left';x.font='11px monospace';
+    const line=(s,col)=>{x.fillStyle=col||'#9aa7c4';x.fillText(s,46,y);y+=16;};
+    x.fillStyle='#7fd4c1';x.font='12px monospace';x.fillText('— PERSONAL READING —',46,y);y+=18;x.font='11px monospace';
+    if(S.caseD)line('Dominant captain: '+PROFILES[S.caseD.dom].n+' · in shadow: '+PROFILES[S.caseD.sha].n);
+    if(S.inv.arch)line('The mirror\'s dominant face: '+{p:'PERSONA',g:'SHADOW',a:'INNER VOICE',s:'SELF'}[S.inv.arch.dom]);
+    if(S.inv.cbt)line('Distortion hunt: '+S.inv.cbt.score+'/6'+(Object.keys(S.inv.cbt.wrong)[0]?' · blind spot: '+CBT.D[Object.keys(S.inv.cbt.wrong).sort((a,b)=>S.inv.cbt.wrong[b]-S.inv.cbt.wrong[a])[0]]:''));
+    if(S.inv.bilat&&S.inv.bilat.length){const avg=(S.inv.bilat.reduce((t,e)=>t+(e.b-e.a),0)/S.inv.bilat.length).toFixed(1);
+      line('Twin light: '+S.inv.bilat.length+' rounds · average release: '+avg);}
+    line('Rites '+riteCount()+'/7 · echoes '+echoCount()+'/16 · locks '+S.locks+'/4'+(S.flags.integrated?' · INTEGRATED with the shadow':''));
+    if(S.flags.reading)line('Your reading: '+(S.flags.reading==='savas'?'WAR':S.flags.reading==='butunlesme'?'INTEGRATION':'THE THIRD READING')+' — and all three were true.','#cdb878');
+    y+=6;x.fillStyle='#9d8cc9';
+    x.fillText('Whoever maps their own mind begins to read how the universe works.',46,y);y+=15;
+    x.fillText('An integrated consciousness cannot be copied — Yaldabaoth stops exactly here.',46,y);
+    x.textAlign='center';x.fillStyle='#5a6478';x.font='10px monospace';
+    x.fillText('DO-LOON-AI EXPRESS · '+new Date().toLocaleDateString('en-GB')+' · no signature — truth has none',W/2,1035);},
+  download(){
+    const c=document.getElementById('mmapC');if(!c)return;
+    const a=document.createElement('a');a.download='mind-map-IT041.png';
+    a.href=c.toDataURL('image/png');a.click();
+    UI.toast('🜨 Your map is downloaded. It is your universe now.');}
+};
+/* ============ v8 — ARCHITECT MODE: build your own universe ============ */
+const Architect={
+  on(){return !!(S.flags.initiate||S.solved.s7);},
+  menu(){
+    if(!this.on()){UI.doc('✶ ARCHITECT MODE','<p>Not yet. To become an architect, either stop the core (⟁) or complete the initiation (✶).</p><p style="color:var(--dim)">Whoever walks the horizontal plane tours the map. Whoever leaps vertically writes it.</p>');return;}
+    const st=this.stars().length,ch=this.story().length;
+    UI.doc('✶ ARCHITECT MODE — your own universe',
+      '<p style="color:var(--dim);font-size:12px">Aelius Ignis\'s last lesson: moving from being narrated to narrating. From here on it is boundless — your own stars, your own book, your own rites.</p>'+
+      '<button class="btn v" onclick="UI.closeDoc();Architect.placeStar()">✶ Plant a star here (you have '+st+')</button>'+
+      '<button class="btn v" onclick="UI.closeDoc();Architect.writeChapter()">📖 Write a chapter of your own book ('+ch+' chapters)</button>'+
+      (ch?'<button class="btn ghost" onclick="Architect.exportBook()">Compile your book (.txt)</button>':'')+
+      '<button class="btn v" onclick="UI.closeDoc();Architect.designRite()">◈ Design your own rite</button>'+
+      (this.myRites().length?'<button class="btn ghost" onclick="UI.closeDoc();Architect.doMyRite()">◈ Practice your own rite</button>':''));},
+  stars(){try{return JSON.parse(localStorage.getItem('it041_stars'))||[]}catch(e){return[]}},
+  story(){try{return JSON.parse(localStorage.getItem('it041_story'))||[]}catch(e){return[]}},
+  myRites(){try{return JSON.parse(localStorage.getItem('it041_myrites'))||[]}catch(e){return[]}},
+  placeStar(){
+    UI.el('riteTitle').textContent='✶ STAR PLANTING — right here';
+    UI.el('riteBody').innerHTML='<p>Leave a sentence at this spot, one that will stay in this world. It becomes one of the first laws of your universe.</p>'+
+      '<textarea id="starT" rows="2" maxlength="90" placeholder="e.g. here I stopped being afraid…"></textarea>'+
+      '<button class="btn v" onclick="Architect.saveStar()">Ignite the star</button><button class="btn ghost" onclick="Rite.closeOnly()">Cancel</button>';
+    UI.show('riteModal');Game.setModal(true);},
+  saveStar(){
+    const t=UI.el('starT').value.trim();if(!t){UI.toast('One sentence is enough.');return;}
+    const l=this.stars();l.push({x:Math.round(S.px),z:Math.round(S.pz),t:t.slice(0,90)});
+    try{localStorage.setItem('it041_stars',JSON.stringify(l.slice(-40)));}catch(e){}
+    W3.addStar&&W3.addStar(S.px,S.pz,t);
+    Trails.add('✶ '+t,S.px,S.pz,true);
+    S.insight+=3;save();Rite.closeOnly();
+    UI.toast('✶ The star is lit. If the trail channel is open, other travelers see it too.');},
+  writeChapter(){
+    UI.el('riteTitle').textContent='📖 YOUR OWN BOOK — CHAPTER '+(this.story().length+1);
+    UI.el('riteBody').innerHTML='<p style="color:var(--dim);font-size:12px">Bahal\'s method: if you like, bury your own cipher in the chapter title (marked letters, reversed reading…). Your book stays on this device only.</p>'+
+      '<input id="chT" maxlength="60" placeholder="chapter title" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:8px">'+
+      '<textarea id="chB" rows="6" maxlength="2000" placeholder="let one of your inner characters narrate: a captain, your shadow, your inner voice…"></textarea>'+
+      '<button class="btn v" onclick="Architect.saveChapter()">Seal the chapter</button><button class="btn ghost" onclick="Rite.closeOnly()">Cancel</button>';
+    UI.show('riteModal');Game.setModal(true);},
+  saveChapter(){
+    const t=UI.el('chT').value.trim(),b=UI.el('chB').value.trim();
+    if(!t||!b){UI.toast('A title and at least one paragraph.');return;}
+    const l=this.story();l.push({t,b,d:new Date().toDateString()});
+    try{localStorage.setItem('it041_story',JSON.stringify(l));}catch(e){}
+    S.insight+=5;save();Rite.closeOnly();
+    UI.toast('📖 CHAPTER '+l.length+' sealed — '+t);},
+  exportBook(){
+    const l=this.story();if(!l.length)return;
+    const name=((typeof plName==='function'&&plName())||'TRAVELER IT-041');
+    let txt='MY OWN UNIVERSE — '+name+'\nWritten inside the Do-Loon-AI Express universe. A signature grants identity; truth has none.\n\n';
+    l.forEach((c,i)=>{txt+='CHAPTER '+(i+1)+' — '+c.t+'\n('+c.d+')\n\n'+c.b+'\n\n— · —\n\n';});
+    const a=document.createElement('a');a.download='my-own-universe.txt';
+    a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));a.click();
+    UI.toast('📖 Your book is compiled.');},
+  designRite(){
+    UI.el('riteTitle').textContent='◈ YOUR OWN RITE';
+    UI.el('riteBody').innerHTML='<p style="color:var(--dim);font-size:12px">The seven rites were Bahal\'s. The eighth and onward are yours. Design a question to ask yourself every day / every full moon.</p>'+
+      '<input id="mrT" maxlength="40" placeholder="rite name (e.g. EVENING RECKONING)" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:8px">'+
+      '<textarea id="mrQ" rows="2" maxlength="160" placeholder="its question: e.g. which mask did I carry longest today?"></textarea>'+
+      '<button class="btn v" onclick="Architect.saveRite()">Establish the rite</button><button class="btn ghost" onclick="Rite.closeOnly()">Cancel</button>';
+    UI.show('riteModal');Game.setModal(true);},
+  saveRite(){
+    const t=UI.el('mrT').value.trim(),q=UI.el('mrQ').value.trim();
+    if(!t||!q){UI.toast('A name and a question.');return;}
+    const l=this.myRites();l.push({t,q,log:[]});
+    try{localStorage.setItem('it041_myrites',JSON.stringify(l.slice(-10)));}catch(e){}
+    Rite.closeOnly();UI.toast('◈ RITE ESTABLISHED — '+t+'. Practice it any day from Architect Mode.');},
+  doMyRite(){
+    const l=this.myRites();if(!l.length)return;
+    const r=l[l.length-1];this._cur=l.length-1;
+    UI.el('riteTitle').textContent='◈ '+r.t+' (your rite)';
+    UI.el('riteBody').innerHTML='<p style="color:var(--violet)">'+esc(r.q)+'</p>'+
+      (l.length>1?'<p style="color:var(--dim);font-size:11px">'+l.map((x,i)=>'<a href="#" onclick="Architect._cur='+i+';return false" style="color:var(--accent)">'+esc(x.t)+'</a>').join(' · ')+'</p>':'')+
+      '<textarea id="mrA" rows="3" maxlength="300" placeholder="today\'s answer…"></textarea>'+
+      '<button class="btn v" onclick="Architect.answerRite()">Answer</button><button class="btn ghost" onclick="Rite.closeOnly()">Not today</button>';
+    UI.show('riteModal');Game.setModal(true);},
+  answerRite(){
+    const a=UI.el('mrA').value.trim();if(!a){UI.toast('One sentence is enough.');return;}
+    const l=this.myRites();const r=l[this._cur||l.length-1];
+    r.log.push({d:new Date().toDateString(),a:a.slice(0,300)});r.log=r.log.slice(-30);
+    try{localStorage.setItem('it041_myrites',JSON.stringify(l));}catch(e){}
+    S.insight+=3;S.lucidity=Math.min(100,S.lucidity+10);save();refreshHud();Rite.closeOnly();
+    UI.toast('◈ '+r.t+' practiced — the record is yours.');}
+};
+if(typeof window!=='undefined'){window.CBT=CBT;window.Bilat=Bilat;window.Arch=Arch;
+  window.Daily3=Daily3;window.MindMap=MindMap;window.Architect=Architect;}
+
 /* ============ DREAM WELL ============ */
 const Dreams={
   KEY:'it041_dreams',
   list(){try{return JSON.parse(localStorage.getItem(this.KEY))||[]}catch(e){return[]}},
   add(t){const l=this.list();l.push({d:new Date().toDateString(),t:String(t).slice(0,400)});
-    try{localStorage.setItem(this.KEY,JSON.stringify(l.slice(-40)))}catch(e){}}
+    try{localStorage.setItem(this.KEY,JSON.stringify(l.slice(-40)))}catch(e){}
+    window.Daily3&&Daily3.mark('dream');}
 };
 function doDreamWell(){
   const l=Dreams.list();let h='';
@@ -2072,7 +2475,8 @@ if(HAS3D)(function(){
   moonLight.shadow.mapSize.set(2048,2048);
   moonLight.shadow.camera.left=-220;moonLight.shadow.camera.right=220;
   moonLight.shadow.camera.top=220;moonLight.shadow.camera.bottom=-220;
-  moonLight.shadow.camera.far=700;moonLight.shadow.bias=-0.0008;
+  moonLight.shadow.camera.far=700;moonLight.shadow.bias=-0.0003;
+  moonLight.shadow.normalBias=1.1; /* v8: kills the stripe artifacts (shadow acne) on the ground */
   const mlTarget=new THREE.Object3D();mlTarget.position.set(190,0,145);scene.add(mlTarget);
   moonLight.target=mlTarget;scene.add(moonLight);
   const lantern=new THREE.PointLight(0xffd9a8,.85,11,2);scene.add(lantern);
@@ -2265,6 +2669,35 @@ if(HAS3D)(function(){
   if(S.rites&&S.rites.r1!==undefined)W3.rite_r1(S.rites.r1);
   /* altar */
   cyl(1.2,1.5,.8,std(0x14101e,{emissive:0x9d8cc9,emissiveIntensity:.2}),L.diskAltar.x,.4,L.diskAltar.z);
+
+  /* ---- v8: Therapy Center inventory devices ---- */
+  (function(){
+    /* Distortion Hunter desk — green-screened thought desk */
+    box(2.2,.9,1.1,std(0x2a2218,{roughness:.6}),L.cbtDesk.x,.45,L.cbtDesk.z);
+    box(1.2,.8,.08,std(0x06140c,{emissive:0x2c8c5c,emissiveIntensity:.8}),L.cbtDesk.x,1.3,L.cbtDesk.z-.3,-.25);
+    /* Twin-Light Stone — a two-tipped obelisk with two light spheres */
+    cyl(.5,.7,2.6,std(0x1a1626,{emissive:0x9d8cc9,emissiveIntensity:.25}),L.bilatStone.x,1.3,L.bilatStone.z);
+    const bl1=new THREE.PointLight(0x7fd4c1,.7,9),bl2=new THREE.PointLight(0xcdb878,.7,9);
+    bl1.position.set(L.bilatStone.x-1.4,2.4,L.bilatStone.z);bl2.position.set(L.bilatStone.x+1.4,2.4,L.bilatStone.z);
+    scene.add(bl1);scene.add(bl2);
+    W3._bilat=(tt)=>{const p=Math.sin(tt*2.2);bl1.intensity=.35+Math.max(0,-p)*.9;bl2.intensity=.35+Math.max(0,p)*.9;};
+    /* Archetype Mirror — four-faced prism */
+    const am=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,2.4,4),
+      std(0x101522,{roughness:.1,metalness:.9,emissive:0x3a4a66,emissiveIntensity:.4}));
+    am.position.set(L.archStone.x,1.2,L.archStone.z);am.castShadow=true;scene.add(am);
+    W3._archM=am;
+  })();
+  /* ---- v8: Architect stars — permanent lights planted by the player ---- */
+  const STARS=[];
+  W3.addStar=(x,z,txt)=>{
+    const m=new THREE.Mesh(new THREE.OctahedronGeometry(.5),
+      std(0x141020,{emissive:0xe8e4d4,emissiveIntensity:.9}));
+    m.position.set(x,2.6,z);scene.add(m);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(String(txt).slice(0,42),512,64,22,'rgba(232,228,212,.85)'),transparent:true,depthWrite:false}));
+    sp.scale.set(10,1.4,1);sp.position.set(x,3.8,z);scene.add(sp);
+    STARS.push(m);};
+  try{(JSON.parse(localStorage.getItem('it041_stars'))||[]).forEach(s=>W3.addStar(s.x,s.z,s.t));}catch(e){}
+  W3._starAnim=(tt)=>STARS.forEach((m,i)=>{m.rotation.y=tt*.8+i;m.position.y=2.6+Math.sin(tt*1.4+i)*.2;});
 
   /* ---- prison / two houses ---- */
   const houseWin=[];
@@ -2604,8 +3037,12 @@ if(HAS3D)(function(){
   });
   W3.agentNear=()=>{for(const a of AGENTS){
     if(Math.hypot(S.px-a.f.g.position.x,S.pz-a.f.g.position.z)<3.5)return a;}return null;};
+  /* v8: after integration, the shadow walking beside you can be talked to at any moment */
+  W3.bahalNear=()=>bahalMode==='walk'&&bahal.g.visible&&
+    Math.hypot(S.px-bahal.g.position.x,S.pz-bahal.g.position.z)<3.6;
   W3.agentTalk=()=>{const a=W3.agentNear();if(!a)return;
     a.wait=12;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
+    window.Daily3&&Daily3.mark('agent');
     if(window.Mirror&&Mirror.ready()){Mirror.open('agent'+(AGENTS.indexOf(a)%7));return;}
     const line=AG_LINES[a.li];a.li=(a.li+1)%AG_LINES.length;
     Dlg.open([[line[0],line[1]]],()=>{
@@ -2828,7 +3265,7 @@ if(HAS3D)(function(){
       renderer.domElement.requestPointerLock&&renderer.domElement.requestPointerLock();});
   addEventListener('mousemove',e=>{
     if(document.pointerLockElement===renderer.domElement){
-      Cam.yaw-=e.movementX*.0024;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+e.movementY*.0024));}});
+      Cam.yaw-=e.movementX*.0024;Cam.pitch=Math.max(-.48,Math.min(.95,Cam.pitch+e.movementY*.0024));}});
   addEventListener('wheel',e=>{Cam.dist=Math.max(4,Math.min(13,Cam.dist+e.deltaY*.005));});
   let lookId=null,lx=0,ly=0,lookMoved=false;
   addEventListener('touchstart',e=>{for(const t of e.changedTouches){
@@ -2838,7 +3275,7 @@ if(HAS3D)(function(){
   addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===lookId){
     const ddx=t.clientX-lx,ddy=t.clientY-ly;
     if(!lookMoved){if(Math.abs(ddx)+Math.abs(ddy)<7)return;lookMoved=true;lx=t.clientX;ly=t.clientY;return;}
-    Cam.yaw-=ddx*.006;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+ddy*.006));
+    Cam.yaw-=ddx*.006;Cam.pitch=Math.max(-.48,Math.min(.95,Cam.pitch+ddy*.006));
     lx=t.clientX;ly=t.clientY;}},{passive:true});
   addEventListener('touchend',e=>{for(const t of e.changedTouches)if(t.identifier===lookId)lookId=null;},{passive:true});
   addEventListener('touchcancel',()=>{lookId=null;},{passive:true});
@@ -2911,7 +3348,7 @@ if(HAS3D)(function(){
     /* jump */
     if(keys['space']&&jy<=0&&Game.running&&!Game.modal){vy=5.6;}
     if(vy!==0||jy>0){jy+=vy*dt;vy-=15*dt;if(jy<=0){jy=0;vy=0;}}
-    S.heading=meshAng+Math.PI;
+    S.heading=Math.PI-meshAng; /* v8: minimap arrow now matches travel direction */
     player.g.position.set(S.px,jy+Math.abs(Math.sin(walkT))*.05,S.pz);
     player.g.rotation.y=meshAng;
     const moving=Math.abs(mx)+Math.abs(mz)>0.0001;
@@ -2927,9 +3364,9 @@ if(HAS3D)(function(){
       const cd=Cam.dist,cp=Cam.pitch;
       camera.position.lerp(new THREE.Vector3(
         S.px+Math.sin(Cam.yaw)*Math.cos(cp)*cd,
-        1.6+Math.sin(cp)*cd,
+        Math.max(.55,1.6+Math.sin(cp)*cd), /* v8: no ground clipping when looking up */
         S.pz+Math.cos(Cam.yaw)*Math.cos(cp)*cd),.18);
-      camera.lookAt(S.px,1.9,S.pz);
+      camera.lookAt(S.px,cp<0?1.9-cp*9:1.9,S.pz); /* v8: low camera tilts the gaze skyward */
       moonLight.position.set(S.px+130,200,S.pz-60);
       mlTarget.position.set(S.px,0,S.pz);
     }
@@ -2946,8 +3383,10 @@ if(HAS3D)(function(){
     PLM.forEach((p,i)=>{if(!p.collected){p.g.position.y=Math.sin(t*2+i)*.15;p.g.rotation.y=t*.8;}});
     ECHM.forEach((e,i)=>{if(e.m.visible){e.m.position.y=1.2+Math.sin(t*1.6+i)*.25;e.m.rotation.y=t*.9+i;}});
     fire.intensity=1.4+Math.sin(t*9)*.3+Math.sin(t*23)*.15;
+    W3._bilat&&W3._bilat(t);W3._starAnim&&W3._starAnim(t);
+    if(W3._archM)W3._archM.rotation.y=t*.3;
     flame.scale.y=1+Math.sin(t*11)*.2;
-    mists.forEach(sp=>{sp.position.x+=sp.userData.v*dt;if(sp.position.x>370)sp.position.x=10;});
+    mists.forEach(sp=>{sp.position.x+=sp.userData.v*dt*.35;if(sp.position.x>370)sp.position.x=10;}); /* v8: calmer mist */
     {const arr=ffGeo.attributes.position.array;
       for(let i=0;i<ffN;i++){arr[i*3+1]=1.4+Math.sin(t*1.4+ffSeed[i])*1.1;
         arr[i*3]+=Math.sin(t*.6+ffSeed[i]*2)*.012;arr[i*3+2]+=Math.cos(t*.5+ffSeed[i]*3)*.012;}
@@ -3074,11 +3513,16 @@ if(HAS3D)(function(){
       if(!S.flags.inPleroma){
         const TZ=[['blackdisk',0],['prison',1],['therapy',2],['labyrinth',3],['forest',4],['lake',5]];
         for(const[k,ti]of TZ){const z=L[k];
-          if(Math.hypot(S.px-z.x,S.pz-z.z)<z.r+4){want=ti;break;}}
+          if(Math.hypot(S.px-z.x,S.pz-z.z)<z.r+4){want=ti;
+            window.Daily3&&Daily3.zone(k);break;}}
       }
       Snd._zoneWant=want;
       Snd.zoneTape&&Snd.zoneTape(want);
     }
+    /* v8: lucidity regenerates on its own — a breathing mind recovers.
+       Fast in daylight and at full moon, slow at night; drains still apply. */
+    if(Game.running&&!Game.modal)
+      S.lucidity=Math.min(100,S.lucidity+dt*((W3.sun||0)>.45?1.1:.35)*(isFull&&isFull()?1.6:1));
     document.getElementById('dmg').style.opacity=S.lucidity<35?(35-S.lucidity)/40:0;
 
     /* beacon */

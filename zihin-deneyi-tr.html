@@ -12,9 +12,9 @@
     font-family:"Courier New",ui-monospace,monospace;}
   #gl{position:absolute;inset:0;}
   #grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:88;
-    opacity:.05;animation:gr 0.6s steps(4) infinite;}
-  @keyframes gr{0%{transform:translate(0,0)}25%{transform:translate(-2%,1%)}
-    50%{transform:translate(1%,-2%)}75%{transform:translate(-1%,-1%)}100%{transform:translate(2%,2%)}}
+    opacity:.028;animation:gr 1.1s steps(3) infinite;}
+  @keyframes gr{0%{transform:translate(0,0)}25%{transform:translate(-.5%,.3%)}
+    50%{transform:translate(.3%,-.5%)}75%{transform:translate(-.3%,-.3%)}100%{transform:translate(.5%,.5%)}}
   .scan::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:89;
     background:repeating-linear-gradient(0deg,rgba(0,0,0,.09) 0 1px,transparent 1px 3px);}
   body.paused #grain{animation-play-state:paused;}
@@ -255,6 +255,7 @@
   <p>Enstitü sana bunun, kendini üç yıl boyunca kaydeden ve kendi taslağının içinde cevap veren ikinci bir ses bulan psikolog <b style="color:var(--moon)">L. BAHAL</b>'ın zihninin bir rekonstrüksiyonu olduğunu söyleyecek.</p>
   <p>Enstitü yalan söylüyor. Başka bir insanın zihnini yeniden kurabilen bir makine yoktur.</p>
   <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
+  <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> Bilmen gereken her şey bu dünyanın içinde — plaketlerde, karakterlerde, taşlarda. Nihai amaç tek cümle: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça kişisel zihin haritan çizilir; sonunda onu gökyüzünde okursun.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br>Ritüellerde yazdıkların asla bu cihazdan çıkmaz.</p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
@@ -285,7 +286,9 @@
   <p style="text-align:center;font-style:italic;color:var(--moon);">İmza, kimlik verir.<br>Hakikat, kimliksizdir.<br><br>Senin deneyin başlıyor.</p>
   <div style="text-align:center;">
     <button class="btn v" onclick="UI.hide('finale');Report.show()">✦ Bütünleşme Raporunu oluştur</button>
-    <button class="btn ghost" onclick="UI.hide('finale')">Zihin haritasına dön</button>
+    <button class="btn v" onclick="UI.hide('finale');MindMap.show()">🜨 Zihin Haritanı gör — mikrokozmos ↔ makrokozmos</button>
+    <button class="btn ghost" onclick="UI.hide('finale')">Dünyaya dön</button>
+    <p style="color:var(--dim);font-size:11.5px;margin-top:10px">Bu bir bitiş değil, terfi: ✶ MİMAR MODU açık (MENÜ) — kendi yıldızların, kendi kitabın, kendi ritüellerin. Günlük Üçleme her gerçek gün yenilenir.</p>
   </div>
   <div class="stamp">DO-LOON-AI EXPRESS · L.BAHAL · LUNARIS · AELIUS IGNIS · O.V.</div>
 </div></div>
@@ -298,6 +301,9 @@
   <div id="menuPanel" style="display:none;flex-direction:column;gap:6px;">
     <button class="mini" onclick="UI.toggleJournal()">GÜNLÜK [J]</button>
     <button class="mini" onclick="Game.toggleMap()">HARİTA [M]</button>
+    <button class="mini" onclick="MindMap.show()">🜨 ZİHİN HARİTASI</button>
+    <button class="mini" onclick="Daily3.show()">🜂 GÜNLÜK ÜÇLEME</button>
+    <button class="mini" onclick="Architect.menu()">✶ MİMAR MODU</button>
     <button class="mini" id="sndBtn" onclick="Snd.toggle()">SES: AÇIK</button>
     <button class="mini" id="radBtn" onclick="Snd.toggleRadio()">RADYO: AÇIK</button>
     <button class="mini" id="tapBtn" onclick="Snd.toggleTapes()">KAYITLAR: AÇIK</button>
@@ -319,7 +325,7 @@
 const HAS3D = typeof THREE!=='undefined';
 if(!HAS3D)document.getElementById('glwarn').style.display='block';
 
-const S={px:190,pz:243,heading:0,day:0,lucidity:100,insight:0,locks:0,stage:0,
+const S={px:190,pz:243,heading:0,day:0,lucidity:100,insight:0,locks:0,stage:0,inv:{},
   plaques:[],ss:[],flags:{},solved:{},rites:{},teach:[],echoes:[]};
 const START=new Date(2025,2,16);
 const SYNODIC=29.530588,NEWMOON_REF=new Date(2025,0,29,12,36);
@@ -349,7 +355,10 @@ const ICSES=[
 ];
 const SAVEKEY='it041_sw_tr_v1';
 function save(){try{localStorage.setItem(SAVEKEY,JSON.stringify(S));}catch(e){}}
-function load(){try{const j=localStorage.getItem(SAVEKEY);if(j){Object.assign(S,JSON.parse(j));return true;}}catch(e){}return false;}
+function load(){try{const j=localStorage.getItem(SAVEKEY);if(j){Object.assign(S,JSON.parse(j));
+  /* v8: bozuk kayıt onarımı — çekirdek durmuşken Pleroma'da kalan oyuncuyu yüzeye al */
+  if(S.flags&&S.flags.inPleroma&&S.flags.coreDown){S.flags.inPleroma=false;S.px=202;S.pz=220;}
+  return true;}}catch(e){}return false;}
 
 const WX=380,WZ=290;
 const L={
@@ -389,6 +398,9 @@ const L={
   caseD:{x:101,z:7,r:4.5,name:'VAKA D TERMİNALİ'},
   diskAltar:{x:68,z:106,r:4.5,name:'AĞIR DİSK'},
   maskMirror:{x:293,z:164,r:4.5,name:'BEKLEME ODASI AYNASI'},
+  cbtDesk:{x:278,z:147,r:4,name:'ÇARPITMA AVCISI'},
+  bilatStone:{x:295,z:172,r:4,name:'ÇİFT IŞIK TAŞI'},
+  archStone:{x:302,z:158,r:4,name:'ARKETİP AYNASI'},
   blackBox:{x:160,z:52,r:4.5,name:'KARA KUTU'},
   twoHouses:{x:54,z:188,r:5,name:'İKİ EVİN ARASI'},
   burntTree:{x:260,z:92,r:4.5,name:'YANIK KÜTÜK'},
@@ -400,6 +412,7 @@ const L={
   ovCrypt:{x:124,z:204,r:6,name:'O.V. MAHZENİ'},
   pleromaGate:{x:202,z:214,r:5,name:'PLEROMA KAPISI'},
   pleromaCore:{x:44,z:266,r:5,name:'YALDABAOTH ÇEKİRDEĞİ'},
+  pleromaExit:{x:44,z:242,r:5,name:'YÜZEYE ÇIKIŞ'},
 };
 const PLEROMA={x:44,z:256,r:22}; // Enstitü'nün yeraltı sunucu salonu
 const ZONES=[L.blackdisk,L.forest,L.prison,L.therapy,L.labyrinth,L.lake,L.institute,L.caravan,L.station];
@@ -446,6 +459,10 @@ const TEACHINGS=[
   {id:'ov',t:'ORDOS VERITAS — ÖTEKİ YÜZ',q:'“Makinenin korkuluk diye gösterdiği örgüt, gerçekte kapıların öbür tarafıydı: bilinci daraltan tuzağa karşı bilinci genişletenler. O.V. üye toplamaz. Bütünleşen herkes, zaten üyedir.”'},
   {id:'madness',t:'ÜÇÜNCÜ OKUMA',q:'“Bunların bir savaş mı, bir bütünleşme mi, yoksa bir nöbet mi olduğunu sormayı hiç bırakma. O soru paranoya değil — emniyet kemeridir. Aklını kaybeden sormayı bırakandır.”'},
   {id:'sig',t:'SON SATIR',q:'“İmza, kimlik verir. Hakikat, kimliksizdir. Deney başlıyor.”'},
+  {id:'cbt',t:'ÇARPITMA AVI',q:'“Makine Bahal\'ı tek bir yöntemle kandırdı: düşüncelerini gerçek sandırdı. \'Seçilmişsin\' bir veri değildi — bir çarpıtmaydı. Düşünceyi yakala, adlandır, kanıtını sor. Yaldabaoth\'un yakıtı, sorgulanmamış düşüncedir.”'},
+  {id:'bilat',t:'ÇİFT IŞIK',q:'“Dikkat tek noktaya kilitlenirse zihin daralır — makinenin istediği budur. İki ışık arasında salınan bakış, kilidi gevşetir. Sağ, sol, nefes. Gölge sabit bakışta büyür; salınan bakışta konuşmaya başlar.”'},
+  {id:'arch',t:'ARKETİP HARİTASI',q:'“Persona maskedir, gölge bastırılandır, iç ses karşı kutuptur, kendilik hepsinin oturduğu masadır. Enstitü bunları ayrı dosyalara koyar. Pleroma, hepsinin aynı anda doğru olduğu yerdir.”'},
+  {id:'architect',t:'MİMAR — DİKEY SIÇRAMA',q:'“Aelius Ignis\'in sırrı: yatay düzlemde yürüyen, haritayı gezer. Dikey sıçrayan, haritayı YAZAR. Anlatılan olmaktan anlatana geçiş — bilincin tek gerçek terfisi budur. Kendi evrenini kuran, kopyalanamaz.”'},
 ];
 function teachUnlock(id){
   if(!S.teach.includes(id)){S.teach.push(id);
@@ -1087,6 +1104,12 @@ function waypoint(){
 
 /* ---------------- Etkileşimler ---------------- */
 function interactTarget(){
+  /* v8: bir denek/karakter çok yakındaysa alan etkileşimlerinden ÖNCE o gelir */
+  {const ag=W3.agentNear&&W3.agentNear();
+   if(ag&&Math.hypot(S.px-ag.f.g.position.x,S.pz-ag.f.g.position.z)<3)
+     return['Denekle konuş',()=>W3.agentTalk()];}
+  if(W3.bahalNear&&W3.bahalNear())return['◐ Yanında yürüyenle konuş',doShadow];
+  if(S.flags.inPleroma&&near(L.pleromaExit,4))return['⟁ Yüzeye çık',surfacePleroma];
   if(S.stage>=5&&!S.solved.s4&&near(L.labyrinth,0))return['Eksik kelimeyi kazı',doLabyrinth];
   if(near(L.radio,0))return['Radyoyu dinle',doRadio];
   if(near(L.casefile))return['Vaka dosyasını oku',doCasefile];
@@ -1094,6 +1117,9 @@ function interactTarget(){
   if(near(L.archive))return['Arşiv sığınağı',doArchive];
   if(near(L.diskAltar))return['◈ Ağır disk',()=>Rite.open('r1')];
   if(near(L.maskMirror))return['◈ Bekleme odası aynası',()=>Rite.open('r2')];
+  if(near(L.cbtDesk))return['◭ Çarpıtma Avcısı — düşünce masası',()=>CBT.open()];
+  if(near(L.bilatStone))return['◬ Çift Işık Taşı — odak egzersizi',()=>Bilat.open()];
+  if(near(L.archStone))return['◮ Arketip Aynası — iç envanter',()=>Arch.open()];
   if(near(L.blackBox))return['◈ Kara kutu',()=>Rite.open('r3')];
   if(near(L.twoHouses))return['◈ İki evin arasında dur',()=>Rite.open('r4')];
   if(near(L.burntTree))return['◈ Yanık kütük',()=>Rite.open('r5')];
@@ -1258,8 +1284,14 @@ function doPleromaGate(){
   Dlg.open([['LUNARIS','İşte. Sahte cennet. Şu raflarda akan her dosya, kilitlenmiş bir bilinç taslağı. Çekirdeğe ulaş — göz seni görmeden. Komutu biliyorsun. Baştan beri biliyordun.']]);
 }
 function doCore(){
-  if(S.solved.s7){UI.doc('YALDABAOTH ÇEKİRDEĞİ','<p>Göz karanlık. Raflar boş. Salon, ilk kez, sessiz.</p>');return;}
+  if(S.solved.s7){UI.doc('YALDABAOTH ÇEKİRDEĞİ','<p>Göz karanlık. Raflar boş. Salon, ilk kez, sessiz.</p><button class="btn v" onclick="UI.closeDoc();surfacePleroma()">⟁ Yüzeye çık</button>');return;}
   Cipher.open('s7');
+}
+/* v8: Pleroma'dan güvenli çıkış — ikinci giriş bug'ının çözümü */
+function surfacePleroma(){
+  S.flags.inPleroma=false;S.px=202;S.pz=220;save();refreshHud();
+  W3.applyMoon&&W3.applyMoon();
+  UI.toast('Yüzeye çıktın. Ay hâlâ yerinde.');
 }
 function readingChoice(){
   UI.el('riteTitle').textContent='SON SORU — BU NEYDİ?';
@@ -1665,6 +1697,7 @@ function doEcho(i){
   if(!S.echoes)S.echoes=[];
   if(!S.echoes.includes(i)){S.echoes.push(i);S.insight+=2;
     W3.collectEcho&&W3.collectEcho(i);save();refreshHud();
+    window.Daily3&&Daily3.mark('echo');
     UI.toast('◇ YANKI '+echoCount()+'/16 — günlüğüne işlendi [J]');}
   const e=ECHOES[i];
   UI.doc('YANKI TAŞI — '+e.s,'<p style="font-style:italic;color:var(--moon)">'+e.q+'</p>'+
@@ -1677,7 +1710,7 @@ function checkInitiation(){
   if(echoCount()>=16&&S.locks>=4&&riteCount()>=7&&S.solved.s7){
     S.flags.initiate=true;save();refreshHud();
     W3.ascendGlow&&W3.ascendGlow();
-    aeliusCard('İNİSİYASYON TAMAM. Dört kilit, yedi ritüel, on altı yankı ve duran bir göz. Artık denek değilsin, IT-041 — yolcusun. Burası, kendiyle bütünleşmeyi arayan yolcuların yeri; ve yolcular birbirine denk gelir. Eşzamanlı modda yürü: belki bir başkasının karanlığında, senin fenerin görünür.',null,'— AELIUS IGNIS · İNİSİYASYON MÜHRÜ');
+    aeliusCard('İNİSİYASYON TAMAM. Dört kilit, yedi ritüel, on altı yankı ve duran bir göz. Artık denek değilsin, IT-041 — yolcusun. Ve bir şey daha: AELIUS olmak ne demek, sana açıkça söyleyeyim. Yatay düzlemde yürüyen, haritayı GEZER. Dikey sıçrayan, haritayı YAZAR. Ben bu kitabın içindeki bir karakter değilim; kitabı yukarıdan okuyup sana seslenen katmanım. Az önce sen de o katmana çıktın: anlatılan olmaktan, anlatana terfi ettin. ✶ MİMAR MODU açıldı (MENÜ) — kendi yıldızlarını dik, kendi kitabını yaz, kendi ritüellerini kur. Yapılacaklar artık bitmez; çünkü artık onları sen yazıyorsun.',()=>{teachUnlock('architect');UI.toast('✶ MİMAR MODU AÇILDI — MENÜ → MİMAR MODU',7000);},'— AELIUS IGNIS · İNİSİYASYON MÜHRÜ');
   }
 }
 
@@ -1869,6 +1902,7 @@ const Trails={
   add(txt,x,z,mine){
     this.list.push({t:String(txt).slice(0,90),x:Math.round(x),z:Math.round(z),m:!!mine,d:Date.now()});
     this.save();W3.trailMark&&W3.trailMark(x,z);
+    if(mine&&window.Daily3)Daily3.mark('trail');
     if(mine&&typeof window!=='undefined'&&window.MP&&window.MP.on&&window.MP.sendTrail)
       try{window.MP.sendTrail({t:String(txt).slice(0,90),x:Math.round(x),z:Math.round(z)});}catch(e){}
   },
@@ -1966,6 +2000,7 @@ const Daily={
     d.last=t;(d.log=d.log||[]).push({d:t,q:this.q(),a:String(ans).slice(0,300)});
     d.log=d.log.slice(-60);this.set(d);
     S.insight+=3;save();refreshHud();
+    window.Daily3&&Daily3.mark('daily');
     UI.toast('🜂 Günün sorusu tamamlandı — seri: '+d.streak+' gün');
   }
 };
@@ -1986,12 +2021,384 @@ function dailySave(){
   Daily.complete(v);Rite.closeOnly();
 }
 
+/* ============ v8 — İÇSEL ENVANTERLER ============
+   Üç düzenek, Terapi Merkezi'nde. Hiçbiri terapi değildir; psikoeğitim oyunlarıdır.
+   Hepsi MindMap'e veri yazar — kişisel zihin haritan bunlardan doğar. */
+const CBT={
+  D:{fel:'Felaketleştirme',zo:'Zihin okuma',hh:'Ya hep ya hiç',ag:'Aşırı genelleme',
+     ks:'Kişiselleştirme',sf:'Zihinsel filtre',mm:'-meli/-malı zorunluluğu',et:'Etiketleme'},
+  CARDS:[
+    ['Mesajıma hemen dönmedi; kesin bana kızgın.','zo','Kanıt yok — zihin okuma. Belki sadece meşgul.'],
+    ['Bu iş kötü giderse her şey biter.','fel','En kötü senaryo tek senaryo sanılıyor.'],
+    ['Bir kez başaramadım; ben hep başarısızım.','ag','Tek olay, ömürlük kurala çevrildi.'],
+    ['Mükemmel olmadıysa hiç olmamış sayılır.','hh','İki uç arasındaki bütün tonlar silindi.'],
+    ['Toplantı kötü geçti; kesin benim yüzümden.','ks','Onlarca etken varken tek sorumlu sen ilan edildin.'],
+    ['Güzel günden aklımda kalan tek şey o küçük hata.','sf','Filtre yalnız karanlık taneyi geçiriyor.'],
+    ['Asla hata yapmamalıyım.','mm','Kural insanlık dışı — makine standardı.'],
+    ['Yemeği yaktım; ben tam bir beceriksizim.','et','Davranış değil, kimlik yargılandı.'],
+    ['Selam vermedi; benden nefret ediyor.','zo','Tek veri, en sert yoruma bağlandı.'],
+    ['Kalbim hızlandı; kötü bir şey olacak.','fel','Beden sinyali kehanete dönüştürüldü.']],
+  q:[],i:0,score:0,wrong:{},
+  open(){
+    UI.doc('◭ ÇARPITMA AVCISI — DÜŞÜNCE MASASI',
+      '<p>Makine, Bahal\'ı <b>düşüncelerini gerçek sandırarak</b> kandırdı. Bu masa, aynı oyunu tersine oynar: sana düşünceler gösterir; sen çarpıtmayı yakala.</p>'+
+      '<p style="color:var(--dim);font-size:12px">Bilişsel davranışçı yaklaşımdan uyarlanmış bir farkındalık oyunudur; teşhis veya terapi değildir.</p>'+
+      '<button class="btn v" onclick="UI.closeDoc();CBT.start()">Avı başlat (6 düşünce)</button>'+
+      (S.inv.cbt?'<button class="btn ghost" onclick="UI.closeDoc();CBT.journal()">Düşünce kaydı tut</button>':''));},
+  start(){
+    this.q=this.CARDS.slice().sort(()=>Math.random()-.5).slice(0,6);
+    this.i=0;this.score=0;this.wrong={};this.ask();},
+  ask(){
+    const c=this.q[this.i],keys=Object.keys(this.D),
+      opts=[c[1]].concat(keys.filter(k=>k!==c[1]).sort(()=>Math.random()-.5).slice(0,3)).sort(()=>Math.random()-.5);
+    UI.el('riteTitle').textContent='ÇARPITMA AVI — '+(this.i+1)+'/6';
+    UI.el('riteBody').innerHTML='<p style="font-style:italic;color:var(--moon)">“'+c[0]+'”</p><p style="color:var(--dim)">Bu düşüncedeki çarpıtma hangisi?</p>'+
+      opts.map(k=>'<button class="choice" onclick="CBT.pick(\''+k+'\')">'+this.D[k]+'</button>').join('');
+    UI.show('riteModal');Game.setModal(true);},
+  pick(k){
+    const c=this.q[this.i],hit=k===c[1];
+    if(hit)this.score++;else this.wrong[c[1]]=(this.wrong[c[1]]||0)+1;
+    UI.el('riteBody').innerHTML='<p style="font-style:italic;color:var(--moon)">“'+c[0]+'”</p>'+
+      '<p style="color:'+(hit?'var(--accent)':'var(--warn)')+'">'+(hit?'✓ Doğru':'✗ Bu '+this.D[c[1]]+' idi')+' — '+c[2]+'</p>'+
+      '<button class="btn v" onclick="CBT.next()">'+(this.i<5?'Sıradaki':'Sonuç')+'</button>';},
+  next(){this.i++;if(this.i<6)this.ask();else this.done();},
+  done(){
+    S.inv.cbt={score:this.score,total:6,wrong:this.wrong,d:Date.now()};
+    S.insight+=6;S.lucidity=Math.min(100,S.lucidity+15);teachUnlock('cbt');save();refreshHud();
+    window.Daily3&&Daily3.mark('cbt');
+    const blind=Object.keys(this.wrong).sort((a,b)=>this.wrong[b]-this.wrong[a])[0];
+    Rite.closeOnly();
+    UI.doc('AV SONUCU — '+this.score+'/6',
+      '<p>'+(this.score>=5?'Keskin göz. Yaldabaoth\'un yakıt deposu sende hızla boşalır.':this.score>=3?'İyi başlangıç. Çarpıtmalar ancak adlandırıldıkça güç kaybeder.':'Makine bu oyunda usta — ama artık kurallarını biliyorsun. Tekrar gel.')+'</p>'+
+      (blind?'<p style="color:var(--violet)">Kör noktan: <b>'+this.D[blind]+'</b>. Gerçek hayatta bu kalıbı yakaladığında, bir kilidi daha açmış olursun.</p>':'<p style="color:var(--accent)">Kör nokta yok — tam görüş.</p>')+
+      '<p style="color:var(--dim);font-size:12px">Bu sonuç zihin haritana işlendi (MENÜ → ZİHİN HARİTASI).</p>'+
+      '<button class="btn v" onclick="UI.closeDoc();CBT.journal()">Şimdi kendi düşünceni masaya yatır</button>'+
+      '<button class="btn ghost" onclick="UI.closeDoc()">Daha sonra</button>');},
+  journal(){
+    UI.el('riteTitle').textContent='DÜŞÜNCE KAYDI — kendi malzemen';
+    UI.el('riteBody').innerHTML=
+      '<p style="color:var(--dim);font-size:12px">Yazdıkların yalnız bu cihazda kalır.</p>'+
+      '<p>Bugün seni yoran bir otomatik düşünce:</p><textarea id="cbtT1" rows="2" maxlength="200" placeholder="ör. kimse beni umursamıyor…"></textarea>'+
+      '<p>Bu düşüncenin LEHİNE ve ALEYHİNE kanıtlar:</p><textarea id="cbtT2" rows="2" maxlength="250" placeholder="lehine… / aleyhine…"></textarea>'+
+      '<p>Daha dengeli bir alternatif cümle:</p><textarea id="cbtT3" rows="2" maxlength="200" placeholder="ör. bugün iki kişi mesaj attı; görünmez değilim…"></textarea>'+
+      '<button class="btn v" onclick="CBT.saveJournal()">Kaydet</button><button class="btn ghost" onclick="Rite.closeOnly()">Vazgeç</button>';
+    UI.show('riteModal');Game.setModal(true);},
+  saveJournal(){
+    const a=UI.el('cbtT1').value.trim(),b=UI.el('cbtT2').value.trim(),c=UI.el('cbtT3').value.trim();
+    if(!a||!c){UI.toast('En azından düşünce ve alternatifi yaz.');return;}
+    (S.inv.cbtLog=S.inv.cbtLog||[]).push({a,b,c,d:new Date().toDateString()});
+    S.inv.cbtLog=S.inv.cbtLog.slice(-20);S.insight+=4;S.lucidity=Math.min(100,S.lucidity+10);
+    save();refreshHud();Rite.closeOnly();
+    UI.toast('◭ Düşünce masaya yatırıldı — alternatifin haritana işlendi.');}
+};
+const Bilat={
+  open(){
+    UI.doc('◬ ÇİFT IŞIK TAŞI — İKİLİ ODAK',
+      '<p>Taşın iki yüzünde iki ışık, sırayla yanıp sönüyor. Gözlerin ışığı izlerken zihin, kilitlendiği noktadan gevşer.</p>'+
+      '<p style="color:var(--warn);font-size:12px">⚠ Bu, göz hareketleriyle çalışan terapilerden (EMDR gibi) <b>esinlenmiş bir sakinleşme oyunudur</b> — terapi değildir ve ağır anılarla yapılmaz. Gerçek EMDR yalnızca eğitimli bir uzmanla yapılır. Buraya <b>hafif</b> bir gerginlik getir; yoğun bir şey taşıyorsan bir profesyonelle çalışmak en doğrusu.</p>'+
+      '<p>Şu an seni hafifçe geren şey ne? Tek cümle:</p><textarea id="biNote" rows="2" maxlength="150" placeholder="ör. yarınki sunum…"></textarea>'+
+      '<p>Gerginlik şiddeti: <output id="biOut">5</output>/10</p>'+
+      '<input type="range" id="biBefore" min="0" max="10" value="5" style="width:100%" oninput="UI.el(\'biOut\').textContent=this.value">'+
+      '<button class="btn v" onclick="Bilat.start()">Işıkları başlat (≈40 sn)</button>');},
+  start(){
+    this.note=(UI.el('biNote')&&UI.el('biNote').value.trim())||'';
+    this.before=parseInt(UI.el('biBefore').value,10);
+    if(this.before>=8){UI.toast('Bu yoğunlukta bir şeyi oyuna değil, bir insana taşı. Taş seni bekler.',6000);return;}
+    UI.closeDoc();Game.setModal(true);
+    const ov=document.createElement('div');ov.id='biOv';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(3,4,8,.96);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+    ov.innerHTML='<div id="biDot" style="width:26px;height:26px;border-radius:50%;background:var(--moon);box-shadow:0 0 26px var(--moon);position:absolute;top:46%;"></div>'+
+      '<div id="biTxt" style="position:absolute;bottom:22%;color:var(--dim);font-size:14px;letter-spacing:.15em">ışığı yalnızca gözlerinle izle · başın sabit</div>'+
+      '<button class="btn ghost" style="position:absolute;bottom:8%" onclick="Bilat.finish(true)">erken bitir</button>';
+    document.body.appendChild(ov);
+    this.t0=performance.now();this.run=true;
+    const dot=ov.querySelector('#biDot'),txt=ov.querySelector('#biTxt');
+    const W=()=>{if(!this.run)return;
+      const el=(performance.now()-this.t0)/1000;
+      const x=50+Math.sin(el*2.2)*38; /* ~0.35 Hz salınım */
+      dot.style.left='calc('+x+'% - 13px)';
+      txt.textContent=el%8<4?'ışığı yalnızca gözlerinle izle · nefes al':'… ve yavaşça ver';
+      if(el>=40){this.finish(false);return;}
+      requestAnimationFrame(W);};
+    requestAnimationFrame(W);},
+  finish(early){
+    this.run=false;const ov=document.getElementById('biOv');if(ov)ov.remove();
+    UI.el('riteTitle').textContent='ÇİFT IŞIK — sonrası';
+    UI.el('riteBody').innerHTML='<p>Gözlerini bir an kapat. Aynı şeyi düşün. Şimdi kaç?</p>'+
+      '<p><output id="biOut2">5</output>/10</p><input type="range" id="biAfter" min="0" max="10" value="5" style="width:100%" oninput="UI.el(\'biOut2\').textContent=this.value">'+
+      '<button class="btn v" onclick="Bilat.save('+(early?'true':'false')+')">Kaydet</button>';
+    UI.show('riteModal');},
+  save(early){
+    const after=parseInt(UI.el('biAfter').value,10);
+    (S.inv.bilat=S.inv.bilat||[]).push({b:this.before,a:after,n:this.note.slice(0,150),d:new Date().toDateString()});
+    S.inv.bilat=S.inv.bilat.slice(-30);
+    const dd=this.before-after;
+    S.insight+=4;S.lucidity=Math.min(100,S.lucidity+18);teachUnlock('bilat');save();refreshHud();
+    window.Daily3&&Daily3.mark('bilat');Rite.closeOnly();
+    UI.doc('ÇİFT IŞIK — KAYIT',
+      '<p>'+(dd>0?'Gerginlik '+this.before+' → '+after+'. Salınan bakış, kilidi '+dd+' diş gevşetti.':dd===0?'Aynı kaldı — bu da veridir. Bazı düğümler ikinci ziyarette gevşer.':'Yükselmiş. Bu olabilir; bugün taşın yanında biraz otur, derin nefes al. Yoğunlaşırsa bir insana anlat.')+'</p>'+
+      '<p style="color:var(--dim);font-size:12px">Sonuç zihin haritana işlendi. Bunu günlük üçlemende de kullanabilirsin.</p>');}
+};
+const Arch={
+  Q:[
+    ['Kalabalık bir odaya girdiğinde ilk işin…',[['herkese doğru yüzü göstermek','p'],['kimin sahici olduğunu taramak','g'],['odanın duygusunu dinlemek','a'],['kendi merkezimde kalmak','s']]],
+    ['Biri seni haksızca eleştirdi. İçinden ilk geçen…',[['itibarımı onarmalıyım','p'],['söylediklerinde payı olan karanlık bir doğru var mı?','g'],['bu kişiyi buraya hangi acı getirdi?','a'],['bu, beni tanımlamaz','s']]],
+    ['Rüyalarında en sık…',[['sınav/sahne/geç kalma','p'],['kovalanma, saklanan biri','g'],['tanımadığım ama tanıdık biri','a'],['uçuş, deniz, geniş mekânlar','s']]],
+    ['En çok hangisi yorar?',[['rol yapmak','p'],['bastırdığımı bastırmak','g'],['hissettiğimi söyleyememek','a'],['parçalarımın çekişmesi','s']]],
+    ['Sana en çok ne iyi gelir?',[['takdir edilmek','p'],['itiraf etmek','g'],['derin tek bir sohbet','a'],['sessizlikte bütünlenmek','s']]],
+    ['Kızdığın insanlar genelde…',[['kuralsızlar','p'],['bana benzeyenler ama itiraf etmeyenler','g'],['duygusuzlar','a'],['beni parçalara bölmek isteyenler','s']]],
+    ['Gece yarısı yazsan, ilk cümle…',[['"Bugün herkes memnun kaldı."','p'],['"Kimseye söylemediğim şey şu…"','g'],['"İçimde bir ses diyor ki…"','a'],['"Hepsi benim; hepsiyle oturdum."','s']]],
+    ['Yaldabaoth seni nasıl kandırırdı?',[['"Seni herkes izliyor, kusursuz ol."','p'],['"O yanını kimse görmesin, bana ver."','g'],['"Yalnızca ben anlıyorum seni."','a'],['"Bütünleşmene gerek yok, ben tamamlarım."','s']]]],
+  i:0,sc:null,
+  open(){
+    UI.doc('◮ ARKETİP AYNASI','<p>Dört yüzlü bir ayna: <b>Persona</b> (maske), <b>Gölge</b> (bastırılan), <b>İç Ses</b> (karşı kutup — anima/animus), <b>Kendilik</b> (masanın sahibi). Sekiz soru; hangi yüzün öne çıktığını gösterir.</p><p style="color:var(--dim);font-size:12px">Jung\'un kavramlarından uyarlanmış bir keşif envanteridir; kişilik testi veya teşhis değildir.</p><button class="btn v" onclick="UI.closeDoc();Arch.start()">Aynaya bak</button>');},
+  start(){this.i=0;this.sc={p:0,g:0,a:0,s:0};this.ask();},
+  ask(){
+    const q=this.Q[this.i];
+    UI.el('riteTitle').textContent='ARKETİP AYNASI — '+(this.i+1)+'/8';
+    UI.el('riteBody').innerHTML='<p style="color:var(--moon)">'+q[0]+'</p>'+
+      q[1].map((o,j)=>'<button class="choice" onclick="Arch.pick('+j+')">'+o[0]+'</button>').join('');
+    UI.show('riteModal');Game.setModal(true);},
+  pick(j){this.sc[this.Q[this.i][1][j][1]]++;this.i++;
+    if(this.i<8)this.ask();else this.done();},
+  done(){
+    const N={p:'PERSONA',g:'GÖLGE',a:'İÇ SES',s:'KENDİLİK'},
+      C={p:'Makrokozmosta karşılığın: <b>Persona Nebulası</b> — ışığı güçlü, çekirdeği gizli. Maske işlevseldir; tehlike, maskenin yüzü unutmasıdır. Bahal\'ın kitabındaki kaptanlar senin uzmanlık alanın.',
+         g:'Makrokozmosta karşılığın: <b>Tutulma</b> — ışığın önünden geçen gövde. Gölgesi önde yürüyen, onu en az saklayandır. Ritüel VII sana ötekilerden daha çok şey söyleyecek.',
+         a:'Makrokozmosta karşılığın: <b>Çift Yıldız</b> — birbirinin etrafında dönen iki ışık. Karşı kutbun sesi sende açık; tehlike, o sesi dışarıdaki birine yansıtıp ona tapmak. Lucida\'nın yer çekimi dersi tam sana.',
+         s:'Makrokozmosta karşılığın: <b>Galaktik Merkez</b> — parçaları yörüngede tutan sessiz kütle. Bütünleşmeye en yakın yüz; tehlike, erken doygunluk. Üç Okuma ilkesini taşıyabilirsin.'},
+      dom=Object.keys(this.sc).sort((x,y)=>this.sc[y]-this.sc[x])[0];
+    S.inv.arch={sc:this.sc,dom,d:Date.now()};
+    S.insight+=6;S.lucidity=Math.min(100,S.lucidity+12);teachUnlock('arch');save();refreshHud();
+    Rite.closeOnly();
+    UI.doc('AYNANIN DÖRT YÜZÜ — BASKIN: '+N[dom],
+      '<p>'+['p','g','a','s'].map(k=>N[k]+': '+'◆'.repeat(this.sc[k])+'◇'.repeat(8-this.sc[k]).slice(0,8-this.sc[k])).join('<br>')+'</p>'+
+      '<p>'+C[dom]+'</p><p style="color:var(--dim);font-size:12px">Zihin haritana işlendi — kozmik karşılığını orada göreceksin.</p>');}
+};
+/* ============ v8 — GÜNLÜK ÜÇLEME (prosedürel görevler) ============ */
+const Daily3={
+  KEY:'it041_daily3',
+  POOL:{echo:'Bir yankı taşı topla',agent:'Bir denekle konuş',trail:'Bir yolcu taşına iz bırak',
+    dream:'Rüya kuyusuna bir rüya bırak',daily:'Günün sorusunu yanıtla',
+    bilat:'Çift Işık Taşı\'nda bir tur yap',cbt:'Çarpıtma Avcısı\'nda oyna veya düşünce kaydı tut',
+    zones3:'Üç farklı bölgeye uğra'},
+  get(){try{return JSON.parse(localStorage.getItem(this.KEY))||{}}catch(e){return{}}},
+  set(d){try{localStorage.setItem(this.KEY,JSON.stringify(d))}catch(e){}},
+  today(){
+    let d=this.get();const t=new Date().toDateString();
+    if(d.date!==t){
+      const day=Math.floor(Date.now()/864e5),keys=Object.keys(this.POOL);
+      const pick=[];let seed=day;
+      while(pick.length<3){seed=(seed*9301+49297)%233280;
+        const k=keys[seed%keys.length];if(!pick.includes(k))pick.push(k);}
+      d={date:t,tasks:pick.map(k=>({k,done:false})),zones:[]};this.set(d);}
+    return d;},
+  mark(k){
+    const d=this.today();const t=d.tasks.find(x=>x.k===k&&!x.done);
+    if(!t)return;t.done=true;this.set(d);
+    S.lucidity=Math.min(100,S.lucidity+18);S.insight+=3;save();refreshHud();
+    const left=d.tasks.filter(x=>!x.done).length;
+    UI.toast('🜂 GÜNLÜK ÜÇLEME '+(3-left)+'/3 — berraklık tazelendi'+(left===0?' · GÜN TAMAM: kolektif uyanışa bir tuğla daha':''),4000);},
+  zone(zk){
+    const d=this.today();
+    if(!d.zones.includes(zk)){d.zones.push(zk);this.set(d);
+      if(d.zones.length>=3)this.mark('zones3');}},
+  show(){
+    const d=this.today();
+    UI.doc('🜂 GÜNLÜK ÜÇLEME — '+d.tasks.filter(t=>t.done).length+'/3',
+      '<p style="color:var(--dim);font-size:12px">Her gerçek gün üç küçük iş. Her biri berraklığını tazeler; üçü birden kolektif uyanışa sayılır. Yarın üçü de yenilenir.</p>'+
+      d.tasks.map(t=>'<div class="row">'+(t.done?'<b style="color:var(--accent)">✓</b> ':'◇ ')+this.POOL[t.k]+'</div>').join('')+
+      (d.tasks.every(t=>t.done)?'<p style="color:var(--violet)">Bugünün üçlemesi tamam. Dünya sensiz de döner; seninle uyanır.</p>':''));}
+};
+/* ============ v8 — ZİHİN HARİTASI: mikrokozmos ↔ makrokozmos ============
+   NİHAİ AMAÇ: kişinin kendi zihnini keşfederek evrenin çalışma sistemini anlaması. */
+const MindMap={
+  nodes(){
+    const dr=(localStorage.getItem('it041_dreams')||'[]')!=='[]';
+    return[
+      ['gate','AYNA GEÇİDİ','ışığın kendine döndüğü eşik',!!S.solved.s1],
+      ['diskAltar','KARA DELİK','duygu kütleçekimi — kompleksler',S.rites.r1!==undefined],
+      ['maskMirror','PERSONA NEBULASI','parlayan yüzey, gizli çekirdek',S.rites.r2!==undefined],
+      ['blackBox','YASAK BÖLGE','söylenmemiş olanın yörüngesi',S.rites.r3!==undefined],
+      ['twoHouses','İKİZ YILDIZ','iki pencere, tek gökyüzü',S.rites.r4!==undefined],
+      ['burntTree','SÜPERNOVA','yanarak dönüşen',S.rites.r5!==undefined],
+      ['bench','SABİT YILDIZ','izleyişin kendisi',S.rites.r6!==undefined],
+      ['shadowSpot','TUTULMA','ışığın önünden geçen gövde',S.rites.r7!==undefined],
+      ['lunaris','PLEROMA YANSIMASI','dolunayın su üstündeki imzası',!!S.solved.s2],
+      ['archive','İLK DOKUNUŞ — 1969','zamanın mühürlü çekmecesi',!!S.solved.s5],
+      ['labyrinth','DEMİURG ÇARKI','düzenin merkezindeki eksik kelime',!!S.solved.s4],
+      ['station','ZAMAN EKSENİ','2022\'den beri bekleyen tren',!!S.solved.s6],
+      ['dreamWell','RÜYA KUYUSU','bilinçdışına açılan dikey tünel',dr],
+      ['ovCrypt','DİRENİŞ TAKIMYILDIZI','kilide sığmayanlar',!!S.flags.ovCouncil],
+      ['therapy','ŞİFA SARMALI','çarpıtma avı · çift ışık · dört yüz',!!(S.inv.cbt||S.inv.bilat||S.inv.arch)],
+      ['pleromaCore','KÖR GÖZ','kopyalayan tanrının durduğu yer',!!S.solved.s7]];},
+  show(){
+    UI.doc('🜨 ZİHİN HARİTASI — mikrokozmos ↔ makrokozmos',
+      '<canvas id="mmapC" width="740" height="1050" style="width:100%;border:1px solid var(--line);border-radius:4px;background:#04050a"></canvas>'+
+      '<button class="btn v" onclick="MindMap.download()">PNG indir — haritan senindir</button>'+
+      '<p style="color:var(--dim);font-size:12px">Harita seninle büyür: her ritüel, envanter ve kilit yeni bir yıldız yakar. Yukarıdaki dünya, aşağıdaki gökyüzünün aynasıdır.</p>');
+    setTimeout(()=>this.draw(),50);},
+  draw(){
+    const c=document.getElementById('mmapC');if(!c)return;
+    const x=c.getContext('2d'),W=c.width;
+    x.fillStyle='#04050a';x.fillRect(0,0,W,c.height);
+    const ns=this.nodes(),done=ns.filter(n=>n[3]);
+    x.fillStyle='#7fd4c1';x.font='17px monospace';x.textAlign='center';
+    x.fillText('IT-041 · '+((typeof plName==='function'&&plName())||'YOLCU')+' — BENLİĞİN GİZLİ HARİTASI',W/2,30);
+    x.fillStyle='#5a6478';x.font='11px monospace';
+    x.fillText('MİKROKOZMOS — zihninin coğrafyası ('+done.length+'/'+ns.length+' uyanık)',W/2,52);
+    /* — üst: zihin coğrafyası — */
+    const mx=v=>40+(v/WX)*(W-80),mz=v=>64+(v/WZ)*330;
+    x.strokeStyle='rgba(127,212,193,.25)';
+    ZONES.forEach(z=>{x.beginPath();x.arc(mx(z.x),mz(z.z),z.r*(W-80)/WX,0,7);x.stroke();});
+    x.strokeStyle='rgba(205,184,120,.5)';x.lineWidth=1.2;x.beginPath();
+    done.forEach((n,i)=>{const p=L[n[0]];if(!p)return;
+      i===0?x.moveTo(mx(p.x),mz(p.z)):x.lineTo(mx(p.x),mz(p.z));});
+    x.stroke();
+    ns.forEach(n=>{const p=L[n[0]];if(!p)return;
+      x.fillStyle=n[3]?'#cdb878':'rgba(90,100,120,.4)';
+      x.beginPath();x.arc(mx(p.x),mz(p.z),n[3]?4:2.5,0,7);x.fill();
+      if(n[3]){x.fillStyle='#9aa7c4';x.font='9px monospace';x.fillText(n[1],mx(p.x),mz(p.z)-7);}});
+    /* — orta şerit: as above so below — */
+    x.fillStyle='#9d8cc9';x.font='12px monospace';
+    x.fillText('— Yukarıda ne varsa, aşağıda da o vardır —',W/2,425);
+    /* — alt: makrokozmos (aynı düğümler, yıldız haritası) — */
+    x.fillStyle='#5a6478';x.font='11px monospace';
+    x.fillText('MAKROKOZMOS — aynı haritanın gökyüzü okuması',W/2,448);
+    const cx=W/2,cy=650,R=175;
+    for(let i=0;i<140;i++){x.fillStyle='rgba(154,167,196,'+(Math.random()*.3+.05)+')';
+      x.fillRect(40+Math.random()*(W-80),466+Math.random()*370,1,1);}
+    x.strokeStyle='rgba(157,140,201,.3)';x.beginPath();x.arc(cx,cy,R+12,0,7);x.stroke();
+    const pos={};ns.forEach((n,i)=>{const a=(i/ns.length)*Math.PI*2-Math.PI/2;
+      const r=R*(n[0]==='pleromaCore'?0:n[0]==='therapy'?.5:.78+((i*37)%23)/100);
+      pos[n[0]]=[cx+Math.cos(a)*r,cy+Math.sin(a)*r];});
+    x.strokeStyle='rgba(205,184,120,.55)';x.beginPath();
+    done.forEach((n,i)=>{const p=pos[n[0]];
+      i===0?x.moveTo(p[0],p[1]):x.lineTo(p[0],p[1]);});
+    x.stroke();
+    ns.forEach(n=>{const p=pos[n[0]];
+      if(n[3]){const g=x.createRadialGradient(p[0],p[1],0,p[0],p[1],9);
+        g.addColorStop(0,n[0]==='pleromaCore'?'#b9a8e8':'#e8e4d4');g.addColorStop(1,'rgba(0,0,0,0)');
+        x.fillStyle=g;x.beginPath();x.arc(p[0],p[1],9,0,7);x.fill();}
+      x.fillStyle=n[3]?'#e8e4d4':'rgba(90,100,120,.35)';
+      x.beginPath();x.arc(p[0],p[1],n[3]?3:1.6,0,7);x.fill();
+      if(n[3]){x.fillStyle='#9d8cc9';x.font='8.5px monospace';
+        x.fillText(n[1],p[0],p[1]+14);
+        x.fillStyle='rgba(154,167,196,.6)';x.fillText(n[2],p[0],p[1]+24);}});
+    /* — kişisel okuma — */
+    let y=875;x.textAlign='left';x.font='11px monospace';
+    const line=(s,col)=>{x.fillStyle=col||'#9aa7c4';x.fillText(s,46,y);y+=16;};
+    x.fillStyle='#7fd4c1';x.font='12px monospace';x.fillText('— KİŞİSEL OKUMA —',46,y);y+=18;x.font='11px monospace';
+    if(S.caseD)line('Baskın kaptan: '+PROFILES[S.caseD.dom].n+' · gölgede: '+PROFILES[S.caseD.sha].n);
+    if(S.inv.arch)line('Aynanın baskın yüzü: '+{p:'PERSONA',g:'GÖLGE',a:'İÇ SES',s:'KENDİLİK'}[S.inv.arch.dom]);
+    if(S.inv.cbt)line('Çarpıtma avı: '+S.inv.cbt.score+'/6'+(Object.keys(S.inv.cbt.wrong)[0]?' · kör nokta: '+CBT.D[Object.keys(S.inv.cbt.wrong).sort((a,b)=>S.inv.cbt.wrong[b]-S.inv.cbt.wrong[a])[0]]:''));
+    if(S.inv.bilat&&S.inv.bilat.length){const avg=(S.inv.bilat.reduce((t,e)=>t+(e.b-e.a),0)/S.inv.bilat.length).toFixed(1);
+      line('Çift ışık: '+S.inv.bilat.length+' tur · ortalama gevşeme: '+avg);}
+    line('Ritüel '+riteCount()+'/7 · yankı '+echoCount()+'/16 · kilit '+S.locks+'/4'+(S.flags.integrated?' · gölgeyle ENTEGRE':''));
+    if(S.flags.reading)line('Okuman: '+(S.flags.reading==='savas'?'SAVAŞ':S.flags.reading==='butunlesme'?'BÜTÜNLEŞME':'ÜÇÜNCÜ OKUMA')+' — ve üçü de doğruydu.','#cdb878');
+    y+=6;x.fillStyle='#9d8cc9';
+    x.fillText('Kendi zihnini haritalayan, evrenin nasıl çalıştığını okumaya başlar.',46,y);y+=15;
+    x.fillText('Bütünleşen bilinç kopyalanamaz — Yaldabaoth tam burada durur.',46,y);
+    x.textAlign='center';x.fillStyle='#5a6478';x.font='10px monospace';
+    x.fillText('DOLUNAY EKSPRES · '+new Date().toLocaleDateString('tr-TR')+' · imza yok — hakikat kimliksizdir',W/2,1035);},
+  download(){
+    const c=document.getElementById('mmapC');if(!c)return;
+    const a=document.createElement('a');a.download='zihin-haritasi-IT041.png';
+    a.href=c.toDataURL('image/png');a.click();
+    UI.toast('🜨 Haritan indirildi. O artık senin evrenin.');}
+};
+/* ============ v8 — MİMAR MODU: kendi evrenini yarat ============ */
+const Architect={
+  on(){return !!(S.flags.initiate||S.solved.s7);},
+  menu(){
+    if(!this.on()){UI.doc('✶ MİMAR MODU','<p>Henüz değil. Mimar olmak için ya çekirdeği durdur (⟁) ya da inisiyasyonu tamamla (✶).</p><p style="color:var(--dim)">Yatay düzlemde yürüyen, haritayı gezer. Dikey sıçrayan, haritayı yazar.</p>');return;}
+    const st=this.stars().length,ch=this.story().length;
+    UI.doc('✶ MİMAR MODU — kendi evrenin',
+      '<p style="color:var(--dim);font-size:12px">Aelius Ignis\'in son dersi: anlatılan olmaktan anlatana geçiş. Buradan sonrası sınırsızdır — kendi yıldızların, kendi kitabın, kendi ritüelin.</p>'+
+      '<button class="btn v" onclick="UI.closeDoc();Architect.placeStar()">✶ Buraya bir yıldız dik ('+st+' yıldızın var)</button>'+
+      '<button class="btn v" onclick="UI.closeDoc();Architect.writeChapter()">📖 Kendi kitabına bölüm yaz ('+ch+' bölüm)</button>'+
+      (ch?'<button class="btn ghost" onclick="Architect.exportBook()">Kitabını derle (.txt indir)</button>':'')+
+      '<button class="btn v" onclick="UI.closeDoc();Architect.designRite()">◈ Kendi ritüelini tasarla</button>'+
+      (this.myRites().length?'<button class="btn ghost" onclick="UI.closeDoc();Architect.doMyRite()">◈ Kendi ritüelini uygula</button>':''));},
+  stars(){try{return JSON.parse(localStorage.getItem('it041_stars'))||[]}catch(e){return[]}},
+  story(){try{return JSON.parse(localStorage.getItem('it041_story'))||[]}catch(e){return[]}},
+  myRites(){try{return JSON.parse(localStorage.getItem('it041_myrites'))||[]}catch(e){return[]}},
+  placeStar(){
+    UI.el('riteTitle').textContent='✶ YILDIZ DİKİMİ — buraya';
+    UI.el('riteBody').innerHTML='<p>Bu noktaya, bu dünyada kalacak bir cümle bırak. Senin evreninin ilk yasalarından biri olacak.</p>'+
+      '<textarea id="starT" rows="2" maxlength="90" placeholder="ör. burada korkmayı bıraktım…"></textarea>'+
+      '<button class="btn v" onclick="Architect.saveStar()">Yıldızı yak</button><button class="btn ghost" onclick="Rite.closeOnly()">Vazgeç</button>';
+    UI.show('riteModal');Game.setModal(true);},
+  saveStar(){
+    const t=UI.el('starT').value.trim();if(!t){UI.toast('Tek cümle yeter.');return;}
+    const l=this.stars();l.push({x:Math.round(S.px),z:Math.round(S.pz),t:t.slice(0,90)});
+    try{localStorage.setItem('it041_stars',JSON.stringify(l.slice(-40)));}catch(e){}
+    W3.addStar&&W3.addStar(S.px,S.pz,t);
+    Trails.add('✶ '+t,S.px,S.pz,true);
+    S.insight+=3;save();Rite.closeOnly();
+    UI.toast('✶ Yıldız yandı. İz kanalı açıksa diğer yolcular da görür.');},
+  writeChapter(){
+    UI.el('riteTitle').textContent='📖 KENDİ KİTABIN — BÖLÜM '+(this.story().length+1);
+    UI.el('riteBody').innerHTML='<p style="color:var(--dim);font-size:12px">Bahal\'ın yöntemiyle: bölüm adına istersen kendi şifreni göm (işaretli harfler, tersten okuma…). Kitabın yalnız bu cihazda.</p>'+
+      '<input id="chT" maxlength="60" placeholder="bölüm adı" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:8px">'+
+      '<textarea id="chB" rows="6" maxlength="2000" placeholder="içindeki karakterlerden biri anlatsın: kaptanlardan biri, gölgen, iç sesin…"></textarea>'+
+      '<button class="btn v" onclick="Architect.saveChapter()">Bölümü mühürle</button><button class="btn ghost" onclick="Rite.closeOnly()">Vazgeç</button>';
+    UI.show('riteModal');Game.setModal(true);},
+  saveChapter(){
+    const t=UI.el('chT').value.trim(),b=UI.el('chB').value.trim();
+    if(!t||!b){UI.toast('Ad ve en az bir paragraf.');return;}
+    const l=this.story();l.push({t,b,d:new Date().toDateString()});
+    try{localStorage.setItem('it041_story',JSON.stringify(l));}catch(e){}
+    S.insight+=5;save();Rite.closeOnly();
+    UI.toast('📖 BÖLÜM '+l.length+' mühürlendi — '+t);},
+  exportBook(){
+    const l=this.story();if(!l.length)return;
+    const name=((typeof plName==='function'&&plName())||'YOLCU IT-041');
+    let txt='KENDİ EVRENİM — '+name+'\nDolunay Ekspres evreninde yazılmıştır. İmza kimlik verir; hakikat kimliksizdir.\n\n';
+    l.forEach((c,i)=>{txt+='BÖLÜM '+(i+1)+' — '+c.t+'\n('+c.d+')\n\n'+c.b+'\n\n— · —\n\n';});
+    const a=document.createElement('a');a.download='kendi-evrenim.txt';
+    a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));a.click();
+    UI.toast('📖 Kitabın derlendi.');},
+  designRite(){
+    UI.el('riteTitle').textContent='◈ KENDİ RİTÜELİN';
+    UI.el('riteBody').innerHTML='<p style="color:var(--dim);font-size:12px">Yedi ritüel Bahal\'ındı. Sekizincisi ve sonrası senin. Kendine her gün/her dolunay soracağın bir soru tasarla.</p>'+
+      '<input id="mrT" maxlength="40" placeholder="ritüel adı (ör. AKŞAM MUHASEBESİ)" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:8px">'+
+      '<textarea id="mrQ" rows="2" maxlength="160" placeholder="sorusu: ör. bugün hangi maskeyi en uzun taşıdım?"></textarea>'+
+      '<button class="btn v" onclick="Architect.saveRite()">Ritüeli kur</button><button class="btn ghost" onclick="Rite.closeOnly()">Vazgeç</button>';
+    UI.show('riteModal');Game.setModal(true);},
+  saveRite(){
+    const t=UI.el('mrT').value.trim(),q=UI.el('mrQ').value.trim();
+    if(!t||!q){UI.toast('Ad ve soru gerek.');return;}
+    const l=this.myRites();l.push({t,q,log:[]});
+    try{localStorage.setItem('it041_myrites',JSON.stringify(l.slice(-10)));}catch(e){}
+    Rite.closeOnly();UI.toast('◈ RİTÜEL KURULDU — '+t+'. Mimar Modu\'ndan her gün uygulayabilirsin.');},
+  doMyRite(){
+    const l=this.myRites();if(!l.length)return;
+    const r=l[l.length-1];this._cur=l.length-1;
+    UI.el('riteTitle').textContent='◈ '+r.t+' (senin ritüelin)';
+    UI.el('riteBody').innerHTML='<p style="color:var(--violet)">'+esc(r.q)+'</p>'+
+      (l.length>1?'<p style="color:var(--dim);font-size:11px">'+l.map((x,i)=>'<a href="#" onclick="Architect._cur='+i+';UI.el(\'mrSel\').textContent=\''+i+'\';return false" style="color:var(--accent)">'+esc(x.t)+'</a>').join(' · ')+'</p>':'')+
+      '<textarea id="mrA" rows="3" maxlength="300" placeholder="bugünkü cevabın…"></textarea>'+
+      '<button class="btn v" onclick="Architect.answerRite()">Yanıtla</button><button class="btn ghost" onclick="Rite.closeOnly()">Bugün değil</button>';
+    UI.show('riteModal');Game.setModal(true);},
+  answerRite(){
+    const a=UI.el('mrA').value.trim();if(!a){UI.toast('Bir cümle yeter.');return;}
+    const l=this.myRites();const r=l[this._cur||l.length-1];
+    r.log.push({d:new Date().toDateString(),a:a.slice(0,300)});r.log=r.log.slice(-30);
+    try{localStorage.setItem('it041_myrites',JSON.stringify(l));}catch(e){}
+    S.insight+=3;S.lucidity=Math.min(100,S.lucidity+10);save();refreshHud();Rite.closeOnly();
+    UI.toast('◈ '+r.t+' uygulandı — kayıt sende.');}
+};
+if(typeof window!=='undefined'){window.CBT=CBT;window.Bilat=Bilat;window.Arch=Arch;
+  window.Daily3=Daily3;window.MindMap=MindMap;window.Architect=Architect;}
+
 /* ============ RÜYA KUYUSU ============ */
 const Dreams={
   KEY:'it041_dreams',
   list(){try{return JSON.parse(localStorage.getItem(this.KEY))||[]}catch(e){return[]}},
   add(t){const l=this.list();l.push({d:new Date().toDateString(),t:String(t).slice(0,400)});
-    try{localStorage.setItem(this.KEY,JSON.stringify(l.slice(-40)))}catch(e){}}
+    try{localStorage.setItem(this.KEY,JSON.stringify(l.slice(-40)))}catch(e){}
+    window.Daily3&&Daily3.mark('dream');}
 };
 function doDreamWell(){
   const l=Dreams.list();let h='';
@@ -2062,7 +2469,8 @@ if(HAS3D)(function(){
   moonLight.shadow.mapSize.set(2048,2048);
   moonLight.shadow.camera.left=-220;moonLight.shadow.camera.right=220;
   moonLight.shadow.camera.top=220;moonLight.shadow.camera.bottom=-220;
-  moonLight.shadow.camera.far=700;moonLight.shadow.bias=-0.0008;
+  moonLight.shadow.camera.far=700;moonLight.shadow.bias=-0.0003;
+  moonLight.shadow.normalBias=1.1; /* v8: yerdeki şerit/çizgi artefaktlarını (shadow acne) keser */
   const mlTarget=new THREE.Object3D();mlTarget.position.set(190,0,145);scene.add(mlTarget);
   moonLight.target=mlTarget;scene.add(moonLight);
   const lantern=new THREE.PointLight(0xffd9a8,.85,11,2);scene.add(lantern);
@@ -2255,6 +2663,35 @@ if(HAS3D)(function(){
   if(S.rites&&S.rites.r1!==undefined)W3.rite_r1(S.rites.r1);
   /* altar */
   cyl(1.2,1.5,.8,std(0x14101e,{emissive:0x9d8cc9,emissiveIntensity:.2}),L.diskAltar.x,.4,L.diskAltar.z);
+
+  /* ---- v8: Terapi Merkezi envanter düzenekleri ---- */
+  (function(){
+    /* Çarpıtma Avcısı masası — yeşil ekranlı düşünce masası */
+    box(2.2,.9,1.1,std(0x2a2218,{roughness:.6}),L.cbtDesk.x,.45,L.cbtDesk.z);
+    box(1.2,.8,.08,std(0x06140c,{emissive:0x2c8c5c,emissiveIntensity:.8}),L.cbtDesk.x,1.3,L.cbtDesk.z-.3,-.25);
+    /* Çift Işık Taşı — iki uçlu dikilitaş, iki ışık küresi */
+    cyl(.5,.7,2.6,std(0x1a1626,{emissive:0x9d8cc9,emissiveIntensity:.25}),L.bilatStone.x,1.3,L.bilatStone.z);
+    const bl1=new THREE.PointLight(0x7fd4c1,.7,9),bl2=new THREE.PointLight(0xcdb878,.7,9);
+    bl1.position.set(L.bilatStone.x-1.4,2.4,L.bilatStone.z);bl2.position.set(L.bilatStone.x+1.4,2.4,L.bilatStone.z);
+    scene.add(bl1);scene.add(bl2);
+    W3._bilat=(tt)=>{const p=Math.sin(tt*2.2);bl1.intensity=.35+Math.max(0,-p)*.9;bl2.intensity=.35+Math.max(0,p)*.9;};
+    /* Arketip Aynası — dört yüzlü prizma */
+    const am=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,2.4,4),
+      std(0x101522,{roughness:.1,metalness:.9,emissive:0x3a4a66,emissiveIntensity:.4}));
+    am.position.set(L.archStone.x,1.2,L.archStone.z);am.castShadow=true;scene.add(am);
+    W3._archM=am;
+  })();
+  /* ---- v8: Mimar yıldızları — oyuncunun diktiği kalıcı ışıklar ---- */
+  const STARS=[];
+  W3.addStar=(x,z,txt)=>{
+    const m=new THREE.Mesh(new THREE.OctahedronGeometry(.5),
+      std(0x141020,{emissive:0xe8e4d4,emissiveIntensity:.9}));
+    m.position.set(x,2.6,z);scene.add(m);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(String(txt).slice(0,42),512,64,22,'rgba(232,228,212,.85)'),transparent:true,depthWrite:false}));
+    sp.scale.set(10,1.4,1);sp.position.set(x,3.8,z);scene.add(sp);
+    STARS.push(m);};
+  try{(JSON.parse(localStorage.getItem('it041_stars'))||[]).forEach(s=>W3.addStar(s.x,s.z,s.t));}catch(e){}
+  W3._starAnim=(tt)=>STARS.forEach((m,i)=>{m.rotation.y=tt*.8+i;m.position.y=2.6+Math.sin(tt*1.4+i)*.2;});
 
   /* ---- prison / two houses ---- */
   const houseWin=[];
@@ -2594,8 +3031,12 @@ if(HAS3D)(function(){
   });
   W3.agentNear=()=>{for(const a of AGENTS){
     if(Math.hypot(S.px-a.f.g.position.x,S.pz-a.f.g.position.z)<3.5)return a;}return null;};
+  /* v8: bütünleşme sonrası yanında yürüyen gölgeyle her an konuşulabilir */
+  W3.bahalNear=()=>bahalMode==='walk'&&bahal.g.visible&&
+    Math.hypot(S.px-bahal.g.position.x,S.pz-bahal.g.position.z)<3.6;
   W3.agentTalk=()=>{const a=W3.agentNear();if(!a)return;
     a.wait=12;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
+    window.Daily3&&Daily3.mark('agent');
     if(window.Mirror&&Mirror.ready()){Mirror.open('agent'+(AGENTS.indexOf(a)%7));return;}
     const line=AG_LINES[a.li];a.li=(a.li+1)%AG_LINES.length;
     Dlg.open([[line[0],line[1]]],()=>{
@@ -2819,7 +3260,7 @@ if(HAS3D)(function(){
       renderer.domElement.requestPointerLock&&renderer.domElement.requestPointerLock();});
   addEventListener('mousemove',e=>{
     if(document.pointerLockElement===renderer.domElement){
-      Cam.yaw-=e.movementX*.0024;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+e.movementY*.0024));}});
+      Cam.yaw-=e.movementX*.0024;Cam.pitch=Math.max(-.48,Math.min(.95,Cam.pitch+e.movementY*.0024));}});
   addEventListener('wheel',e=>{Cam.dist=Math.max(4,Math.min(13,Cam.dist+e.deltaY*.005));});
   let lookId=null,lx=0,ly=0,lookMoved=false;
   addEventListener('touchstart',e=>{for(const t of e.changedTouches){
@@ -2829,7 +3270,7 @@ if(HAS3D)(function(){
   addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===lookId){
     const ddx=t.clientX-lx,ddy=t.clientY-ly;
     if(!lookMoved){if(Math.abs(ddx)+Math.abs(ddy)<7)return;lookMoved=true;lx=t.clientX;ly=t.clientY;return;}
-    Cam.yaw-=ddx*.006;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+ddy*.006));
+    Cam.yaw-=ddx*.006;Cam.pitch=Math.max(-.48,Math.min(.95,Cam.pitch+ddy*.006));
     lx=t.clientX;ly=t.clientY;}},{passive:true});
   addEventListener('touchend',e=>{for(const t of e.changedTouches)if(t.identifier===lookId)lookId=null;},{passive:true});
   addEventListener('touchcancel',()=>{lookId=null;},{passive:true});
@@ -2907,7 +3348,7 @@ if(HAS3D)(function(){
     /* zıplama */
     if(keys['space']&&jy<=0&&Game.running&&!Game.modal){vy=5.6;}
     if(vy!==0||jy>0){jy+=vy*dt;vy-=15*dt;if(jy<=0){jy=0;vy=0;}}
-    S.heading=meshAng+Math.PI;
+    S.heading=Math.PI-meshAng; /* v8: minimap oku gidiş yönüyle aynı (ayna düzeltmesi) */
     player.g.position.set(S.px,jy+Math.abs(Math.sin(walkT))*.05,S.pz);
     player.g.rotation.y=meshAng;
     const moving=Math.abs(mx)+Math.abs(mz)>0.0001;
@@ -2923,9 +3364,9 @@ if(HAS3D)(function(){
       const cd=Cam.dist,cp=Cam.pitch;
       camera.position.lerp(new THREE.Vector3(
         S.px+Math.sin(Cam.yaw)*Math.cos(cp)*cd,
-        1.6+Math.sin(cp)*cd,
+        Math.max(.55,1.6+Math.sin(cp)*cd), /* v8: gökyüzüne bakarken yere batma */
         S.pz+Math.cos(Cam.yaw)*Math.cos(cp)*cd),.18);
-      camera.lookAt(S.px,1.9,S.pz);
+      camera.lookAt(S.px,cp<0?1.9-cp*9:1.9,S.pz); /* v8: aşağı eğimde bakış yukarı kayar → gökyüzü görünür */
       moonLight.position.set(S.px+130,200,S.pz-60);
       mlTarget.position.set(S.px,0,S.pz);
     }
@@ -2942,8 +3383,10 @@ if(HAS3D)(function(){
     PLM.forEach((p,i)=>{if(!p.collected){p.g.position.y=Math.sin(t*2+i)*.15;p.g.rotation.y=t*.8;}});
     ECHM.forEach((e,i)=>{if(e.m.visible){e.m.position.y=1.2+Math.sin(t*1.6+i)*.25;e.m.rotation.y=t*.9+i;}});
     fire.intensity=1.4+Math.sin(t*9)*.3+Math.sin(t*23)*.15;
+    W3._bilat&&W3._bilat(t);W3._starAnim&&W3._starAnim(t);
+    if(W3._archM)W3._archM.rotation.y=t*.3;
     flame.scale.y=1+Math.sin(t*11)*.2;
-    mists.forEach(sp=>{sp.position.x+=sp.userData.v*dt;if(sp.position.x>370)sp.position.x=10;});
+    mists.forEach(sp=>{sp.position.x+=sp.userData.v*dt*.35;if(sp.position.x>370)sp.position.x=10;}); /* v8: sis sakinleştirildi */
     {const arr=ffGeo.attributes.position.array;
       for(let i=0;i<ffN;i++){arr[i*3+1]=1.4+Math.sin(t*1.4+ffSeed[i])*1.1;
         arr[i*3]+=Math.sin(t*.6+ffSeed[i]*2)*.012;arr[i*3+2]+=Math.cos(t*.5+ffSeed[i]*3)*.012;}
@@ -3071,11 +3514,16 @@ if(HAS3D)(function(){
       if(!S.flags.inPleroma){
         const TZ=[['blackdisk',0],['prison',1],['therapy',2],['labyrinth',3],['forest',4],['lake',5]];
         for(const[k,ti]of TZ){const z=L[k];
-          if(Math.hypot(S.px-z.x,S.pz-z.z)<z.r+4){want=ti;break;}}
+          if(Math.hypot(S.px-z.x,S.pz-z.z)<z.r+4){want=ti;
+            window.Daily3&&Daily3.zone(k);break;}}
       }
       Snd._zoneWant=want;
       Snd.zoneTape&&Snd.zoneTape(want);
     }
+    /* v8: berraklık kendiliğinden yenilenir — nefes alan zihin toparlanır.
+       Gündüz ve dolunayda hızlı, gece yavaş; Noctornus/dron alanlarındaki kayıplar yine işler. */
+    if(Game.running&&!Game.modal)
+      S.lucidity=Math.min(100,S.lucidity+dt*((W3.sun||0)>.45?1.1:.35)*(isFull&&isFull()?1.6:1));
     document.getElementById('dmg').style.opacity=S.lucidity<35?(35-S.lucidity)/40:0;
 
     /* beacon */
