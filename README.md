@@ -1,5 +1,7 @@
 # THE MIND EXPERIMENT — IT-041
 
+![visits](https://hits.sh/lunarisbahal.github.io/the-mind-experiment.svg?label=doors%20opened&color=cdb878)
+
 **I.R.F.I.A. — INSTITUTE FOR RESEARCH OF FRACTURED IDENTITY ARCHITECTURES**
 **SIMULATION IT-041 · RECONSTRUCTION BUILD**
 

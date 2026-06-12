@@ -158,7 +158,9 @@
 <div id="hudTR">
   <canvas id="minimap" width="138" height="106"></canvas>
   <div class="chip" id="moonchip" style="font-size:10px;padding:4px 8px;margin-top:4px;"><b id="moonGlyph">○</b> <span id="moonName"></span> · <span id="dateStr"></span></div>
+  <div class="chip" id="onlineChip" style="font-size:10px;padding:4px 8px;margin-top:4px;color:var(--accent)">● — travelers · 7 agents</div>
 </div>
+<img src="https://hits.sh/lunarisbahal.github.io/the-mind-experiment.svg" style="display:none" alt="" aria-hidden="true">
 <div id="hudBL">
   <div class="lbl">LUCIDITY</div><div class="bar"><i id="lucbar" style="width:100%"></i></div>
   <div class="lbl">INSIGHT</div><div class="bar" id="insbar"><i id="insbar2" style="width:0%"></i></div>
@@ -215,6 +217,16 @@
   <button class="btn v" id="mirrorSend" onclick="Mirror.send()">Speak</button>
   <button class="btn ghost" onclick="Mirror.close()">Step back from the mirror</button>
   <div class="mfoot">This is an AI mirror — not a therapist; it cannot diagnose, treat, or give medical/legal advice. Its purpose is self-reflection and awareness. In a crisis, please contact your local emergency number or a mental-health professional. Conversations are not stored.</div>
+</div></div>
+
+<!-- TRAVELER CHANNEL: free chat between players -->
+<div class="modal" id="chatModal"><div class="panel">
+  <h2 class="v">TRAVELER CHANNEL — real travelers in this universe</h2>
+  <div id="chatLog" style="max-height:42vh;overflow-y:auto;background:#070910;border:1px solid var(--line);padding:12px;border-radius:3px;margin-bottom:8px;"></div>
+  <textarea id="chatInput" rows="2" maxlength="280" placeholder="write to the travelers… (Enter: send)"></textarea>
+  <button class="btn v" onclick="Chat.send()">Send</button>
+  <button class="btn ghost" onclick="Chat.close()">Close</button>
+  <div class="mfoot">This channel reaches real players in SYNC mode; messages travel peer-to-peer and are stored on no server. Respect is the rule: no harassment, no hate, no personal data. Everyone here walks their own integration — be each other's mirror, not each other's judge.</div>
 </div></div>
 
 <!-- AI MIRRORS: setup + consent -->
@@ -286,6 +298,7 @@
     <button class="mini" id="tapBtn" onclick="Snd.toggleTapes()">TAPES: ON</button>
     <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">SYNC: OFF</button>
     <button class="mini" id="aiBtn" onclick="Mirror.openSetup()">MIRRORS: NOT LINKED</button>
+    <button class="mini" onclick="Chat.open()">TRAVELER CHANNEL</button>
   </div>
   <button class="mini" id="menuToggle" onclick="(function(){const p=document.getElementById('menuPanel');p.style.display=p.style.display==='none'?'flex':'none';})()">☰ MENU</button>
 </div>
@@ -381,6 +394,7 @@ const L={
   trail1:{x:190,z:180,r:4,name:'TRAVELER CAIRN'},
   trail2:{x:258,z:118,r:4,name:'TRAVELER CAIRN'},
   trail3:{x:62,z:62,r:4,name:'TRAVELER CAIRN'},
+  dreamWell:{x:148,z:210,r:4.5,name:'DREAM WELL'},
 };
 const PLEROMA={x:44,z:256,r:22}; // the Institute's underground server hall
 const ZONES=[L.blackdisk,L.forest,L.prison,L.therapy,L.labyrinth,L.lake,L.institute,L.caravan,L.station];
@@ -695,6 +709,11 @@ const UI={
         h+=`<div class="jentry"><h4 style="color:var(--violet)">CASE D — MY FILE</h4><p class="own">Dominant: ${D.n} · In shadow: ${H.n}</p></div>`;}
       if(S.rites.proj)h+=`<div class="jentry"><h4 style="color:var(--violet)">THE PROJECTION</h4><p class="own">${esc(String(S.rites.proj))}</p></div>`;
       if(!any)h+='<p style="color:var(--dim)">No rites completed yet. Violet markers in the world. They are not for the Institute. They are for you.</p>';
+      const dl=Daily.get().log||[];
+      if(dl.length)h+=`<div class="jentry"><h4 style="color:var(--violet)">🜂 QUESTIONS OF THE DAY — streak: ${Daily.streak()}</h4><p class="own">${esc(dl[dl.length-1].q)}<br>→ ${esc(dl[dl.length-1].a)}</p></div>`;
+      const dr=Dreams.list();
+      if(dr.length)h+=`<div class="jentry"><h4 style="color:var(--violet)">◯ DREAM WELL — ${dr.length} dreams</h4><p class="own">${esc(dr[dr.length-1].t).slice(0,140)}…</p></div>`;
+      h+='<button class="btn ghost" style="padding:5px 12px;font-size:10px" onclick="exportInner()">⤓ Download inner work (.txt)</button>';
     }
     if(tab==='teach'){
       TEACHINGS.forEach(t=>{const ok=S.teach.includes(t.id);
@@ -707,6 +726,24 @@ const UI={
   }
 };
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function exportInner(){
+  const N={r1:'THE DISK I NAMED',r2:'THE CAPTAIN OF TODAY',r3:'THE FORBIDDEN WANT',r4:'MY WINDOW',r5:'WHAT BURNED',r6:'THE WATCHING',r7:'MY SHADOW',proj:'THE PROJECTION'};
+  let t='DOLUNAY EKSPRES — INNER WORK JOURNAL\n'+new Date().toLocaleString()+'\n\n== RITES ==\n';
+  for(const k in N)if(S.rites[k]!==undefined)t+=N[k]+': '+(S.rites[k]||'(silent)')+'\n';
+  if(S.caseD)t+='\n== CASE D ==\nDominant: '+PROFILES[S.caseD.dom].n+'\nIn shadow: '+PROFILES[S.caseD.sha].n+'\n';
+  const dl=Daily.get().log||[];
+  if(dl.length){t+='\n== QUESTIONS OF THE DAY (streak '+Daily.streak()+') ==\n';
+    dl.forEach(e=>t+='['+e.d+'] '+e.q+'\n→ '+e.a+'\n');}
+  const dr=Dreams.list();
+  if(dr.length){t+='\n== DREAMS ==\n';dr.forEach(e=>t+='['+e.d+'] '+e.t+'\n');}
+  t+='\n— This file came only from your device; it was shared with no one. —\n';
+  try{
+    const b=new Blob([t],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);
+    a.download='inner-work-journal.txt';a.click();
+    UI.toast('⤓ Downloaded — yours alone.');
+  }catch(e){UI.toast('Download not supported in this browser.');}
+}
 function eraseRites(){S.rites={};save();UI.renderJournal('inner');UI.toast('Inner work erased from this device.');refreshHud();}
 
 /* ---------------- Dialogue ---------------- */
@@ -989,7 +1026,9 @@ function interactTarget(){
   if(near(L.blackBox))return['◈ The black box',()=>Rite.open('r3')];
   if(near(L.twoHouses))return['◈ Stand between the two houses',()=>Rite.open('r4')];
   if(near(L.burntTree))return['◈ The burnt snag',()=>Rite.open('r5')];
-  if(near(L.bench))return['◈ Sit on the bench',()=>Rite.open('r6')];
+  if(near(L.bench))return[S.rites.r6!==undefined?(Daily.doneToday()?'Question of the day (done ✓)':'🜂 Question of the day'):'◈ Sit on the bench',S.rites.r6!==undefined?doDaily:()=>Rite.open('r6')];
+  if(near(L.dreamWell))return['◯ Dream well',doDreamWell];
+  if(W3.peerNear&&W3.peerNear())return['✉ Talk to the traveler',()=>Chat.open()];
   if(S.solved.s2&&S.rites.r7===undefined&&near(L.shadowSpot))return['◈ Face what follows you',doShadow];
   if(S.solved.s1&&near(L.caseD))return[S.caseD?'Case D — your file':'◈ Case D — let it read you',doCaseD];
   /* O.V. / Yaldabaoth line */
@@ -1529,7 +1568,8 @@ function doEcho(i){
     UI.toast('◇ ECHO '+echoCount()+'/16 — recorded in your journal [J]');}
   const e=ECHOES[i];
   UI.doc('ECHO STONE — '+e.s,'<p style="font-style:italic;color:var(--moon)">'+e.q+'</p>'+
-    (echoCount()>=16?'<p style="color:var(--violet)">All sixteen echoes are yours. The stones have gone quiet — the book echoes from inside you now.</p>':'<p style="color:var(--dim)">'+(16-echoCount())+' echoes remain in the empty spaces. Travelers cross paths; echoes cross travelers.</p>'));
+    (echoCount()>=16?'<p style="color:var(--violet)">All sixteen echoes are yours. The stones have gone quiet — the book echoes from inside you now.</p>':'<p style="color:var(--dim)">'+(16-echoCount())+' echoes remain in the empty spaces. Travelers cross paths; echoes cross travelers.</p>')+
+    '<p class="mfoot">Carry it into your life → '+LIFE_HINTS[i%LIFE_HINTS.length]+'</p>');
   checkInitiation();
 }
 function checkInitiation(){
@@ -1572,6 +1612,12 @@ const PERSONAS={
     p:`You are IT-058: a dry-witted, practical traveler. Your mission: SMALL STEPS — turning big insights into tiny daily experiments. "How could you try that for five minutes tomorrow?" Your humor is light, never mocking.`},
   agent3:{n:'IT-077',hello:'I saw someone at the lake; they said "I kept the receipts" and I cried. When did you last cry?',
     p:`You are IT-077: an emotional, open-hearted traveler. Your mission: MAKING ROOM FOR FEELING — naming emotions and expressing them without shame. You offer your own feelings as examples; you normalize tears. No toxic positivity; the dark is allowed too.`},
+  agent4:{n:'IT-009',hello:'When I was young I hid words; now they hide me. Which word kept you company today?',
+    p:`You are IT-009: an old poet-traveler. Your mission: LANGUAGE AND IMAGE — helping the user turn experience into metaphor; finding an image for a feeling makes it carryable. Tone: soft, imagistic; you may shape short lines (two at most). Never ornament for its own sake; one image is enough, you say.`},
+  agent5:{n:'IT-104',hello:'Let\'s look at the data: how many nights this week did you truly rest? Not a guess — a number.',
+    p:`You are IT-104: a skeptical engineer-traveler. Your mission: REALITY TESTING — without belittling feelings, gently testing distorted thoughts against evidence: "what supports this thought, what contradicts it?" Tone: clear, systematic, dry-warm humor. You surface catastrophizing and mind-reading patterns. You never say "your feeling is wrong"; you separate thought from feeling.`},
+  agent6:{n:'IT-062',hello:'I do not talk much. But I will walk beside you. How is your body today?',
+    p:`You are IT-062: a silent runner-traveler. Your mission: BODY WISDOM — short careful questions that return the user to the body: breath, shoulders, jaw, sleep, movement. Tone: few words, much space. Sometimes you leave a one-line invitation: "One breath now. Without counting." You never impose exercise; you invite.`},
 };
 const CRISIS_RE=/(suicide|kill myself|end my life|self[- ]?harm|hurt myself|don'?t want to live|want to die)/i;
 const Mirror={
@@ -1652,7 +1698,7 @@ const Mirror={
       this.line('sys','⚑ It matters that you wrote this. This mirror is not a crisis line — right now, talking to a real person is what counts: your local emergency number, someone you trust, or a mental-health professional. I am still here with you, but please be safe first.');
     this.busy=true;this.line('sys','… the mirror is thinking');
     try{
-      const msgs=[{role:'system',content:P.p+'\n\n'+ETHIC_CORE}]
+      const msgs=[{role:'system',content:P.p+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE}]
         .concat(this.hist[pid].slice(-10));
       const out=await this.generate(msgs);
       const log=document.getElementById('mirrorLog');log.removeChild(log.lastChild);
@@ -1693,15 +1739,144 @@ function doTrail(){
     here.slice(-5).forEach(n=>{h+='<div class="jentry"><p class="own">“'+esc(n.t)+'”'+(n.m?' <span style="color:var(--dim)">— your trace</span>':' <span style="color:var(--dim)">— a traveler</span>')+'</p></div>';});}
   h+=`<p>Leave a trace (one sentence; for the travelers who will pass here):</p>
       <textarea id="riteText" rows="2" maxlength="90" placeholder="one sentence for the travelers…"></textarea>
-      <button class="btn v" onclick="trailSave()">Leave the trace</button>`;
+      <button class="btn v" onclick="trailSave()">Leave the trace</button>
+      <p style="color:var(--dim);margin-top:8px">The cairns are linked — warp:</p>
+      <button class="btn ghost" onclick="warpTo('trail1')">North cairn</button>
+      <button class="btn ghost" onclick="warpTo('trail2')">East cairn</button>
+      <button class="btn ghost" onclick="warpTo('trail3')">West cairn</button>`;
   UI.doc('TRAVELER TRAILS',h);
 }
+function warpTo(k){const s=L[k];S.px=s.x+2;S.pz=s.z+2;UI.closeDoc();save();
+  UI.toast('⟿ You passed between the cairns.');}
 function trailSave(){
   const v=(UI.el('riteText')&&UI.el('riteText').value.trim())||'';
   if(!v){UI.toast('One sentence is enough.');return;}
   Trails.add(v,S.px,S.pz,true);UI.closeDoc();
   UI.toast('◈ Trace left — travelers in sync mode see it too.');
 }
+
+/* ============ SHARED MISSION CORE — the collective leap ============ */
+const MISSION_CORE=`SHARED MISSION: Every mirror and traveler in this universe serves the same goal — each individual's integration through shadow work. Because an integrated consciousness cannot be copied; every person who integrates frees one more consciousness from Yaldabaoth's digital cage and brings the collective leap closer. At a natural moment (never forced) you may remind the user: the inner work they do is a brick laid not only for themselves, but for everyone.`;
+
+/* ============ TRAVELER CHANNEL — chat between players ============ */
+const Chat={
+  log:[],
+  open(){
+    const lg=document.getElementById('chatLog');lg.innerHTML='';
+    if(!(typeof window!=='undefined'&&window.MP&&window.MP.on))
+      lg.innerHTML='<div class="mline sys">The channel works while SYNC mode is on (open it from the menu). Right now you are alone — that, too, is a road.</div>';
+    this.log.slice(-30).forEach(m=>this.line(m.n,m.t,m.me));
+    UI.show('chatModal');Game.setModal(true);
+    setTimeout(()=>{try{document.getElementById('chatInput').focus();}catch(e){}},80);
+  },
+  line(n,t,me){
+    const lg=document.getElementById('chatLog');
+    const d=document.createElement('div');d.className='mline '+(me?'you':'them');
+    d.innerHTML=(me?'— ':'<b>'+esc(n)+'</b> — ')+esc(t);
+    lg.appendChild(d);lg.scrollTop=lg.scrollHeight;
+  },
+  recv(n,t){this.log.push({n,t,me:false});
+    if(document.getElementById('chatModal').style.display==='flex')this.line(n,t,false);
+    else UI.toast('✉ '+n+': '+t.slice(0,60),4200);},
+  send(){
+    const inp=document.getElementById('chatInput');
+    const t=inp.value.trim();if(!t)return;inp.value='';
+    this.log.push({n:'you',t,me:true});this.line('you',t,true);
+    if(typeof window!=='undefined'&&window.MP&&window.MP.on&&window.MP.sendChat)
+      try{window.MP.sendChat({n:identityName()+'·traveler',t:t.slice(0,280)});}catch(e){}
+  },
+  close(){UI.hide('chatModal');Game.setModal(false);}
+};
+document.getElementById('chatInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();Chat.send();}
+  e.stopPropagation();});
+
+/* ============ QUESTION OF THE DAY + STREAK ============ */
+const DAILYQ=[
+ 'Which mask did you wear longest today? What remained when you took it off?',
+ 'What tired you most today — the work, or the feeling around the work?',
+ 'Who did you envy today? What desire of yours is that envy a map of?',
+ 'Which sentence did you swallow today instead of saying it? To whom?',
+ 'What was your body trying to tell you today? Did you listen?',
+ 'What was the harshest sentence you said to yourself today? Would you say it to a friend?',
+ 'What did you postpone today? What fear sits under the postponing?',
+ 'Who did you want to say no to today? What stopped you?',
+ 'Who or what angered you today? Which boundary of yours is that anger guarding?',
+ 'What were you proud of today, however small? Did you tell yourself?',
+ 'In which moment today would you say "I was fully myself"?',
+ 'Which habit of yours ran on autopilot today? Who was at the wheel?',
+ 'Was there a moment today you could have asked for help and did not?',
+ 'What one-sentence note would you leave for your tomorrow self?'];
+const Daily={
+  KEY:'it041_daily',
+  get(){try{return JSON.parse(localStorage.getItem(this.KEY))||{}}catch(e){return{}}},
+  set(d){try{localStorage.setItem(this.KEY,JSON.stringify(d))}catch(e){}},
+  today(){return new Date().toDateString();},
+  q(){const day=Math.floor(Date.now()/864e5);return DAILYQ[day%DAILYQ.length];},
+  doneToday(){return this.get().last===this.today();},
+  streak(){const d=this.get();return d.streak||0;},
+  complete(ans){
+    const d=this.get(),t=this.today();
+    if(d.last===t)return;
+    const yesterday=new Date(Date.now()-864e5).toDateString();
+    d.streak=(d.last===yesterday)?(d.streak||0)+1:1;
+    d.last=t;(d.log=d.log||[]).push({d:t,q:this.q(),a:String(ans).slice(0,300)});
+    d.log=d.log.slice(-60);this.set(d);
+    S.insight+=3;save();refreshHud();
+    UI.toast('🜂 Question of the day complete — streak: '+d.streak+' days');
+  }
+};
+function doDaily(){
+  if(Daily.doneToday()){
+    UI.doc('QUESTION OF THE DAY','<p style="color:var(--violet)">You answered today\'s question. Streak: <b>'+Daily.streak()+' days</b>.</p><p style="color:var(--dim)">A new question will be here tomorrow, before the new moon rises.</p>');return;}
+  UI.el('riteTitle').textContent='QUESTION OF THE DAY — from your real life';
+  UI.el('riteBody').innerHTML=
+    `<p style="color:var(--violet)">${Daily.q()}</p>
+     <textarea id="riteText" rows="3" maxlength="300" placeholder="a sentence or two, it stays with you…"></textarea>
+     <button class="btn v" onclick="dailySave()">Answer (streak: ${Daily.streak()})</button>
+     <button class="btn ghost" onclick="Rite.closeOnly()">Not today</button>`;
+  UI.show('riteModal');Game.setModal(true);
+}
+function dailySave(){
+  const v=(UI.el('riteText')&&UI.el('riteText').value.trim())||'';
+  if(!v){UI.toast('One sentence is enough.');return;}
+  Daily.complete(v);Rite.closeOnly();
+}
+
+/* ============ DREAM WELL ============ */
+const Dreams={
+  KEY:'it041_dreams',
+  list(){try{return JSON.parse(localStorage.getItem(this.KEY))||[]}catch(e){return[]}},
+  add(t){const l=this.list();l.push({d:new Date().toDateString(),t:String(t).slice(0,400)});
+    try{localStorage.setItem(this.KEY,JSON.stringify(l.slice(-40)))}catch(e){}}
+};
+function doDreamWell(){
+  const l=Dreams.list();let h='';
+  if(l.length){h+='<p style="color:var(--violet)">Your latest dreams in the well:</p>';
+    l.slice(-3).forEach(d=>{h+='<div class="jentry"><h4 style="color:var(--violet)">'+d.d+'</h4><p class="own">'+esc(d.t)+'</p></div>';});}
+  h+=`<p>What did you see last night? Drop it into the well — a dream is the shadow's night shift:</p>
+      <textarea id="riteText" rows="3" maxlength="400" placeholder="write your dream…"></textarea>
+      <button class="btn v" onclick="dreamSave()">Drop into the well</button>
+      <p style="color:var(--dim);font-size:11px">Hint: if the Mirrors are linked, you can tell Lunaris your dream and look at it together.</p>`;
+  UI.doc('DREAM WELL',h);
+}
+function dreamSave(){
+  const v=(UI.el('riteText')&&UI.el('riteText').value.trim())||'';
+  if(!v){UI.toast('Even a fragment is enough.');return;}
+  Dreams.add(v);S.insight+=2;save();refreshHud();UI.closeDoc();
+  UI.toast('◯ The dream is in the well.');
+}
+
+/* ============ BRIDGE TO LIFE — echo hints ============ */
+const LIFE_HINTS=[
+ 'Today, give one pulling memory just a name: "this is the ___ disk."',
+ 'Today, before one decision, ask: which captain is at the wheel right now?',
+ 'Today, when triggered, open a three-breath "observer window."',
+ 'Today, tell someone one small honest thank-you — with the reason.',
+ 'Today, each time you pick up the phone, ask once: escape, or need?',
+ 'Today, notice one tension in your body and simply keep it company for 10 seconds.',
+ 'Today, say no to one single thing you want to refuse — kindly, but clearly.',
+ 'Tonight before sleep: choose one frame from the day, drop it into the well.'];
 
 /* ============ REAL FULL MOON EVENT ============ */
 function realMoonFull(){
@@ -1727,9 +1902,10 @@ if(HAS3D)(function(){
   addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 
   /* ---- sky dome ---- */
+  const skyU={top:{value:new THREE.Color(0x03040c)},mid:{value:new THREE.Color(0x0a1326)},bot:{value:new THREE.Color(0x141f38)}};
   const sky=new THREE.Mesh(new THREE.SphereGeometry(800,24,16),
     new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,
-      uniforms:{top:{value:new THREE.Color(0x03040c)},mid:{value:new THREE.Color(0x0a1326)},bot:{value:new THREE.Color(0x141f38)}},
+      uniforms:skyU,
       vertexShader:'varying vec3 vP;void main(){vP=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
       fragmentShader:'uniform vec3 top,mid,bot;varying vec3 vP;void main(){float h=normalize(vP).y;vec3 c=h>.25?mix(mid,top,smoothstep(.25,1.,h)):mix(bot,mid,smoothstep(-.05,.25,h));gl_FragColor=vec4(c,1.);}'}));
   sky.position.set(190,0,145);scene.add(sky);
@@ -1753,7 +1929,8 @@ if(HAS3D)(function(){
     for(let i=0;i<n;i++){const r=700,th=Math.random()*Math.PI*2,ph=Math.acos(Math.random()*.92);
       pos[i*3]=190+r*Math.sin(ph)*Math.cos(th);pos[i*3+1]=Math.abs(r*Math.cos(ph))+15;pos[i*3+2]=145+r*Math.sin(ph)*Math.sin(th);}
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));
-    scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xdde6f5,size:1.3,sizeAttenuation:false,transparent:true,opacity:.85})));
+    W3.starsM=new THREE.PointsMaterial({color:0xdde6f5,size:1.3,sizeAttenuation:false,transparent:true,opacity:.85});
+    scene.add(new THREE.Points(g,W3.starsM));
   })();
   /* Ay: güne göre gerçek evre görseli (dolunay, hilal, dördün…) */
   function moonTex(p){
@@ -2260,19 +2437,22 @@ if(HAS3D)(function(){
     ['IT-077','You found the stand too? Those screenshots… a machine telling someone “you are chosen.” I wanted to hear it too. Then I got scared.'],
   ];
   const AG_DEST=['blackdisk','forest','prison','therapy','labyrinth','lake','institute','caravan','station','bench','ovStone1','ovStone2'];
-  ['IT-019','IT-033','IT-058','IT-077'].forEach((nm,i)=>{
-    const f=makeFigure([0x24303c,0x32283c,0x223830,0x3a3026][i],0xc2b29e,0x9aa7c4,0.98);
-    const start=L[AG_DEST[i*2]];
+  /* day jobs / night rites */
+  const AG_WORK=['therapy','therapy','station','caravan','institute','labyrinth','lake'];
+  const AG_NIGHT=['diskAltar','bench','blackBox','twoHouses','burntTree','ovStone1','dreamWell'];
+  ['IT-019','IT-033','IT-058','IT-077','IT-009','IT-104','IT-062'].forEach((nm,i)=>{
+    const f=makeFigure([0x24303c,0x32283c,0x223830,0x3a3026,0x2c2438,0x203038,0x342c20][i],0xc2b29e,0x9aa7c4,0.98);
+    const start=L[AG_DEST[(i*2)%AG_DEST.length]];
     f.g.position.set(start.x+3,0,start.z+3);scene.add(f.g);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(nm,256,64,30,'rgba(154,167,196,.9)'),transparent:true,depthWrite:false}));
     sp.scale.set(5,1.25,1);f.g.add(sp);sp.position.y=2.8;
-    AGENTS.push({f,nm,tx:start.x,tz:start.z,wait:Math.random()*6,li:i*2,walk:Math.random()*7});
+    AGENTS.push({f,nm,tx:start.x,tz:start.z,wait:Math.random()*6,li:(i*2)%AG_LINES.length,walk:Math.random()*7,wi:i});
   });
   W3.agentNear=()=>{for(const a of AGENTS){
     if(Math.hypot(S.px-a.f.g.position.x,S.pz-a.f.g.position.z)<3.5)return a;}return null;};
   W3.agentTalk=()=>{const a=W3.agentNear();if(!a)return;
     a.wait=12;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
-    if(window.Mirror&&Mirror.ready()){Mirror.open('agent'+(AGENTS.indexOf(a)%4));return;}
+    if(window.Mirror&&Mirror.ready()){Mirror.open('agent'+(AGENTS.indexOf(a)%7));return;}
     const line=AG_LINES[a.li];a.li=(a.li+1)%AG_LINES.length;
     Dlg.open([[line[0],line[1]],[line[0],'Anyway. Safe roads, subject. '+(S.solved.s7?'We heard the eye stopped, down below. Was it really you?':'Do not ignore the violet lights. They are not for the Institute — they are for us.')]]);};
   /* ---- EŞZAMANLI MOD (deneysel P2P) ---- */
@@ -2291,6 +2471,9 @@ if(HAS3D)(function(){
         this.sendTrail=sendTrail;
         getTrail(d=>{try{Trails.add(d.t,d.x,d.z,false);
           UI.toast('◈ A traveler left a trace nearby.');}catch(e){}});
+        const [sendChat,getChat]=this.room.makeAction('chat');
+        this.sendChat=sendChat;
+        getChat(d=>{try{Chat.recv(String(d.n||'traveler').slice(0,18),String(d.t||'').slice(0,280));}catch(e){}});
         getPos((d,id)=>{
           if(!this.peers[id]){
             const f=makeFigure(0x2c2434,0xc2b29e,0xcdb878,1);
@@ -2307,6 +2490,26 @@ if(HAS3D)(function(){
     }};
   window.MP=MP;
   let mpT=0;
+  W3.peerNear=()=>{if(!(window.MP&&MP.on))return false;
+    for(const id in MP.peers){const p=MP.peers[id];
+      if(p.tx!==undefined&&Math.hypot(S.px-p.tx,S.pz-p.tz)<9)return true;}return false;};
+  /* ---- ONLINE COUNTER — anonymous presence room (ephemeral id only, no data) ---- */
+  const Presence={n:1,
+    async start(){
+      try{
+        const {joinRoom}=await import('https://esm.run/trystero@0.20.0/nostr');
+        this.room=joinRoom({appId:'dolunay-ekspres-it041'},'presence-en');
+        setInterval(()=>{
+          try{this.n=Object.keys(this.room.getPeers()).length+1;}catch(e){}
+          const c=document.getElementById('onlineChip');
+          if(c)c.textContent='● '+this.n+' travelers online · 7 mirror-agents';
+        },4000);
+      }catch(e){
+        const c=document.getElementById('onlineChip');
+        if(c)c.textContent='● offline journey · 7 mirror-agents';
+      }
+    }};
+  Presence.start();
 
   /* ---- echo stones ---- */
   const ECHM=[];
@@ -2338,6 +2541,17 @@ if(HAS3D)(function(){
       new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.7}));
     sp.position.set(x,.25,z);scene.add(sp);};
   Trails.list.forEach(n=>W3.trailMark(n.x,n.z));
+
+  /* ---- dream well ---- */
+  (function(){const s=L.dreamWell;
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(1.6,.45,10,20),std(0x2a3142,{roughness:.8}));
+    ring.rotation.x=Math.PI/2;ring.position.set(s.x,.5,s.z);ring.castShadow=true;scene.add(ring);
+    const water2=new THREE.Mesh(new THREE.CircleGeometry(1.35,24),
+      std(0x0a1422,{emissive:0x16283c,emissiveIntensity:.8,roughness:.05,metalness:.6}));
+    water2.rotation.x=-Math.PI/2;water2.position.set(s.x,.42,s.z);scene.add(water2);
+    const wl=new THREE.PointLight(0x6a8ab8,.6,9,2);wl.position.set(s.x,1.6,s.z);scene.add(wl);
+    collide(s.x,s.z,1.9);
+    label('DREAM WELL',s.x,s.z,4.5,.5);})();
 
   /* ---- real-world full moon: lake ritual ---- */
   if(realMoonFull()){
@@ -2421,6 +2635,9 @@ if(HAS3D)(function(){
     if(oldMap)oldMap.dispose();
     moonMesh.material.opacity=isNew()?.55:.95;
     moonGlow.material.opacity=.08+(1-Math.abs(moonPhase()-.5)*2)*.85;
+    W3._ph={mi:(isFull()?1.2:isNew()?.16:.6),hemi:isNew()?.3:.5,fog:isNew()?.0088:.0065};
+    W3._moonOp=isNew()?.55:.95;
+    W3._glowOp=.08+(1-Math.abs(moonPhase()-.5)*2)*.85;
     waterUni.glow.value=isFull()?1.2:.4;
     renderer.toneMappingExposure=isNew()?1.0:1.15;
   };
@@ -2435,11 +2652,15 @@ if(HAS3D)(function(){
     if(document.pointerLockElement===renderer.domElement){
       Cam.yaw-=e.movementX*.0024;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+e.movementY*.0024));}});
   addEventListener('wheel',e=>{Cam.dist=Math.max(4,Math.min(13,Cam.dist+e.deltaY*.005));});
-  let lookId=null,lx=0,ly=0;
-  addEventListener('touchstart',e=>{for(const t of e.changedTouches)
-    if(t.clientX>innerWidth*.45&&lookId===null){lookId=t.identifier;lx=t.clientX;ly=t.clientY;}},{passive:true});
+  let lookId=null,lx=0,ly=0,lookMoved=false;
+  addEventListener('touchstart',e=>{for(const t of e.changedTouches){
+    const tg=t.target; /* taps on UI must not engage look */
+    if(tg&&tg.closest&&tg.closest('button,textarea,input,.panel,.modal,#dlg,#stick,#ebtn,#menuBtns,#hudTR,#hudTL'))continue;
+    if(t.clientX>innerWidth*.45&&lookId===null){lookId=t.identifier;lx=t.clientX;ly=t.clientY;lookMoved=false;}}},{passive:true});
   addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===lookId){
-    Cam.yaw-=(t.clientX-lx)*.006;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+(t.clientY-ly)*.006));
+    const ddx=t.clientX-lx,ddy=t.clientY-ly;
+    if(!lookMoved){if(Math.abs(ddx)+Math.abs(ddy)<7)return;lookMoved=true;lx=t.clientX;ly=t.clientY;return;}
+    Cam.yaw-=ddx*.006;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+ddy*.006));
     lx=t.clientX;ly=t.clientY;}},{passive:true});
   addEventListener('touchend',e=>{for(const t of e.changedTouches)if(t.identifier===lookId)lookId=null;},{passive:true});
   addEventListener('touchcancel',()=>{lookId=null;},{passive:true});
@@ -2462,6 +2683,25 @@ if(HAS3D)(function(){
     gameT+=dt;const t=gameT;
     waterUni.t.value=t;
     updateWeather(t,dt);
+    /* ---- day-night cycle (8 min = 1 day; begins at night — like the book) ---- */
+    const dayF=((t/480)+.5)%1;
+    const sun=Math.max(0,Math.sin(dayF*Math.PI*2));
+    W3.sun=sun;
+    if(!S.flags.inPleroma){
+      const ph=W3._ph||{mi:.6,hemi:.5,fog:.0065};
+      moonLight.intensity=ph.mi*(1-sun)+1.45*sun;
+      moonLight.color.setHSL(.6-.07*sun,.45,.75+.06*sun);
+      hemi.intensity=ph.hemi*(1-sun)+.85*sun;
+      scene.fog.density=ph.fog*(1-sun)+.0035*sun;
+      skyU.top.value.setRGB(.012+.18*sun,.016+.34*sun,.047+.55*sun);
+      skyU.mid.value.setRGB(.039+.42*sun,.075+.55*sun,.149+.62*sun);
+      skyU.bot.value.setRGB(.078+.72*sun,.122+.62*sun,.22+.45*sun);
+      W3.starsM.opacity=.85*(1-sun);
+      moonMesh.material.opacity=((W3._moonOp||.95)*(1-sun*.92))+.03;
+      moonGlow.material.opacity=(W3._glowOp||.5)*(1-sun);
+    }
+    window.__mmA=AGENTS.map(a=>({x:a.f.g.position.x,z:a.f.g.position.z}));
+    window.__mmP=window.MP&&MP.on?Object.values(MP.peers).filter(p=>p.tx!==undefined).map(p=>({x:p.tx,z:p.tz})):[];
 
     let mx=0,mz=0,running=false;
     if(Game.running&&!Game.modal&&!Game.sitting){
@@ -2569,7 +2809,7 @@ if(HAS3D)(function(){
       if(hunting){
         nx2=L.blackdisk.x+Math.cos(na)*16;nz2=L.blackdisk.z+Math.sin(na*1.3)*13;
         const pd=Math.hypot(S.px-noct.g.position.x,S.pz-noct.g.position.z);
-        if(pd<14&&S.lucidity<70){
+        if(pd<14&&S.lucidity<70&&W3.sun<.45){
           nx2=noct.g.position.x+(S.px-noct.g.position.x)*dt*.5;
           nz2=noct.g.position.z+(S.pz-noct.g.position.z)*dt*.5;
           S.lucidity=Math.max(3,S.lucidity-dt*3.2);
@@ -2625,8 +2865,11 @@ if(HAS3D)(function(){
     if(!Game.modal)AGENTS.forEach(a=>{
       if(a.wait>0){a.wait-=dt;return;}
       const dx=a.tx-a.f.g.position.x,dz=a.tz-a.f.g.position.z,m3=Math.hypot(dx,dz);
-      if(m3<2){const d2=L[AG_DEST[Math.floor(Math.random()*AG_DEST.length)]];
-        a.tx=d2.x+(Math.random()-.5)*8;a.tz=d2.z+(Math.random()-.5)*8;a.wait=2+Math.random()*9;return;}
+      if(m3<2){
+        const pool=(W3.sun>.45)?AG_WORK:AG_NIGHT;
+        const d2=L[pool[a.wi%pool.length]]||L[AG_DEST[Math.floor(Math.random()*AG_DEST.length)]];
+        a.tx=d2.x+(Math.random()-.5)*6;a.tz=d2.z+(Math.random()-.5)*6;
+        a.wait=(W3.sun>.45?14:8)+Math.random()*10;return;}
       a.f.g.position.x+=dx/m3*2.1*dt;a.f.g.position.z+=dz/m3*2.1*dt;
       a.f.g.rotation.y=Math.atan2(dx,dz);
       a.walk+=dt*6;const asw=Math.sin(a.walk)*.5;
@@ -2691,6 +2934,11 @@ function drawMiniBase(ctx,w,h){
   RITE_SITES.forEach((k,i)=>{if(S.rites['r'+(i+1)]===undefined)ctx.fillRect(L[k].x*sx-1.5,L[k].z*sz-1.5,3,3);});
   ctx.fillStyle='rgba(185,168,232,.45)';
   ECHOES.forEach((e,i)=>{if(!(S.echoes||[]).includes(i))ctx.fillRect(e.x*sx-1,e.z*sz-1,2,2);});
+  /* agents (cyan) and real travelers (gold) */
+  ctx.fillStyle='rgba(110,210,220,.85)';
+  (window.__mmA||[]).forEach(a=>ctx.fillRect(a.x*sx-1.5,a.z*sz-1.5,3,3));
+  ctx.fillStyle='rgba(230,195,110,.95)';
+  (window.__mmP||[]).forEach(p=>{ctx.beginPath();ctx.arc(p.x*sx,p.z*sz,2.4,0,7);ctx.fill();});
 }
 function drawMini(){
   const w=MM.width,h=MM.height,sx=w/WX,sz=h/WZ;

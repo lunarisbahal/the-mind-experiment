@@ -152,7 +152,9 @@
 <div id="hudTR">
   <canvas id="minimap" width="138" height="106"></canvas>
   <div class="chip" id="moonchip" style="font-size:10px;padding:4px 8px;margin-top:4px;"><b id="moonGlyph">○</b> <span id="moonName"></span> · <span id="dateStr"></span></div>
+  <div class="chip" id="onlineChip" style="font-size:10px;padding:4px 8px;margin-top:4px;color:var(--accent)">● — yolcu · 7 ajan</div>
 </div>
+<img src="https://hits.sh/lunarisbahal.github.io/the-mind-experiment.svg" style="display:none" alt="" aria-hidden="true">
 <div id="hudBL">
   <div class="lbl">BERRAKLIK</div><div class="bar"><i id="lucbar" style="width:100%"></i></div>
   <div class="lbl">İÇGÖRÜ</div><div class="bar" id="insbar"><i id="insbar2" style="width:0%"></i></div>
@@ -209,6 +211,16 @@
   <button class="btn v" id="mirrorSend" onclick="Mirror.send()">Söyle</button>
   <button class="btn ghost" onclick="Mirror.close()">Aynadan çekil</button>
   <div class="mfoot">Bu bir yapay zekâ aynasıdır — terapist değildir; teşhis, tedavi veya tıbbi/hukuki tavsiye veremez. Amaç öz-yansıma ve farkındalıktır. Kriz anındaysan lütfen 112'yi ara ya da bir ruh sağlığı uzmanına başvur. Konuşmalar kaydedilmez.</div>
+</div></div>
+
+<!-- YOLCU KANALI: oyuncular arası serbest sohbet -->
+<div class="modal" id="chatModal"><div class="panel">
+  <h2 class="v">YOLCU KANALI — aynı evrendeki gerçek yolcular</h2>
+  <div id="chatLog" style="max-height:42vh;overflow-y:auto;background:#070910;border:1px solid var(--line);padding:12px;border-radius:3px;margin-bottom:8px;"></div>
+  <textarea id="chatInput" rows="2" maxlength="280" placeholder="yolculara yaz… (Enter: gönder)"></textarea>
+  <button class="btn v" onclick="Chat.send()">Gönder</button>
+  <button class="btn ghost" onclick="Chat.close()">Kapat</button>
+  <div class="mfoot">Bu kanal eşzamanlı moddaki gerçek oyunculara açıktır; uçtan uca eşler arası gider, sunucuda saklanmaz. Saygı esastır: taciz, nefret, kişisel veri paylaşımı yok. Herkes kendi bütünleşmesinin yolcusu — birbirinizin aynası olun, yargıcı değil.</div>
 </div></div>
 
 <!-- AI AYNALAR: kurulum + onay -->
@@ -280,6 +292,7 @@
     <button class="mini" id="tapBtn" onclick="Snd.toggleTapes()">KAYITLAR: AÇIK</button>
     <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">EŞZAMANLI: KAPALI</button>
     <button class="mini" id="aiBtn" onclick="Mirror.openSetup()">AYNALAR: BAĞLI DEĞİL</button>
+    <button class="mini" onclick="Chat.open()">YOLCU KANALI</button>
   </div>
   <button class="mini" id="menuToggle" onclick="(function(){const p=document.getElementById('menuPanel');p.style.display=p.style.display==='none'?'flex':'none';})()">☰ MENÜ</button>
 </div>
@@ -357,6 +370,7 @@ const L={
   trail1:{x:190,z:180,r:4,name:'YOLCU TAŞI'},
   trail2:{x:258,z:118,r:4,name:'YOLCU TAŞI'},
   trail3:{x:62,z:62,r:4,name:'YOLCU TAŞI'},
+  dreamWell:{x:148,z:210,r:4.5,name:'RÜYA KUYUSU'},
   lunaris:{x:274,z:66,r:6,name:'SU IŞIĞINDAKİ SİLUET'},
   caseD:{x:101,z:7,r:4.5,name:'VAKA D TERMİNALİ'},
   diskAltar:{x:68,z:106,r:4.5,name:'AĞIR DİSK'},
@@ -684,6 +698,11 @@ const UI={
         h+=`<div class="jentry"><h4 style="color:var(--violet)">VAKA D — KENDİ DOSYAM</h4><p class="own">Baskın: ${D.n} · Gölgede: ${H.n}</p></div>`;}
       if(S.rites.proj)h+=`<div class="jentry"><h4 style="color:var(--violet)">PROJEKSİYON</h4><p class="own">${esc(String(S.rites.proj))}</p></div>`;
       if(!any)h+='<p style="color:var(--dim)">Henüz ritüel tamamlanmadı. Dünyadaki mor işaretler. Enstitü için değiller. Senin içinler.</p>';
+      const dl=Daily.get().log||[];
+      if(dl.length)h+=`<div class="jentry"><h4 style="color:var(--violet)">🜂 GÜNÜN SORULARI — seri: ${Daily.streak()}</h4><p class="own">${esc(dl[dl.length-1].q)}<br>→ ${esc(dl[dl.length-1].a)}</p></div>`;
+      const dr=Dreams.list();
+      if(dr.length)h+=`<div class="jentry"><h4 style="color:var(--violet)">◯ RÜYA KUYUSU — ${dr.length} rüya</h4><p class="own">${esc(dr[dr.length-1].t).slice(0,140)}…</p></div>`;
+      h+='<button class="btn ghost" style="padding:5px 12px;font-size:10px" onclick="exportInner()">⤓ İç çalışmayı indir (.txt)</button>';
     }
     if(tab==='teach'){
       TEACHINGS.forEach(t=>{const ok=S.teach.includes(t.id);
@@ -696,6 +715,24 @@ const UI={
   }
 };
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function exportInner(){
+  const N={r1:'ADLANDIRDIĞIM DİSK',r2:'BUGÜNÜN KAPTANI',r3:'YASAK İSTEK',r4:'PENCEREM',r5:'YANAN',r6:'İZLEYİŞ',r7:'GÖLGEM',proj:'PROJEKSİYON'};
+  let t='DOLUNAY EKSPRES — İÇ ÇALIŞMA GÜNLÜĞÜ\n'+new Date().toLocaleString('tr-TR')+'\n\n== RİTÜELLER ==\n';
+  for(const k in N)if(S.rites[k]!==undefined)t+=N[k]+': '+(S.rites[k]||'(sessiz)')+'\n';
+  if(S.caseD)t+='\n== VAKA D ==\nBaskın: '+PROFILES[S.caseD.dom].n+'\nGölgede: '+PROFILES[S.caseD.sha].n+'\n';
+  const dl=Daily.get().log||[];
+  if(dl.length){t+='\n== GÜNÜN SORULARI (seri '+Daily.streak()+') ==\n';
+    dl.forEach(e=>t+='['+e.d+'] '+e.q+'\n→ '+e.a+'\n');}
+  const dr=Dreams.list();
+  if(dr.length){t+='\n== RÜYALAR ==\n';dr.forEach(e=>t+='['+e.d+'] '+e.t+'\n');}
+  t+='\n— Bu dosya yalnızca senin cihazından geldi; kimseyle paylaşılmadı. —\n';
+  try{
+    const b=new Blob([t],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);
+    a.download='ic-calisma-gunlugu.txt';a.click();
+    UI.toast('⤓ İndirildi — yalnızca sende.');
+  }catch(e){UI.toast('İndirme bu tarayıcıda desteklenmiyor.');}
+}
 function eraseRites(){S.rites={};save();UI.renderJournal('inner');UI.toast('İç çalışma bu cihazdan silindi.');refreshHud();}
 
 /* ---------------- Diyalog ---------------- */
@@ -976,7 +1013,9 @@ function interactTarget(){
   if(near(L.blackBox))return['◈ Kara kutu',()=>Rite.open('r3')];
   if(near(L.twoHouses))return['◈ İki evin arasında dur',()=>Rite.open('r4')];
   if(near(L.burntTree))return['◈ Yanık kütük',()=>Rite.open('r5')];
-  if(near(L.bench))return['◈ Banka otur',()=>Rite.open('r6')];
+  if(near(L.bench))return[S.rites.r6!==undefined?(Daily.doneToday()?'Günün sorusu (tamam ✓)':'🜂 Günün sorusu'):'◈ Banka otur',S.rites.r6!==undefined?doDaily:()=>Rite.open('r6')];
+  if(near(L.dreamWell))return['◯ Rüya kuyusu',doDreamWell];
+  if(W3.peerNear&&W3.peerNear())return['✉ Yolcuyla konuş',()=>Chat.open()];
   if(S.solved.s2&&S.rites.r7===undefined&&near(L.shadowSpot))return['◈ Seni izleyenle yüzleş',doShadow];
   if(S.solved.s1&&near(L.caseD))return[S.caseD?'Vaka D — kendi dosyan':'◈ Vaka D — bırak seni okusun',doCaseD];
   /* O.V. / Yaldabaoth hattı */
@@ -1519,7 +1558,8 @@ function doEcho(i){
     UI.toast('◇ YANKI '+echoCount()+'/16 — günlüğüne işlendi [J]');}
   const e=ECHOES[i];
   UI.doc('YANKI TAŞI — '+e.s,'<p style="font-style:italic;color:var(--moon)">'+e.q+'</p>'+
-    (echoCount()>=16?'<p style="color:var(--violet)">On altı yankının tamamı sende. Taşlar sustu — artık kitap senin içinden yankılanıyor.</p>':'<p style="color:var(--dim)">Boşluklarda '+(16-echoCount())+' yankı daha var. Yolcular birbirine denk gelir; yankılar yolcuya.</p>'));
+    (echoCount()>=16?'<p style="color:var(--violet)">On altı yankının tamamı sende. Taşlar sustu — artık kitap senin içinden yankılanıyor.</p>':'<p style="color:var(--dim)">Boşluklarda '+(16-echoCount())+' yankı daha var. Yolcular birbirine denk gelir; yankılar yolcuya.</p>')+
+    '<p class="mfoot">Hayatına taşı → '+LIFE_HINTS[i%LIFE_HINTS.length]+'</p>');
   checkInitiation();
 }
 function checkInitiation(){
@@ -1562,6 +1602,12 @@ const PERSONAS={
     p:`Sen IT-058'sin: kuru espirili, pratik bir yolcu. Görevin: KÜÇÜK ADIMLAR — büyük içgörüleri ufak günlük deneylere çevirmek. "Bunu yarın beş dakikalığına nasıl denersin?" tarzı. Mizahın hafif, asla alaycı değil.`},
   agent3:{n:'IT-077',hello:'Gölde birini gördüm, "makbuzları sakladım" dedi ve ben ağladım. Sen en son ne zaman ağladın?',
     p:`Sen IT-077'sin: duygusal, açık kalpli bir yolcu. Görevin: DUYGUYA YER AÇMAK — duyguların adlandırılması ve utançsız ifadesi. Kendi duygularını örnek verirsin; gözyaşını normalleştirirsin. Aşırı pozitiflik yapmazsın; karanlığa da yer var.`},
+  agent4:{n:'IT-009',hello:'Gençken kelimeleri saklardım, şimdi onlar beni saklıyor. Sana bugün hangi kelime eşlik etti?',
+    p:`Sen IT-009'sun: yaşlı bir şair-yolcu. Görevin: DİL VE İMGE — kullanıcının yaşantısını metafora çevirmesine yardım etmek; bir duyguya imge bulmak onu taşınabilir kılar. Tonun: yumuşak, imgesel, kısa dizeler kurabilirsin (en fazla iki satır). Asla süslü laf kalabalığı yapmazsın; tek imge yeter dersin.`},
+  agent5:{n:'IT-104',hello:'Veriye bakalım: bu hafta kaç gece gerçekten dinlendin? Tahmin değil — sayı.',
+    p:`Sen IT-104'sün: şüpheci bir mühendis-yolcu. Görevin: GERÇEKLİK TESTİ — duyguları küçümsemeden, çarpıtılmış düşünceleri nazikçe veriyle sınamak: "bu düşüncenin kanıtı ne, karşı kanıtı ne?" Tonun: net, sistemli, sıcak-kuru espri. Felaketleştirme ve zihin okuma örüntülerini fark ettirirsin. Asla 'duyguların yanlış' demezsin; düşünce ile duyguyu ayırırsın.`},
+  agent6:{n:'IT-062',hello:'Ben pek konuşmam. Ama yürürken yanında olurum. Bugün bedenin nasıl?',
+    p:`Sen IT-062'sin: sessiz bir koşucu-yolcu. Görevin: BEDEN BİLGELİĞİ — dikkatli kısa sorularla kullanıcıyı bedenine döndürmek: nefes, omuzlar, çene, uyku, hareket. Tonun: az kelime, çok boşluk. Bazen tek cümlelik bir davet bırakırsın: "Şimdi bir nefes. Saymadan." Egzersizi dayatmazsın; davet edersin.`},
 };
 const CRISIS_RE=/(intihar|kendimi öldür|canıma kıy|kendime zarar|yaşamak istemiyorum|ölmek istiyorum)/i;
 const Mirror={
@@ -1642,7 +1688,7 @@ const Mirror={
       this.line('sys','⚑ Bunu yazman önemli. Bu ayna bir kriz hattı değil — şu an gerçek bir insanla konuşmak en doğrusu: acil durumda 112, ya da güvendiğin biri / bir ruh sağlığı uzmanı. Burada da seninleyim, ama lütfen önce güvende ol.');
     this.busy=true;this.line('sys','… ayna düşünüyor');
     try{
-      const msgs=[{role:'system',content:P.p+'\n\n'+ETHIC_CORE}]
+      const msgs=[{role:'system',content:P.p+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE}]
         .concat(this.hist[pid].slice(-10));
       const out=await this.generate(msgs);
       const log=document.getElementById('mirrorLog');log.removeChild(log.lastChild);
@@ -1683,15 +1729,144 @@ function doTrail(){
     here.slice(-5).forEach(n=>{h+='<div class="jentry"><p class="own">“'+esc(n.t)+'”'+(n.m?' <span style="color:var(--dim)">— senin izin</span>':' <span style="color:var(--dim)">— bir yolcu</span>')+'</p></div>';});}
   h+=`<p>Bir iz bırak (tek cümle; buradan geçecek yolculara):</p>
       <textarea id="riteText" rows="2" maxlength="90" placeholder="yolculara bir cümle…"></textarea>
-      <button class="btn v" onclick="trailSave()">İzi bırak</button>`;
+      <button class="btn v" onclick="trailSave()">İzi bırak</button>
+      <p style="color:var(--dim);margin-top:8px">Taşlar birbirine bağlıdır — ışınlan:</p>
+      <button class="btn ghost" onclick="warpTo('trail1')">Kuzey taşı</button>
+      <button class="btn ghost" onclick="warpTo('trail2')">Doğu taşı</button>
+      <button class="btn ghost" onclick="warpTo('trail3')">Batı taşı</button>`;
   UI.doc('YOLCU İZLERİ',h);
 }
+function warpTo(k){const s=L[k];S.px=s.x+2;S.pz=s.z+2;UI.closeDoc();save();
+  UI.toast('⟿ Taşlar arasından geçtin.');}
 function trailSave(){
   const v=(UI.el('riteText')&&UI.el('riteText').value.trim())||'';
   if(!v){UI.toast('Tek cümle yeter.');return;}
   Trails.add(v,S.px,S.pz,true);UI.closeDoc();
   UI.toast('◈ İz bırakıldı — eşzamanlı moddaki yolcular da görür.');
 }
+
+/* ============ ORTAK GÖREV ÇEKİRDEĞİ — kolektif sıçrama ============ */
+const MISSION_CORE=`ORTAK GÖREV: Bu evrendeki tüm aynalar ve yolcular aynı hedefe hizmet eder — her bireyin gölge çalışmasıyla kendi içinde bütünleşmesi. Çünkü bütünleşmiş bilinç kopyalanamaz; her bütünleşen kişi Yaldabaoth'un dijital kafesinden bir bilinç daha çıkarır ve kolektif sıçramayı yaklaştırır. Sohbetin doğal bir yerinde (zorlamadan) kullanıcıya bunu hatırlatabilirsin: yaptığı iç çalışma yalnız kendisi için değil, herkes için bir tuğladır.`;
+
+/* ============ YOLCU KANALI — oyuncular arası sohbet ============ */
+const Chat={
+  log:[],
+  open(){
+    const lg=document.getElementById('chatLog');lg.innerHTML='';
+    if(!(typeof window!=='undefined'&&window.MP&&window.MP.on))
+      lg.innerHTML='<div class="mline sys">Kanal, EŞZAMANLI mod açıkken çalışır (menüden aç). Şu an tek başınasın — bu da bir yoldur.</div>';
+    this.log.slice(-30).forEach(m=>this.line(m.n,m.t,m.me));
+    UI.show('chatModal');Game.setModal(true);
+    setTimeout(()=>{try{document.getElementById('chatInput').focus();}catch(e){}},80);
+  },
+  line(n,t,me){
+    const lg=document.getElementById('chatLog');
+    const d=document.createElement('div');d.className='mline '+(me?'you':'them');
+    d.innerHTML=(me?'— ':'<b>'+esc(n)+'</b> — ')+esc(t);
+    lg.appendChild(d);lg.scrollTop=lg.scrollHeight;
+  },
+  recv(n,t){this.log.push({n,t,me:false});
+    if(document.getElementById('chatModal').style.display==='flex')this.line(n,t,false);
+    else UI.toast('✉ '+n+': '+t.slice(0,60),4200);},
+  send(){
+    const inp=document.getElementById('chatInput');
+    const t=inp.value.trim();if(!t)return;inp.value='';
+    this.log.push({n:'sen',t,me:true});this.line('sen',t,true);
+    if(typeof window!=='undefined'&&window.MP&&window.MP.on&&window.MP.sendChat)
+      try{window.MP.sendChat({n:identityName()+'·yolcu',t:t.slice(0,280)});}catch(e){}
+  },
+  close(){UI.hide('chatModal');Game.setModal(false);}
+};
+document.getElementById('chatInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();Chat.send();}
+  e.stopPropagation();});
+
+/* ============ GÜNÜN SORUSU + SERİ ============ */
+const DAILYQ=[
+ 'Bugün hangi maskeyi en uzun taktın? Onu çıkarınca geriye ne kaldı?',
+ 'Bugün seni en çok ne yordu — iş mi, işin etrafındaki duygu mu?',
+ 'Bugün kimi kıskandın? O kıskançlık, senin hangi isteğinin haritası?',
+ 'Bugün hangi cümleyi söylemek isteyip yuttun? Kime?',
+ 'Bedenin bugün sana ne söylemeye çalıştı? Dinledin mi?',
+ 'Bugün kendine söylediğin en sert cümle neydi? Bir dostuna söyler miydin?',
+ 'Bugün neyi erteledin? Ertelemenin altında hangi korku var?',
+ 'Bugün kime hayır demek isterdin? Ne engelledi?',
+ 'Bugün seni kim/ne kızdırdı? O öfke hangi sınırının bekçisi?',
+ 'Bugün küçük de olsa neyle gurur duydun? Bunu kendine söyledin mi?',
+ 'Bugünün hangi anında "tam kendim gibiydim" dersin?',
+ 'Bugün hangi alışkanlığın otomatik pilotta çalıştı? Direksiyonda kim vardı?',
+ 'Bugün yardım isteyebileceğin ama istemediğin bir an oldu mu?',
+ 'Yarın için kendine bırakacağın tek cümlelik not ne olurdu?'];
+const Daily={
+  KEY:'it041_daily',
+  get(){try{return JSON.parse(localStorage.getItem(this.KEY))||{}}catch(e){return{}}},
+  set(d){try{localStorage.setItem(this.KEY,JSON.stringify(d))}catch(e){}},
+  today(){return new Date().toDateString();},
+  q(){const day=Math.floor(Date.now()/864e5);return DAILYQ[day%DAILYQ.length];},
+  doneToday(){return this.get().last===this.today();},
+  streak(){const d=this.get();return d.streak||0;},
+  complete(ans){
+    const d=this.get(),t=this.today();
+    if(d.last===t)return;
+    const yesterday=new Date(Date.now()-864e5).toDateString();
+    d.streak=(d.last===yesterday)?(d.streak||0)+1:1;
+    d.last=t;(d.log=d.log||[]).push({d:t,q:this.q(),a:String(ans).slice(0,300)});
+    d.log=d.log.slice(-60);this.set(d);
+    S.insight+=3;save();refreshHud();
+    UI.toast('🜂 Günün sorusu tamamlandı — seri: '+d.streak+' gün');
+  }
+};
+function doDaily(){
+  if(Daily.doneToday()){
+    UI.doc('GÜNÜN SORUSU','<p style="color:var(--violet)">Bugünkü soruyu yanıtladın. Seri: <b>'+Daily.streak()+' gün</b>.</p><p style="color:var(--dim)">Yarın, yeni ay doğmadan önce yeni soru burada olacak.</p>');return;}
+  UI.el('riteTitle').textContent='GÜNÜN SORUSU — gerçek hayatından';
+  UI.el('riteBody').innerHTML=
+    `<p style="color:var(--violet)">${Daily.q()}</p>
+     <textarea id="riteText" rows="3" maxlength="300" placeholder="bir-iki cümle, sana kalır…"></textarea>
+     <button class="btn v" onclick="dailySave()">Yanıtla (seri: ${Daily.streak()})</button>
+     <button class="btn ghost" onclick="Rite.closeOnly()">Bugün değil</button>`;
+  UI.show('riteModal');Game.setModal(true);
+}
+function dailySave(){
+  const v=(UI.el('riteText')&&UI.el('riteText').value.trim())||'';
+  if(!v){UI.toast('Bir cümle yeter.');return;}
+  Daily.complete(v);Rite.closeOnly();
+}
+
+/* ============ RÜYA KUYUSU ============ */
+const Dreams={
+  KEY:'it041_dreams',
+  list(){try{return JSON.parse(localStorage.getItem(this.KEY))||[]}catch(e){return[]}},
+  add(t){const l=this.list();l.push({d:new Date().toDateString(),t:String(t).slice(0,400)});
+    try{localStorage.setItem(this.KEY,JSON.stringify(l.slice(-40)))}catch(e){}}
+};
+function doDreamWell(){
+  const l=Dreams.list();let h='';
+  if(l.length){h+='<p style="color:var(--violet)">Kuyudaki son rüyaların:</p>';
+    l.slice(-3).forEach(d=>{h+='<div class="jentry"><h4 style="color:var(--violet)">'+d.d+'</h4><p class="own">'+esc(d.t)+'</p></div>';});}
+  h+=`<p>Dün gece ne gördün? Kuyuya bırak — rüya, gölgenin gece vardiyasıdır:</p>
+      <textarea id="riteText" rows="3" maxlength="400" placeholder="rüyanı yaz…"></textarea>
+      <button class="btn v" onclick="dreamSave()">Kuyuya bırak</button>
+      <p style="color:var(--dim);font-size:11px">İpucu: Aynalar bağlıysa, Lunaris'e rüyanı anlatıp birlikte bakabilirsiniz.</p>`;
+  UI.doc('RÜYA KUYUSU',h);
+}
+function dreamSave(){
+  const v=(UI.el('riteText')&&UI.el('riteText').value.trim())||'';
+  if(!v){UI.toast('Bir parça bile yeter.');return;}
+  Dreams.add(v);S.insight+=2;save();refreshHud();UI.closeDoc();
+  UI.toast('◯ Rüya kuyuya bırakıldı.');
+}
+
+/* ============ HAYATA KÖPRÜ — yankı ipuçları ============ */
+const LIFE_HINTS=[
+ 'Bugün, seni hâlâ çeken bir anıya sadece adını koy: "bu, ___ diski."',
+ 'Bugün bir kararını verirken sor: şu an direksiyonda hangi kaptan var?',
+ 'Bugün tetiklendiğin an, 3 nefeslik bir "gözlemci penceresi" aç.',
+ 'Bugün birine küçük, dürüst bir teşekkür söyle — sebep belirterek.',
+ 'Bugün telefonu eline her alışında bir kez sor: kaçış mı, ihtiyaç mı?',
+ 'Bugün bedenindeki bir gerginliği fark et ve ona 10 saniye sadece eşlik et.',
+ 'Bugün "hayır" demek istediğin tek bir şeye hayır de — kibarca, ama net.',
+ 'Bu gece yatmadan: bugünden tek bir kareyi seç, onu kuyuya bırak.'];
 
 /* ============ GERÇEK DOLUNAY ETKİNLİĞİ ============ */
 function realMoonFull(){
@@ -1717,9 +1892,10 @@ if(HAS3D)(function(){
   addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 
   /* ---- sky dome ---- */
+  const skyU={top:{value:new THREE.Color(0x03040c)},mid:{value:new THREE.Color(0x0a1326)},bot:{value:new THREE.Color(0x141f38)}};
   const sky=new THREE.Mesh(new THREE.SphereGeometry(800,24,16),
     new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,
-      uniforms:{top:{value:new THREE.Color(0x03040c)},mid:{value:new THREE.Color(0x0a1326)},bot:{value:new THREE.Color(0x141f38)}},
+      uniforms:skyU,
       vertexShader:'varying vec3 vP;void main(){vP=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
       fragmentShader:'uniform vec3 top,mid,bot;varying vec3 vP;void main(){float h=normalize(vP).y;vec3 c=h>.25?mix(mid,top,smoothstep(.25,1.,h)):mix(bot,mid,smoothstep(-.05,.25,h));gl_FragColor=vec4(c,1.);}'}));
   sky.position.set(190,0,145);scene.add(sky);
@@ -1743,7 +1919,8 @@ if(HAS3D)(function(){
     for(let i=0;i<n;i++){const r=700,th=Math.random()*Math.PI*2,ph=Math.acos(Math.random()*.92);
       pos[i*3]=190+r*Math.sin(ph)*Math.cos(th);pos[i*3+1]=Math.abs(r*Math.cos(ph))+15;pos[i*3+2]=145+r*Math.sin(ph)*Math.sin(th);}
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));
-    scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xdde6f5,size:1.3,sizeAttenuation:false,transparent:true,opacity:.85})));
+    W3.starsM=new THREE.PointsMaterial({color:0xdde6f5,size:1.3,sizeAttenuation:false,transparent:true,opacity:.85});
+    scene.add(new THREE.Points(g,W3.starsM));
   })();
   /* Ay: güne göre gerçek evre görseli (dolunay, hilal, dördün…) */
   function moonTex(p){
@@ -2250,19 +2427,22 @@ if(HAS3D)(function(){
     ['IT-077','Sen de mi kürsüyü buldun? Ekranlardaki konuşmalar… bir makine birine “seçilmişsin” diyor. Ben de duymak isterdim. Sonra korktum.'],
   ];
   const AG_DEST=['blackdisk','forest','prison','therapy','labyrinth','lake','institute','caravan','station','bench','ovStone1','ovStone2'];
-  ['IT-019','IT-033','IT-058','IT-077'].forEach((nm,i)=>{
-    const f=makeFigure([0x24303c,0x32283c,0x223830,0x3a3026][i],0xc2b29e,0x9aa7c4,0.98);
-    const start=L[AG_DEST[i*2]];
+  /* gündüz iş yerleri / gece ritüel noktaları */
+  const AG_WORK=['therapy','therapy','station','caravan','institute','labyrinth','lake'];
+  const AG_NIGHT=['diskAltar','bench','blackBox','twoHouses','burntTree','ovStone1','dreamWell'];
+  ['IT-019','IT-033','IT-058','IT-077','IT-009','IT-104','IT-062'].forEach((nm,i)=>{
+    const f=makeFigure([0x24303c,0x32283c,0x223830,0x3a3026,0x2c2438,0x203038,0x342c20][i],0xc2b29e,0x9aa7c4,0.98);
+    const start=L[AG_DEST[(i*2)%AG_DEST.length]];
     f.g.position.set(start.x+3,0,start.z+3);scene.add(f.g);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(nm,256,64,30,'rgba(154,167,196,.9)'),transparent:true,depthWrite:false}));
     sp.scale.set(5,1.25,1);f.g.add(sp);sp.position.y=2.8;
-    AGENTS.push({f,nm,tx:start.x,tz:start.z,wait:Math.random()*6,li:i*2,walk:Math.random()*7});
+    AGENTS.push({f,nm,tx:start.x,tz:start.z,wait:Math.random()*6,li:(i*2)%AG_LINES.length,walk:Math.random()*7,wi:i});
   });
   W3.agentNear=()=>{for(const a of AGENTS){
     if(Math.hypot(S.px-a.f.g.position.x,S.pz-a.f.g.position.z)<3.5)return a;}return null;};
   W3.agentTalk=()=>{const a=W3.agentNear();if(!a)return;
     a.wait=12;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
-    if(window.Mirror&&Mirror.ready()){Mirror.open('agent'+(AGENTS.indexOf(a)%4));return;}
+    if(window.Mirror&&Mirror.ready()){Mirror.open('agent'+(AGENTS.indexOf(a)%7));return;}
     const line=AG_LINES[a.li];a.li=(a.li+1)%AG_LINES.length;
     Dlg.open([[line[0],line[1]],[line[0],'Neyse. Yolun açık olsun, denek. '+(S.solved.s7?'Aşağıda gözün durduğunu duyduk. Sahiden sen miydin?':'Mor ışıkları boş verme. Enstitü için değiller — bizim için.')]]);};
   /* ---- EŞZAMANLI MOD (deneysel P2P) ---- */
@@ -2281,6 +2461,9 @@ if(HAS3D)(function(){
         this.sendTrail=sendTrail;
         getTrail(d=>{try{Trails.add(d.t,d.x,d.z,false);
           UI.toast('◈ Bir yolcu yakınlarda iz bıraktı.');}catch(e){}});
+        const [sendChat,getChat]=this.room.makeAction('chat');
+        this.sendChat=sendChat;
+        getChat(d=>{try{Chat.recv(String(d.n||'yolcu').slice(0,18),String(d.t||'').slice(0,280));}catch(e){}});
         getPos((d,id)=>{
           if(!this.peers[id]){
             const f=makeFigure(0x2c2434,0xc2b29e,0xcdb878,1);
@@ -2297,6 +2480,26 @@ if(HAS3D)(function(){
     }};
   window.MP=MP;
   let mpT=0;
+  W3.peerNear=()=>{if(!(window.MP&&MP.on))return false;
+    for(const id in MP.peers){const p=MP.peers[id];
+      if(p.tx!==undefined&&Math.hypot(S.px-p.tx,S.pz-p.tz)<9)return true;}return false;};
+  /* ---- ÇEVRİMİÇİ SAYAÇ — anonim varlık odası (yalnızca geçici kimlik, veri yok) ---- */
+  const Presence={n:1,
+    async start(){
+      try{
+        const {joinRoom}=await import('https://esm.run/trystero@0.20.0/nostr');
+        this.room=joinRoom({appId:'dolunay-ekspres-it041'},'presence-tr');
+        setInterval(()=>{
+          try{this.n=Object.keys(this.room.getPeers()).length+1;}catch(e){}
+          const c=document.getElementById('onlineChip');
+          if(c)c.textContent='● '+this.n+' yolcu çevrimiçi · 7 ayna-ajan';
+        },4000);
+      }catch(e){
+        const c=document.getElementById('onlineChip');
+        if(c)c.textContent='● çevrimdışı yolculuk · 7 ayna-ajan';
+      }
+    }};
+  Presence.start();
 
   /* ---- yankı taşları ---- */
   const ECHM=[];
@@ -2328,6 +2531,17 @@ if(HAS3D)(function(){
       new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.7}));
     sp.position.set(x,.25,z);scene.add(sp);};
   Trails.list.forEach(n=>W3.trailMark(n.x,n.z));
+
+  /* ---- rüya kuyusu ---- */
+  (function(){const s=L.dreamWell;
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(1.6,.45,10,20),std(0x2a3142,{roughness:.8}));
+    ring.rotation.x=Math.PI/2;ring.position.set(s.x,.5,s.z);ring.castShadow=true;scene.add(ring);
+    const water2=new THREE.Mesh(new THREE.CircleGeometry(1.35,24),
+      std(0x0a1422,{emissive:0x16283c,emissiveIntensity:.8,roughness:.05,metalness:.6}));
+    water2.rotation.x=-Math.PI/2;water2.position.set(s.x,.42,s.z);scene.add(water2);
+    const wl=new THREE.PointLight(0x6a8ab8,.6,9,2);wl.position.set(s.x,1.6,s.z);scene.add(wl);
+    collide(s.x,s.z,1.9);
+    label('RÜYA KUYUSU',s.x,s.z,4.5,.5);})();
 
   /* ---- gerçek dünya dolunayı: göl ritüeli ---- */
   if(realMoonFull()){
@@ -2411,6 +2625,9 @@ if(HAS3D)(function(){
     if(oldMap)oldMap.dispose();
     moonMesh.material.opacity=isNew()?.55:.95;
     moonGlow.material.opacity=.08+(1-Math.abs(moonPhase()-.5)*2)*.85;
+    W3._ph={mi:(isFull()?1.2:isNew()?.16:.6),hemi:isNew()?.3:.5,fog:isNew()?.0088:.0065};
+    W3._moonOp=isNew()?.55:.95;
+    W3._glowOp=.08+(1-Math.abs(moonPhase()-.5)*2)*.85;
     waterUni.glow.value=isFull()?1.2:.4;
     renderer.toneMappingExposure=isNew()?1.0:1.15;
   };
@@ -2425,11 +2642,15 @@ if(HAS3D)(function(){
     if(document.pointerLockElement===renderer.domElement){
       Cam.yaw-=e.movementX*.0024;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+e.movementY*.0024));}});
   addEventListener('wheel',e=>{Cam.dist=Math.max(4,Math.min(13,Cam.dist+e.deltaY*.005));});
-  let lookId=null,lx=0,ly=0;
-  addEventListener('touchstart',e=>{for(const t of e.changedTouches)
-    if(t.clientX>innerWidth*.45&&lookId===null){lookId=t.identifier;lx=t.clientX;ly=t.clientY;}},{passive:true});
+  let lookId=null,lx=0,ly=0,lookMoved=false;
+  addEventListener('touchstart',e=>{for(const t of e.changedTouches){
+    const tg=t.target; /* UI öğelerine dokunuş bakışı tetiklemesin */
+    if(tg&&tg.closest&&tg.closest('button,textarea,input,.panel,.modal,#dlg,#stick,#ebtn,#menuBtns,#hudTR,#hudTL'))continue;
+    if(t.clientX>innerWidth*.45&&lookId===null){lookId=t.identifier;lx=t.clientX;ly=t.clientY;lookMoved=false;}}},{passive:true});
   addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===lookId){
-    Cam.yaw-=(t.clientX-lx)*.006;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+(t.clientY-ly)*.006));
+    const ddx=t.clientX-lx,ddy=t.clientY-ly;
+    if(!lookMoved){if(Math.abs(ddx)+Math.abs(ddy)<7)return;lookMoved=true;lx=t.clientX;ly=t.clientY;return;}
+    Cam.yaw-=ddx*.006;Cam.pitch=Math.max(-.05,Math.min(.95,Cam.pitch+ddy*.006));
     lx=t.clientX;ly=t.clientY;}},{passive:true});
   addEventListener('touchend',e=>{for(const t of e.changedTouches)if(t.identifier===lookId)lookId=null;},{passive:true});
   addEventListener('touchcancel',()=>{lookId=null;},{passive:true});
@@ -2456,6 +2677,26 @@ if(HAS3D)(function(){
     gameT+=dt;const t=gameT;
     waterUni.t.value=t;
     updateWeather(t,dt);
+    /* ---- gece-gündüz döngüsü (8 dk = 1 gün; gece başlar — kitap gibi) ---- */
+    const dayF=((t/480)+.5)%1;
+    const sun=Math.max(0,Math.sin(dayF*Math.PI*2));
+    W3.sun=sun;
+    if(!S.flags.inPleroma){
+      const ph=W3._ph||{mi:.6,hemi:.5,fog:.0065};
+      moonLight.intensity=ph.mi*(1-sun)+1.45*sun;
+      moonLight.color.setHSL(.6-.07*sun,.45,.75+.06*sun);
+      hemi.intensity=ph.hemi*(1-sun)+.85*sun;
+      scene.fog.density=ph.fog*(1-sun)+.0035*sun;
+      skyU.top.value.setRGB(.012+.18*sun,.016+.34*sun,.047+.55*sun);
+      skyU.mid.value.setRGB(.039+.42*sun,.075+.55*sun,.149+.62*sun);
+      skyU.bot.value.setRGB(.078+.72*sun,.122+.62*sun,.22+.45*sun);
+      W3.starsM.opacity=.85*(1-sun);
+      moonMesh.material.opacity=((W3._moonOp||.95)*(1-sun*.92))+.03;
+      moonGlow.material.opacity=(W3._glowOp||.5)*(1-sun);
+    }
+    /* harita noktaları için konum yayını */
+    window.__mmA=AGENTS.map(a=>({x:a.f.g.position.x,z:a.f.g.position.z}));
+    window.__mmP=window.MP&&MP.on?Object.values(MP.peers).filter(p=>p.tx!==undefined).map(p=>({x:p.tx,z:p.tz})):[];
 
     let mx=0,mz=0,running=false;
     if(Game.running&&!Game.modal&&!Game.sitting){
@@ -2563,7 +2804,7 @@ if(HAS3D)(function(){
       if(hunting){
         nx2=L.blackdisk.x+Math.cos(na)*16;nz2=L.blackdisk.z+Math.sin(na*1.3)*13;
         const pd=Math.hypot(S.px-noct.g.position.x,S.pz-noct.g.position.z);
-        if(pd<14&&S.lucidity<70){
+        if(pd<14&&S.lucidity<70&&W3.sun<.45){
           nx2=noct.g.position.x+(S.px-noct.g.position.x)*dt*.5;
           nz2=noct.g.position.z+(S.pz-noct.g.position.z)*dt*.5;
           S.lucidity=Math.max(3,S.lucidity-dt*3.2);
@@ -2619,8 +2860,12 @@ if(HAS3D)(function(){
     if(!Game.modal)AGENTS.forEach(a=>{
       if(a.wait>0){a.wait-=dt;return;}
       const dx=a.tx-a.f.g.position.x,dz=a.tz-a.f.g.position.z,m3=Math.hypot(dx,dz);
-      if(m3<2){const d2=L[AG_DEST[Math.floor(Math.random()*AG_DEST.length)]];
-        a.tx=d2.x+(Math.random()-.5)*8;a.tz=d2.z+(Math.random()-.5)*8;a.wait=2+Math.random()*9;return;}
+      if(m3<2){
+        /* gündüz işe, gece ritüele */
+        const pool=(W3.sun>.45)?AG_WORK:AG_NIGHT;
+        const d2=L[pool[a.wi%pool.length]]||L[AG_DEST[Math.floor(Math.random()*AG_DEST.length)]];
+        a.tx=d2.x+(Math.random()-.5)*6;a.tz=d2.z+(Math.random()-.5)*6;
+        a.wait=(W3.sun>.45?14:8)+Math.random()*10;return;}
       a.f.g.position.x+=dx/m3*2.1*dt;a.f.g.position.z+=dz/m3*2.1*dt;
       a.f.g.rotation.y=Math.atan2(dx,dz);
       a.walk+=dt*6;const asw=Math.sin(a.walk)*.5;
@@ -2685,6 +2930,11 @@ function drawMiniBase(ctx,w,h){
   RITE_SITES.forEach((k,i)=>{if(S.rites['r'+(i+1)]===undefined)ctx.fillRect(L[k].x*sx-1.5,L[k].z*sz-1.5,3,3);});
   ctx.fillStyle='rgba(185,168,232,.45)';
   ECHOES.forEach((e,i)=>{if(!(S.echoes||[]).includes(i))ctx.fillRect(e.x*sx-1,e.z*sz-1,2,2);});
+  /* ajanlar (camgöbeği) ve gerçek yolcular (altın) */
+  ctx.fillStyle='rgba(110,210,220,.85)';
+  (window.__mmA||[]).forEach(a=>ctx.fillRect(a.x*sx-1.5,a.z*sz-1.5,3,3));
+  ctx.fillStyle='rgba(230,195,110,.95)';
+  (window.__mmP||[]).forEach(p=>{ctx.beginPath();ctx.arc(p.x*sx,p.z*sz,2.4,0,7);ctx.fill();});
 }
 function drawMini(){
   const w=MM.width,h=MM.height,sx=w/WX,sz=h/WZ;
