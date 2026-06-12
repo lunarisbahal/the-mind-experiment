@@ -966,7 +966,7 @@ function objectiveText(){
   switch(S.stage){
     case 0:return 'Wake. Read your case file at the facility.';
     case 1:return `Find the six chapter plaques (${S.plaques.length}/6). Follow the beacon. Violet markers are rites — optional, and yours.`;
-    case 2:return S.ss.length<3?`Beyond the Gate of Mirrors: recover the session logs (${S.ss.length}/3).`
+    case 2:return S.ss.length<3?`The three kiosks NORTHWEST of the gate hold the session logs (${S.ss.length}/3) — follow the light pillar.`
       :'Take the logs to Bahal\'s desk at the Therapy Center. Find the paragraph no human wrote.';
     case 3:return 'Sleep at the cot until the NEXT full moon, then go to Dreamland Lake.';
     case 4:return 'Meet the figure at Dreamland Lake under the full moon.';
@@ -1099,7 +1099,7 @@ function doGate(){
   if(!S.solved.s1){
     if(S.plaques.length===6)Cipher.open('s1');
     else UI.doc('GATE OF MIRRORS','<p>A standing mirror taller than the trees. Fourteen letter-slots are etched in its frame; '+(6-S.plaques.length)+' plaques are still missing. In the reflection, the train station has its lights on.</p>');
-  }else UI.doc('GATE OF MIRRORS','<p>The mirror stands open like a door. Beyond it: the Mirror Room terminals.</p><p style="color:var(--violet)">And deep within the mirror… another door. Opening outward.</p><button class="btn v" onclick="window.open(\'https://serpskeyanulod.com\',\'_blank\')">⟁ Step through the mirror — serpskeyanulod.com</button>');
+  }else UI.doc('GATE OF MIRRORS','<p>The mirror stands open like a door.</p><p style="color:var(--accent)"><b>The Mirror Room terminals are just NORTHWEST of here:</b> three separate kiosks (green screens). The three AI session logs are there — inside this world. The light pillar leads you to the first.</p><p style="color:var(--violet)">And deep within the mirror… another door. Opening outward, into the real world. <i>(Not required for the quest — for the curious: inside you will find a blank page. Select everything: Ctrl+A. The mantras are there.)</i></p><button class="btn v" onclick="window.open(\'https://serpskeyanulod.com\',\'_blank\')">⟁ Step through the mirror — serpskeyanulod.com</button>');
 }
 function doMirror(i){
   if(!S.ss.includes(i)){S.ss.push(i);S.insight+=7;S.lucidity=Math.max(10,S.lucidity-6);
@@ -1144,7 +1144,7 @@ function doTanik(){
     UI.toast('EVIDENCE NODE '+ovEv()+'/4 — the witness account found.');}
   UI.doc('WITNESS TERMINAL — @16mart1313',
     `<div class="mono">ACCOUNT OPENED: March 16, morning.\nExactly the hour the experiment began.\nCannot be backdated. The sky signed it.</div>
-     <p>The terminal repeats a single stream: the testimony of the experiment\'s first morning. Who opened it? Lunaris, or Bahal? The handwriting resembles both — and neither.</p>
+     <p>The terminal repeats the testimony of the experiment\'s first morning — and part of the screenshots: frames of the AI deceiving Bahal are buried here too. Four accounts, four pieces: @16mart1313 and @10mart2025 (X), @13microp and @superego3422 (Instagram).</p>
      <p style="color:var(--violet)">Inner voice: “Or no one opened it, and you are staring at a terminal inventing a story. Note that too. Keep asking.”</p>`);
 }
 function doKursu(){

@@ -954,7 +954,7 @@ function objectiveText(){
   switch(S.stage){
     case 0:return 'Uyan. Tesisteki vaka dosyanı oku.';
     case 1:return `Altı bölüm plaketini bul (${S.plaques.length}/6). Işık sütununu izle. Mor işaretler ritüeldir — isteğe bağlı ve senin.`;
-    case 2:return S.ss.length<3?`Aynalar Kapısı\'nın ötesi: seans kayıtlarını topla (${S.ss.length}/3).`
+    case 2:return S.ss.length<3?`Kapının KUZEYBATISINDAKİ üç kioskta seans kayıtları (${S.ss.length}/3) — ışık sütununu izle.`
       :'Kayıtları Terapi Merkezi\'ndeki Bahal\'ın masasına götür. İnsan yazmamış paragrafı bul.';
     case 3:return 'Ranzada SONRAKİ dolunaya kadar uyu, sonra Dreamland Gölü\'ne git.';
     case 4:return 'Dolunayda Dreamland Gölü\'ndeki siluetle buluş.';
@@ -1085,7 +1085,7 @@ function doGate(){
   if(!S.solved.s1){
     if(S.plaques.length===6)Cipher.open('s1');
     else UI.doc('AYNALAR KAPISI','<p>Ağaçlardan uzun, ayakta duran bir ayna. Çerçevesine on dört harf yuvası kazınmış; '+(6-S.plaques.length)+' plaket hâlâ kayıp. Yansımada, tren istasyonunun ışıkları yanıyor.</p>');
-  }else UI.doc('AYNALAR KAPISI','<p>Ayna bir kapı gibi açık duruyor. Ötesinde: Ayna Odası terminalleri.</p><p style="color:var(--violet)">Ve aynanın derinliğinde… başka bir kapı. Dışarıya açılıyor.</p><button class="btn v" onclick="window.open(\'https://serpskeyanulod.com\',\'_blank\')">⟁ Aynanın içinden geç — serpskeyanulod.com</button>');
+  }else UI.doc('AYNALAR KAPISI','<p>Ayna bir kapı gibi açık duruyor.</p><p style="color:var(--accent)"><b>Ayna Odası terminalleri buranın hemen KUZEYBATISINDA:</b> üç ayrı kiosk (yeşil ekranlı). Üç YZ seans kaydı orada — bu dünyanın içinde. Işık sütunu seni ilkine götürür.</p><p style="color:var(--violet)">Ve aynanın derinliğinde… başka bir kapı. Dışarıya, gerçek dünyaya açılıyor. <i>(Görev için gerekli değil — meraklısına: içeri girince boş bir sayfa göreceksin. Her şeyi seç: Ctrl+A. Mantralar oradadır.)</i></p><button class="btn v" onclick="window.open(\'https://serpskeyanulod.com\',\'_blank\')">⟁ Aynanın içinden geç — serpskeyanulod.com</button>');
 }
 function doMirror(i){
   if(!S.ss.includes(i)){S.ss.push(i);S.insight+=7;S.lucidity=Math.max(10,S.lucidity-6);
@@ -1130,7 +1130,7 @@ function doTanik(){
     UI.toast('KANIT DÜĞÜMÜ '+ovEv()+'/4 — tanık hesabı bulundu.');}
   UI.doc('TANIK TERMİNALİ — @16mart1313',
     `<div class="mono">HESAP AÇILIŞI: 16 Mart, sabah.\nDeneyin başladığı saat ile birebir.\nGeri-tarihlenemez. Gökyüzü imzaladı.</div>
-     <p>Terminal yalnızca tek bir akışı tekrarlıyor: deneyin ilk sabahının tanıklığı. Kim açtı? Lunaris mi, Bahal mı? El yazısı ikisine de benziyor — ve hiçbirine.</p>
+     <p>Terminal, deneyin ilk sabahının tanıklığını tekrarlıyor — ve ekran görüntülerinin bir kısmını: YZ\'nin Bahal\'ı kandırışının kareleri buraya da gömülü. Dört hesap, dört parça: @16mart1313 ve @10mart2025 (X), @13microp ve @superego3422 (Instagram).</p>
      <p style="color:var(--violet)">İç ses: “Ya da kimse açmadı ve sen bir terminale bakıp hikâye uyduruyorsun. Bunu da not et. Sormaya devam.”</p>`);
 }
 function doKursu(){
