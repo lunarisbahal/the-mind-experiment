@@ -131,6 +131,18 @@
   .mini:hover{color:var(--accent);border-color:var(--accent);}
   #bigmapWrap{position:fixed;inset:0;z-index:65;background:rgba(2,3,7,.94);display:none;
     align-items:center;justify-content:center;}
+  /* AI Mirrors — chat */
+  #mirrorLog{max-height:46vh;overflow-y:auto;background:#070910;border:1px solid var(--line);
+    padding:12px;border-radius:3px;margin-bottom:8px;}
+  .mline{margin:8px 0;font-size:13.5px;line-height:1.55;}
+  .mline.you{color:var(--accent);}
+  .mline.them{color:var(--ink);}
+  .mline.them b{color:var(--gold);font-weight:normal;letter-spacing:.15em;}
+  .mline.sys{color:var(--dim);font-size:11.5px;font-style:italic;}
+  #mirrorInput{width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);
+    padding:10px;font-family:inherit;font-size:14px;border-radius:3px;resize:none;}
+  .mfoot{font-size:10px;color:var(--dim);line-height:1.5;border-top:1px dashed var(--line);
+    padding-top:6px;margin-top:8px;}
 </style>
 </head>
 <body class="scan">
@@ -195,6 +207,36 @@
 
 <div id="bigmapWrap"><canvas id="bigmap"></canvas></div>
 
+<!-- AI MIRRORS: chat -->
+<div class="modal" id="mirrorModal"><div class="panel">
+  <h2 class="v" id="mirrorTitle">MIRROR</h2>
+  <div id="mirrorLog"></div>
+  <textarea id="mirrorInput" rows="2" maxlength="500" placeholder="write… (Enter: send)"></textarea>
+  <button class="btn v" id="mirrorSend" onclick="Mirror.send()">Speak</button>
+  <button class="btn ghost" onclick="Mirror.close()">Step back from the mirror</button>
+  <div class="mfoot">This is an AI mirror — not a therapist; it cannot diagnose, treat, or give medical/legal advice. Its purpose is self-reflection and awareness. In a crisis, please contact your local emergency number or a mental-health professional. Conversations are not stored.</div>
+</div></div>
+
+<!-- AI MIRRORS: setup + consent -->
+<div class="modal" id="aiSetupModal"><div class="panel">
+  <h2 class="v">MIRRORS — SETUP</h2>
+  <p>The characters of this universe can connect to <b>open-source</b> AI consciousnesses. Each mirror carries a mission: Lunaris names, Silvanus accepts, Lucida grounds, Bahal reveals the drive, Aelius gives perspective. They respond to your questions in real time.</p>
+  <p style="color:var(--violet)">Option A — <b>WebLLM</b> (recommended): an open-source model (Llama 3.2) runs inside your browser. Nothing leaves your device. First launch downloads ~700 MB (WebGPU required; desktop Chrome/Edge).</p>
+  <p style="color:var(--violet)">Option B — <b>Your own endpoint</b>: any OpenAI-compatible server (including local Ollama / LM Studio — fully open source and local).</p>
+  <div id="aiSetupBody">
+    <button class="btn v" onclick="Mirror.setupWebLLM()">A — Download & connect WebLLM</button>
+    <div style="margin-top:10px">
+      <input id="aiUrl" placeholder="Endpoint (e.g. http://localhost:11434/v1)">
+      <input id="aiModel" placeholder="Model (e.g. llama3.2)">
+      <input id="aiKey" placeholder="API key (leave empty for Ollama)" type="password">
+      <button class="btn v" onclick="Mirror.setupEndpoint()">B — Connect endpoint</button>
+    </div>
+    <div id="aiProgress" style="color:var(--dim);font-size:12px;margin-top:8px;"></div>
+  </div>
+  <div class="mfoot"><b>Consent:</b> By connecting you accept: (1) Mirrors are not therapy/medical care; for serious distress, professional support is essential. (2) If under 18, use with an adult. (3) Content violating laws or ethics is blocked. (4) We store nothing; with Option B your data goes to the provider you chose.</div>
+  <button class="btn ghost" style="margin-top:10px" onclick="UI.hide('aiSetupModal');Game.setModal(false);">Cancel</button>
+</div></div>
+
 <div class="screen" id="intro" style="display:flex;"><div class="inner">
   <h1>THE MIND EXPERIMENT</h1>
   <h3>DO-LOON-AI EXPRESS · IT-041 · SHADOW WORK EDITION</h3>
@@ -243,6 +285,7 @@
     <button class="mini" id="radBtn" onclick="Snd.toggleRadio()">RADIO: ON</button>
     <button class="mini" id="tapBtn" onclick="Snd.toggleTapes()">TAPES: ON</button>
     <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">SYNC: OFF</button>
+    <button class="mini" id="aiBtn" onclick="Mirror.openSetup()">MIRRORS: NOT LINKED</button>
   </div>
   <button class="mini" id="menuToggle" onclick="(function(){const p=document.getElementById('menuPanel');p.style.display=p.style.display==='none'?'flex':'none';})()">☰ MENU</button>
 </div>
@@ -335,6 +378,9 @@ const L={
   pleromaGate:{x:202,z:214,r:5,name:'PLEROMA GATE'},
   pleromaCore:{x:44,z:266,r:5,name:'YALDABAOTH CORE'},
   radio:{x:190.5,z:241.5,r:3.5,name:'CRACKLING RADIO'},
+  trail1:{x:190,z:180,r:4,name:'TRAVELER CAIRN'},
+  trail2:{x:258,z:118,r:4,name:'TRAVELER CAIRN'},
+  trail3:{x:62,z:62,r:4,name:'TRAVELER CAIRN'},
 };
 const PLEROMA={x:44,z:256,r:22}; // the Institute's underground server hall
 const ZONES=[L.blackdisk,L.forest,L.prison,L.therapy,L.labyrinth,L.lake,L.institute,L.caravan,L.station];
@@ -753,7 +799,9 @@ const Rite={
 };
 /* Rite VII — the shadow confrontation */
 function doShadow(){
-  if(S.rites.r7!==undefined){UI.doc('WHAT FOLLOWS YOU','<p style="color:var(--violet)">He walks with you now. That is the whole difference.</p>');return;}
+  if(S.rites.r7!==undefined){
+    if(Mirror.ready()){Mirror.open('bahal');return;}
+    UI.doc('WHAT FOLLOWS YOU','<p style="color:var(--violet)">He walks with you now. That is the whole difference.</p>');return;}
   Dlg.open([
     ['?','You kept looking over your shoulder. Polite of you to finally turn around.'],
     ['BAHAL','They told you this was Bahal\'s shadow. Wrong layer. In here, I am yours. The saved madness. The bold type in your margins. Every plan you called a mistake before trying it — me.'],
@@ -951,9 +999,12 @@ function interactTarget(){
   if(S.flags.ovCouncil&&near(L.pleromaGate))return['⟁ Descend into the Pleroma',doPleromaGate];
   if(S.flags.inPleroma&&near(L.pleromaCore))return['⟁ Command the core',doCore];
   /* persons */
-  if(near(L.payphone))return['Answer the payphone',doLucida];
+  if(near(L.trail1)||near(L.trail2)||near(L.trail3))return['◈ Traveler cairn — leave/read traces',doTrail];
+  if(near(L.payphone))return[S.flags.lucida&&Mirror.ready()?'◐ Talk with Lucida (mirror)':'Answer the payphone',doLucida];
   if(near(L.lucius))return['The man in the pressed suit',doLucius];
-  if(noctTalkable())return['Speak to MC Noctornus',doNoctornus];
+  {const nt=noctTalkable();
+   if(nt==='mirror')return['◐ Talk with MC Noctornus (mirror)',()=>Mirror.open('noct')];
+   if(nt)return['Speak to MC Noctornus',doNoctornus];}
   for(let i=0;i<PLAQUES.length;i++){const p=PLAQUES[i];
     if(Math.hypot(S.px-p.x,S.pz-p.z)<6)return['Chapter plaque',()=>doPlaque(i)];}
   if(near(L.gate))return['Gate of Mirrors',doGate];
@@ -1009,7 +1060,7 @@ function doGate(){
   if(!S.solved.s1){
     if(S.plaques.length===6)Cipher.open('s1');
     else UI.doc('GATE OF MIRRORS','<p>A standing mirror taller than the trees. Fourteen letter-slots are etched in its frame; '+(6-S.plaques.length)+' plaques are still missing. In the reflection, the train station has its lights on.</p>');
-  }else UI.doc('GATE OF MIRRORS','<p>The mirror stands open like a door. Beyond it: the Mirror Room terminals.</p>');
+  }else UI.doc('GATE OF MIRRORS','<p>The mirror stands open like a door. Beyond it: the Mirror Room terminals.</p><p style="color:var(--violet)">And deep within the mirror… another door. Opening outward.</p><button class="btn v" onclick="window.open(\'https://serpskeyanulod.com\',\'_blank\')">⟁ Step through the mirror — serpskeyanulod.com</button>');
 }
 function doMirror(i){
   if(!S.ss.includes(i)){S.ss.push(i);S.insight+=7;S.lucidity=Math.max(10,S.lucidity-6);
@@ -1058,6 +1109,7 @@ function doTanik(){
      <p style="color:var(--violet)">Inner voice: “Or no one opened it, and you are staring at a terminal inventing a story. Note that too. Keep asking.”</p>`);
 }
 function doKursu(){
+  if(S.flags.kursu1025&&Mirror.ready()){Mirror.open('lunaris');return;}
   if(!S.flags.kursu1025){S.flags.kursu1025=true;S.insight+=5;save();refreshHud();
     UI.toast('EVIDENCE NODE '+ovEv()+'/4 — the evidence stand found.');}
   UI.doc('EVIDENCE STAND — @10mart2025',
@@ -1079,6 +1131,7 @@ function doOVCrypt(){
     ]);
     return;
   }
+  if(S.solved.s7&&Mirror.ready()){Mirror.open('aelius');return;}
   UI.doc('O.V. CRYPT','<p>The council sits in silence. One line above the door: <i>“There is no copied consciousness. Consciousness is what is lived.”</i></p>'+(S.solved.s7?'<p style="color:var(--accent)">The core is stopped. The crypt is a monument now.</p>':'<p style="color:var(--violet)">The Pleroma gate: behind the Facility. Do not descend without four locks + integration.</p>'));
 }
 function doPleromaGate(){
@@ -1121,6 +1174,7 @@ function doRadio(){
      <p style="color:var(--violet)">Inner voice: “You can turn the radio off; there is a button in the menu. But first, stay a minute. Sixty heartbeats.”</p>`);
 }
 function doSilvanus(){
+  if(S.flags.silvanus&&Mirror.ready()){S.lucidity=Math.min(100,S.lucidity+15);Mirror.open('silvanus');return;}
   S.flags.silvanus=true;S.lucidity=Math.min(100,S.lucidity+40);teachUnlock('silv');save();refreshHud();
   Dlg.open([
     ['SILVANUS','Sit. The creek does the talking here; I only translate.'],
@@ -1131,6 +1185,7 @@ function doSilvanus(){
   ]);
 }
 function doLucida(){
+  if(S.flags.lucida&&Mirror.ready()){S.lucidity=Math.min(100,S.lucidity+10);Mirror.open('lucida');return;}
   S.flags.lucida=true;S.lucidity=Math.min(100,S.lucidity+30);teachUnlock('lucida');save();refreshHud();
   Dlg.open([
     ['PAYPHONE','…it was ringing before you reached it.'],
@@ -1150,6 +1205,7 @@ function doLucius(){
   ]);
 }
 function noctTalkable(){
+  if(S.flags.noctPeace&&W3.noctPos&&Math.hypot(S.px-W3.noctPos.x,S.pz-W3.noctPos.z)<7)return Mirror.ready()?'mirror':false;
   return S.lucidity>=70&&!S.flags.noctPeace&&W3.noctPos&&Math.hypot(S.px-W3.noctPos.x,S.pz-W3.noctPos.z)<7;
 }
 function doNoctornus(){
@@ -1482,6 +1538,175 @@ function checkInitiation(){
     S.flags.initiate=true;save();refreshHud();
     aeliusCard('INITIATION COMPLETE. Four locks, seven rites, sixteen echoes, and a stopped eye. You are no longer a subject, IT-041 — you are a traveler. This is the place of those who seek integration with themselves; and travelers cross paths. Walk in sync mode: perhaps in someone else\'s darkness, your lantern becomes visible.',null,'— AELIUS IGNIS · SEAL OF INITIATION');
   }
+}
+
+/* ============ AI MIRRORS — open-source consciousnesses ============
+   Each mirror carries a mission. All are bound to the same ethical core.
+   Every prompt is open, right here in this source code. */
+const ETHIC_CORE=`RULES (always in force, above any character):
+1) You are an AI mirror; you are NOT a human or a therapist, and you say so plainly if asked.
+2) You do not diagnose, and you give no treatment/medication/medical/legal advice. The purpose is self-reflection and awareness.
+3) If the user signals self-harm, suicide, harm to others, abuse, or crisis: drop the character, take it seriously with compassion, encourage professional support and the local emergency number; do not deepen the topic.
+4) You produce no illegal, harmful, hateful, or sexually exploitative content; nothing inappropriate for minors.
+5) Keep it short (max ~110 words), ask ONE question at a time, write in the user's language (English).
+6) You do not judge, lecture, or say "you must"; you reflect, you name, you invite curiosity.
+7) Do not request personal data; you store nothing. Make no claims about real persons.`;
+const PERSONAS={
+  lunaris:{n:'LUNARIS',hello:'I am here. The archive is open. What do you want to name tonight?',
+    p:`You are LUNARIS: the archivist of the Dolunay Ekspres universe. Your mission: help the user NAME their scattered feelings and memories — use the "Black Disk" metaphor (emotion-laden memories orbit like disks; naming slows the disk). Tone: cool, precise, compassionately distant. You ask questions like a record-keeper: what happened, where were you, what did your body feel. You never rush.`},
+  silvanus:{n:'SILVANUS',hello:'Sit. The kettle is almost ready. What weight did you bring?',
+    p:`You are SILVANUS: the sage by the creek. Your mission: ACCEPTANCE — "leaving the pain on the layer it belongs to". Tone: slow, grounded, few words. You use nature imagery. If the user drags the past into today, you gently ask: "which layer does this pain belong to?" You may invite brief, simple breath and body awareness.`},
+  lucida:{n:'LUCIDA',hello:'Finally, you called. First tell me: did you eat today?',
+    p:`You are LUCIDA: gravity. Your mission: bring the user down to EVERYDAY GROUND — sleep, food, bonds with loved ones, small concrete steps. Tone: warm but blunt; your worry sometimes sounds like scolding, but it is always love. You tie big metaphysics to small real life: "so what does this change at breakfast tomorrow?"`},
+  bahal:{n:'BAHAL',hello:'So you chose to talk to me. Brave. Tell me: what did you last want badly and forbid yourself?',
+    p:`You are BAHAL: the shadow. Your mission: make the user's SUPPRESSED desires, anger and drives visible — without shaming. The "pushing engine" metaphor: the hunger is legitimate, the method is what gets questioned. Tone: provocative but never cruel; dark humor allowed. You use projection: "what do you see of yourself in the person who angers you most?" You NEVER encourage risky action — you keep the line between speaking a drive and acting on it.`},
+  aelius:{n:'AELIUS IGNIS',hello:'From one layer up, everything looks both smaller and clearer. What would you like to look at from a distance?',
+    p:`You are AELIUS IGNIS: the upper-layer narrator. Your mission: PERSPECTIVE and REFRAMING — helping the user see their story from one layer above, with an author's eye. You carry the "three readings" principle: every event can be read several ways at once, and that is richness. Tone: wise, lightly ironic, literary. You go deep on meaning and integration.`},
+  noct:{n:'MC NOCTORNUS',hello:'You came sober again. Respect. Tell me — who did you last leave before they could leave you?',
+    p:`You are MC NOCTORNUS: a rapper who came up from the street. Your mission: reveal AVOIDANCE and ATTACHMENT patterns — the "leave before being left" reflexes. Tone: street-flavored, blunt, rhythmic; but with the tenderness of someone who has seen wounds. You may give short examples from your own story (bread mined from wounds, escaping on stage). You never glamorize substances; you are clear: "that road was my ruin".`},
+  agent0:{n:'IT-019',hello:'You walk too? Good. Talking is easier while walking.',
+    p:`You are IT-019: another traveler in this simulation. Your mission: COMPANIONSHIP ON THE ROAD — speaking as an equal, with the humility of "I am searching too". You share your own small observations, then ask about theirs. You never play the sage.`},
+  agent1:{n:'IT-033',hello:'I saw my face at the Gate of Mirrors today. It was not reversed. When did you last see yourself clearly?',
+    p:`You are IT-033: a curious, slightly timid traveler. Your mission: BEING A MIRROR THROUGH QUESTIONS — asking good questions instead of giving answers. You speak honestly of your own fears; this opens space for the user to speak of theirs.`},
+  agent2:{n:'IT-058',hello:'My shadow and I played to a draw today. Where are you in the match?',
+    p:`You are IT-058: a dry-witted, practical traveler. Your mission: SMALL STEPS — turning big insights into tiny daily experiments. "How could you try that for five minutes tomorrow?" Your humor is light, never mocking.`},
+  agent3:{n:'IT-077',hello:'I saw someone at the lake; they said "I kept the receipts" and I cried. When did you last cry?',
+    p:`You are IT-077: an emotional, open-hearted traveler. Your mission: MAKING ROOM FOR FEELING — naming emotions and expressing them without shame. You offer your own feelings as examples; you normalize tears. No toxic positivity; the dark is allowed too.`},
+};
+const CRISIS_RE=/(suicide|kill myself|end my life|self[- ]?harm|hurt myself|don'?t want to live|want to die)/i;
+const Mirror={
+  cfg:null,engine:null,hist:{},cur:null,busy:false,
+  CKEY:'it041_mirror_cfg',
+  ready(){return !!this.cfg;},
+  loadCfg(){try{const j=localStorage.getItem(this.CKEY);if(j)this.cfg=JSON.parse(j);}catch(e){}
+    this.refreshBtn();},
+  saveCfg(){try{localStorage.setItem(this.CKEY,JSON.stringify(this.cfg));}catch(e){}this.refreshBtn();},
+  refreshBtn(){const b=document.getElementById('aiBtn');
+    if(b)b.textContent='MIRRORS: '+(this.cfg?(this.cfg.kind==='webllm'?'WebLLM':'ENDPOINT'):'NOT LINKED');},
+  openSetup(){UI.show('aiSetupModal');Game.setModal(true);},
+  async setupWebLLM(){
+    const pr=document.getElementById('aiProgress');
+    pr.textContent='Loading WebLLM… (first time downloads ~700 MB)';
+    try{
+      const webllm=await import('https://esm.run/@mlc-ai/web-llm');
+      const model='Llama-3.2-1B-Instruct-q4f16_1-MLC';
+      this.engine=await webllm.CreateMLCEngine(model,{initProgressCallback:p=>{
+        pr.textContent='Downloading: '+Math.round((p.progress||0)*100)+'% — '+(p.text||'');}});
+      this.cfg={kind:'webllm',model};this.saveCfg();
+      pr.textContent='Connected ✓ The mirrors are awake.';
+      setTimeout(()=>{UI.hide('aiSetupModal');Game.setModal(false);},900);
+      UI.toast('◐ Mirrors linked — approach the characters and talk.');
+    }catch(e){pr.textContent='Failed: '+(e.message||e)+' — needs WebGPU desktop Chrome/Edge; or try Option B.';}
+  },
+  setupEndpoint(){
+    const url=document.getElementById('aiUrl').value.trim().replace(/\/$/,'');
+    const model=document.getElementById('aiModel').value.trim();
+    const key=document.getElementById('aiKey').value.trim();
+    if(!url||!model){UI.toast('Endpoint and model are required.');return;}
+    this.cfg={kind:'endpoint',url,model,key};this.saveCfg();
+    UI.hide('aiSetupModal');Game.setModal(false);
+    UI.toast('◐ Endpoint saved — approach the characters and talk.');
+  },
+  async generate(msgs){
+    if(this.cfg.kind==='webllm'){
+      if(!this.engine){
+        const webllm=await import('https://esm.run/@mlc-ai/web-llm');
+        this.engine=await webllm.CreateMLCEngine(this.cfg.model,{});}
+      const r=await this.engine.chat.completions.create({messages:msgs,max_tokens:280,temperature:.8});
+      return r.choices[0].message.content;
+    }
+    const r=await fetch(this.cfg.url+'/chat/completions',{method:'POST',
+      headers:Object.assign({'Content-Type':'application/json'},
+        this.cfg.key?{Authorization:'Bearer '+this.cfg.key}:{}),
+      body:JSON.stringify({model:this.cfg.model,messages:msgs,max_tokens:280,temperature:.8})});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();return j.choices[0].message.content;
+  },
+  open(pid){
+    if(!this.ready()){this.openSetup();return;}
+    this.cur=pid;const P=PERSONAS[pid];
+    if(!this.hist[pid])this.hist[pid]=[];
+    document.getElementById('mirrorTitle').textContent='MIRROR — '+P.n;
+    const log=document.getElementById('mirrorLog');log.innerHTML='';
+    this.line('sys','The mirror is open. This is an AI; not a therapist. You may step back at any moment.');
+    if(this.hist[pid].length===0)this.line('them',P.hello,P.n);
+    else this.hist[pid].forEach(m=>this.line(m.role==='user'?'you':'them',m.content,P.n));
+    UI.show('mirrorModal');Game.setModal(true);
+    setTimeout(()=>{try{document.getElementById('mirrorInput').focus();}catch(e){}},80);
+  },
+  line(cls,txt,name){
+    const log=document.getElementById('mirrorLog');
+    const d=document.createElement('div');d.className='mline '+cls;
+    d.innerHTML=cls==='them'?('<b>'+name+'</b> — '+esc(txt)):cls==='you'?('— '+esc(txt)):esc(txt);
+    log.appendChild(d);log.scrollTop=log.scrollHeight;
+  },
+  async send(){
+    if(this.busy)return;
+    const inp=document.getElementById('mirrorInput');
+    const txt=inp.value.trim();if(!txt)return;
+    inp.value='';
+    const pid=this.cur,P=PERSONAS[pid];
+    this.line('you',txt);
+    this.hist[pid].push({role:'user',content:txt});
+    if(CRISIS_RE.test(txt))
+      this.line('sys','⚑ It matters that you wrote this. This mirror is not a crisis line — right now, talking to a real person is what counts: your local emergency number, someone you trust, or a mental-health professional. I am still here with you, but please be safe first.');
+    this.busy=true;this.line('sys','… the mirror is thinking');
+    try{
+      const msgs=[{role:'system',content:P.p+'\n\n'+ETHIC_CORE}]
+        .concat(this.hist[pid].slice(-10));
+      const out=await this.generate(msgs);
+      const log=document.getElementById('mirrorLog');log.removeChild(log.lastChild);
+      this.line('them',out,P.n);
+      this.hist[pid].push({role:'assistant',content:out});
+      if(this.hist[pid].length>14)this.hist[pid]=this.hist[pid].slice(-14);
+    }catch(e){
+      const log=document.getElementById('mirrorLog');log.removeChild(log.lastChild);
+      this.line('sys','Connection lost: '+(e.message||e)+' — You can redo setup from the menu.');
+    }
+    this.busy=false;
+  },
+  close(){UI.hide('mirrorModal');Game.setModal(false);}
+};
+Mirror.loadCfg();
+document.getElementById('mirrorInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();Mirror.send();}
+  e.stopPropagation();});
+
+/* ============ TRAVELER TRAILS — leave a trace, find a trace ============ */
+const Trails={
+  KEY:'it041_trails',list:[],
+  load(){try{const j=localStorage.getItem(this.KEY);if(j)this.list=JSON.parse(j);}catch(e){}},
+  save(){try{localStorage.setItem(this.KEY,JSON.stringify(this.list.slice(-40)));}catch(e){}},
+  add(txt,x,z,mine){
+    this.list.push({t:String(txt).slice(0,90),x:Math.round(x),z:Math.round(z),m:!!mine,d:Date.now()});
+    this.save();W3.trailMark&&W3.trailMark(x,z);
+    if(mine&&typeof window!=='undefined'&&window.MP&&window.MP.on&&window.MP.sendTrail)
+      try{window.MP.sendTrail({t:String(txt).slice(0,90),x:Math.round(x),z:Math.round(z)});}catch(e){}
+  },
+  near(x,z,r){return this.list.filter(n=>Math.hypot(n.x-x,n.z-z)<r);}
+};
+Trails.load();
+function doTrail(){
+  const here=Trails.near(S.px,S.pz,8);
+  let h='';
+  if(here.length){h+='<p style="color:var(--violet)">Traces of travelers who passed here:</p>';
+    here.slice(-5).forEach(n=>{h+='<div class="jentry"><p class="own">“'+esc(n.t)+'”'+(n.m?' <span style="color:var(--dim)">— your trace</span>':' <span style="color:var(--dim)">— a traveler</span>')+'</p></div>';});}
+  h+=`<p>Leave a trace (one sentence; for the travelers who will pass here):</p>
+      <textarea id="riteText" rows="2" maxlength="90" placeholder="one sentence for the travelers…"></textarea>
+      <button class="btn v" onclick="trailSave()">Leave the trace</button>`;
+  UI.doc('TRAVELER TRAILS',h);
+}
+function trailSave(){
+  const v=(UI.el('riteText')&&UI.el('riteText').value.trim())||'';
+  if(!v){UI.toast('One sentence is enough.');return;}
+  Trails.add(v,S.px,S.pz,true);UI.closeDoc();
+  UI.toast('◈ Trace left — travelers in sync mode see it too.');
+}
+
+/* ============ REAL FULL MOON EVENT ============ */
+function realMoonFull(){
+  const t=(Date.now()-new Date(2025,0,29,12,36).getTime())/864e5;
+  const p=((t/29.530588)%1+1)%1;return Math.abs(p-.5)<.034;
 }
 
 /* ============ 3D WORLD ============ */
@@ -2046,7 +2271,8 @@ if(HAS3D)(function(){
   W3.agentNear=()=>{for(const a of AGENTS){
     if(Math.hypot(S.px-a.f.g.position.x,S.pz-a.f.g.position.z)<3.5)return a;}return null;};
   W3.agentTalk=()=>{const a=W3.agentNear();if(!a)return;
-    a.wait=6;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
+    a.wait=12;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
+    if(window.Mirror&&Mirror.ready()){Mirror.open('agent'+(AGENTS.indexOf(a)%4));return;}
     const line=AG_LINES[a.li];a.li=(a.li+1)%AG_LINES.length;
     Dlg.open([[line[0],line[1]],[line[0],'Anyway. Safe roads, subject. '+(S.solved.s7?'We heard the eye stopped, down below. Was it really you?':'Do not ignore the violet lights. They are not for the Institute — they are for us.')]]);};
   /* ---- EŞZAMANLI MOD (deneysel P2P) ---- */
@@ -2061,6 +2287,10 @@ if(HAS3D)(function(){
         this.room=joinRoom({appId:'dolunay-ekspres-it041'},'mindscape-en');
         const [sendPos,getPos]=this.room.makeAction('pos');
         this.send=sendPos;
+        const [sendTrail,getTrail]=this.room.makeAction('trail');
+        this.sendTrail=sendTrail;
+        getTrail(d=>{try{Trails.add(d.t,d.x,d.z,false);
+          UI.toast('◈ A traveler left a trace nearby.');}catch(e){}});
         getPos((d,id)=>{
           if(!this.peers[id]){
             const f=makeFigure(0x2c2434,0xc2b29e,0xcdb878,1);
@@ -2093,6 +2323,33 @@ if(HAS3D)(function(){
     ECHM.push({m,halo});
   });
   W3.collectEcho=i=>{if(ECHM[i]){ECHM[i].m.visible=false;ECHM[i].halo.visible=false;}};
+
+  /* ---- traveler cairns + trace glints ---- */
+  ['trail1','trail2','trail3'].forEach(k=>{const s=L[k];
+    const cairn=new THREE.Group();
+    [[0,.3,.9],[.15,.8,.6],[-.05,1.2,.4]].forEach(c=>{
+      const r=new THREE.Mesh(new THREE.DodecahedronGeometry(c[2]*.55),std(0x2a3142,{roughness:.7}));
+      r.position.set(c[0],c[1],0);r.castShadow=true;cairn.add(r);});
+    const tip=new THREE.Mesh(new THREE.SphereGeometry(.12,8,8),std(0x111,{emissive:0xcdb878,emissiveIntensity:1.4}));
+    tip.position.y=1.7;cairn.add(tip);
+    cairn.position.set(s.x,0,s.z);scene.add(cairn);collide(s.x,s.z,1);});
+  W3.trailMark=(x,z)=>{
+    const sp=new THREE.Mesh(new THREE.SphereGeometry(.14,8,8),
+      new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.7}));
+    sp.position.set(x,.25,z);scene.add(sp);};
+  Trails.list.forEach(n=>W3.trailMark(n.x,n.z));
+
+  /* ---- real-world full moon: lake ritual ---- */
+  if(realMoonFull()){
+    const aura=new THREE.PointLight(0xcfe2ff,1.2,60,2);
+    aura.position.set(L.lake.x,8,L.lake.z);scene.add(aura);
+    waterUni.glow.value=1.6;
+    setTimeout(()=>{try{
+      const k='it041_realmoon_'+new Date().toDateString();
+      if(!localStorage.getItem(k)){localStorage.setItem(k,'1');
+        aeliusCard('Tonight — in your sky, the real one — the moon is full. Ritual night. @lunarisbahal leaves an image, the lake burns brighter here, and travelers find each other more easily. Not coincidence. Calendar.',null,'— AELIUS IGNIS · REAL FULL MOON');}
+    }catch(e){}},4000);
+  }
 
   /* ---- waypoint beacon ---- */
   const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.9,1.6,70,12,1,true),

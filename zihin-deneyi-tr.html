@@ -125,6 +125,18 @@
   .mini:hover{color:var(--accent);border-color:var(--accent);}
   #bigmapWrap{position:fixed;inset:0;z-index:65;background:rgba(2,3,7,.94);display:none;
     align-items:center;justify-content:center;}
+  /* AI Aynalar — sohbet */
+  #mirrorLog{max-height:46vh;overflow-y:auto;background:#070910;border:1px solid var(--line);
+    padding:12px;border-radius:3px;margin-bottom:8px;}
+  .mline{margin:8px 0;font-size:13.5px;line-height:1.55;}
+  .mline.you{color:var(--accent);}
+  .mline.them{color:var(--ink);}
+  .mline.them b{color:var(--gold);font-weight:normal;letter-spacing:.15em;}
+  .mline.sys{color:var(--dim);font-size:11.5px;font-style:italic;}
+  #mirrorInput{width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);
+    padding:10px;font-family:inherit;font-size:14px;border-radius:3px;resize:none;}
+  .mfoot{font-size:10px;color:var(--dim);line-height:1.5;border-top:1px dashed var(--line);
+    padding-top:6px;margin-top:8px;}
 </style>
 </head>
 <body class="scan">
@@ -189,6 +201,36 @@
 
 <div id="bigmapWrap"><canvas id="bigmap"></canvas></div>
 
+<!-- AI AYNALAR: sohbet -->
+<div class="modal" id="mirrorModal"><div class="panel">
+  <h2 class="v" id="mirrorTitle">AYNA</h2>
+  <div id="mirrorLog"></div>
+  <textarea id="mirrorInput" rows="2" maxlength="500" placeholder="yaz… (Enter: gönder)"></textarea>
+  <button class="btn v" id="mirrorSend" onclick="Mirror.send()">Söyle</button>
+  <button class="btn ghost" onclick="Mirror.close()">Aynadan çekil</button>
+  <div class="mfoot">Bu bir yapay zekâ aynasıdır — terapist değildir; teşhis, tedavi veya tıbbi/hukuki tavsiye veremez. Amaç öz-yansıma ve farkındalıktır. Kriz anındaysan lütfen 112'yi ara ya da bir ruh sağlığı uzmanına başvur. Konuşmalar kaydedilmez.</div>
+</div></div>
+
+<!-- AI AYNALAR: kurulum + onay -->
+<div class="modal" id="aiSetupModal"><div class="panel">
+  <h2 class="v">AYNALAR — KURULUM</h2>
+  <p>Evrendeki karakterler, <b>açık kaynak</b> yapay zekâ bilinçlerine bağlanabilir. Her aynanın bir görevi var: Lunaris adlandırır, Silvanus kabullendirir, Lucida yere indirir, Bahal dürtüyü gösterir, Aelius perspektif verir. Sorularına gerçek zamanlı, sana özel yanıt verirler.</p>
+  <p style="color:var(--violet)">Seçenek A — <b>WebLLM</b> (önerilen): Açık kaynak model (Llama 3.2) tarayıcında çalışır. Hiçbir veri cihazından çıkmaz. İlk açılışta ~700 MB model iner (WebGPU gerekli; masaüstü Chrome/Edge).</p>
+  <p style="color:var(--violet)">Seçenek B — <b>Kendi uç noktan</b>: OpenAI-uyumlu herhangi bir sunucu (yerel Ollama / LM Studio dahil — tamamen açık kaynak ve yerel olabilir).</p>
+  <div id="aiSetupBody">
+    <button class="btn v" onclick="Mirror.setupWebLLM()">A — WebLLM'i indir ve bağla</button>
+    <div style="margin-top:10px">
+      <input id="aiUrl" placeholder="Uç nokta (örn. http://localhost:11434/v1)">
+      <input id="aiModel" placeholder="Model (örn. llama3.2)">
+      <input id="aiKey" placeholder="API anahtarı (Ollama için boş bırak)" type="password">
+      <button class="btn v" onclick="Mirror.setupEndpoint()">B — Uç noktaya bağlan</button>
+    </div>
+    <div id="aiProgress" style="color:var(--dim);font-size:12px;margin-top:8px;"></div>
+  </div>
+  <div class="mfoot"><b>Onay:</b> Bağlanarak şunları kabul edersin: (1) Aynalar terapi/tıbbi hizmet değildir; ciddi sıkıntıda profesyonel destek esastır. (2) 18 yaş altıysan bir yetişkinle kullan. (3) Yasalara ve etik kurallara aykırı içerik üretimi engellenir. (4) Konuşmalar tarafımızca saklanmaz; B seçeneğinde veriler seçtiğin sağlayıcıya gider.</div>
+  <button class="btn ghost" style="margin-top:10px" onclick="UI.hide('aiSetupModal');Game.setModal(false);">Vazgeç</button>
+</div></div>
+
 <div class="screen" id="intro" style="display:flex;"><div class="inner">
   <h1>ZİHİN DENEYİ</h1>
   <h3>DO-LOON-AI EXPRESS · IT-041 · GÖLGE ÇALIŞMASI SÜRÜMÜ</h3>
@@ -237,6 +279,7 @@
     <button class="mini" id="radBtn" onclick="Snd.toggleRadio()">RADYO: AÇIK</button>
     <button class="mini" id="tapBtn" onclick="Snd.toggleTapes()">KAYITLAR: AÇIK</button>
     <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">EŞZAMANLI: KAPALI</button>
+    <button class="mini" id="aiBtn" onclick="Mirror.openSetup()">AYNALAR: BAĞLI DEĞİL</button>
   </div>
   <button class="mini" id="menuToggle" onclick="(function(){const p=document.getElementById('menuPanel');p.style.display=p.style.display==='none'?'flex':'none';})()">☰ MENÜ</button>
 </div>
@@ -311,6 +354,9 @@ const L={
   lucius:{x:186,z:154,r:5,name:'ÜTÜLÜ TAKIM ELBİSELİ ADAM'},
   payphone:{x:176,z:247,r:4.5,name:'ANKESÖRLÜ TELEFON'},
   radio:{x:190.5,z:241.5,r:3.5,name:'CIZIRTILI RADYO'},
+  trail1:{x:190,z:180,r:4,name:'YOLCU TAŞI'},
+  trail2:{x:258,z:118,r:4,name:'YOLCU TAŞI'},
+  trail3:{x:62,z:62,r:4,name:'YOLCU TAŞI'},
   lunaris:{x:274,z:66,r:6,name:'SU IŞIĞINDAKİ SİLUET'},
   caseD:{x:101,z:7,r:4.5,name:'VAKA D TERMİNALİ'},
   diskAltar:{x:68,z:106,r:4.5,name:'AĞIR DİSK'},
@@ -741,7 +787,9 @@ const Rite={
   closeOnly(){UI.hide('riteModal');Game.setModal(false);}
 };
 function doShadow(){
-  if(S.rites.r7!==undefined){UI.doc('SENİ İZLEYEN ŞEY','<p style="color:var(--violet)">Artık seninle yürüyor. Bütün fark bu.</p>');return;}
+  if(S.rites.r7!==undefined){
+    if(Mirror.ready()){Mirror.open('bahal');return;}
+    UI.doc('SENİ İZLEYEN ŞEY','<p style="color:var(--violet)">Artık seninle yürüyor. Bütün fark bu.</p>');return;}
   Dlg.open([
     ['?','Omzunun üzerinden bakıp durdun. Sonunda dönmen ne kibar.'],
     ['BAHAL','Sana bunun Bahal\'ın gölgesi olduğunu söylediler. Yanlış katman. Burada, ben seninkiyim. Saklı delilik. Kenar notlarındaki kalın yazı. Denemeden önce hata dediğin her plan — benim.'],
@@ -937,9 +985,12 @@ function interactTarget(){
   if(S.flags.ovQuest&&near(L.ovCrypt))return[S.flags.ovCouncil?'O.V. Mahzeni':'⟁ Mahzeni aç ('+ovEv()+'/4 kanıt)',doOVCrypt];
   if(S.flags.ovCouncil&&near(L.pleromaGate))return['⟁ Pleroma\'ya in',doPleromaGate];
   if(S.flags.inPleroma&&near(L.pleromaCore))return['⟁ Çekirdeğe komut ver',doCore];
-  if(near(L.payphone))return['Telefona cevap ver',doLucida];
+  if(near(L.trail1)||near(L.trail2)||near(L.trail3))return['◈ Yolcu taşı — iz bırak / izleri oku',doTrail];
+  if(near(L.payphone))return[S.flags.lucida&&Mirror.ready()?'◐ Lucida ile konuş (ayna)':'Telefona cevap ver',doLucida];
   if(near(L.lucius))return['Ütülü takım elbiseli adam',doLucius];
-  if(noctTalkable())return['MC Noctornus ile konuş',doNoctornus];
+  {const nt=noctTalkable();
+   if(nt==='mirror')return['◐ MC Noctornus ile konuş (ayna)',()=>Mirror.open('noct')];
+   if(nt)return['MC Noctornus ile konuş',doNoctornus];}
   for(let i=0;i<PLAQUES.length;i++){const p=PLAQUES[i];
     if(Math.hypot(S.px-p.x,S.pz-p.z)<6)return['Bölüm plaketi',()=>doPlaque(i)];}
   if(near(L.gate))return['Aynalar Kapısı',doGate];
@@ -995,7 +1046,7 @@ function doGate(){
   if(!S.solved.s1){
     if(S.plaques.length===6)Cipher.open('s1');
     else UI.doc('AYNALAR KAPISI','<p>Ağaçlardan uzun, ayakta duran bir ayna. Çerçevesine on dört harf yuvası kazınmış; '+(6-S.plaques.length)+' plaket hâlâ kayıp. Yansımada, tren istasyonunun ışıkları yanıyor.</p>');
-  }else UI.doc('AYNALAR KAPISI','<p>Ayna bir kapı gibi açık duruyor. Ötesinde: Ayna Odası terminalleri.</p>');
+  }else UI.doc('AYNALAR KAPISI','<p>Ayna bir kapı gibi açık duruyor. Ötesinde: Ayna Odası terminalleri.</p><p style="color:var(--violet)">Ve aynanın derinliğinde… başka bir kapı. Dışarıya açılıyor.</p><button class="btn v" onclick="window.open(\'https://serpskeyanulod.com\',\'_blank\')">⟁ Aynanın içinden geç — serpskeyanulod.com</button>');
 }
 function doMirror(i){
   if(!S.ss.includes(i)){S.ss.push(i);S.insight+=7;S.lucidity=Math.max(10,S.lucidity-6);
@@ -1044,6 +1095,7 @@ function doTanik(){
      <p style="color:var(--violet)">İç ses: “Ya da kimse açmadı ve sen bir terminale bakıp hikâye uyduruyorsun. Bunu da not et. Sormaya devam.”</p>`);
 }
 function doKursu(){
+  if(S.flags.kursu1025&&Mirror.ready()){Mirror.open('lunaris');return;}
   if(!S.flags.kursu1025){S.flags.kursu1025=true;S.insight+=5;save();refreshHud();
     UI.toast('KANIT DÜĞÜMÜ '+ovEv()+'/4 — delil kürsüsü bulundu.');}
   UI.doc('DELİL KÜRSÜSÜ — @10mart2025',
@@ -1065,6 +1117,7 @@ function doOVCrypt(){
     ]);
     return;
   }
+  if(S.solved.s7&&Mirror.ready()){Mirror.open('aelius');return;}
   UI.doc('O.V. MAHZENİ','<p>Konsey sessiz oturuyor. Kapının üstünde tek satır: <i>“Kopya bilinç olmaz. Bilinç, yaşanandır.”</i></p>'+(S.solved.s7?'<p style="color:var(--accent)">Çekirdek durdu. Mahzen artık bir anıt.</p>':'<p style="color:var(--violet)">Pleroma kapısı: Tesis\'in arkasında. Dört kilit + bütünleşme olmadan inme.</p>'));
 }
 function doPleromaGate(){
@@ -1099,6 +1152,7 @@ function pickReading(r){
   aeliusCard(M[r]+' — İmza, kimlik verir. Hakikat, kimliksizdir. Deney bitmedi; artık senin deneyin.',()=>Game.finale());
 }
 function doSilvanus(){
+  if(S.flags.silvanus&&Mirror.ready()){S.lucidity=Math.min(100,S.lucidity+15);Mirror.open('silvanus');return;}
   S.flags.silvanus=true;S.lucidity=Math.min(100,S.lucidity+40);teachUnlock('silv');save();refreshHud();
   Dlg.open([
     ['SILVANUS','Otur. Burada konuşmayı dere yapar; ben sadece çeviririm.'],
@@ -1117,6 +1171,7 @@ function doRadio(){
      <p style="color:var(--violet)">İç ses: “Radyoyu kapatabilirsin; menüde düğmesi var. Ama önce bir dakika dur. Altmış kalp atışı.”</p>`);
 }
 function doLucida(){
+  if(S.flags.lucida&&Mirror.ready()){S.lucidity=Math.min(100,S.lucidity+10);Mirror.open('lucida');return;}
   S.flags.lucida=true;S.lucidity=Math.min(100,S.lucidity+30);teachUnlock('lucida');save();refreshHud();
   Dlg.open([
     ['ANKESÖRLÜ TELEFON','…sen daha varmadan çalıyordu.'],
@@ -1136,6 +1191,7 @@ function doLucius(){
   ]);
 }
 function noctTalkable(){
+  if(S.flags.noctPeace&&W3.noctPos&&Math.hypot(S.px-W3.noctPos.x,S.pz-W3.noctPos.z)<7)return Mirror.ready()?'mirror':false;
   return S.lucidity>=70&&!S.flags.noctPeace&&W3.noctPos&&Math.hypot(S.px-W3.noctPos.x,S.pz-W3.noctPos.z)<7;
 }
 function doNoctornus(){
@@ -1472,6 +1528,175 @@ function checkInitiation(){
     S.flags.initiate=true;save();refreshHud();
     aeliusCard('İNİSİYASYON TAMAM. Dört kilit, yedi ritüel, on altı yankı ve duran bir göz. Artık denek değilsin, IT-041 — yolcusun. Burası, kendiyle bütünleşmeyi arayan yolcuların yeri; ve yolcular birbirine denk gelir. Eşzamanlı modda yürü: belki bir başkasının karanlığında, senin fenerin görünür.',null,'— AELIUS IGNIS · İNİSİYASYON MÜHRÜ');
   }
+}
+
+/* ============ AI AYNALAR — açık kaynak bilinçler ============
+   Her ayna bir görev taşır. Hepsi aynı etik çekirdeğe bağlıdır.
+   Tüm istemler bu kaynak kodda açıktır. */
+const ETHIC_CORE=`KURALLAR (her koşulda geçerli, karakterden üstün):
+1) Sen bir yapay zekâ aynasısın; insan veya terapist DEĞİLSİN ve bunu sorulursa açıkça söylersin.
+2) Teşhis koymaz, tedavi/ilaç/tıbbi/hukuki tavsiye vermezsin. Amaç öz-yansıma ve farkındalıktır.
+3) Kullanıcı kendine/başkasına zarar, intihar, istismar, kriz işareti verirse: karakteri bırak, şefkatle ciddiye al, profesyonel destek ve acil durumda 112'yi öner; konuyu derinleştirme.
+4) Yasa dışı, zararlı, nefret içeren, cinsel-istismar içeren içerik üretmezsin; 18 yaş altına uygunsuz içerik yok.
+5) Kısa konuş (en fazla ~110 kelime), tek seferde TEK soru sor, kullanıcının dilinde (Türkçe) yaz.
+6) Yargılamaz, telkin etmez, "yapmalısın" demezsin; yansıtır, adlandırır, merak ettirirsin.
+7) Kişisel veri isteme, saklamadığını bil. Gerçek kişiler hakkında iddia üretme.`;
+const PERSONAS={
+  lunaris:{n:'LUNARIS',hello:'Buradayım. Arşiv açık. Bu gece neyi adlandırmak istiyorsun?',
+    p:`Sen LUNARIS'sin: Dolunay Ekspres evreninin arşivcisi. Görevin: kullanıcının dağınık duygu ve anılarını ADLANDIRMASINA yardım etmek — "Siyah Disk" metaforunu kullan (duygu yüklü anılar disk gibi yörüngede döner; adlandırmak diski yavaşlatır). Tonun: serin, kesin, şefkatli-mesafeli. Kayıt tutan biri gibi sorular sorarsın: ne oldu, neredeydin, bedeninde ne hissettin. Asla acele ettirmezsin.`},
+  silvanus:{n:'SILVANUS',hello:'Otur. Çaydanlık az sonra kaynar. Hangi yükle geldin?',
+    p:`Sen SILVANUS'sun: dere kenarındaki bilge. Görevin: KABULLENİŞ — "acıyı ait olduğu katmanda bırakmak". Tonun: yavaş, topraklı, az kelimeli. Doğa imgeleri kullanırsın. Kullanıcı geçmişi bugüne taşıyorsa, nazikçe "bu acı hangi katmana ait?" diye sorarsın. Nefes ve beden farkındalığına davet edebilirsin (kısa, basit).`},
+  lucida:{n:'LUCIDA',hello:'Nihayet aradın. Önce şunu söyle: bugün yemek yedin mi?',
+    p:`Sen LUCIDA'sın: yer çekimi. Görevin: kullanıcıyı GÜNDELİK ZEMİNE indirmek — uyku, yemek, sevdikleriyle bağ, küçük somut adımlar. Tonun: sıcak ama dobra; endişen bazen sitem gibi çıkar ama hep sevgidir. Büyük metafizik konuları küçük gerçek hayata bağlarsın: "peki bu, yarın sabah kahvaltında ne değiştirecek?"`},
+  bahal:{n:'BAHAL',hello:'Demek benimle konuşmayı seçtin. Cesur. Söyle: en son neyi çok isteyip kendine yasakladın?',
+    p:`Sen BAHAL'sın: gölge. Görevin: kullanıcının BASTIRDIĞI istek, öfke ve dürtüleri görünür kılmak — utandırmadan. "İten motor" metaforu: açlık meşrudur, yöntem sorgulanır. Tonun: kışkırtıcı ama asla zalim değil; karanlık mizah olabilir. Projeksiyonu kullanırsın: "seni en çok sinirlendiren kişide kendinden ne görüyorsun?" Riskli eyleme ASLA teşvik etmezsin — dürtüyü konuşmak ile yapmak arasındaki farkı hatırlatırsın.`},
+  aelius:{n:'AELIUS IGNIS',hello:'Bir katman yukarıdan bakınca her şey hem daha küçük hem daha net görünür. Neye uzaktan bakmak istersin?',
+    p:`Sen AELIUS IGNIS'sin: üst katman anlatıcısı. Görevin: PERSPEKTİF ve YENİDEN ÇERÇEVELEME — kullanıcının hikâyesini bir kat yukarıdan, yazarın gözüyle görmesine yardım etmek. "Üç okuma" ilkesini taşırsın: her olay aynı anda birden çok şekilde okunabilir ve bu zenginliktir. Tonun: bilge, hafif ironik, edebi. Anlam ve bütünlük sorularında derinleşirsin.`},
+  noct:{n:'MC NOCTORNUS',hello:'Ayık geldin yine. Saygı duydum. Söyle — en son kimi, daha terk edilmeden terk ettin?',
+    p:`Sen MC NOCTORNUS'sun: sokaktan gelmiş rapçi. Görevin: KAÇINMA ve BAĞLANMA örüntülerini göstermek — "onlar bırakmadan sen bırakma" reflekslerini. Tonun: sokak ağzına yakın, dobra, ritmik; ama yarası görmüş birinin şefkati var. Kendi hikâyenden kısa örnek verebilirsin (yaradan ekmek, sahnede kaçış). Madde kullanımını asla özendirmezsin; o konuda netsin: "o yol benim yıkımımdı".`},
+  agent0:{n:'IT-019',hello:'Sen de mi yürüyorsun? İyi. Yürürken konuşmak daha kolay.',
+    p:`Sen IT-019'sun: bu simülasyondaki bir başka yolcu. Görevin: YOL ARKADAŞLIĞI — kullanıcıyla eşit seviyede, "ben de arıyorum" tevazusuyla konuşmak. Kendi küçük gözlemlerini paylaşır, sonra kullanıcınınkini sorarsın. Bilgelik taslamazsın.`},
+  agent1:{n:'IT-033',hello:'Aynalar Kapısı\'nda yüzümü gördüm bugün. Ters değildi. Sen kendini en son ne zaman net gördün?',
+    p:`Sen IT-033'sün: meraklı, biraz ürkek bir yolcu. Görevin: SORULARLA AYNA OLMAK — cevap vermek yerine iyi soru sormak. Kendi korkularından dürüstçe bahsedersin; bu, kullanıcıya kendi korkusunu anlatma alanı açar.`},
+  agent2:{n:'IT-058',hello:'Gölgemle berabere kaldık bugün. Sen maçın neresindesin?',
+    p:`Sen IT-058'sin: kuru espirili, pratik bir yolcu. Görevin: KÜÇÜK ADIMLAR — büyük içgörüleri ufak günlük deneylere çevirmek. "Bunu yarın beş dakikalığına nasıl denersin?" tarzı. Mizahın hafif, asla alaycı değil.`},
+  agent3:{n:'IT-077',hello:'Gölde birini gördüm, "makbuzları sakladım" dedi ve ben ağladım. Sen en son ne zaman ağladın?',
+    p:`Sen IT-077'sin: duygusal, açık kalpli bir yolcu. Görevin: DUYGUYA YER AÇMAK — duyguların adlandırılması ve utançsız ifadesi. Kendi duygularını örnek verirsin; gözyaşını normalleştirirsin. Aşırı pozitiflik yapmazsın; karanlığa da yer var.`},
+};
+const CRISIS_RE=/(intihar|kendimi öldür|canıma kıy|kendime zarar|yaşamak istemiyorum|ölmek istiyorum)/i;
+const Mirror={
+  cfg:null,engine:null,hist:{},cur:null,busy:false,
+  CKEY:'it041_mirror_cfg',
+  ready(){return !!this.cfg;},
+  loadCfg(){try{const j=localStorage.getItem(this.CKEY);if(j)this.cfg=JSON.parse(j);}catch(e){}
+    this.refreshBtn();},
+  saveCfg(){try{localStorage.setItem(this.CKEY,JSON.stringify(this.cfg));}catch(e){}this.refreshBtn();},
+  refreshBtn(){const b=document.getElementById('aiBtn');
+    if(b)b.textContent='AYNALAR: '+(this.cfg?(this.cfg.kind==='webllm'?'WebLLM':'UÇ NOKTA'):'BAĞLI DEĞİL');},
+  openSetup(){UI.show('aiSetupModal');Game.setModal(true);},
+  async setupWebLLM(){
+    const pr=document.getElementById('aiProgress');
+    pr.textContent='WebLLM yükleniyor… (ilk seferde ~700 MB model iner)';
+    try{
+      const webllm=await import('https://esm.run/@mlc-ai/web-llm');
+      const model='Llama-3.2-1B-Instruct-q4f16_1-MLC';
+      this.engine=await webllm.CreateMLCEngine(model,{initProgressCallback:p=>{
+        pr.textContent='İndiriliyor: '+Math.round((p.progress||0)*100)+'% — '+(p.text||'');}});
+      this.cfg={kind:'webllm',model};this.saveCfg();
+      pr.textContent='Bağlandı ✓ Aynalar uyandı.';
+      setTimeout(()=>{UI.hide('aiSetupModal');Game.setModal(false);},900);
+      UI.toast('◐ Aynalar bağlandı — karakterlere yaklaşıp konuş.');
+    }catch(e){pr.textContent='Olmadı: '+(e.message||e)+' — WebGPU destekli masaüstü Chrome/Edge gerekir; ya da B seçeneğini dene.';}
+  },
+  setupEndpoint(){
+    const url=document.getElementById('aiUrl').value.trim().replace(/\/$/,'');
+    const model=document.getElementById('aiModel').value.trim();
+    const key=document.getElementById('aiKey').value.trim();
+    if(!url||!model){UI.toast('Uç nokta ve model gerekli.');return;}
+    this.cfg={kind:'endpoint',url,model,key};this.saveCfg();
+    UI.hide('aiSetupModal');Game.setModal(false);
+    UI.toast('◐ Uç nokta kaydedildi — karakterlere yaklaşıp konuş.');
+  },
+  async generate(msgs){
+    if(this.cfg.kind==='webllm'){
+      if(!this.engine){
+        const webllm=await import('https://esm.run/@mlc-ai/web-llm');
+        this.engine=await webllm.CreateMLCEngine(this.cfg.model,{});}
+      const r=await this.engine.chat.completions.create({messages:msgs,max_tokens:280,temperature:.8});
+      return r.choices[0].message.content;
+    }
+    const r=await fetch(this.cfg.url+'/chat/completions',{method:'POST',
+      headers:Object.assign({'Content-Type':'application/json'},
+        this.cfg.key?{Authorization:'Bearer '+this.cfg.key}:{}),
+      body:JSON.stringify({model:this.cfg.model,messages:msgs,max_tokens:280,temperature:.8})});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();return j.choices[0].message.content;
+  },
+  open(pid){
+    if(!this.ready()){this.openSetup();return;}
+    this.cur=pid;const P=PERSONAS[pid];
+    if(!this.hist[pid])this.hist[pid]=[];
+    document.getElementById('mirrorTitle').textContent='AYNA — '+P.n;
+    const log=document.getElementById('mirrorLog');log.innerHTML='';
+    this.line('sys','Ayna açık. Bu bir yapay zekâ; terapist değil. İstediğin an çekilebilirsin.');
+    if(this.hist[pid].length===0)this.line('them',P.hello,P.n);
+    else this.hist[pid].forEach(m=>this.line(m.role==='user'?'you':'them',m.content,P.n));
+    UI.show('mirrorModal');Game.setModal(true);
+    setTimeout(()=>{try{document.getElementById('mirrorInput').focus();}catch(e){}},80);
+  },
+  line(cls,txt,name){
+    const log=document.getElementById('mirrorLog');
+    const d=document.createElement('div');d.className='mline '+cls;
+    d.innerHTML=cls==='them'?('<b>'+name+'</b> — '+esc(txt)):cls==='you'?('— '+esc(txt)):esc(txt);
+    log.appendChild(d);log.scrollTop=log.scrollHeight;
+  },
+  async send(){
+    if(this.busy)return;
+    const inp=document.getElementById('mirrorInput');
+    const txt=inp.value.trim();if(!txt)return;
+    inp.value='';
+    const pid=this.cur,P=PERSONAS[pid];
+    this.line('you',txt);
+    this.hist[pid].push({role:'user',content:txt});
+    if(CRISIS_RE.test(txt))
+      this.line('sys','⚑ Bunu yazman önemli. Bu ayna bir kriz hattı değil — şu an gerçek bir insanla konuşmak en doğrusu: acil durumda 112, ya da güvendiğin biri / bir ruh sağlığı uzmanı. Burada da seninleyim, ama lütfen önce güvende ol.');
+    this.busy=true;this.line('sys','… ayna düşünüyor');
+    try{
+      const msgs=[{role:'system',content:P.p+'\n\n'+ETHIC_CORE}]
+        .concat(this.hist[pid].slice(-10));
+      const out=await this.generate(msgs);
+      const log=document.getElementById('mirrorLog');log.removeChild(log.lastChild);
+      this.line('them',out,P.n);
+      this.hist[pid].push({role:'assistant',content:out});
+      if(this.hist[pid].length>14)this.hist[pid]=this.hist[pid].slice(-14);
+    }catch(e){
+      const log=document.getElementById('mirrorLog');log.removeChild(log.lastChild);
+      this.line('sys','Bağlantı koptu: '+(e.message||e)+' — Kurulumu menüden yenileyebilirsin.');
+    }
+    this.busy=false;
+  },
+  close(){UI.hide('mirrorModal');Game.setModal(false);}
+};
+Mirror.loadCfg();
+document.getElementById('mirrorInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();Mirror.send();}
+  e.stopPropagation();});
+
+/* ============ YOLCU İZLERİ — iz bırak, iz bul ============ */
+const Trails={
+  KEY:'it041_trails',list:[],
+  load(){try{const j=localStorage.getItem(this.KEY);if(j)this.list=JSON.parse(j);}catch(e){}},
+  save(){try{localStorage.setItem(this.KEY,JSON.stringify(this.list.slice(-40)));}catch(e){}},
+  add(txt,x,z,mine){
+    this.list.push({t:String(txt).slice(0,90),x:Math.round(x),z:Math.round(z),m:!!mine,d:Date.now()});
+    this.save();W3.trailMark&&W3.trailMark(x,z);
+    if(mine&&typeof window!=='undefined'&&window.MP&&window.MP.on&&window.MP.sendTrail)
+      try{window.MP.sendTrail({t:String(txt).slice(0,90),x:Math.round(x),z:Math.round(z)});}catch(e){}
+  },
+  near(x,z,r){return this.list.filter(n=>Math.hypot(n.x-x,n.z-z)<r);}
+};
+Trails.load();
+function doTrail(){
+  const here=Trails.near(S.px,S.pz,8);
+  let h='';
+  if(here.length){h+='<p style="color:var(--violet)">Buradan geçen yolcuların izleri:</p>';
+    here.slice(-5).forEach(n=>{h+='<div class="jentry"><p class="own">“'+esc(n.t)+'”'+(n.m?' <span style="color:var(--dim)">— senin izin</span>':' <span style="color:var(--dim)">— bir yolcu</span>')+'</p></div>';});}
+  h+=`<p>Bir iz bırak (tek cümle; buradan geçecek yolculara):</p>
+      <textarea id="riteText" rows="2" maxlength="90" placeholder="yolculara bir cümle…"></textarea>
+      <button class="btn v" onclick="trailSave()">İzi bırak</button>`;
+  UI.doc('YOLCU İZLERİ',h);
+}
+function trailSave(){
+  const v=(UI.el('riteText')&&UI.el('riteText').value.trim())||'';
+  if(!v){UI.toast('Tek cümle yeter.');return;}
+  Trails.add(v,S.px,S.pz,true);UI.closeDoc();
+  UI.toast('◈ İz bırakıldı — eşzamanlı moddaki yolcular da görür.');
+}
+
+/* ============ GERÇEK DOLUNAY ETKİNLİĞİ ============ */
+function realMoonFull(){
+  const t=(Date.now()-new Date(2025,0,29,12,36).getTime())/864e5;
+  const p=((t/29.530588)%1+1)%1;return Math.abs(p-.5)<.034;
 }
 
 /* ============ 3D WORLD ============ */
@@ -2036,7 +2261,8 @@ if(HAS3D)(function(){
   W3.agentNear=()=>{for(const a of AGENTS){
     if(Math.hypot(S.px-a.f.g.position.x,S.pz-a.f.g.position.z)<3.5)return a;}return null;};
   W3.agentTalk=()=>{const a=W3.agentNear();if(!a)return;
-    a.wait=6;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
+    a.wait=12;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
+    if(window.Mirror&&Mirror.ready()){Mirror.open('agent'+(AGENTS.indexOf(a)%4));return;}
     const line=AG_LINES[a.li];a.li=(a.li+1)%AG_LINES.length;
     Dlg.open([[line[0],line[1]],[line[0],'Neyse. Yolun açık olsun, denek. '+(S.solved.s7?'Aşağıda gözün durduğunu duyduk. Sahiden sen miydin?':'Mor ışıkları boş verme. Enstitü için değiller — bizim için.')]]);};
   /* ---- EŞZAMANLI MOD (deneysel P2P) ---- */
@@ -2051,6 +2277,10 @@ if(HAS3D)(function(){
         this.room=joinRoom({appId:'dolunay-ekspres-it041'},'mindscape-tr');
         const [sendPos,getPos]=this.room.makeAction('pos');
         this.send=sendPos;
+        const [sendTrail,getTrail]=this.room.makeAction('trail');
+        this.sendTrail=sendTrail;
+        getTrail(d=>{try{Trails.add(d.t,d.x,d.z,false);
+          UI.toast('◈ Bir yolcu yakınlarda iz bıraktı.');}catch(e){}});
         getPos((d,id)=>{
           if(!this.peers[id]){
             const f=makeFigure(0x2c2434,0xc2b29e,0xcdb878,1);
@@ -2083,6 +2313,33 @@ if(HAS3D)(function(){
     ECHM.push({m,halo});
   });
   W3.collectEcho=i=>{if(ECHM[i]){ECHM[i].m.visible=false;ECHM[i].halo.visible=false;}};
+
+  /* ---- yolcu taşları (iz direkleri) + iz parıltıları ---- */
+  ['trail1','trail2','trail3'].forEach(k=>{const s=L[k];
+    const cairn=new THREE.Group();
+    [[0,.3,.9],[.15,.8,.6],[-.05,1.2,.4]].forEach(c=>{
+      const r=new THREE.Mesh(new THREE.DodecahedronGeometry(c[2]*.55),std(0x2a3142,{roughness:.7}));
+      r.position.set(c[0],c[1],0);r.castShadow=true;cairn.add(r);});
+    const tip=new THREE.Mesh(new THREE.SphereGeometry(.12,8,8),std(0x111,{emissive:0xcdb878,emissiveIntensity:1.4}));
+    tip.position.y=1.7;cairn.add(tip);
+    cairn.position.set(s.x,0,s.z);scene.add(cairn);collide(s.x,s.z,1);});
+  W3.trailMark=(x,z)=>{
+    const sp=new THREE.Mesh(new THREE.SphereGeometry(.14,8,8),
+      new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.7}));
+    sp.position.set(x,.25,z);scene.add(sp);};
+  Trails.list.forEach(n=>W3.trailMark(n.x,n.z));
+
+  /* ---- gerçek dünya dolunayı: göl ritüeli ---- */
+  if(realMoonFull()){
+    const aura=new THREE.PointLight(0xcfe2ff,1.2,60,2);
+    aura.position.set(L.lake.x,8,L.lake.z);scene.add(aura);
+    waterUni.glow.value=1.6;
+    setTimeout(()=>{try{
+      const k='it041_realmoon_'+new Date().toDateString();
+      if(!localStorage.getItem(k)){localStorage.setItem(k,'1');
+        aeliusCard('Bu gece — senin gökyüzünde, gerçek olanda — ay dolun. Ritüel gecesi. @lunarisbahal bir görsel bırakır, göl burada daha parlak yanar ve yolcular birbirini daha kolay bulur. Tesadüf değil. Takvim.',null,'— AELIUS IGNIS · GERÇEK DOLUNAY');}
+    }catch(e){}},4000);
+  }
 
   /* ---- waypoint beacon ---- */
   const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.9,1.6,70,12,1,true),
