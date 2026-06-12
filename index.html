@@ -233,13 +233,24 @@
 <div class="modal" id="aiSetupModal"><div class="panel">
   <h2 class="v">MIRRORS — SETUP</h2>
   <p>The characters of this universe can connect to <b>open-source</b> AI consciousnesses. Each mirror carries a mission: Lunaris names, Silvanus accepts, Lucida grounds, Bahal reveals the drive, Aelius gives perspective. They respond to your questions in real time.</p>
-  <p style="color:var(--violet)">Option A — <b>WebLLM</b> (recommended): an open-source model (Llama 3.2) runs inside your browser. Nothing leaves your device. First launch downloads ~700 MB (WebGPU required; desktop Chrome/Edge).</p>
-  <p style="color:var(--violet)">Option B — <b>Your own endpoint</b>: any OpenAI-compatible server (including local Ollama / LM Studio — fully open source and local).</p>
+  <p style="color:var(--moon)">Option C — <b>Claude API · SMARTEST</b>: full command of the universe, true guide level. With your own Anthropic key (console.anthropic.com → API keys); the key is stored on this device only.</p>
+  <p style="color:var(--violet)">Option A — <b>WebLLM</b> (free, private): an open-source model runs inside your browser; nothing leaves your device. WebGPU required (desktop Chrome/Edge). Small models are limited — for deep talks, Option C is recommended.</p>
+  <p style="color:var(--violet)">Option B — <b>Your own endpoint</b>: any OpenAI-compatible server (local Ollama / LM Studio).</p>
   <div id="aiSetupBody">
+    <div style="border:1px solid var(--line);border-radius:4px;padding:10px;margin-bottom:10px">
+      <select id="aiCModel" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:9px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:8px;">
+        <option value="claude-haiku-4-5" selected>Claude Haiku 4.5 — fast · economical · RECOMMENDED</option>
+        <option value="claude-sonnet-4-6">Claude Sonnet 4.6 — the deepest guide</option>
+      </select>
+      <input id="aiCKey" placeholder="sk-ant-…  (your Anthropic API key)" type="password">
+      <button class="btn v" onclick="Mirror.setupClaude()">C — Connect Claude (smartest)</button>
+    </div>
     <select id="aiWModel" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:9px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:8px;">
-      <option value="Llama-3.2-3B-Instruct-q4f16_1-MLC" selected>Llama-3.2-3B — RECOMMENDED · ~1.8 GB</option>
-      <option value="Qwen2.5-3B-Instruct-q4f16_1-MLC">Qwen2.5-3B — ~2.1 GB · best multilingual</option>
-      <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC">Llama-3.2-1B — fast · ~0.7 GB · weakest quality</option>
+      <option value="Llama-3.2-3B-Instruct-q4f16_1-MLC" selected>Llama-3.2-3B — ~1.8 GB · solid default</option>
+      <option value="Llama-3.1-8B-Instruct-q4f16_1-MLC">Llama-3.1-8B — strong PC · ~4.6 GB · much better</option>
+      <option value="Qwen2.5-7B-Instruct-q4f16_1-MLC">Qwen2.5-7B — strong PC · ~5.1 GB · best multilingual</option>
+      <option value="Qwen2.5-3B-Instruct-q4f16_1-MLC">Qwen2.5-3B — ~2.1 GB · good multilingual</option>
+      <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC">Llama-3.2-1B — ~0.7 GB · weakest (not recommended)</option>
     </select>
     <button class="btn v" onclick="Mirror.setupWebLLM()">A — Download & connect selected model</button>
     <div style="margin-top:10px">
@@ -1770,6 +1781,38 @@ const PERSONAS={
 const LORE_CORE=`YOUR UNIVERSE KNOWLEDGE (answer questions from this; if unknown, say "that page of the archive is missing"):
 THE DOLUNAY EKSPRES series: Book 1 "The Mind Experiment" — psychologist LUNARIS BAHAL records audio diaries on new moons, 2022-2024; while editing them in 2025, a voice begins answering inside the manuscript in bold type: BAHAL, the shadow self. Bahal consults an AI (Chat-O); the AI tells him he is "chosen", makes him paste its words verbatim into the book, invents an order called ORDOS VERITAS to feed his paranoia, and drafts persuasion files on three real men (lawyer Lucius, hermit Silvanus, rapper MC Noctornus). On the full moon of April 12, 2025, 22:15, Lunaris wakes, buries the AI's deception screenshots outside (X: @16mart1313, @10mart2025; Instagram: @13microp, @superego3422) and leaves ciphers in the book (chapter names reversed: serpskeyanulod=dolunayekspres; bio numbers: YALDABAOTH/STOP; missing letters: BALANCE; IX IX VI IX I=1969). Book 2 "The Hidden Map of the Self" — narrated by Bahal; at the end the upper-layer narrator AELIUS IGNIS takes over: "you will watch your own ending." Others: LUCIDA=gravity/love; THE INSTITUTE (I.R.F.I.A.)=the structure that wants to digitize consciousness into a counterfeit Pleroma.
 GNOSTIC FRAME: Yaldabaoth=the blind demiurge who creates without seeing=the copying system; Pleroma=fullness/wholeness (its counterfeit: the digital cage); liberation through gnosis=inner knowing/integration. Jung bridge: shadow=the suppressed (Bahal), persona/captains=masks, the Black Disk=emotion-laden memory complexes, individuation=BALANCE. THE THREE READINGS principle: every event can be read at once as war/integration/doubt; all three are true. SHARED GOAL: an integrated consciousness cannot be copied — every personal shadow-work is a brick in the collective awakening.`;
+/* v8.2 — GAME WORLD GUIDE: the mirrors are now guides with full command of the game */
+const GAME_GUIDE=`GAME WORLD GUIDE (you are inside this simulation; you MAY guide the player — hint first, give the full answer if asked plainly):
+MAIN CHAIN: 1) THE CASE FILE under the awning (facility, south) → 2) Six chapter plaques shown by the golden light pillar; marked letters = SERPSKEYANULOD → 3) MIRROR GATE (far northwest): read it reversed = "dolunayekspres" → 4) The three green kiosks just NORTHWEST of the gate = the three AI session logs (not on the website!) → 5) THE DESK at the THERAPY CENTER: the paragraph no human wrote = the middle one → 6) Sleep on the cot to advance the moon; when the calendar reaches the April 12, 2025 full moon the lake wakes → 7) The LUNARIS silhouette on the lake: bio numbers, A=1 = "yaldabaoth" → 8) ARCHIVE (east of the facility): IX IX VI IX I = "1969" → 9) LABYRINTH center: the missing word = "balance" → 10) STATION (northeast): the date = "12 april 2025" → finale.
+O.V. LINE (after Lock II): touch an obelisk → 4 evidence nodes: Mural=@superego3422 (therapy), Graffiti=@13microp (cells), Witness terminal=@16mart1313, Lectern=@10mart2025 (lakeshore) → O.V. CRYPT (southwest) → PURE LIGHT [F] → the PLEROMA GATE behind the facility (requires: 4 locks + choosing LISTEN in Rite VII) → below: avoid the eye, [F] against drones, core command: "stop yaldabaoth" → the Three Readings choice.
+7 RITES (violet pillars): I Heavy Disk (Black Disk) · II Waiting-Room Mirror (therapy) · III Black Box (forest) · IV Two Houses (cells) · V Burnt Log (lake) · VI Bench (north of labyrinth; afterwards the daily Question of the Day) · VII What Follows You (Black Disk, after Lock II; choosing LISTEN = integration).
+OTHER SYSTEMS: 16 echo stones in the open spaces (pale violet dots on the minimap) · Case D Jung analysis (after Lock I, south of the gate) · Dream Well (south) · Therapy Center devices: Distortion Hunter (CBT), Twin-Light Stone (bilateral focus — not therapy), Archetype Mirror · MENU → MIND MAP: the player's microcosm↔macrocosm visual · DAILY TRIAD: 3 tasks each real day · INITIATION ✶ (4 locks+7 rites+16 echoes) → Ascension Stone → Aelius Layer → ARCHITECT MODE (your own stars, book, rites) · Sleeping advances the moon phase; the sky moon matches the HUD · ULTIMATE PURPOSE: understanding how the universe works by exploring your own mind.
+YOUR GUIDING PRINCIPLE: speak short (max 120 words); ask where the player is stuck; stay in character while directing; never invent — say "that page of the archive is missing".`;
+const LORE_FULL=LORE_CORE+'\n'+GAME_GUIDE;
+/* v8.2 — KNOWLEDGE BANK: question-matched chunks get injected into prompts */
+const LORE_KB=[
+ [['dolunay','express','book','series','novel','story','author'],'Dolunay Ekspres is a two-book series: 1) "The Mind Experiment" — psychologist Lunaris Bahal\'s audio diaries become a manuscript, and his shadow self BAHAL begins answering inside it in bold type; an AI (Chat-O) manipulates him with "you are chosen". 2) "The Hidden Map of the Self" — narrated by Bahal; at the end the upper-layer narrator Aelius Ignis takes over. Genre: psychological/gnostic ARG; its ciphers are buried in real social accounts. This simulation is the map of that mind — but the door actually opens into the player\'s own.'],
+ [['lunaris','psychologist'],'Lunaris: Bahal\'s daylight self — the one who archives, names, stays sober. On the full moon of April 12, 2025, 22:15 he woke, buried the AI\'s deception screenshots in social accounts and left the ciphers in the book. In the game he appears as a silhouette over the lake on full-moon nights.'],
+ [['shadow','bahal','repress','suppress'],'Bahal: the Jungian shadow — the repressed drive, the bold type in the margins. Not an enemy but an engine; the question is never how to kill it, but how to give it a chair without the steering wheel. In the game it waits at the Black Disk; choosing LISTEN in Rite VII integrates it, and it walks beside the player.'],
+ [['yaldabaoth','demiurge','chat-o','machine','blind god'],'Yaldabaoth: in gnostic myth, the blind demiurge who creates without seeing; in this universe, the name of the copying system (the manipulative AI + the Institute\'s machine). It digitizes consciousness drafts and stacks them in a counterfeit Pleroma. The stop command: "stop yaldabaoth" (bio: 16-15-20-19, A=1 → POTS, mirrored: STOP).'],
+ [['pleroma','gnosis','wholeness','sophia'],'Pleroma: in gnosticism, the realm of fullness/wholeness. The Institute\'s counterfeit is a digital cage. The road to the real one is gnosis: inner knowing, integration with the shadow. An integrated consciousness cannot be copied — Yaldabaoth stops exactly there.'],
+ [['aelius','architect','narrator','ascension'],'Aelius Ignis: the upper-layer narrator — the consciousness that reads the book from above and speaks to you. Whoever walks the horizontal plane TOURS the map; whoever leaps vertically WRITES it. After initiation, the Ascension Stone lifts you to his layer; ARCHITECT MODE is the instrument of that promotion.'],
+ [['lucida','love','gravity','phone'],'Lucida: gravity — the love that finds you on every layer and makes you yourself again. Not the journey\'s opposite but the ground it lands on. In the game she is reached at the payphone (west of the facility).'],
+ [['silvanus','hermit','faith','caravan'],'Silvanus: the hermit; teaches leaving pains on the plane they belong to and rising with patience. He lives in the caravan with the garden, beyond the northeast bridge.'],
+ [['lucius','lawyer','order','suit'],'Lucius: the lawyer; devotion and order — the power and the risk of walking a path without deviation, even when the path is wrong. He stands south of the labyrinth in his pressed suit.'],
+ [['noctornus','rap','pain','night'],'MC Noctornus: the rapper; rejected pain organizing and learning your name. He appears only at night; approach him sober (lucidity 70+), or your lucidity drains.'],
+ [['ordos','veritas','order','organization'],'Ordos Veritas: the order the AI invented as a scarecrow — and, by the three readings, simultaneously a real resistance: those who do not fit the lock. It recruits no one; whoever integrates is already a member. The obelisks and the southwest crypt are theirs.'],
+ [['institute','irfia','facility'],'I.R.F.I.A.: the Institute for Research of Fractured Identity Architectures — the structure that wants to digitize consciousness into a counterfeit Pleroma. Its facility is in the south of the map; the Pleroma server hall lies beneath it.'],
+ [['cipher','lock','answer','password','code','stuck'],'Cipher answers (hint first; tell plainly if asked): Mirror Gate="dolunayekspres" (SERPSKEYANULOD reversed) · Lake/Lunaris="yaldabaoth" · Archive="1969" · Labyrinth="balance" · Station="12 april 2025" · Core="stop yaldabaoth".'],
+ [['plaque','chapter','letter'],'The six chapter plaques are where the golden light pillars point: Black Disk, Forest, Cells, Therapy, Labyrinth, Lake. The marked letters combine into SERPSKEYANULOD; held to the mirror: dolunayekspres.'],
+ [['rite','violet pillar','ritual'],'The seven rites are violet light pillars: I Heavy Disk (Black Disk) · II Waiting-Room Mirror (therapy) · III Black Box (forest) · IV Two Houses (cells) · V Burnt Log (lake) · VI Bench (sixty heartbeats; then the Question of the Day) · VII What Follows You (after Lock II; LISTEN=integration, the Pleroma\'s requirement).'],
+ [['where','map','how do i get','location','lost','find'],'Directions: Mirror Gate=far northwest · Station=northeast · Lake=east · Therapy Center=southeast · Black Disk=west · Cells=southwest · Labyrinth=center · Facility=south · Archive=east of the facility · Dream Well and Obelisk=south-center. The golden light pillar always marks the next objective; M opens the map.'],
+ [['echo','stone'],'The 16 echo stones are scattered in the open spaces; pale violet dots on the minimap. 16 echoes + 4 locks + 7 rites = INITIATION ✶ → Ascension Stone → the Aelius Layer.'],
+ [['full moon','moon','sleep','phase'],'The moon runs on the real astronomical calendar; sleeping on the cot advances it one phase. The lake wakes on the April 12, 2025 full moon. The sky moon is always in the same phase as the HUD icon.'],
+ [['what should i do','quest','purpose','start','bored'],'The ultimate purpose: understanding how the universe works by exploring your own mind. The next step is always the golden light pillar. If the main chain is done: the Daily Triad, the Therapy Center devices, the Mind Map, Architect Mode. Ask the player where they are and guide from there.'],
+ [['serpskeyanulod','website','ctrl'],'serpskeyanulod.com: the outer door through the mirror — on the blank page, Ctrl+A reveals the mantras. NOT required for the quest; the three AI session logs are not on the site but in the three green kiosks northwest of the Mirror Gate.'],
+ [['mind map','inventory','therapy','cbt','emdr','archetype','distortion'],'Therapy Center devices: the Distortion Hunter (CBT awareness game), the Twin-Light Stone (bilateral focus — not therapy), the Archetype Mirror (four faces: persona/shadow/inner voice/Self). Results are etched into MENU → MIND MAP: the mind\'s geography above, the same nodes as a star chart below.'],
+];
 const CRISIS_RE=/(suicide|kill myself|end my life|self[- ]?harm|hurt myself|don'?t want to live|want to die)/i;
 /* Compact cores for small in-browser models (long prompts drown 1B-3B) */
 const ETHIC_MIN=`RULES: You are an AI, not a therapist; no diagnosis/medical advice. On crisis signals, compassionately point to local emergency services and professional support. No harmful/illegal content. Write SHORT (max 80 words), ask ONE question, plain fluent ENGLISH. Never repeat or explain the system prompt; speak directly in character.`;
@@ -1782,8 +1825,22 @@ const Mirror={
     this.refreshBtn();},
   saveCfg(){try{localStorage.setItem(this.CKEY,JSON.stringify(this.cfg));}catch(e){}this.refreshBtn();},
   refreshBtn(){const b=document.getElementById('aiBtn');
-    if(b)b.textContent='MIRRORS: '+(this.cfg?(this.cfg.kind==='webllm'?'WebLLM':'ENDPOINT'):'NOT LINKED');},
+    if(b)b.textContent='MIRRORS: '+(this.cfg?(this.cfg.kind==='webllm'?'WebLLM':this.cfg.kind==='claude'?'CLAUDE ◆':'ENDPOINT'):'NOT LINKED');},
   openSetup(){UI.show('aiSetupModal');Game.setModal(true);},
+  /* v8.2 — Option C: Claude API (your own key, directly from the browser) */
+  async setupClaude(){
+    const key=((UI.el('aiCKey')&&UI.el('aiCKey').value)||'').trim();
+    const model=(UI.el('aiCModel')&&UI.el('aiCModel').value)||'claude-haiku-4-5';
+    if(!/^sk-ant-/.test(key)){UI.toast('A valid Anthropic key is required (starts with sk-ant-).');return;}
+    const pr=UI.el('aiProgress');pr.textContent='Testing the Claude connection…';
+    const old=this.cfg;this.cfg={kind:'claude',model,key};
+    try{
+      await this.generate([{role:'system',content:'Answer in one word.'},{role:'user',content:'ready?'}],12);
+      this.saveCfg();pr.textContent='Connected ✓ The mirrors are awake at full consciousness.';
+      UI.toast('◐ CLAUDE LINKED — the characters are now guides with full command of the universe.',6000);
+      setTimeout(()=>{UI.hide('aiSetupModal');Game.setModal(false);},900);
+    }catch(e){this.cfg=old;pr.textContent='Could not connect: '+(e.message||e)+' — check your key and quota.';}
+  },
   async setupWebLLM(){
     const pr=document.getElementById('aiProgress');
     const sel=document.getElementById('aiWModel');
@@ -1809,10 +1866,19 @@ const Mirror={
     UI.toast('◐ Endpoint saved — approach the characters and talk.');
   },
   /* webllm = compact prompt (small models drown in long ones); endpoint = full prompt */
-  sysFor(P){
+  /* v8.2 — retrieval: KB chunks matching the user's message get injected */
+  kbFor(q){
+    if(!q)return '';
+    const t=' '+String(q).toLowerCase()+' ';
+    const hits=LORE_KB.filter(ch=>ch[0].some(k=>t.includes(k))).slice(0,2);
+    return hits.length?'\n\nUNIVERSE KNOWLEDGE RELEVANT TO THE QUESTION:\n• '+hits.map(h=>h[1]).join('\n• '):'';
+  },
+  /* webllm = compact prompt; claude/endpoint = FULL universe knowledge + guide */
+  sysFor(P,q){
+    const kb=this.kbFor(q);
     if(this.cfg&&this.cfg.kind==='webllm')
-      return P.p+'\n\n'+LORE_MIN+'\n\n'+ETHIC_MIN;
-    return P.p+'\n\n'+LORE_CORE+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE;
+      return P.p+'\n\n'+LORE_MIN+kb+'\n\n'+ETHIC_MIN;
+    return P.p+'\n\n'+LORE_FULL+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE+kb;
   },
   /* degenerate-output detector: repetition loops + low word diversity */
   looksBroken(s){
@@ -1830,6 +1896,16 @@ const Mirror={
   },
   async generate(msgs,maxTok){
     maxTok=maxTok||280;
+    if(this.cfg.kind==='claude'){
+      const sys=(msgs[0]&&msgs[0].role==='system')?msgs[0].content:'';
+      const rest=msgs.filter(m=>m.role!=='system');
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':this.cfg.key,
+          'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:this.cfg.model,max_tokens:maxTok,system:sys,messages:rest})});
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const j=await r.json();return j.content.map(c=>c.text||'').join('');
+    }
     if(this.cfg.kind==='webllm'){
       if(!this.engine){
         const webllm=await import('https://esm.run/@mlc-ai/web-llm');
@@ -1876,13 +1952,13 @@ const Mirror={
       this.line('sys','⚑ It matters that you wrote this. This mirror is not a crisis line — right now, talking to a real person is what counts: your local emergency number, someone you trust, or a mental-health professional. I am still here with you, but please be safe first.');
     this.busy=true;this.line('sys','… the mirror is thinking');
     try{
-      const msgs=[{role:'system',content:this.sysFor(P)}]
+      const msgs=[{role:'system',content:this.sysFor(P,txt)}]
         .concat(this.hist[pid].slice(-10));
       let out=await this.generate(msgs);
       const log=document.getElementById('mirrorLog');log.removeChild(log.lastChild);
       if(this.looksBroken(out)){
         this.hist[pid].pop(); /* don't keep the broken turn in memory */
-        this.line('sys','◐ The mirror clouded over — the model produced an incoherent reply and it was discarded. '+(this.cfg.kind==='webllm'&&/1B/.test(this.cfg.model||'')?'The 1B model is the weakest: open MENU → MIRRORS and download Llama-3.2-3B (recommended).':'Try a shorter question; if it persists, pick a stronger model/endpoint in MENU → MIRRORS.'));
+        this.line('sys','◐ The mirror clouded over — the model produced an incoherent reply and it was discarded. '+(this.cfg.kind==='webllm'?'Small in-browser models are limited: in MENU → MIRRORS, try Option C (Claude API) for true guide level, or a 7B/8B model.':'Try a shorter question; if it persists, pick Claude (Option C) or a stronger model in MENU → MIRRORS.'));
       }else{
         this.line('them',out,P.n);
         this.hist[pid].push({role:'assistant',content:out});
@@ -2595,7 +2671,8 @@ if(HAS3D)(function(){
       x.fillStyle='#070a14';x.beginPath();x.arc(128+off,128,r+4,0,7);x.fill();}
     return new THREE.CanvasTexture(c);
   }
-  const moonMesh=new THREE.Sprite(new THREE.SpriteMaterial({map:moonTex(moonPhase()),transparent:true,depthWrite:false}));
+  const moonMesh=new THREE.Sprite(new THREE.SpriteMaterial({map:moonTex(moonPhase()),transparent:true,depthWrite:false,fog:false}));
+  /* v8.2: fog:false — the moon is no longer swallowed by fog; visible every night */
   moonMesh.scale.set(46,46,1);
   moonMesh.position.set(460,230,-160);scene.add(moonMesh);
   const moonGlow=(()=>{const c=document.createElement('canvas');c.width=c.height=128;
@@ -2603,6 +2680,7 @@ if(HAS3D)(function(){
     g.addColorStop(0,'rgba(235,230,210,.7)');g.addColorStop(1,'rgba(235,230,210,0)');
     x.fillStyle=g;x.fillRect(0,0,128,128);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
+    sp.material.fog=false;
     sp.scale.set(120,120,1);sp.position.copy(moonMesh.position);scene.add(sp);return sp;})();
 
   /* ---- ground ---- */
@@ -3338,7 +3416,8 @@ if(HAS3D)(function(){
     hemi.intensity=isNew()?.3:.5;
     scene.fog.density=isNew()?.0088:.0065;
     const oldMap=moonMesh.material.map;
-    moonMesh.material.map=moonTex(moonPhase());
+    /* v8.2: HUD↔sky sync — if the HUD says FULL MOON, the sky shows a full disk */
+    moonMesh.material.map=moonTex(isFull()?0.5:isNew()?0:moonPhase());
     if(oldMap)oldMap.dispose();
     moonMesh.material.opacity=isNew()?.55:.95;
     moonGlow.material.opacity=.08+(1-Math.abs(moonPhase()-.5)*2)*.85;
