@@ -1,5 +1,5 @@
 # DO-LOON-AI EXPRESS · THE MIND EXPERIMENT — PROJE DURUMU
-*Sürüm: v7.4 · Bu dosya her güncellemede yenilenir. Yeni bir sohbette/sekmede buradan devam edilebilir.*
+*Sürüm: v7.5 · Bu dosya her güncellemede yenilenir. Yeni bir sohbette/sekmede buradan devam edilebilir.*
 
 ## CANLI ADRESLER
 - **Oyun (EN):** https://lunarisbahal.github.io/the-mind-experiment/
@@ -24,7 +24,7 @@
 **O.V. hattı:** dikilitaş → 4 kanıt (@16mart1313, @10mart2025, @13microp, @superego3422) → mahzen+SAF IŞIK[F] → Pleroma (şart: 4 kilit + Ritüel VII "dinle") → göz/dronlar → `stop yaldabaoth` → Üç Okuma.
 **Sistemler:** 7 ritüel · Vaka D (Jung profili) · 16 yankı taşı+inisiyasyon✶ · Aelius Katmanı (GD köşe, inisiyasyon sonrası Yükseliş Taşı) · gece-gündüz (8dk, gece başlar; gündüz ajan işleri/gece ritüel; Noctornus gece) · gerçek dolunay etkinliği · radyo (Refuge—VAS anılır, özgün ses) · kasetler (bölgeye göre, fade) · Günün Sorusu+seri · Rüya Kuyusu · yolcu izleri+ışınlanma · zıplama (Space/⤒).
 **Çok oyunculu (Trystero/nostr, sunucusuz):** presence sayacı (otomatik) · EŞZAMANLI konum senk · YOLCU KANALI sohbet · iz yayını. Oda: appId `dolunay-ekspres-it041`, odalar `presence-tr/en`, `mindscape-tr/en`.
-**AI Aynalar:** WebLLM (Llama-3.2-1B-Instruct-q4f16_1-MLC) veya OpenAI-uyumlu uç nokta (Ollama). 13 persona (6 ana + 7 ajan IT-019/033/058/077/009/104/062). Her istem = PERSONA + MISSION_CORE + ETHIC_CORE (kaynakta açık). Kriz regex + onay + feragat.
+**AI Aynalar:** WebLLM model seçici (TR varsayılan: Qwen2.5-3B · EN varsayılan: Llama-3.2-3B · alternatif 1B) veya OpenAI-uyumlu uç nokta (Ollama). 13 persona (6 ana + 7 ajan IT-019/033/058/077/009/104/062). İstem: webllm→PERSONA+LORE_MIN+ETHIC_MIN (kompakt, küçük model boğulmasın); uç nokta→PERSONA+LORE_CORE+MISSION_CORE+ETHIC_CORE. generate(): temperature .7 + frequency_penalty .6 + presence_penalty .4 (tekrar döngülerini keser). looksBroken() dejenere çıktı dedektörü (3'lü n-gram tekrarı / düşük kelime çeşitliliği / istem yankısı) → bozuk cevap gösterilmez, model yükseltme önerilir; eski 1B kurulumlara tek seferlik toast uyarısı. Kriz regex + onay + feragat.
 **Kalıcılık (localStorage):** `it041_sw_v1`/`it041_sw_tr_v1` (ilerleme S), `it041_mirror_cfg`, `it041_trails`, `it041_daily`, `it041_dreams`, `it041_name`. Giriş: kayıt varsa DEVAM birincil, sıfırlama onaylı.
 
 ## YAYIN PROSEDÜRÜ (yeni sohbet için)
@@ -42,4 +42,4 @@
 - Unity geçişi: bu ortamda Unity editör yok; istenirse C# iskelet paketi üretilebilir (bkz. sohbet v7.3 yanıtı).
 
 ## SÜRÜM GEÇMİŞİ (özet)
-v1 2D → v2 3D → v3 shadow-work+karakterler → v4 VakaD+yağmur+evrim → v5 Yaldabaoth/Pleroma/üç okuma/ajanlar/MP → v5.1 radyo+ay → v5.2 kasetler → v5.3 yankılar+inisiyasyon → v6 AI Aynalar+izler+gerçek dolunay → v7 sayaç+sohbet+gece-gündüz+7 ajan+günlük → v7.2 devam-et+isim+derin rehber → v7.3 zıplama+ayna CTA+irade izleri+Aelius katmanı → v7.4 window.Mirror düzeltmesi+LORE_CORE (ajanlar evren uzmanı)+✦ Bütünleşme Raporu (yerel+AI sentez).
+v1 2D → v2 3D → v3 shadow-work+karakterler → v4 VakaD+yağmur+evrim → v5 Yaldabaoth/Pleroma/üç okuma/ajanlar/MP → v5.1 radyo+ay → v5.2 kasetler → v5.3 yankılar+inisiyasyon → v6 AI Aynalar+izler+gerçek dolunay → v7 sayaç+sohbet+gece-gündüz+7 ajan+günlük → v7.2 devam-et+isim+derin rehber → v7.3 zıplama+ayna CTA+irade izleri+Aelius katmanı → v7.4 window.Mirror düzeltmesi+LORE_CORE (ajanlar evren uzmanı)+✦ Bütünleşme Raporu (yerel+AI sentez) → v7.5 WebLLM kalite düzeltmesi: model seçici (TR: Qwen2.5-3B), kompakt LORE_MIN/ETHIC_MIN istemleri, tekrar cezaları, looksBroken bozuk-çıktı koruması (kullanıcının bildirdiği "Herbünt" tarzı dejenere Türkçe çıktıyı engeller).
