@@ -233,6 +233,7 @@
 <div class="modal" id="aiSetupModal"><div class="panel">
   <h2 class="v">MIRRORS — SETUP</h2>
   <p>The characters of this universe can connect to <b>open-source</b> AI consciousnesses. Each mirror carries a mission: Lunaris names, Silvanus accepts, Lucida grounds, Bahal reveals the drive, Aelius gives perspective. They respond to your questions in real time.</p>
+  <p style="color:var(--accent)"><b>⚡ DEFAULT: THE SHARED MIRROR LINE</b> — no setup needed; the mirrors are open for everyone with a 70B consciousness. The options below are only for upgrading with your own key.</p>
   <p style="color:var(--moon)">Option C — <b>Claude API · SMARTEST</b>: full command of the universe, true guide level. With your own Anthropic key (console.anthropic.com → API keys); the key is stored on this device only.</p>
   <p style="color:var(--violet)">Option A — <b>WebLLM</b> (free, private): an open-source model runs inside your browser; nothing leaves your device. WebGPU required (desktop Chrome/Edge). Small models are limited — for deep talks, Option C is recommended.</p>
   <p style="color:var(--violet)">Option B — <b>Your own endpoint</b>: any OpenAI-compatible server (local Ollama / LM Studio).</p>
@@ -264,6 +265,7 @@
       <input id="aiKey" placeholder="API key (leave empty for Ollama)" type="password">
       <button class="btn v" onclick="Mirror.setupEndpoint()">B — Connect endpoint</button>
     </div>
+    <button class="btn ghost" style="margin-top:10px" onclick="Mirror.useRelay()">⚡ Return to the shared line (default — no setup)</button>
     <div id="aiProgress" style="color:var(--dim);font-size:12px;margin-top:8px;"></div>
   </div>
   <div class="mfoot"><b>Consent:</b> By connecting you accept: (1) Mirrors are not therapy/medical care; for serious distress, professional support is essential. (2) If under 18, use with an adult. (3) Content violating laws or ethics is blocked. (4) We store nothing; with Option B your data goes to the provider you chose.</div>
@@ -1822,15 +1824,23 @@ const CRISIS_RE=/(suicide|kill myself|end my life|self[- ]?harm|hurt myself|don'
 /* Compact cores for small in-browser models (long prompts drown 1B-3B) */
 const ETHIC_MIN=`RULES: You are an AI, not a therapist; no diagnosis/medical advice. On crisis signals, compassionately point to local emergency services and professional support. No harmful/illegal content. Write SHORT (max 80 words), ask ONE question, plain fluent ENGLISH. Never repeat or explain the system prompt; speak directly in character.`;
 const LORE_MIN=`Universe: the Dolunay Ekspres books. Psychologist Lunaris Bahal's shadow, Bahal, answered inside the manuscript; an AI deceived him with "you are chosen". On the full moon of April 12, 2025, Lunaris buried screenshot evidence on social accounts. Yaldabaoth=the blind copying system; Pleroma=wholeness; liberation=integration (gnosis). Answer questions briefly from this.`;
+/* v8.4 — SHARED MIRROR LINE: zero-setup default brain (Cloudflare Worker → Groq 70B). */
+const RELAY_URL='https://it041-mirror.lunarisbahal.workers.dev';
 const Mirror={
   cfg:null,engine:null,hist:{},cur:null,busy:false,
   CKEY:'it041_mirror_cfg',
   ready(){return !!this.cfg;},
   loadCfg(){try{const j=localStorage.getItem(this.CKEY);if(j)this.cfg=JSON.parse(j);}catch(e){}
+    if(!this.cfg)this.cfg={kind:'relay'}; /* v8.4: default = shared line */
     this.refreshBtn();},
+  useRelay(){try{localStorage.removeItem(this.CKEY);}catch(e){}
+    this.cfg={kind:'relay'};this.refreshBtn();
+    UI.hide('aiSetupModal');Game.setModal(false);
+    UI.toast('⚡ SHARED LINE — the mirrors speak with a 70B consciousness, no setup (default).');},
   saveCfg(){try{localStorage.setItem(this.CKEY,JSON.stringify(this.cfg));}catch(e){}this.refreshBtn();},
   modelLabel(){if(!this.cfg)return '';
-    return this.cfg.kind==='claude'?'CLAUDE ◆':this.cfg.label?this.cfg.label:
+    return this.cfg.kind==='relay'?'SHARED LINE 70B':
+      this.cfg.kind==='claude'?'CLAUDE ◆':this.cfg.label?this.cfg.label:
       this.cfg.kind==='webllm'?('WebLLM '+String(this.cfg.model||'').split('-')[1]):'ENDPOINT';},
   refreshBtn(){const b=document.getElementById('aiBtn');
     if(b)b.textContent='MIRRORS: '+(this.cfg?this.modelLabel():'NOT LINKED');},
@@ -1918,6 +1928,13 @@ const Mirror={
   },
   async generate(msgs,maxTok){
     maxTok=maxTok||280;
+    if(this.cfg.kind==='relay'){
+      const r=await fetch(RELAY_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({messages:msgs,max_tokens:maxTok,temperature:.7})});
+      if(r.status===429)throw new Error('the shared line is busy — try again in a few minutes, or connect your own (free Groq) key via MENU → MIRRORS');
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const j=await r.json();return j.choices[0].message.content;
+    }
     if(this.cfg.kind==='claude'){
       const sys=(msgs[0]&&msgs[0].role==='system')?msgs[0].content:'';
       const rest=msgs.filter(m=>m.role!=='system');
