@@ -251,7 +251,7 @@ function renderAll(){if(!S)return;
   $('news').innerHTML=(S.news||[]).slice().reverse().map(n=>`<div class="rep" style="border-color:${mC(n.who)}"><div class="who" style="color:${mC(n.who)}">✋ ${mN(n.who)}${n.imp?' · önemli':''} · ${ago(n.t)}</div><p style="font-style:normal;color:var(--moon)">${esc(n.text)}</p></div>`).join('')||'<div class="empty">Henüz söz alan yok.</div>';
   const idn=S.identities||{};$('idents').innerHTML=Object.keys(idn).length?Object.keys(idn).map(k=>`<div class="r"><div class="top"><b style="color:${mC(k)}">${mN(k)}</b></div><div style="font-size:11.5px;color:var(--ink);font-style:italic;line-height:1.5">${esc(idn[k])}</div></div>`).join(''):'<div class="empty" style="padding:10px">Kimlikler deneyimle gelişiyor…</div>';
   // temsilci (sözcü) mesajları
-  $('reps').innerHTML=(S.reps||[]).slice().reverse().map(r=>`<div class="rep"><div class="who">temsilci — ${mN(r[0])}</div><p>${esc(r[1])}</p></div>`).join('')||'<div class="empty">Temsilciden henüz mesaj yok.</div>';
+  $('reps').innerHTML=(S.reps||[]).slice().reverse().map(r=>`<div class="rep"><div class="who">temsilci — ${mN(r[0])}${r[2]?' · '+ago(r[2]):''}</div><p>${esc(r[1])}</p></div>`).join('')||'<div class="empty">Temsilciden henüz mesaj yok.</div>';
   // Claude komut kuyruğu
   const ord=S.orders||[];
   const ST={'new':['yeni','var(--dim)'],seen:['✦ Claude gördü','var(--accent)'],in_progress:['⟳ süreç başladı','var(--gold)'],done:['✓ yapıldı','var(--accent)'],wont:['✗ yapılmayacak','var(--warn)']};

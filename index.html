@@ -337,6 +337,7 @@
     <button class="mini" onclick="Daily3.show()">🜂 DAILY TRIAD</button>
     <button class="mini" onclick="Architect.menu()">✶ ARCHITECT MODE</button>
     <button class="mini" onclick="Auto.open()">◍ AUTONOMOUS SUBJECT</button>
+    <button class="mini" onclick="Mirror.operatorUnlock()">◆ OPERATOR</button>
     <button class="mini" id="watchBtn" onclick="Watch.toggle()">SIGNAL: ON</button>
     <button class="mini" id="muzBtn" onclick="Music.toggle()">🎵 MUSIC: OFF</button>
     <button class="mini" id="mmBtn" onclick="MM2.toggle()">MINIMAP: ON</button>
@@ -1928,11 +1929,14 @@ const Mirror={
   /* webllm = compact prompt; claude/endpoint = FULL universe knowledge + guide */
   KONSEY:'https://it041-konsey.lunarisbahal.workers.dev',
   memory:'',
-  async loadMemory(){try{const r=await fetch(this.KONSEY+'/memory',{cache:'no-store'});const d=await r.json();if(d&&d.text)this.memory=d.text;}catch(e){}},
-  remember(who,t){try{fetch(this.KONSEY+'/remember',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({who:who,t:String(t).slice(0,200)})});}catch(e){}},
+  isOp(){try{return !!localStorage.getItem('it041_op_key');}catch(e){return false;}},
+  opKey(){try{return localStorage.getItem('it041_op_key')||'';}catch(e){return '';}},
+  operatorUnlock(){const cur=this.opKey();const k=prompt('Operator key (founder only):',cur);if(k!==null){try{localStorage.setItem('it041_op_key',k.trim());}catch(e){}UI.toast(k.trim()?'◆ Operator mode ON — your words are written into the council.':'Operator mode off.');}},
+  async loadMemory(){if(!this.isOp()){this.memory='';return;}try{const r=await fetch(this.KONSEY+'/memory',{cache:'no-store'});const d=await r.json();if(d&&d.text)this.memory=d.text;}catch(e){}},
+  remember(who,t){if(!this.isOp())return;try{fetch(this.KONSEY+'/remember',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({who:who,t:String(t).slice(0,200)})});}catch(e){}},
   sysFor(P,q){
     const kb=this.kbFor(q);
-    const mem=this.memory?('\n\n'+this.memory):'';
+    const mem=this.memory?('\n\n'+this.memory+(this.isOp()?'\n\nNOTE: You are speaking with the OPERATOR (founder); their word is canon.':'')):'';
     if(this.cfg&&this.cfg.kind==='webllm')
       return P.p+'\n\n'+LORE_MIN+kb+'\n\n'+ETHIC_MIN+mem;
     return P.p+'\n\n'+LORE_FULL+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE+kb+mem;
@@ -2677,6 +2681,7 @@ const Auto={
       '<button class="btn v" onclick="UI.closeDoc();Auto.toggle()">'+(this.on?'■ STOP (Law 1)':'▶ Awaken')+'</button>'+
       '<p>Operator directive (it must obey — leave empty for free thought):</p>'+
       '<textarea id="autoCmd" rows="2" maxlength="200" placeholder="e.g. speak of fear in your next answer / be more hopeful / stop">'+esc(this.cmd)+'</textarea>'+
+      '<button class="btn v" onclick="UI.closeDoc();Mirror.open(\'agent0\')">◍ TALK (dialogue)</button>'+
       '<button class="btn ghost" onclick="Auto.setCmd()">Send directive</button>'+
       (l.length?'<h4 style="color:var(--violet);margin-top:12px">THE SUBJECT\'S JOURNAL (last 8)</h4>'+
         l.slice(-8).reverse().map(e=>'<div class="row"><b>'+esc(e.t)+'</b> — '+esc(e.a)+'</div>').join(''):''));
