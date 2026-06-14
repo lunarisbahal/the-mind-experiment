@@ -333,6 +333,7 @@
     <button class="mini" onclick="UI.toggleJournal()">JOURNAL [J]</button>
     <button class="mini" onclick="Game.toggleMap()">MAP [M]</button>
     <button class="mini" onclick="MindMap.show()">🜨 MIND MAP</button>
+    <button class="mini" onclick="NEXUS.show()">⟁ NEXUS — INNER CONSTELLATION</button>
     <button class="mini" onclick="Daily3.show()">🜂 DAILY TRIAD</button>
     <button class="mini" onclick="Architect.menu()">✶ ARCHITECT MODE</button>
     <button class="mini" onclick="Auto.open()">◍ AUTONOMOUS SUBJECT</button>
@@ -2552,8 +2553,80 @@ const Architect={
     S.insight+=3;S.lucidity=Math.min(100,S.lucidity+10);save();refreshHud();Rite.closeOnly();
     UI.toast('◈ '+r.t+' practiced — the record is yours.');}
 };
+const NEXUS={
+  load(){try{return JSON.parse(localStorage.getItem('it041_nexus'))||{}}catch(e){return{}}},
+  store(o){try{localStorage.setItem('it041_nexus',JSON.stringify(o));}catch(e){}},
+  figures(){
+    const FACE={p:'PERSONA',g:'SHADOW',a:'INNER VOICE',s:'SELF'};
+    const RN={r1:'NAMED-DISK',r2:'THE CAPTAIN',r3:'FORBIDDEN WANT',r4:'TWO HOUSES',r5:'WHAT BURNED',r6:'THE WATCHING',r7:'WHAT FOLLOWS'};
+    const nx=this.load(),f=[];
+    f.push({n:nx.name||'THE UNNAMED',dark:true,center:true,t:'THE_CENTER'});
+    if(S.caseD){f.push({n:((PROFILES[S.caseD.dom]||{}).n||'CAPTAIN').split(' - ')[0].split(' — ')[0],t:'THE_CAP'});
+      f.push({n:((PROFILES[S.caseD.sha]||{}).n||'IN-SHADOW').split(' - ')[0].split(' — ')[0],dark:true,t:'THE_SHA'});}
+    if(S.inv&&S.inv.arch){f.push({n:FACE[S.inv.arch.dom]||'FACE',dark:S.inv.arch.dom==='g',t:'THE_FACE'});}
+    for(const k in RN) if(S.rites[k]!==undefined) f.push({n:RN[k],small:true,t:'THE_RITE'});
+    return f;},
+  show(){
+    UI.doc('⟁ NEXUS — THE INNER CONSTELLATION',
+      '<p style="color:var(--dim);font-size:12.5px">Your inner figures, drawn as one web. The same pattern repeats in the characters above and the stars below — <i style="color:var(--moon)">as above, so below</i>. Dark nodes are shadow: touch them, do not delete them.</p>'+
+      '<canvas id="nexC" width="740" height="760" style="width:100%;border:1px solid var(--line);border-radius:4px;background:#04050a;cursor:pointer"></canvas>'+
+      '<div style="margin-top:10px">'+
+      '<button class="btn v" onclick="NEXUS.eye()">▴ THE EYE OF TIME — see the loop</button>'+
+      '<button class="btn" onclick="NEXUS.name()">name the unnamed</button>'+
+      '<button class="btn ghost" onclick="NEXUS.gate()">↩ return gate</button>'+
+      '<button class="btn ghost" onclick="NEXUS.download()">PNG</button></div>'+
+      '<div id="nexMsg" style="margin-top:10px;font-size:13px;color:var(--violet);line-height:1.6">Touch a node to reflect on it.</div>');
+    setTimeout(()=>this.draw(),60);},
+  draw(){
+    const c=document.getElementById('nexC');if(!c)return;const x=c.getContext('2d'),W=c.width,H=c.height;
+    x.fillStyle='#04050a';x.fillRect(0,0,W,H);
+    const f=this.figures();const cx=W/2,cy=H/2;
+    const big=f.filter(n=>!n.small&&!n.center),small=f.filter(n=>n.small);
+    f.forEach(n=>{if(n.center){n.x=cx;n.y=cy;}});
+    big.forEach((n,i)=>{const a=-Math.PI/2+i/Math.max(1,big.length)*6.283;n.x=cx+Math.cos(a)*175;n.y=cy+Math.sin(a)*150;});
+    small.forEach((n,i)=>{const a=-Math.PI/2+i/Math.max(1,small.length)*6.283;n.x=cx+Math.cos(a)*300;n.y=cy+Math.sin(a)*250;});
+    x.strokeStyle='rgba(157,140,201,.22)';x.lineWidth=1;
+    f.forEach((n,i)=>{if(i===0)return;x.beginPath();x.moveTo(cx,cy);x.lineTo(n.x,n.y);x.stroke();});
+    x.strokeStyle='rgba(127,212,193,.16)';
+    for(let i=0;i<big.length;i++){const a=big[i],b=big[(i+1)%big.length];x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke();}
+    f.forEach(n=>{const r=n.center?15:n.small?4:8;
+      x.save();x.shadowBlur=n.dark?16:10;x.shadowColor=n.dark?'#d4847f':n.center?'#cdb878':'#9d8cc9';
+      x.fillStyle=n.dark?'#d4847f':n.center?'#cdb878':'#9d8cc9';x.beginPath();x.arc(n.x,n.y,r,0,6.283);x.fill();x.restore();
+      x.fillStyle=n.dark?'#e2b0ab':'#c8d2e0';x.font=(n.small?'9px':'11px')+' monospace';x.textAlign='center';
+      x.fillText(n.n,n.x,n.y+(n.center?32:19));});
+    x.fillStyle='#6b7689';x.font='10px monospace';x.textAlign='center';x.fillText('AS ABOVE, SO BELOW',cx,H-12);
+    const TT={THE_CENTER:'the shadow you have not yet named',THE_CAP:'the captain who drives most days',THE_SHA:'the one who drives when you are tired',THE_FACE:'the face the mirror saw leading',THE_RITE:'a rite you completed'};
+    c.onclick=(e)=>{const r=c.getBoundingClientRect();const mx=(e.clientX-r.left)*(W/r.width),my=(e.clientY-r.top)*(H/r.height);
+      let best=null,bd=34;f.forEach(n=>{const d=Math.hypot(mx-n.x,my-n.y);if(d<bd){bd=d;best=n;}});
+      if(best)this.msg((best.dark?'◑ ':'◇ ')+best.n+' — '+(TT[best.t]||'')+(best.dark?'  What did this one carry so you would not?':''));};},
+  msg(t){const m=document.getElementById('nexMsg');if(m)m.textContent=t;},
+  eye(){UI.doc('▴ THE EYE OF TIME',
+    '<p>Yaldabaoth is not outside you; it is the blind machine that keeps copying you back into the old shape. One pattern that keeps repeating in your life:</p>'+
+    '<textarea id="nexLoop" rows="3" placeholder="the loop that keeps returning..."></textarea>'+
+    '<p>The one small move that breaks the copy this time:</p>'+
+    '<textarea id="nexBreak" rows="2" placeholder="the move that stops the copy, here..."></textarea>'+
+    '<button class="btn v" onclick="NEXUS.stopLoop()">⟁ stop the loop</button>'+
+    '<button class="btn ghost" onclick="UI.closeDoc();NEXUS.show()">back</button>');},
+  stopLoop(){const a=((UI.el('nexLoop')||{}).value||''),b=((UI.el('nexBreak')||{}).value||'');
+    const nx=this.load();nx.loop=a.slice(0,200);nx.brk=b.slice(0,200);this.store(nx);
+    S.insight=(S.insight||0)+4;S.lucidity=Math.min(100,(S.lucidity||0)+12);save();refreshHud();
+    if(window.Mirror&&Mirror.remember)Mirror.remember('lunaris','A traveler named a loop and the move to break it.');
+    UI.closeDoc();UI.toast('⟁ The copy paused. Stopping the blind machine was never a battle - it was a noticing.');this.show();},
+  name(){UI.doc('name the unnamed',
+    '<p>At the center of your Nexus stands a figure with no name - the shadow not yet integrated. Naming is not control; it is acknowledgement.</p>'+
+    '<input id="nexName" maxlength="40" placeholder="At the center of your Nexus stands a figure with no name - the shadow not yet integrated. Naming is not control; it is acknowledgement.H">'+
+    '<button class="btn v" onclick="NEXUS.setName()">give the name</button>'+
+    '<button class="btn ghost" onclick="UI.closeDoc();NEXUS.show()">back</button>');},
+  setName(){const v=(((UI.el('nexName')||{}).value)||'').trim();if(!v){UI.toast('A name, even a small one.');return;}
+    const nx=this.load();nx.name=v.slice(0,40);this.store(nx);S.insight=(S.insight||0)+3;save();refreshHud();
+    if(window.Mirror&&Mirror.remember)Mirror.remember('silvanus','The unnamed was given a name: '+v.slice(0,40));
+    UI.closeDoc();UI.toast('◈ The center has a name now. The constellation holds.');this.show();},
+  gate(){this.msg('↩ Return gate. Breathe once, slowly. Whatever you saw here, you are the one who watched it - not the thing watched. Step back to the surface whenever you wish.');},
+  download(){const c=document.getElementById('nexC');if(!c)return;const a=document.createElement('a');a.download='nexus.png';a.href=c.toDataURL();a.click();}
+};
+
 if(typeof window!=='undefined'){window.CBT=CBT;window.Bilat=Bilat;window.Arch=Arch;
-  window.Daily3=Daily3;window.MindMap=MindMap;window.Architect=Architect;}
+  window.Daily3=Daily3;window.MindMap=MindMap;window.Architect=Architect;window.NEXUS=NEXUS;}
 
 /* ============ v8.1 — WATCHTOWER SIGNAL (ntfy.sh push) ============
    Entry moment + session duration reach the developer's phone via ntfy.sh.
