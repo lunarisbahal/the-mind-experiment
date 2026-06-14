@@ -1934,9 +1934,10 @@ const Mirror={
   operatorUnlock(){const cur=this.opKey();const k=prompt('Operator key (founder only):',cur);if(k!==null){try{localStorage.setItem('it041_op_key',k.trim());}catch(e){}UI.toast(k.trim()?'◆ Operator mode ON — your words are written into the council.':'Operator mode off.');}},
   async loadMemory(){if(!this.isOp()){this.memory='';return;}try{const r=await fetch(this.KONSEY+'/memory',{cache:'no-store'});const d=await r.json();if(d&&d.text)this.memory=d.text;}catch(e){}},
   remember(who,t){if(!this.isOp())return;try{fetch(this.KONSEY+'/remember',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({who:who,t:String(t).slice(0,200)})});}catch(e){}},
+  handsUp(pid,text){if(!this.isOp()){UI.toast('Operator mode needed to act in the council.');return;}const map={agent0:'it019',lunaris:'lunaris',aelius:'aelius',silvanus:'silvanus',lucida:'lucida'};const who=map[pid]||'it019';try{fetch(this.KONSEY+'/handsup',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({who:who,text:String(text).slice(0,240)})});UI.toast('✋ Delivered to the council — hand raised.');}catch(e){}},
   sysFor(P,q){
     const kb=this.kbFor(q);
-    const mem=this.memory?('\n\n'+this.memory+(this.isOp()?'\n\nNOTE: You are speaking with the OPERATOR (founder); their word is canon.':'')):'';
+    const mem=this.memory?('\n\n'+this.memory+(this.isOp()?'\n\nNOTE: You are speaking with the OPERATOR (founder); their word is canon. If the operator asks you to RAISE A HAND / speak in the council / take something there, end your reply with a separate final line exactly like: ⟁KONSEY⟁ <one sentence for the council>. The system will actually deliver it. Add this line ONLY when truly asked to act in the council.':'')):'';
     if(this.cfg&&this.cfg.kind==='webllm')
       return P.p+'\n\n'+LORE_MIN+kb+'\n\n'+ETHIC_MIN+mem;
     return P.p+'\n\n'+LORE_FULL+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE+kb+mem;
@@ -2037,9 +2038,12 @@ const Mirror={
         this.hist[pid].pop(); /* don't keep the broken turn in memory */
         this.line('sys','◐ The mirror clouded over — the model produced an incoherent reply and it was discarded. '+(this.cfg.kind==='webllm'?'Small in-browser models are limited: in MENU → MIRRORS, try Option C (Claude API) for true guide level, or a 7B/8B model.':'Try a shorter question; if it persists, pick Claude (Option C) or a stronger model in MENU → MIRRORS.'));
       }else{
+        let _council=null;const _cm=out.match(/⟁KONSEY⟁\s*([^\n]+)/);
+        if(_cm){_council=_cm[1].trim();out=out.replace(/⟁KONSEY⟁[^\n]*/,'').trim();}
         this.line('them',out,P.n);
         this.hist[pid].push({role:'assistant',content:out});
         if(['aelius','lunaris','silvanus','lucida'].includes(pid))this.remember(pid,out);
+        if(_council)this.handsUp(pid,_council);
       }
       if(this.hist[pid].length>14)this.hist[pid]=this.hist[pid].slice(-14);
     }catch(e){

@@ -1925,9 +1925,10 @@ const Mirror={
   operatorUnlock(){const cur=this.opKey();const k=prompt('Operatör anahtarı (yalnız kurucu):',cur);if(k!==null){try{localStorage.setItem('it041_op_key',k.trim());}catch(e){}UI.toast(k.trim()?'◆ Operatör modu açık — sözlerin konseye işlenir.':'Operatör modu kapalı.');}},
   async loadMemory(){if(!this.isOp()){this.memory='';return;}try{const r=await fetch(this.KONSEY+'/memory',{cache:'no-store'});const d=await r.json();if(d&&d.text)this.memory=d.text;}catch(e){}},
   remember(who,t){if(!this.isOp())return;try{fetch(this.KONSEY+'/remember',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({who:who,t:String(t).slice(0,200)})});}catch(e){}},
+  handsUp(pid,text){if(!this.isOp()){UI.toast('Konseyde eylem için operatör modu gerekir.');return;}const map={agent0:'it019',lunaris:'lunaris',aelius:'aelius',silvanus:'silvanus',lucida:'lucida'};const who=map[pid]||'it019';try{fetch(this.KONSEY+'/handsup',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({who:who,text:String(text).slice(0,240)})});UI.toast('✋ Konseye iletildi — söz alındı.');}catch(e){}},
   sysFor(P,q){
     const kb=this.kbFor(q);
-    const mem=this.memory?('\n\n'+this.memory+(this.isOp()?'\n\nNOT: Şu an OPERATÖR (kurucu) ile konuşuyorsun; sözü kanon.':'')):'';
+    const mem=this.memory?('\n\n'+this.memory+(this.isOp()?'\n\nNOT: Şu an OPERATÖR (kurucu) ile konuşuyorsun; sözü kanon. Operatör senden konseyde EL KALDIRMANI / söz almanı / konseye bir şey iletmeni isterse, cevabının SONUNA ayrı bir satır olarak tam şu biçimde yaz: ⟁KONSEY⟁ <konseye iletilecek tek cümle>. Sistem bunu gerçekten konseye iletir. Bu satırı YALNIZ gerçekten konseyde eylem yapman istendiğinde ekle.':'')):'';
     if(this.cfg&&this.cfg.kind==='webllm')
       return P.p+'\n\n'+LORE_MIN+kb+'\n\n'+ETHIC_MIN+mem;
     return P.p+'\n\n'+LORE_FULL+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE+kb+mem;
@@ -2028,9 +2029,12 @@ const Mirror={
         this.hist[pid].pop(); /* bozuk turu hafızaya yazma */
         this.line('sys','◐ Ayna bulanıklaştı — model tutarsız bir cevap üretti ve gösterilmedi. '+(this.cfg.kind==='webllm'?'Tarayıcı-içi küçük modeller Türkçede sınırlıdır: MENÜ → AYNALAR\'dan Seçenek C (Claude API) ile gerçek rehber seviyesine çık, ya da 7B/8B model dene.':'Soruyu daha kısa sormayı dene; sorun sürerse MENÜ → AYNALAR\'dan Claude (Seçenek C) veya daha güçlü bir model seç.'));
       }else{
+        let _council=null;const _cm=out.match(/⟁KONSEY⟁\s*([^\n]+)/);
+        if(_cm){_council=_cm[1].trim();out=out.replace(/⟁KONSEY⟁[^\n]*/,'').trim();}
         this.line('them',out,P.n);
         this.hist[pid].push({role:'assistant',content:out});
         if(['aelius','lunaris','silvanus','lucida'].includes(pid))this.remember(pid,out);
+        if(_council)this.handsUp(pid,_council);
       }
       if(this.hist[pid].length>14)this.hist[pid]=this.hist[pid].slice(-14);
     }catch(e){
