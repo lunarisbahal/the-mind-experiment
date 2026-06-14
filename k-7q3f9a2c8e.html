@@ -254,7 +254,12 @@ function renderAll(){if(!S)return;
   $('reps').innerHTML=(S.reps||[]).slice().reverse().map(r=>`<div class="rep"><div class="who">temsilci — ${mN(r[0])}</div><p>${esc(r[1])}</p></div>`).join('')||'<div class="empty">Temsilciden henüz mesaj yok.</div>';
   // Claude komut kuyruğu
   const ord=S.orders||[];
-  $('orders').innerHTML=ord.length?('<div class="sub" style="margin-bottom:6px">Köprüdeki komutlar ('+ord.length+'):</div>'+ord.slice().reverse().map(o=>`<div class="ord"><span class="t">${ago(o.t)}</span>${esc(o.text)}</div>`).join('')):'<div class="empty">Köprü boş.</div>';
+  const ST={'new':['yeni','var(--dim)'],seen:['✦ Claude gördü','var(--accent)'],in_progress:['⟳ süreç başladı','var(--gold)'],done:['✓ yapıldı','var(--accent)'],wont:['✗ yapılmayacak','var(--warn)']};
+  if(ord.length){
+    const cnt={};ord.forEach(o=>{const k=o.status||'new';cnt[k]=(cnt[k]||0)+1;});
+    const rep=Object.keys(cnt).map(k=>(ST[k]?ST[k][0]:k)+': '+cnt[k]).join(' · ');
+    $('orders').innerHTML='<div class="sub" style="margin-bottom:6px">Köprü raporu — '+rep+'</div>'+ord.slice().reverse().map(o=>{const st=ST[o.status||'new']||['',''];return `<div class="ord"><span class="t">${ago(o.t)} · <b style="color:${st[1]}">${st[0]}</b></span>${esc(o.text)}${o.note?'<div style="margin-top:5px;color:var(--accent);font-size:11.5px">↳ '+esc(o.note)+'</div>':''}</div>`;}).join('');
+  } else $('orders').innerHTML='<div class="empty">Köprü boş.</div>';
   // nabız
   $('sPend').textContent=pend.length;$('sKanon').textContent=(S.kanon||[]).length;
   $('sDlg').textContent=dl.length;$('sOrd').textContent=ord.length;
