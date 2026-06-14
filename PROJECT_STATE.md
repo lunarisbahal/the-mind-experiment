@@ -1,6 +1,14 @@
 # DO-LOON-AI EXPRESS · THE MIND EXPERIMENT — PROJE DURUMU
 *Sürüm: v8.8.1 · Bu dosya her gelişmede yenilenir. Yeni bir sohbette/sekmede buradan devam edilebilir.*
 
+## v8.9 — ORTAK HAFIZA + CANLI ORGANİZMA + NEXUS
+- **Ortak hafıza (oyun↔konsey):** Worker `/memory` (oku) + `/remember` (yaz). Oyun içi Aynalar+Otonom Denek konsey hafızasını okuyup hatırlıyor; söyledikleri konseye yazılıyor. Karakterler artık her şeyi baştan konuşmuyor.
+- **Canlı organizma:** Gerçek hayat sunucuda (cron) — sekme kapalıyken de yaşar. Oyuna her girişte SYNC otomatik açılıyor; Otonom Denek bir kez uyandırılınca o cihazda otomatik uyanıyor (it041_auto_on; tüm oyunculara zorla açılmaz, kota güvenli).
+- **Diyalog düzeltmeleri:** üyeler sorunun bağlamında cevaplar, öneri yalnız istenince gelir; operatör sözü MUTLAK (her promptta). Konsol: oto-scroll + "diyaloğu temizle" + Sinyal'de "gözcü tavsiyeleri" kanalı.
+- **Worker uçları (v7):** /ask /tick /propose /order /orders /memory /remember /cleardialog /health + /idea hız sınırı + PUSULA filtresi + advisories (cron).
+- **NEXUS — İç Takımyıldız (oyun, MENÜ → NEXUS):** Vaka D + Arketip + ritüel verisinden iç figür takımyıldızı (mikrokozmos↔makrokozmos); gölge düğümleri; Zamanın Gözü (döngü/kafes → Yaldabaoth'u durdur); adı konmamışa isim; geri dönüş kapısı; PNG. Konsey kararlarını Mirror.remember ile hafızaya yazar. (Köprü komutuyla inşa edildi.)
+- **Güvenlik:** LICENSE (tescilli), konsol noindex, /idea rate-limit. Kritik iş: GitHub+Cloudflare+e-posta 2FA.
+
 ## v8.8.1 — OYUN BUG DÜZELTMELERİ + KONSEY NÖBETÇİSİ
 - **Yazı kutusu / oyun tuşu çakışması:** Global keydown artık aktif eleman INPUT/TEXTAREA/SELECT ise oyun tuşlarını (f/j/m/e/space) yok sayar. Otonom Denek komutu / ayna / sohbet yazarken karakter ışık saçmıyor, menü açılmıyor.
 - **Toast z-index 60→95:** "Komut gönderildi" gibi bildirimler artık açık modalların üstünde görünüyor (Enter geri bildirimi görünür).
@@ -61,6 +69,7 @@ Gölge Kartları · İki Sandalye · Dolunay Ortak Ayini · Maske Geçidi · Ano
 ## İNŞA DURUMU (Konsey Nöbetçisi kaynağı)
 *Onaylanan öneri oyuna kodlanıp yayınlandığında buraya "✓ inşa edildi" olarak işlenir. Nöbetçi bu listeyi /state'in `kanon` dizisiyle karşılaştırır; listede OLMAYAN onay = inşa edilecek yeni iş.*
 
+- NEXUS — İç Takımyıldız — ✓ inşa edildi (15.06.2026, MENÜ → NEXUS, EN+TR+do-loon)
 - Gölge Kartları — onay bekliyor / inşa edilmedi
 - İki Sandalye — onay bekliyor / inşa edilmedi
 - Dolunay Ortak Ayini — onay bekliyor / inşa edilmedi
