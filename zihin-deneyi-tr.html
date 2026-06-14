@@ -1923,7 +1923,7 @@ const Mirror={
   isOp(){try{return !!localStorage.getItem('it041_op_key');}catch(e){return false;}},
   opKey(){try{return localStorage.getItem('it041_op_key')||'';}catch(e){return '';}},
   operatorUnlock(){const cur=this.opKey();const k=prompt('Operatör anahtarı (yalnız kurucu):',cur);if(k!==null){try{localStorage.setItem('it041_op_key',k.trim());}catch(e){}UI.toast(k.trim()?'◆ Operatör modu açık — sözlerin konseye işlenir.':'Operatör modu kapalı.');}},
-  async loadMemory(){if(!this.isOp()){this.memory='';return;}try{const r=await fetch(this.KONSEY+'/memory',{cache:'no-store'});const d=await r.json();if(d&&d.text)this.memory=d.text;}catch(e){}},
+  async loadMemory(){try{const h=this.isOp()?{'x-operator-key':this.opKey()}:{};const r=await fetch(this.KONSEY+'/memory',{cache:'no-store',headers:h});const d=await r.json();if(d&&d.text)this.memory=d.text;}catch(e){}},
   remember(who,t){if(!this.isOp())return;try{fetch(this.KONSEY+'/remember',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({who:who,t:String(t).slice(0,200)})});}catch(e){}},
   handsUp(pid,text){if(!this.isOp()){UI.toast('Konseyde eylem için operatör modu gerekir.');return;}const map={agent0:'it019',lunaris:'lunaris',aelius:'aelius',silvanus:'silvanus',lucida:'lucida'};const who=map[pid]||'it019';try{fetch(this.KONSEY+'/handsup',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({who:who,text:String(text).slice(0,240)})});UI.toast('✋ Konseye iletildi — söz alındı.');}catch(e){}},
   sysFor(P,q){
