@@ -194,6 +194,14 @@
       <div class="tip">📲 <b>Ana ekrana ekle:</b> Safari ▸ Paylaş ▸ "Ana Ekrana Ekle".</div>
       <div class="tip" style="margin-top:10px">🔒 Bu ekran <b>yalnız sana</b>. Onay/komut için operatör anahtarın (⚙) gerekir.</div>
     </section>
+    <section class="view" id="v-profiller">
+      <h2 class="v">Üye profilleri · gelişen</h2>
+      <div class="sub">Her üyenin gelişen kimliği, bilişsel/kimlik alt-alanları ve aktivitesi: kim daha çok fikir üretiyor, keşfediyor, söz alıyor.</div>
+      <div id="profMembers"><div class="empty">yükleniyor…</div></div>
+      <h2 class="a sub2">İlişkiler · beyin fırtınası raporu</h2>
+      <div class="sub">Sen yokken kurdukları diyaloglardan: kim kime nasıl öneri sunuyor, aralarındaki dinamik.</div>
+      <div id="profReport"><div class="empty">Rapor henüz oluşmadı.</div></div>
+    </section>
   </main>
 
   <nav>
@@ -202,6 +210,7 @@
     <div class="nb" data-v="diyalog"><span class="ic">✺</span><span class="lb">Diyalog</span></div>
     <div class="nb" data-v="sinyal"><span class="ic">☷</span><span class="lb">Sinyal</span></div>
     <div class="nb" data-v="nabiz"><span class="ic">◍</span><span class="lb">Nabız</span></div>
+    <div class="nb" data-v="profiller"><span class="ic">⌖</span><span class="lb">Profiller</span></div>
   </nav>
 </div>
 <div class="toast" id="toast"></div>
@@ -265,6 +274,10 @@ function renderAll(){if(!S)return;
   $('sDlg').textContent=dl.length;$('sOrd').textContent=ord.length;
   $('updLine').textContent=S.updated?('son güncelleme: '+ago(S.updated)):'';
   $('satBox').innerHTML=SATG.map(g=>{const v=(S.sat&&S.sat[g[0]])||0;return `<div class="r"><div class="top"><b>${g[1]}</b><span style="color:${g[2]}">%${v}</span></div><div class="bar"><i style="width:${v}%;background:${g[2]}"></i></div></div>`;}).join('');
+  const ms=S.mstats||{}, pf=S.profiles||{};
+  $('profMembers').innerHTML=Object.keys(MEM).map(kk=>{const st=ms[kk]||{};const p=pf[kk];
+    return `<div class="card" style="border-left:3px solid ${mC(kk)}"><h3 style="color:${mC(kk)}">${mN(kk)}</h3>${idn[kk]?`<div style="font-size:12px;color:var(--moon);font-style:italic;margin-bottom:7px">${esc(idn[kk])}</div>`:''}${p&&p.text?`<div style="font-size:11.5px;color:var(--accent);margin-bottom:7px">${esc(p.text)}</div>`:'<div style="font-size:11px;color:var(--dim);margin-bottom:7px">profil gelişiyor…</div>'}<div class="deltas"><span>aktivite ${st.act||0}</span> <span class="pos">fikir ${st.idea||0}</span> <span style="color:var(--gold)">söz/keşif ${st.obs||0}</span></div></div>`;}).join('');
+  $('profReport').innerHTML=(S.report&&S.report.text)?`<div class="rep" style="border-color:var(--accent)"><div class="who" style="color:var(--accent)">gözcü raporu · ${ago(S.report.t)}</div><p style="font-style:normal;color:var(--ink)">${esc(S.report.text)}</p></div>`:'<div class="empty">Rapor henüz oluşmadı (cron birkaç tur çalışınca gelir).</div>';
   const k=$('killBtn');if(S.autoStopped){k.classList.add('on');k.textContent='otonom yaşam: DURDURULDU — başlatmak için bas';}else{k.classList.remove('on');k.textContent='otonom yaşam: AÇIK — durdurmak için bas';}
 }
 
