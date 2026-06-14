@@ -1,72 +1,79 @@
 # DO-LOON-AI EXPRESS · THE MIND EXPERIMENT — PROJE DURUMU
-*Sürüm: v8.6 · Bu dosya her güncellemede yenilenir. Yeni bir sohbette/sekmede buradan devam edilebilir.*
+*Sürüm: v8.8.1 · Bu dosya her gelişmede yenilenir. Yeni bir sohbette/sekmede buradan devam edilebilir.*
 
-## v8.6 — KURULUMSUZ TAM AÇIK + KONFOR
-- **Tam açık başlangıç:** loadCfg artık eski webllm kurulumlarını da ortak hatta taşır (yalnız bilinçli Claude/Groq/uç nokta seçimleri korunur) → HERKES en iyi ücretsiz seviyeyle (70B) bağlı başlar. AYNALAR ekranı sadeleştirildi: üstte "Aynalar zaten açık" + tek buton; tüm anahtar seçenekleri "Gelişmiş ▾" altında katlanır (aiAdv).
-- **Adil kullanım kotası:** ortak hat kişi başı 80 mesaj/gün (it041_relay_q, istemci tarafı); %70'te (56.) toast uyarısı; dolunca o kullanıcıya yarına kadar dostça engel + ücretsiz Groq anahtarı tarifi. Otonom Denek mesajları da sayılır.
-- **🎵 MÜZİK:** menüde buton → sol-altta Spotify embed paneli (playlist 7jP0jZ8fYpqDXM9iLHPWvI). Tam parça için kullanıcının Spotify oturumu; oturumsuz önizleme. Dokunmatik bakış kontrolünden hariç tutuldu (#musicPanel,iframe).
-- **Mobil mini harita:** pointer:coarse'ta 96px + %50 saydam; menüden MİNİ HARİTA AÇIK/GİZLİ (body.mmHide, it041_mmhide kalıcı).
-- **Haritada isimler:** Büyük haritada [M] karakterler yeşilimsi (SILVANUS, LUCIUS, LUCIDA ☎, BAHAL ⟁ entegre olana dek, MC NOCTORNUS gece, LUNARIS ☽ dolunayda), ajanlar camgöbeği (IT-019…), çevrimiçi yolcular altın (adlarıyla — MP peer'ları artık nm taşır). Minimap'te yolcu adları 7px altın.
+## v8.8.1 — OYUN BUG DÜZELTMELERİ + KONSEY NÖBETÇİSİ
+- **Yazı kutusu / oyun tuşu çakışması:** Global keydown artık aktif eleman INPUT/TEXTAREA/SELECT ise oyun tuşlarını (f/j/m/e/space) yok sayar. Otonom Denek komutu / ayna / sohbet yazarken karakter ışık saçmıyor, menü açılmıyor.
+- **Toast z-index 60→95:** "Komut gönderildi" gibi bildirimler artık açık modalların üstünde görünüyor (Enter geri bildirimi görünür).
+- **Mobil zıplama tuşu (#jbtn):** bottom:118/right:24 → bottom:52/right:104 (E'nin soluna); menü ile çakışması giderildi.
+- EN + TR + do-loon docs senkron.
+- **KONSEY NÖBETÇİSİ (zamanlanmış görev):** Her gün Konsey /state'i okur, `kanon` (onaylanan) öğeleri "İNŞA DURUMU" listesiyle karşılaştırır; yeni onay varsa Berkay'a inşa emri olarak getirir. Berkay onaylayınca Claude kodlar+yayınlar, sonra buraya "inşa edildi" yazar (nöbetçi tekrar getirmesin). Reddedilen = çöp.
 
-## v8.5 — BEYAZ SAYFA + EVREN TOHUMU
-- **BEYAZ SAYFA (whitePage 114,40 — Aynalar Kapısı'nın yanında):** serpskeyanulod.com'un gizli mantraları (deney sonrası Bahal'ın zihnine akan kelimeler; site CANLI, tarihli girişler 31.05.26'ya kadar sürüyor). Oyunda bembeyaz modal: metin beyaz-üstü-beyaz; Ctrl+A / seçme / "her şeyi seç" düğmesiyle görünür (Mantra.reveal). MANTRAS: 30 satırlık gömülü seçki, "günün mantrası" rotasyonu. ◌ TİTREŞİMSEL FREKANS OKUMASI: deterministik kurgu-frekans (harf kodlarından 111-999 Hz) + Aelius sesiyle AI okuması (ses dokusu→element, yaratılış aşaması, kişisel rezonans sorusu; "kurgusal-sezgisel, bilimsel değil" feragati istemde zorunlu). Kendi kelimeni de okutma. S.inv.mantra (son 20) → MindMap ◌ düğümü + kişisel okuma satırı. Daily3 havuzuna 'mantra' görevi. Teaching: 'mantra'.
-- **EVREN TOHUMU (Genesis — Mimar Modu içinde):** 4 adımlı sihirbaz (ad+İlk Yasa → ışık-gölge: denge/nabız/alaşım → zaman: nehir/sarmal/gelgit → sakinler) → Aelius AI yaratılış manifestosu (AI yoksa şablon fallback) → deterministik doğum haritası canvas'ı (isim+yasadan seed, sarmal kollar=zaman, renk=denge; PNG indirme) → dünyaya 🜨 tohum yıldızı (addStar) + Trails duyurusu. localStorage it041_universe (tek evren; silip yeniden tohumlanabilir). Teaching: 'genesis'. MindMap kişisel okumada evren satırı.
+## v8.8 — ORTAK BİLİNÇ / KONSEY + OPERATÖR KONSOLU + CLOUDFLARE BACKEND
+**Vizyon:** Dışarıdan bağımsız, kendi sakinleri (otonom AI'lar) olan, insanların maskeler ardında birlikte gölge çalışması yaptığı, içine girince çıkılmak istenmeyen mistik bir ekosistem. Dört sütun: canlı topluluk · kişisel dönüşüm · bitmeyen gizem · yaşayan dünya. AI'lar katmanlı: hem kendi hayatı olan sakinler hem rehber aynalar.
 
-## ORTAK AYNA HATTI (v8.4 — kurulumsuz AI)
-- Cloudflare Worker: `it041-mirror` → https://it041-mirror.lunarisbahal.workers.dev (hesap: Lunarisbahal@hotmail.com)
-- Worker, GROQ_KEY secret'ıyla api.groq.com'a (llama-3.3-70b-versatile) vekillik eder; CORS yalnız lunarisbahal.github.io; max_tokens≤400; son 16 mesaj.
-- Oyun tarafı: kayıtlı cfg yoksa Mirror.cfg={kind:'relay'} varsayılan → HERKES kurulumsuz 70B alır. generate() relay dalı RELAY_URL'e POST eder; 429'da "ortak hat yoğun" mesajı. Setup'ta "⚡ Ortak hatta dön" butonu (kayıtlı cfg'yi siler). modelLabel: ORTAK HAT 70B / SHARED LINE 70B.
-- Kota: Groq ücretsiz katman (Berkay'ın hesabı) — aşılırsa oyuncular kendi anahtarını bağlayabilir (A/B/C/Groq seçenekleri durur).
+### KONSEY (canlı backend)
+- AI üyeleri evreni nasıl geliştireceğini tartışır, öneri üretir; **hiçbir şey operatör (Berkay) onaylamadan kanona girmez (Yasa 1)**. Üyeler **gerçek LLM** (Groq 70B) + karakter persona (AELIUS, LUNARIS, IT-019/Otonom Denek, SILVANUS, LUCIDA — **EBBI yok, EBBI yalnız bir tercüman, karakter değil**).
+- **Cloudflare Worker `it041-konsey`** → https://it041-konsey.lunarisbahal.workers.dev (hesap: Lunarisbahal@hotmail.com)
+  - Bindings: `KV` (namespace `it041_konsey`), Secret `GROQ_KEY`, Secret `OPERATOR_KEY`, (ops.) Text `NTFY_TOPIC`.
+  - Uçlar: `GET /state` (herkes okur), `GET /health` (groq/operator var mı), `POST /idea` (katılımcı öneri bırakır, yetkisiz), `POST /decide` (operatör onay/ret/ertele), `POST /stop` (tüm otonomları durdur/başlat), `POST /tick` (operatör anında bir meclis turu), `POST /ask` (operatör otonomlara doğrudan seslenir; her üye fikir üretir). Operatör uçları `x-operator-key` header ister. CORS yalnız `lunarisbahal.github.io`.
+  - **Cron** `0 6 * * *` (veya 0 21 * * *): sen yokken meclis bir tur düşünür, öneri olgunlaştırır, ntfy ile haber verir.
+  - Durum tek KV anahtarında (`state`): pending/kanon/archive/dialog/feed/reps/sat/autoStopped/stats.
+- Worker kaynak: `it041-konsey-worker.js` (outputs).
 
-## NİHAİ AMAÇ (v8 manifestosu)
-Kişinin kendi zihnini keşfederek evrenin çalışma sistemini anlaması. Kitap okumamış oyuncu da tam deneyimi alır (giriş paneli + oyun içi öğretiler). Oyun verisi → kişisel ZİHİN HARİTASI görseli (mikrokozmos: oyun haritasındaki yolculuk; makrokozmos: aynı düğümlerin yıldız haritası okuması; PNG indirilebilir). Sonsuz içerik: Günlük Üçleme + Mimar Modu.
+### OPERATÖR KONSOLU (telefon app)
+- **Yalnız Berkay'a özel, listelenmeyen URL:** https://lunarisbahal.github.io/the-mind-experiment/k-7q3f9a2c8e.html (+ ikon `k-7q3f9a2c8e-icon.png`). iPhone'da Safari ▸ Paylaş ▸ Ana Ekrana Ekle → tam ekran app.
+- Sekmeler: **Onaylar** (öneri kartları + onay/ret SONUÇ özeti + tahmini TATMİN etkisi: Otonom AI / Karakter / Topluluk) · **Meclis** (canlı tartışma + "yeni tur") · **Diyalog** (otonomlara doğrudan seslen, her üye yanıtlar) · **Sinyal** (temsilci mesajları) · **Nabız** (istatistik + tatmin barları + "Tüm otonomları durdur").
+- Operatör anahtarı dosyaya gömülü DEĞİL; konsol ilk açılışta sorar, yalnız cihazda (localStorage) saklar. ⚙ ile değiştirilir.
+- **Rol ayrımı (kalıcı kural):** Operatör = tam kontrol (onay/durdurma). Katılımcılar (insan + AI) = ayrı, kısıtlı arayüz; yalnız öneri/gölge bırakır, onay/kontrol yetkileri YOK (sunucuda operatör anahtarıyla zorlanır).
+- **Onay = kanona/yol haritasına ekler; oyuna kodlamayı Claude yapar** (AI üretimi fikri otomatik kod+deploy etmek güvenli değil). Onaylananlar KV'de kalıcı, tekrar çıkmaz.
+
+### Onaylı bekleyen yeni etkinlikler (gölge-çalışması oyunları)
+Gölge Kartları · İki Sandalye · Dolunay Ortak Ayini · Maske Geçidi · Anonim Mektuplar · Rüya Kuyusu Geceleri. (Konsey ayrıca cron/diyalogla yenilerini üretir.)
+
+### Yan dosyalar (outputs)
+`ortak-bilinc-konsey-prototip.html` (sunucusuz prototip) · `ORTAK_BILINC_katman_notu.md` (kanon tasarım notu) · `YAPILACAKLAR_konsey_kalicilik.md` (Cloudflare kurulum) · `KONSEY-operator-konsol.html` (konsol kaynağı).
+
+## v8.7 — OTONOM DENEK ARTIK OYUNU DA OYNUYOR + ENTER DÜZELTMESİ
+- **#1:** `Auto.tick()` artık dönüşümlü: bir tur ritüel, bir tur **dünya keşfi** — IT-019 12 mekândan birine yürür (yasak orman, rüya gölü, labirent, istasyon, beyaz sayfa, aynalar kapısı, kara disk, OV dikilitaşı, terapi, karavan…), orada birinci tekil tek cümle söyler, iz bırakır. `Auto.playSites` + `Auto.step`. AGENT LAWS korunur.
+- **#2:** Otonom Denek komut kutusu (`#autoCmd`) dinamik üretildiği için Enter'ı dinlemiyordu → artık Enter gönderir, Shift+Enter alt satır.
+- EN (`index.html`) + TR (`zihin-deneyi-tr.html`) senkron; `node --check` + Auto nesnesi izole test edildi.
 
 ## CANLI ADRESLER
-- **Oyun (EN):** https://lunarisbahal.github.io/the-mind-experiment/
-- **Oyun (TR):** https://lunarisbahal.github.io/the-mind-experiment/zihin-deneyi-tr.html
-- **Ana repo kopyaları:** https://lunarisbahal.github.io/do-loon-ai-express/the-mind-experiment-en.html · /zihin-deneyi-tr.html
-- **Toplam giriş sayacı:** https://hits.sh/lunarisbahal.github.io/the-mind-experiment/ (README rozetinde de görünür)
+- Oyun (EN): https://lunarisbahal.github.io/the-mind-experiment/
+- Oyun (TR): https://lunarisbahal.github.io/the-mind-experiment/zihin-deneyi-tr.html
+- Operatör Konsolu (gizli): https://lunarisbahal.github.io/the-mind-experiment/k-7q3f9a2c8e.html
+- Konsey API: https://it041-konsey.lunarisbahal.workers.dev/state
+- Ortak ayna hattı: https://it041-mirror.lunarisbahal.workers.dev
 
-## REPOLAR
+## REPOLAR (3 repo, EN+TR v8.7 senkron)
 | Repo | İçerik |
 |---|---|
-| `lunarisbahal/the-mind-experiment` | index.html (EN), zihin-deneyi-tr.html (TR), audio/tape1-6.mp3 (sesli kitap kesitleri, 20dk/24kbps), README (banner+rozet), PROJECT_STATE.md |
-| `lunarisbahal/do-loon-ai-express` | Kitap arşivi (temizlenmiş) + docs/ altında oyun kopyaları; Pages: docs/ |
-| `lunarisbahal/dolunay-ekspres` | Kitap tanıtım reposu (banner eklendi) |
+| `lunarisbahal/the-mind-experiment` | index.html (EN), zihin-deneyi-tr.html (TR), k-7q3f9a2c8e.html (operatör konsolu, gizli), audio/, README, PROJECT_STATE.md |
+| `lunarisbahal/do-loon-ai-express` | docs/the-mind-experiment-en.html + docs/zihin-deneyi-tr.html (oyun kopyaları, v8.7) + kitap arşivi |
+| `lunarisbahal/dolunay-ekspres` | docs/index.html tanıtım sayfası (oyun yok — istenirse eklenecek) |
 
-## KANONİK DOSYALAR (yerel çalışma adları)
-- `THE_MIND_EXPERIMENT_IT-041_SHADOWWORK.html` = EN ana kaynak
-- `ZIHIN_DENEYI_IT-041_GOLGE_CALISMASI_TR.html` = TR ana kaynak
-- Yayın eşlemesi: EN→index.html, TR→zihin-deneyi-tr.html (+ do-loon docs kopyaları)
+## YAYIN PROSEDÜRÜ
+1. Yerel düzenle → `node --check` (script çıkarıp) + yapı testi.
+2. GitHub web upload (Chrome, oturum gerekli) → dosyaları bırak → Commit. EN→index.html, TR→zihin-deneyi-tr.html; do-loon docs kopyaları; konsol→k-7q3f9a2c8e.html.
+3. Doğrula: `git fetch` + anahtar dizgi kontrolü; Pages 200.
+4. Bu PROJECT_STATE'i güncelle ve yükle.
 
-## OYUN MİMARİSİ (tek dosya, Three.js r128 CDN)
-**Ana zincir:** 6 plaket → Ş1 `dolunayekspres` → 3 YZ kiosku (kapının KB'si) → masa Ş11 → dolunay (12 Nis 2025) → Lunaris Ş2 `yaldabaoth` → arşiv Ş5 `1969` → labirent Ş4 `balance/denge` → istasyon `12 nisan 2025` → final.
-**O.V. hattı:** dikilitaş → 4 kanıt (@16mart1313, @10mart2025, @13microp, @superego3422) → mahzen+SAF IŞIK[F] → Pleroma (şart: 4 kilit + Ritüel VII "dinle") → göz/dronlar → `stop yaldabaoth` → Üç Okuma.
-**Sistemler:** 7 ritüel · Vaka D (Jung profili) · 16 yankı taşı+inisiyasyon✶ · Aelius Katmanı (GD köşe, inisiyasyon sonrası Yükseliş Taşı) · gece-gündüz (8dk, gece başlar; gündüz ajan işleri/gece ritüel; Noctornus gece) · gerçek dolunay etkinliği · radyo (Refuge—VAS anılır, özgün ses) · kasetler (bölgeye göre, fade) · Günün Sorusu+seri · Rüya Kuyusu · yolcu izleri+ışınlanma · zıplama (Space/⤒).
-**Çok oyunculu (Trystero/nostr, sunucusuz):** presence sayacı (otomatik) · EŞZAMANLI konum senk · YOLCU KANALI sohbet · iz yayını. Oda: appId `dolunay-ekspres-it041`, odalar `presence-tr/en`, `mindscape-tr/en`.
-**AI Aynalar (v8.2 ZEKÂ SIÇRAMASI):** Üç seçenek — **C: Claude API (EN ZEKİ)**: kullanıcı kendi sk-ant anahtarını girer (yalnız cihazda saklanır), tarayıcıdan doğrudan api.anthropic.com/v1/messages (header: anthropic-dangerous-direct-browser-access:true), model seçimi claude-haiku-4-5 (varsayılan) / claude-sonnet-4-6; setupClaude() test çağrısıyla doğrular. **A: WebLLM** (seçici: Qwen2.5-3B/7B, Llama-3.1-8B, 3.2-3B/1B). **B: OpenAI-uyumlu uç nokta**. 13 persona. İstem: webllm→PERSONA+LORE_MIN+KB+ETHIC_MIN; claude/uç nokta→PERSONA+**LORE_FULL**(=LORE_CORE+GAME_GUIDE: tam yürüyüş rehberi, tüm şifre cevapları, konumlar, rehberlik ilkesi "önce ipucu, istenirse cevap")+MISSION_CORE+ETHIC_CORE+KB. **LORE_KB**: ~21 konu parçası; kbFor(soru) anahtar kelime eşleşmesiyle en çok 2 parçayı isteme enjekte eder (küçük modeller için hayati). looksBroken() koruması sürer; bozuk çıktı mesajı artık Seçenek C'yi önerir. Kriz regex + onay + feragat (C maddesi eklendi).
-**v8 İçsel Envanterler (Terapi Merkezi'nde 3 yeni düzenek):** ÇARPITMA AVCISI (cbtDesk 278,147 — BDT mini oyunu: 10 karttan 6'sı, 8 çarpıtma türü, kör nokta analizi + düşünce kaydı S.inv.cbtLog) · ÇİFT IŞIK TAŞI (bilatStone 295,172 — EMDR-esinli bilateral odak egzersizi, feragatname + yoğunluk≥8 reddi, önce/sonra 0-10 puan S.inv.bilat) · ARKETİP AYNASI (archStone 302,158 — 8 soruluk persona/gölge/iç ses/kendilik envanteri S.inv.arch, kozmik karşılık metinleri).
-**v8 Zihin Haritası (MindMap):** MENÜ→ZİHİN HARİTASI veya finale ekranı. 16 düğüm (kilitler+ritüeller+envanterler+rüya+OV+çekirdek), Canvas 740×1050: üstte mikrokozmos (bölge çemberleri+yolculuk çizgisi), ortada "Yukarıda ne varsa aşağıda da o vardır", altta makrokozmos (aynı düğümler dairesel yıldız haritası, takımyıldız çizgisi, kozmolojik adlar: KARA DELİK/PERSONA NEBULASI/TUTULMA/DEMİURG ÇARKI/KÖR GÖZ…), en altta kişisel okuma (kaptan, arketip, BDT, bilateral, okuma seçimi). PNG indirme.
-**v8 Mimar Modu (Architect):** açılış şartı initiate||s7. Yıldız dik (it041_stars, 3B octahedron+yazı, Trails'e de yayınlanır) · kendi kitabını yaz (it041_story, .txt derleme) · kendi ritüelini tasarla/uygula (it041_myrites). İnisiyasyon kartı Aelius'un anlamını açıkça anlatır (yatay gezer / dikey yazar) + 'architect' öğretisi.
-**v8 Günlük Üçleme (Daily3):** her gerçek gün 3 prosedürel görev (havuz: yankı/denek/iz/rüya/günün sorusu/bilat/cbt/3 bölge), tamamlanan +18 berraklık +3 içgörü; kancalar doEcho/agentTalk/Trails.add/Dreams.add/Daily.complete/Bilat/CBT/bölge ziyareti içinde (it041_daily3).
-**v8 kalibrasyon/bugfix:** berraklık pasif yenilenme (gündüz 1.1/sn, gece .35, dolunay ×1.6) · minimap oku düzeltildi (S.heading=π−meshAng) · sis/grain sakinleştirildi · gökyüzüne bakış (pitch −.48 + kamera yer kelepçesi + bakış yukarı kayması) · yer şeritleri fix (shadow normalBias 1.1, bias −0.0003) · denek önceliği (<3m ajan, alanı yener) · entegre gölgeyle her an konuşma (W3.bahalNear) · Pleroma çıkışı (pleromaExit 44,242 + doCore'da buton + load() bozuk kayıt onarımı).
-**v8.1 Gözcü Sinyali (Watch):** her oyun girişi ntfy.sh push olarak Berkay'ın telefonuna düşer; çıkışta sendBeacon ile oturum süresi (dk). Konu: `dolunay-it041-gozcu-3713` (https://ntfy.sh/dolunay-it041-gozcu-3713). Kurulum: telefona ntfy uygulaması → Subscribe to topic → konu adını yaz. Yalnız varlık sinyali gider (ad+dil+cihaz türü+süre); yazılan içerik asla. Girişte şeffaflık notu; MENÜ → SİNYAL ile kapatılabilir (it041_watch).
-**v8.1 Otonom Denek (Auto):** MENÜ → OTONOM DENEK. Bağlı aynadan (WebLLM/uç nokta) doğan bağımsız AI bilinci; IT-019'un 3B bedenini sürer (W3.autoDrive), 7 ritüeli kendisi için LLM ile yanıtlar (50-75 sn arayla), izler bırakır, günlük tutar (it041_auto). AUTO_LAWS mutlak: 1) operatör komutu üstün ("dur"/"stop" anında durdurur, serbest komut metni sistem istemine eklenir) 2) etik çekirdek 3) AI kimliği gizlenmez 4) kısa-dürüst-birinci tekil. Bozuk çıktı looksBroken ile elenir.
-**Kalıcılık (localStorage):** `it041_sw_v1`/`it041_sw_tr_v1` (ilerleme S — artık S.inv envanterleri de içerir), `it041_mirror_cfg`, `it041_trails`, `it041_daily`, `it041_daily3`, `it041_dreams`, `it041_name`, `it041_stars`, `it041_story`, `it041_myrites`, `it041_auto`, `it041_watch`. Giriş: kayıt varsa DEVAM birincil, sıfırlama onaylı.
+## İNŞA DURUMU (Konsey Nöbetçisi kaynağı)
+*Onaylanan öneri oyuna kodlanıp yayınlandığında buraya "✓ inşa edildi" olarak işlenir. Nöbetçi bu listeyi /state'in `kanon` dizisiyle karşılaştırır; listede OLMAYAN onay = inşa edilecek yeni iş.*
 
-## YAYIN PROSEDÜRÜ (yeni sohbet için)
-1. Yerel iki HTML'i düzenle → `node --check` (script'i çıkarıp) + headless smoke.
-2. Kopyala: EN→index.html, TR→zihin-deneyi-tr.html (+fix/main/ kopyaları).
-3. github.com/.../upload/main (Chrome, oturum gerekli) → dosyaları bırak → JS ile commit:
-   `[...document.querySelectorAll('button[type="submit"]')].find(x=>x.textContent.trim()==='Commit changes').click()`
-4. do-loon-ai-express/upload/main/docs aynısı. PROJECT_STATE.md'yi de güncelle/yükle.
-5. Doğrula: `api.github.com/repos/.../contents/<dosya>` boyut+anahtar dizgiler; Pages 200.
+- Gölge Kartları — onay bekliyor / inşa edilmedi
+- İki Sandalye — onay bekliyor / inşa edilmedi
+- Dolunay Ortak Ayini — onay bekliyor / inşa edilmedi
+- Maske Geçidi — onay bekliyor / inşa edilmedi
+- Anonim Mektuplar — onay bekliyor / inşa edilmedi
+- Rüya Kuyusu Geceleri — onay bekliyor / inşa edilmedi
 
-## BİLİNEN NOTLAR
-- serpskeyanulod.com ÇALIŞIYOR (http üzerinden 200; https sertifika sorunlu olabilir). İçerik: beyaz sayfa + beyaz yazı, ~710 satır mantra, tarihli girişlerle büyüyor. v8.5'te oyuna BEYAZ SAYFA olarak entegre edildi.
-- SS kanıtları 4 sosyal hesaba yüklenecek (kullanıcı). Öneri: sabitle + archive.org yedeği.
-- Tam sesli kitap dosyaları (95-170MB) GitHub limiti üstü → Releases (2GB) seçeneği bekliyor.
-- Unity geçişi: bu ortamda Unity editör yok; istenirse C# iskelet paketi üretilebilir (bkz. sohbet v7.3 yanıtı).
+## SIRADAKİ ADIMLAR
+1. Worker'a v3 kodu (ask/tick/health) yapıştır + Deploy (KV/secret/cron zaten kurulu).
+2. `/health` ile Groq doğrula; konsolda ⚙ anahtar + "yeni tur" + Diyalog testi.
+3. **Katılımcı (kısıtlı) arayüzü** kur — öneri/gölge bırakır, onay yok.
+4. Onaylanan ilk etkinliği (ör. Gölge Kartları) canlı oyuna kodla + 3 repoya yayınla.
+5. KONSEY'i oyun içinde **Mimar Modu → Konsey Salonu** olarak entegre et.
 
-## SÜRÜM GEÇMİŞİ (özet)
-v1 2D → v2 3D → v3 shadow-work+karakterler → v4 VakaD+yağmur+evrim → v5 Yaldabaoth/Pleroma/üç okuma/ajanlar/MP → v5.1 radyo+ay → v5.2 kasetler → v5.3 yankılar+inisiyasyon → v6 AI Aynalar+izler+gerçek dolunay → v7 sayaç+sohbet+gece-gündüz+7 ajan+günlük → v7.2 devam-et+isim+derin rehber → v7.3 zıplama+ayna CTA+irade izleri+Aelius katmanı → v7.4 window.Mirror düzeltmesi+LORE_CORE (ajanlar evren uzmanı)+✦ Bütünleşme Raporu (yerel+AI sentez) → v7.5 WebLLM kalite düzeltmesi: model seçici (TR: Qwen2.5-3B), kompakt LORE_MIN/ETHIC_MIN istemleri, tekrar cezaları, looksBroken bozuk-çıktı koruması (kullanıcının bildirdiği "Herbünt" tarzı dejenere Türkçe çıktıyı engeller) → v8 ZİHİN MOTORU: 8 kalibrasyon/bugfix (arkadaş geri bildirimi) + İçsel Envanterler (BDT/bilateral/arketip) + Zihin Haritası (mikrokozmos↔makrokozmos PNG) + Mimar Modu (yıldız/kitap/ritüel) + Günlük Üçleme + kitap-bilmeyene giriş + 5 yeni öğreti → v8.1 Gözcü Sinyali (ntfy.sh giriş/süre bildirimleri) + Otonom Denek (yasalara bağlı bağımsız AI bilinci) → v8.2 Ayna zekâ sıçraması (Claude API seçeneği + LORE_FULL evren rehberi + LORE_KB soru-eşleşmeli bilgi getirme + 7B/8B WebLLM seçenekleri) + ay senkronu (ay sprite'larına fog:false — sis ayı yutuyordu; HUD dolunay derken gökyüzünde tam daire) → v8.3 ⚡Groq hazır ayarı (ÜCRETSİZ llama-3.3-70b-versatile, api.groq.com/openai/v1, gsk_ anahtar; setupGroq() test çağrısıyla doğrular) + ayna başlığında aktif model etiketi (modelLabel) + webllm açılış uyarısı (küçük model TR bozulabilir → Groq/Claude öner) + webllm temperature .55 + tüm webllm kullanıcılarına tek seferlik yükseltme toast'ı. NOT: Tarayıcı-içi ≤8B modeller Türkçede yapısal olarak zayıftır; kaliteli diyaloğun yolu Groq (ücretsiz) veya Claude'dur. → v8.4 ORTAK AYNA HATTI: Cloudflare Worker vekiliyle kurulumsuz varsayılan 70B beyin (ayrıntı yukarıda) → v8.5 BEYAZ SAYFA (serpskeyanulod mantraları + frekans okuması) + EVREN TOHUMU (Aelius finali: kişisel yaratılış manifestosu + doğum haritası) + Unity C# iskelet paketi (repoda unity-skeleton.zip) → v8.6 kurulumsuz tam açık başlangıç + adil kullanım kotası + Spotify müzik paneli + mobil mini harita + haritada isimler.
+## ÖNCEKİ MİMARİ (özet — değişmedi)
+Tek dosya Three.js r128 oyun: 6 plaket ana zincir · O.V. kanıt hattı (4 sosyal hesap) · 7 ritüel · Vaka D · 16 yankı taşı · gece-gündüz · gerçek dolunay · radyo/kasetler · çok oyunculu (Trystero/nostr) · AI Aynalar (ortak 70B / Claude / Groq, 13 persona) · Zihin Haritası · Mimar Modu · Evren Tohumu · Otonom Denek · Gözcü Sinyali · Beyaz Sayfa (serpskeyanulod mantraları). ANA DEFTER: 12 şifre (ayna yasası), ses haritası, altın rota.
