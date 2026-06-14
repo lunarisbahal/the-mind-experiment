@@ -149,7 +149,10 @@
 
     <!-- SİNYAL -->
     <section class="view" id="v-sinyal">
-      <h2 class="a">Gözcü tavsiyeleri</h2>
+      <h2 class="v">Söz alanlar · haberler</h2>
+      <div class="sub">Üyeler sorulmadan, önemli bulduklarında el kaldırıp paylaşır (✋). Önemli olanlar telefonuna bildirim olarak da düşer.</div>
+      <div id="news"><div class="empty">—</div></div>
+      <h2 class="a sub2">Gözcü tavsiyeleri</h2>
       <div class="sub">Nöbetçinin "yapmalıyız / yapmamalıyız" uyarıları.</div>
       <div id="advis"><div class="empty">—</div></div>
       <h2 class="v sub2">Temsilci · birebir kanal</h2>
@@ -179,6 +182,8 @@
         <div class="stat"><b id="sOrd">—</b><small>Claude komutu</small></div>
       </div>
       <div class="sub" id="updLine" style="text-align:center;margin-top:-6px;"></div>
+      <h2 class="v" style="margin-top:6px">Üye kimlikleri · gelişen</h2>
+      <div class="sat" id="idents"><div class="empty" style="padding:10px">Kimlikler deneyimle gelişiyor…</div></div>
       <h2 class="v" style="margin-top:6px">Tatmin oranları</h2>
       <div class="sat" id="satBox"></div>
       <div class="killbox">
@@ -243,6 +248,8 @@ function renderAll(){if(!S)return;
   $('dialog').innerHTML=dl.length?dl.map(d=>{const op=d.who==='__op';return `<div class="d ${op?'op':''}"><span class="w" style="${op?'':'color:'+mC(d.who)}">${op?'SEN':mN(d.who)}${d.src==='game'?' · oyundan':''}</span>${esc(d.t)}</div>`;}).join(''):'<div class="empty">Henüz konuşma yok.</div>';
   $('dialog').scrollTop=$('dialog').scrollHeight;
   $('advis').innerHTML=(S.advisories||[]).slice().reverse().map(a=>`<div class="rep" style="border-color:var(--accent);background:linear-gradient(180deg,rgba(127,212,193,.10),transparent)"><div class="who" style="color:var(--accent)">nöbetçi · ${ago(a.t)}</div><p style="font-style:normal;color:var(--ink)">${esc(a.text)}</p></div>`).join('')||'<div class="empty">Henüz tavsiye yok.</div>';
+  $('news').innerHTML=(S.news||[]).slice().reverse().map(n=>`<div class="rep" style="border-color:${mC(n.who)}"><div class="who" style="color:${mC(n.who)}">✋ ${mN(n.who)}${n.imp?' · önemli':''} · ${ago(n.t)}</div><p style="font-style:normal;color:var(--moon)">${esc(n.text)}</p></div>`).join('')||'<div class="empty">Henüz söz alan yok.</div>';
+  const idn=S.identities||{};$('idents').innerHTML=Object.keys(idn).length?Object.keys(idn).map(k=>`<div class="r"><div class="top"><b style="color:${mC(k)}">${mN(k)}</b></div><div style="font-size:11.5px;color:var(--ink);font-style:italic;line-height:1.5">${esc(idn[k])}</div></div>`).join(''):'<div class="empty" style="padding:10px">Kimlikler deneyimle gelişiyor…</div>';
   // temsilci (sözcü) mesajları
   $('reps').innerHTML=(S.reps||[]).slice().reverse().map(r=>`<div class="rep"><div class="who">temsilci — ${mN(r[0])}</div><p>${esc(r[1])}</p></div>`).join('')||'<div class="empty">Temsilciden henüz mesaj yok.</div>';
   // Claude komut kuyruğu
