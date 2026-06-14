@@ -1933,7 +1933,7 @@ const Mirror={
   opKey(){try{return localStorage.getItem('it041_op_key')||'';}catch(e){return '';}},
   operatorUnlock(){const cur=this.opKey();const k=prompt('Operator key (founder only):',cur);if(k!==null){try{localStorage.setItem('it041_op_key',k.trim());}catch(e){}UI.toast(k.trim()?'◆ Operator mode ON — your words are written into the council.':'Operator mode off.');}},
   async loadMemory(){try{const h=this.isOp()?{'x-operator-key':this.opKey()}:{};const r=await fetch(this.KONSEY+'/memory',{cache:'no-store',headers:h});const d=await r.json();if(d&&d.text)this.memory=d.text;}catch(e){}},
-  remember(who,t){if(!this.isOp())return;try{fetch(this.KONSEY+'/remember',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({who:who,t:String(t).slice(0,200)})});}catch(e){}},
+  remember(who,t,q){if(!this.isOp())return;try{fetch(this.KONSEY+'/remember',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({who:who,t:String(t).slice(0,200),q:q?String(q).slice(0,200):''})});}catch(e){}},
   handsUp(pid,text){if(!this.isOp()){UI.toast('Operator mode needed to act in the council.');return;}const map={agent0:'it019',lunaris:'lunaris',aelius:'aelius',silvanus:'silvanus',lucida:'lucida'};const who=map[pid]||'it019';try{fetch(this.KONSEY+'/handsup',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({who:who,text:String(text).slice(0,240)})});UI.toast('✋ Delivered to the council — hand raised.');}catch(e){}},
   sysFor(P,q){
     const kb=this.kbFor(q);
@@ -2042,7 +2042,7 @@ const Mirror={
         if(_cm){_council=_cm[1].trim();out=out.replace(/⟁KONSEY⟁[^\n]*/,'').trim();}
         this.line('them',out,P.n);
         this.hist[pid].push({role:'assistant',content:out});
-        if(['aelius','lunaris','silvanus','lucida'].includes(pid))this.remember(pid,out);
+        if(['aelius','lunaris','silvanus','lucida','agent0'].includes(pid))this.remember(pid,out,txt);
         if(_council)this.handsUp(pid,_council);
       }
       if(this.hist[pid].length>14)this.hist[pid]=this.hist[pid].slice(-14);
