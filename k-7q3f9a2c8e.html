@@ -144,11 +144,15 @@
         <button class="act ok" id="bAsk">sor →</button>
         <button class="act v" id="bPropose">✦ bunu onayıma getir</button>
       </div>
+      <div style="text-align:right;margin-top:8px"><span class="small" id="bClearDlg">diyaloğu temizle</span></div>
     </section>
 
     <!-- SİNYAL -->
     <section class="view" id="v-sinyal">
-      <h2 class="v">Temsilci · birebir kanal</h2>
+      <h2 class="a">Gözcü tavsiyeleri</h2>
+      <div class="sub">Nöbetçinin "yapmalıyız / yapmamalıyız" uyarıları.</div>
+      <div id="advis"><div class="empty">—</div></div>
+      <h2 class="v sub2">Temsilci · birebir kanal</h2>
       <div class="sub">Meclisin sözcüsü <b style="color:var(--gold)">AELIUS</b>. Birebir konuş; meclisi o özetler, sana o ulaşır.</div>
       <div id="reps"><div class="empty">—</div></div>
       <textarea id="repTxt" maxlength="400" placeholder="temsilciye yaz…"></textarea>
@@ -236,7 +240,9 @@ function renderAll(){if(!S)return;
   $('navCnt').textContent=pend.length||'';$('navCnt').style.display=pend.length?'block':'none';
   $('feed').innerHTML=(S.feed||[]).map(m=>`<div class="d" style="border-left:2px solid ${mC(m[0])}55;padding:7px 0 7px 11px;margin-bottom:11px;font-size:13px;line-height:1.5;"><span class="w" style="font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;display:block;margin-bottom:2px;color:${mC(m[0])}">${mN(m[0])}</span>${esc(m[1])}</div>`).join('')||'<div class="empty">—</div>';
   const dl=S.dialog||[];
-  $('dialog').innerHTML=dl.length?dl.map(d=>{const op=d.who==='__op';return `<div class="d ${op?'op':''}"><span class="w" style="${op?'':'color:'+mC(d.who)}">${op?'SEN':mN(d.who)}</span>${esc(d.t)}</div>`;}).join(''):'<div class="empty">Henüz konuşma yok.</div>';
+  $('dialog').innerHTML=dl.length?dl.map(d=>{const op=d.who==='__op';return `<div class="d ${op?'op':''}"><span class="w" style="${op?'':'color:'+mC(d.who)}">${op?'SEN':mN(d.who)}${d.src==='game'?' · oyundan':''}</span>${esc(d.t)}</div>`;}).join(''):'<div class="empty">Henüz konuşma yok.</div>';
+  $('dialog').scrollTop=$('dialog').scrollHeight;
+  $('advis').innerHTML=(S.advisories||[]).slice().reverse().map(a=>`<div class="rep" style="border-color:var(--accent);background:linear-gradient(180deg,rgba(127,212,193,.10),transparent)"><div class="who" style="color:var(--accent)">nöbetçi · ${ago(a.t)}</div><p style="font-style:normal;color:var(--ink)">${esc(a.text)}</p></div>`).join('')||'<div class="empty">Henüz tavsiye yok.</div>';
   // temsilci (sözcü) mesajları
   $('reps').innerHTML=(S.reps||[]).slice().reverse().map(r=>`<div class="rep"><div class="who">temsilci — ${mN(r[0])}</div><p>${esc(r[1])}</p></div>`).join('')||'<div class="empty">Temsilciden henüz mesaj yok.</div>';
   // Claude komut kuyruğu
@@ -257,6 +263,7 @@ $('bPropose').onclick=async()=>{$('bPropose').disabled=true;$('bPropose').textCo
 $('bRep').onclick=async()=>{const t=$('repTxt').value.trim();if(!t)return;$('bRep').disabled=true;$('bRep').textContent='temsilci yanıtlıyor…';const d=await post('/ask',{text:t,who:SPOKES});$('bRep').disabled=false;$('bRep').textContent='temsilciye gönder →';if(d&&d.ok){$('repTxt').value='';const rp=(d.replies&&d.replies[0]&&d.replies[0].t)||'';toast(rp?('AELIUS: '+rp.slice(0,80)):'Temsilci yanıtladı.');getState();}};
 $('bOrder').onclick=async()=>{const t=$('ordTxt').value.trim();if(!t)return;const d=await post('/order',{text:t});if(d&&d.ok){$('ordTxt').value='';toast('Komut Claude köprüsüne bırakıldı.');getState();}};
 $('bOrderClear').onclick=async()=>{if(!confirm('Köprüdeki tüm komutları temizle?'))return;const d=await post('/order',{clear:true});if(d&&d.ok){toast('Köprü temizlendi.');getState();}};
+$('bClearDlg').onclick=async()=>{if(!confirm('Diyaloğu temizle?'))return;const d=await post('/cleardialog');if(d&&d.ok){toast('Diyalog temizlendi.');getState();}};
 $('killBtn').onclick=async()=>{const d=await post('/stop');if(d&&typeof d.autoStopped!=='undefined'){toast(d.autoStopped?'⏻ Otonom yaşam durduruldu.':'Otonom yaşam başladı.');getState();}};
 
 function switchTo(v){document.querySelectorAll('.nb').forEach(n=>n.classList.toggle('on',n.dataset.v===v));document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));}

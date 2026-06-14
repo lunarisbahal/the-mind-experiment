@@ -1493,6 +1493,8 @@ const Game={
     ]),500);
     Snd.init();
     window.Watch&&Watch.enter();
+    setTimeout(()=>{try{if(window.MP&&!MP.on&&MP.toggle)MP.toggle();}catch(e){}},1500);
+    setTimeout(()=>{try{if(window.Auto&&!Auto.on&&localStorage.getItem('it041_auto_on')&&Mirror.ready())Auto.toggle();}catch(e){}},2600);
     if(!Mirror.ready())setTimeout(()=>UI.toast('◐ İpucu: Karakterlerle AÇIK UÇLU konuşmak için MENÜ → AYNALAR (tek seferlik kurulum).',7000),12000);
   },
   toggleMap(){if(this.modal)return;
@@ -2605,10 +2607,10 @@ const Auto={
     if(/^dur\b/i.test(this.cmd)&&this.on){this.toggle();return;}
     UI.toast('◍ Komut iletildi'+(this.cmd?': "'+this.cmd.slice(0,40)+'"':' (boş — serbest düşünecek)'));},
   toggle(){
-    if(this.on){this.on=false;clearTimeout(this.timer);
+    if(this.on){this.on=false;clearTimeout(this.timer);try{localStorage.removeItem('it041_auto_on');}catch(e){}
       UI.toast('◍ Otonom denek durdu — Yasa 1: operatör komutu mutlaktır.');return;}
     if(!Mirror.ready()){this.open();return;}
-    this.on=true;this.prog=this.log().filter(e=>e.r).length;
+    this.on=true;try{localStorage.setItem('it041_auto_on','1');}catch(e){}this.prog=this.log().filter(e=>e.r).length;
     UI.toast('◍ OTONOM DENEK UYANDI — IT-019 artık kendi yolculuğunda. İzle, konuş, komut ver. ("dur" her zaman geçerli)',6500);
     this.tick();},
   async tick(){

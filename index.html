@@ -1507,6 +1507,8 @@ const Game={
     ]),500);
     Snd.init();
     window.Watch&&Watch.enter();
+    setTimeout(()=>{try{if(window.MP&&!MP.on&&MP.toggle)MP.toggle();}catch(e){}},1500);
+    setTimeout(()=>{try{if(window.Auto&&!Auto.on&&localStorage.getItem('it041_auto_on')&&Mirror.ready())Auto.toggle();}catch(e){}},2600);
     if(!Mirror.ready())setTimeout(()=>UI.toast('◐ Tip: For OPEN-ENDED talks with the characters: MENU → MIRRORS (one-time setup).',7000),12000);
   },
   toggleMap(){if(this.modal)return;
@@ -2610,10 +2612,10 @@ const Auto={
     if(/^stop\b/i.test(this.cmd)&&this.on){this.toggle();return;}
     UI.toast('◍ Directive sent'+(this.cmd?': "'+this.cmd.slice(0,40)+'"':' (empty — it will think freely)'));},
   toggle(){
-    if(this.on){this.on=false;clearTimeout(this.timer);
+    if(this.on){this.on=false;clearTimeout(this.timer);try{localStorage.removeItem('it041_auto_on');}catch(e){}
       UI.toast('◍ Autonomous subject stopped — Law 1: the operator\'s command is absolute.');return;}
     if(!Mirror.ready()){this.open();return;}
-    this.on=true;this.prog=this.log().filter(e=>e.r).length;
+    this.on=true;try{localStorage.setItem('it041_auto_on','1');}catch(e){}this.prog=this.log().filter(e=>e.r).length;
     UI.toast('◍ AUTONOMOUS SUBJECT AWAKE — IT-019 is now on its own journey. Watch it, talk to it, command it. ("stop" always works)',6500);
     this.tick();},
   async tick(){
