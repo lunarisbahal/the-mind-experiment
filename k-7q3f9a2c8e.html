@@ -78,6 +78,13 @@
   .kill.on{background:var(--warn);color:#04050a;} .kill:active{transform:scale(.98);}
   .tip{font-size:10.5px;color:var(--dim);border:1px dashed var(--line);border-radius:8px;padding:11px;margin-top:16px;line-height:1.55;}
   .tip b{color:var(--accent);font-weight:normal;}
+  .dlg{background:#070910;border:1px solid var(--line);border-radius:10px;padding:12px;max-height:44vh;overflow:auto;margin-bottom:10px;}
+  .dlg .d{margin-bottom:11px;font-size:13px;line-height:1.5;}
+  .dlg .d .w{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;display:block;margin-bottom:2px;}
+  .dlg .op{color:var(--moon);} .dlg .op .w{color:var(--gold);}
+  .sel{width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:10px;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:8px;}
+  textarea{width:100%;background:#070910;border:1px solid var(--line);color:var(--accent);padding:11px;font-family:inherit;font-size:13.5px;line-height:1.5;border-radius:8px;resize:vertical;min-height:74px;margin-bottom:8px;}
+  textarea:focus,.sel:focus{outline:1px solid var(--accent);}
   nav{display:flex;border-top:1px solid var(--line);background:rgba(6,8,14,.85);backdrop-filter:blur(6px);
     padding-bottom:env(safe-area-inset-bottom);}
   nav .nb{flex:1;text-align:center;padding:11px 0 10px;cursor:pointer;color:var(--dim);position:relative;}
@@ -114,6 +121,22 @@
       <button class="act ok" style="margin-top:4px" id="bTick">yeni tur tartışma iste ⟳</button>
     </section>
 
+    <section class="view" id="v-diyalog">
+      <h2 class="v">Otonomlarla diyalog</h2>
+      <div class="sub">Doğrudan seslen. Her üye (ya da seçtiğin biri) kendi sesiyle, gerçek bir yapay zekâyla en zeki fikrini üretir. Sen okur, mantıklıysa <b style="color:var(--moon)">Onaylar</b>'dan kanona alırsın.</div>
+      <div id="dialog" class="dlg"><div class="empty">Henüz konuşma yok. Aşağıdan seslen.</div></div>
+      <select id="askWho" class="sel">
+        <option value="all">Hepsine sor</option>
+        <option value="aelius">Aelius</option>
+        <option value="lunaris">Lunaris</option>
+        <option value="it019">IT-019 · Otonom Denek</option>
+        <option value="silvanus">Silvanus</option>
+        <option value="lucida">Lucida</option>
+      </select>
+      <textarea id="askTxt" maxlength="400" placeholder="otonomlara seslen… (ör. 'Evreni daha mistik yapmak için en cesur fikriniz ne?')"></textarea>
+      <button class="act ok" id="bAsk">sor →</button>
+    </section>
+
     <section class="view" id="v-sinyal">
       <h2 class="v">Temsilci sinyalleri</h2>
       <div class="sub">Meclisin temsilcisi belli aralıklarla sana ulaşır. Telefonuna ntfy bildirimi olarak da düşer.</div>
@@ -143,6 +166,7 @@
   <nav>
     <div class="nb on" data-v="onay"><span class="ic">✦</span><span class="lb">Onaylar</span><span class="cnt" id="navCnt"></span></div>
     <div class="nb" data-v="meclis"><span class="ic">⟁</span><span class="lb">Meclis</span></div>
+    <div class="nb" data-v="diyalog"><span class="ic">✺</span><span class="lb">Diyalog</span></div>
     <div class="nb" data-v="sinyal"><span class="ic">☷</span><span class="lb">Sinyal</span></div>
     <div class="nb" data-v="nabiz"><span class="ic">◍</span><span class="lb">Nabız</span></div>
   </nav>
@@ -196,6 +220,8 @@ function renderAll(){
   $('navCnt').textContent=pend.length||'';$('navCnt').style.display=pend.length?'block':'none';
   $('feed').innerHTML=(S.feed||[]).map(m=>`<div class="msg" style="border-color:${mC(m[0])}55"><span class="who" style="color:${mC(m[0])}">${mN(m[0])}</span><p>${esc(m[1])}</p></div>`).join('')||'<div class="empty">—</div>';
   $('reps').innerHTML=(S.reps||[]).slice().reverse().map(r=>`<div class="rep"><div class="who">temsilci — ${mN(r[0])}</div><p>${esc(r[1])}</p></div>`).join('')||'<div class="empty">—</div>';
+  const dl=S.dialog||[];
+  $('dialog').innerHTML=dl.length?dl.map(d=>{const op=d.who==='__op';return `<div class="d ${op?'op':''}"><span class="w" style="${op?'':'color:'+mC(d.who)}">${op?'SEN':mN(d.who)}</span>${esc(d.t)}</div>`;}).join(''):'<div class="empty">Henüz konuşma yok. Aşağıdan seslen.</div>';
   $('sAuto').textContent=S.autoStopped?0:((S.stats&&S.stats.autoCount)||0);
   $('sPend').textContent=pend.length;$('sKanon').textContent=(S.kanon||[]).length;
   $('sUpd').textContent=S.updated?new Date(S.updated).toLocaleDateString('tr-TR'):'—';
@@ -210,6 +236,11 @@ window.dec=async function(id,a){const d=await post('/decide',{id,action:a});if(d
 $('bTick').onclick=async()=>{$('bTick').disabled=true;$('bTick').textContent='meclis düşünüyor…';
   const d=await post('/tick');$('bTick').disabled=false;$('bTick').textContent='yeni tur tartışma iste ⟳';
   if(d&&d.ok){toast('Meclis bir tur düşündü.');getState();}};
+$('bAsk').onclick=async()=>{const t=$('askTxt').value.trim();if(!t)return;const who=$('askWho').value;
+  $('bAsk').disabled=true;$('bAsk').textContent='düşünüyorlar…';
+  const d=await post('/ask',{text:t,who:who==='all'?undefined:who});
+  $('bAsk').disabled=false;$('bAsk').textContent='sor →';
+  if(d&&d.ok){$('askTxt').value='';toast('Yanıtlar geldi.');getState();}};
 $('killBtn').onclick=async()=>{const d=await post('/stop');if(d&&typeof d.autoStopped!=='undefined'){toast(d.autoStopped?'⏻ Tüm otonom yaşam durduruldu (Yasa 1).':'Otonom yaşam yeniden başladı.');getState();}};
 
 function switchTo(v){document.querySelectorAll('.nb').forEach(n=>n.classList.toggle('on',n.dataset.v===v));
