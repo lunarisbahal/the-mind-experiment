@@ -2705,29 +2705,45 @@ const Library={
 if(typeof window!=='undefined')window.Library=Library;
 
 const Quest={
-  list(){return [
-    {n:1,ch:1,
-     tt:{tr:'Bölüm 1 — Hayatın Kara Delikleri',en:'Chapter 1 — The Black Holes of Life'},
-     intro:{tr:'Bölüm 1 üç şey fısıldar: geçmişin çekim gücü, onun altındaki sessiz tanık, ve "herkesle bir olmak" ile "herkes gibi olmaktan korkmak" arasındaki gerilim. Üçünü de kendi içinde dene — tamamlayınca bu bölümün anlamı derinleşir.',
-            en:'Chapter 1 whispers three things: the gravity of the past, the silent witness beneath it, and the tension between merging with everyone and fearing being "like everyone." Try each within yourself - completing them deepens this chapter.'},
-     topics:[
-       {tt:{tr:'Ağır Diski adlandır',en:'Name the Heavy Disc'},hint:{tr:'Hâlâ çekim gücü olan bir anını adlandır. Kara Disk bölgesine git, Ağır Disk ritüelini yap.',en:'Name a memory that still has gravity. Go to the Black Disk zone, do the Heavy Disc rite.'},done:()=>!!(S.rites&&S.rites.r1!==undefined)},
-       {tt:{tr:'Gözlemci ol',en:'Become the Observer'},hint:{tr:'Kaptanların altındaki sessiz tanığı bul: banka otur, gölü izle, kalkmak isteyeni de izle (İzleme ritüeli).',en:'Find the silent witness beneath the captains: sit on the bench, watch the lake, watch the wanting-to-rise too (the Watching rite).'},done:()=>!!(S.rites&&S.rites.r6!==undefined)},
-       {tt:{tr:'Bütünleşme mi, ayrı kalmak mı?',en:'Merge, or stay separate?'},hint:{tr:'Şu an hangisi daha güçlü: herkesle bir olma isteği mi, ayrı ve özel kalma ihtiyacı mı? Tek dürüst cümle.',en:'Which pulls you more right now: the wish to merge with everyone, or the need to stay separate and singular? One honest sentence.'},done:()=>!!(S.flags&&S.flags.q1_integ),act:true}
-     ]}
-  ];},
-  T(o){return (o&&(o[GAMELANG]||o.en||o.tr))||'';},
-  cur(){const L=this.list();for(const m of L){if(!this.done(m))return m;}return null;},
-  done(m){return m.topics.every(t=>t.done());},
-  next(m){return m.topics.find(t=>!t.done());},
-  objective(){const m=this.cur();if(!m)return null;const s=this.next(m);return (GAMELANG==='tr'?'Bölüm '+m.n+': ':'Chapter '+m.n+': ')+(s?this.T(s.tt):'');},
-  poll(){const L=this.list();let d=0;L.forEach(m=>{if(this.done(m))d++;});const seen=(S.qDone||0);if(seen===undefined)return;if(d>seen){S.qDone=d;const m=L[d-1];if(m){try{UI.toast((GAMELANG==='tr'?'✦ İç çalışma tamam: ':'✦ Inner work done: ')+this.T(m.tt),6000);}catch(e){}S.insight=(S.insight||0)+10;}}},
-  reflect(){UI.doc((GAMELANG==='tr'?'Bütünleşme mi, ayrı kalmak mı?':'Merge, or stay separate?'),'<p style="color:var(--violet)">'+(GAMELANG==='tr'?'Şu an hangisi daha güçlü: herkesle bir olma isteği mi, ayrı ve özel kalma ihtiyacı mı?':'Which pulls you more right now: merging with everyone, or staying separate and singular?')+'</p><p style="color:var(--dim);font-size:11.5px">'+(GAMELANG==='tr'?'Tek dürüst cümle. Kimse okumaz; bu cihazda kalır.':'One honest sentence. No one reads it; it stays on this device.')+'</p><textarea id="qIn" rows="2" maxlength="200" placeholder="..."></textarea><button class="btn v" onclick="Quest.saveReflect()">'+(GAMELANG==='tr'?'bırak':'leave it')+'</button>');},
-  saveReflect(){const v=(UI.el('qIn')&&UI.el('qIn').value.trim())||'';if(!v){UI.toast(GAMELANG==='tr'?'Tek cümle yeter.':'One sentence is enough.');return;}if(!S.flags)S.flags={};S.flags.q1_integ=true;if(typeof save==='function')save();if(typeof refreshHud==='function')refreshHud();UI.toast(GAMELANG==='tr'?'◈ Bırakıldı — gerilim artık görünür.':'◈ Left - the tension is visible now.');this.show();},
-  show(){const m=this.cur()||this.list()[this.list().length-1];const L=GAMELANG;let h='<p style="color:var(--moon);font-size:11.5px">'+(L==='tr'?'İç Çalışma, ana hikâyeden (vaka dosyası, plaketler, kilitler…) AYRI bir hattır — kitabın bölümlerini içeride sana yaşatır.':'Inner Work is a track APART from the main story (case file, plaques, locks…) — it lives the book chapters inside you.')+'</p><p style="color:var(--dim);font-size:12.5px">'+esc(this.T(m.intro))+'</p>';
-    m.topics.forEach(t=>{const d=t.done();h+='<div class="jentry"><h4 style="color:'+(d?'var(--accent)':'var(--violet)')+'">'+(d?'✓ ':'◇ ')+esc(this.T(t.tt))+'</h4><p style="font-size:12px;color:var(--dim)">'+esc(this.T(t.hint))+'</p>'+((!d&&t.act)?'<button class="btn ghost" style="font-size:11px" onclick="Quest.reflect()">'+(L==='tr'?'şimdi yap':'do it now')+'</button>':'')+'</div>';});
-    h+='<p style="color:'+(this.done(m)?'var(--accent)':'var(--moon)')+';font-size:12px;margin-top:6px">'+(this.done(m)?(L==='tr'?'✦ Bu görev tamam. Bölüm 1 derinleşti — Kütüphane\'den "AI özet · sana göre" ile bağ kur.':'✦ Mission complete. Chapter 1 deepened - connect via the Library "AI summary · for you".'):(L==='tr'?'Üçünü de kendi içinde dene. (Sol üstteki hedefe dokunarak buraya dönebilirsin.)':'Try each within yourself. (Tap the top-left objective to return here.)'))+'</p>';
-    UI.doc((L==='tr'?'◇ İÇ ÇALIŞMA — ':'◇ INNER WORK — ')+esc(this.T(m.tt)),h);}
+  authored:{
+    1:{title:{tr:'Bölüm 1 — Hayatın Kara Delikleri',en:'Chapter 1 — The Black Holes of Life'},
+       topics:[
+        {tt:{tr:'Ağır Diski adlandır',en:'Name the Heavy Disc'},hint:{tr:'Kara Disk bölgesine git, Ağır Disk ritüelini yap: hâlâ çekim gücü olan bir anını adlandır.',en:'Go to the Black Disk zone, do the Heavy Disc rite: name a memory that still has gravity.'},done:function(){return !!(S.rites&&S.rites.r1!==undefined);}},
+        {tt:{tr:'Gözlemci ol',en:'Become the Observer'},hint:{tr:'Banka otur, İzleme ritüelini yap: kaptanların altındaki sessiz tanığı bul.',en:'Sit on the bench, do the Watching rite: find the silent witness beneath the captains.'},done:function(){return !!(S.rites&&S.rites.r6!==undefined);}},
+        {tt:{tr:'Bütünleşme mi, ayrı kalmak mı?',en:'Merge, or stay separate?'},hint:{tr:'Şu an hangisi daha güçlü: herkesle bir olma isteği mi, ayrı/özel kalma ihtiyacı mı? Tek dürüst cümle.',en:'Which pulls you more: merging with everyone, or staying separate? One honest sentence.'},done:function(){return !!(S.flags&&S.flags.q1_integ);},set:function(){if(!S.flags)S.flags={};S.flags.q1_integ=true;},reflectable:true}
+       ]}
+  },
+  focus:0,
+  T:function(o){return (o&&(o[GAMELANG]||o.en||o.tr))||'';},
+  maxCh:function(){return (window.Library&&Library.milestones)?Library.milestones():0;},
+  chTitle:function(n){if(this.authored[n])return this.T(this.authored[n].title);var ch=(window.Library)?Library.ent(n):null;var t=ch?Library.L(ch,'title'):'';return t||((GAMELANG==='tr'?'Bölüm ':'Chapter ')+n);},
+  topicsOf:function(n){if(this.authored[n])return this.authored[n].topics;if(S.iw&&S.iw[n]&&S.iw[n].topics){return S.iw[n].topics.map(function(s,i){return {label:s,reflectable:true,idx:i,done:function(){return !!(S.iw[n].done&&S.iw[n].done[i]);}};});}return null;},
+  chDone:function(n){var ts=this.topicsOf(n);if(!ts||!ts.length)return false;return ts.every(function(t){return t.done();});},
+  curCh:function(){var mx=this.maxCh();for(var n=1;n<=mx;n++){if(!this.chDone(n))return n;}return mx>0?mx:0;},
+  objective:function(){var mx=this.maxCh();if(mx<1)return null;var n=this.curCh();if(n<1)return null;var ts=this.topicsOf(n);var k=ts?ts.filter(function(t){return t.done();}).length:0;return (GAMELANG==='tr'?'Bölüm ':'Chapter ')+n+' ('+k+'/3)';},
+  poll:function(){var mx=this.maxCh();var d=0;for(var n=1;n<=mx;n++){if(this.authored[n]||(S.iw&&S.iw[n])){if(this.chDone(n))d++;}}var seen=(S.iwDone||0);if(d>seen){S.iwDone=d;try{UI.toast((GAMELANG==='tr'?'✦ Bir bölümün iç çalışması tamam':'✦ A chapter inner work complete'),5000);}catch(e){}S.insight=(S.insight||0)+8;}},
+  gen:async function(n){if(!S.iw)S.iw={};if(S.iw[n]&&S.iw[n].topics&&S.iw[n].topics.length===3)return true;if(window.Library&&Library.load)await Library.load();var ch=Library.ent(n);var text=ch?(Library.L(ch,'text')||'').replace(/<[^>]+>/g,' '):'';if(!text.trim())return false;var lang=(GAMELANG==='tr'?'Turkce':'English');var sys='Sen Aelius Ignis. Bu metin kayip psikolog Lunaris Bahal adli kisinin gunlugunun bir bolumu. Bu bolumun UC ana golge-calismasi temasini sec; her biri icin okuyucunun kendi hayatina uygulayabilecegi TEK CUMLELIK bir ic-calisma yonergesi (kisa bir soru ya da davet) yaz. TAM 3 satir dondur; her satir 1) 2) 3) ile baslasin; baska hicbir sey yazma. Dil: '+lang+'.';var usr='Bolum metni:\n'+text.slice(0,6000);try{var out=await Mirror.generate([{role:'system',content:sys},{role:'user',content:usr}],300);var lines=out.split('\n').map(function(l){return l.replace(/^\s*\d+[).\-:]\s*/,'').trim();}).filter(Boolean).slice(0,3);if(lines.length>=3){S.iw[n]={topics:lines,done:[false,false,false]};if(typeof save==='function')save();return true;}}catch(e){}return false;},
+  reflect:function(n,i){var t=this.topicsOf(n)[i];var pr=(t.reflectable&&t.label)?t.label:(t.hint?this.T(t.hint):this.T(t.tt));UI.doc((GAMELANG==='tr'?'İç Çalışma':'Inner Work'),'<p style="color:var(--violet)">'+esc(pr)+'</p><p style="color:var(--dim);font-size:11.5px">'+(GAMELANG==='tr'?'Tek dürüst cümle. Kimse okumaz; bu cihazda kalır.':'One honest sentence. No one reads it; it stays on this device.')+'</p><textarea id="qIn" rows="2" maxlength="220" placeholder="..."></textarea><button class="btn v" onclick="Quest.saveReflect('+n+','+i+')">'+(GAMELANG==='tr'?'bırak':'leave it')+'</button>');},
+  saveReflect:function(n,i){var v=(UI.el('qIn')&&UI.el('qIn').value.trim())||'';if(!v){UI.toast(GAMELANG==='tr'?'Tek cümle yeter.':'One sentence is enough.');return;}var t=this.topicsOf(n)[i];if(t.set){t.set();}else{if(!S.iw)S.iw={};if(!S.iw[n])S.iw[n]={topics:[],done:[false,false,false]};if(!S.iw[n].done)S.iw[n].done=[false,false,false];S.iw[n].done[i]=true;}if(typeof save==='function')save();if(typeof refreshHud==='function')refreshHud();UI.toast(GAMELANG==='tr'?'◈ Bırakıldı.':'◈ Left.');this.show(n);},
+  show:async function(n){var L=GAMELANG;var mx=this.maxCh();
+    if(mx<1){UI.doc((L==='tr'?'◇ İÇ ÇALIŞMA':'◇ INNER WORK'),'<p style="color:var(--dim)">'+(L==='tr'?'İç çalışma, kitabın bölümleri açıldıkça başlar. İlerle; ilk bölüm yakında açılır.':'Inner work begins as the book chapters unlock. Keep going; the first chapter opens soon.')+'</p>');return;}
+    if(typeof n!=='number'||n<1)n=this.curCh();if(n>mx)n=mx;if(n<1)n=1;this.focus=n;
+    if(!this.authored[n]&&!(S.iw&&S.iw[n]&&S.iw[n].topics&&S.iw[n].topics.length===3)){
+      UI.doc((L==='tr'?'◇ İÇ ÇALIŞMA — ':'◇ INNER WORK — ')+esc(this.chTitle(n)),'<p style="color:var(--dim)">'+(L==='tr'?'Aelius bu bölümün iç çalışmasını hazırlıyor…':'Aelius is preparing the inner work for this chapter…')+'</p>');
+      var ok=await this.gen(n);
+      if(!ok){var bx=UI.el('docBody');if(bx)bx.innerHTML='<p style="color:var(--warn)">'+(L==='tr'?'Şu an hazırlanamadı (ayna meşgul). Birazdan tekrar dene.':'Could not prepare now (mirror busy). Try again shortly.')+'</p><button class="btn ghost" onclick="Quest.show('+n+')">'+(L==='tr'?'tekrar dene':'retry')+'</button>';return;}
+    }
+    var ts=this.topicsOf(n)||[];
+    var h='<p style="color:var(--moon);font-size:11.5px">'+(L==='tr'?'İç Çalışma, ana hikâyeden AYRI bir hattır — kitabın bölümlerini içeride sana yaşatır.':'Inner Work is a track APART from the main story — it lives the book chapters inside you.')+'</p>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0">';
+    h+=(n>1?'<button class="btn ghost" style="font-size:13px" onclick="Quest.show('+(n-1)+')">◀</button>':'<span></span>');
+    h+='<b style="color:var(--accent);font-size:12px;text-align:center">'+esc(this.chTitle(n))+'</b>';
+    h+=(n<mx?'<button class="btn ghost" style="font-size:13px" onclick="Quest.show('+(n+1)+')">▶</button>':'<span></span>');
+    h+='</div>';
+    ts.forEach(function(t,i){var d=t.done();var lab=t.label?t.label:Quest.T(t.tt);var hint=t.hint?Quest.T(t.hint):'';h+='<div class="jentry"><h4 style="color:'+(d?'var(--accent)':'var(--violet)')+'">'+(d?'✓ ':'◇ ')+esc(lab)+'</h4>'+(hint?'<p style="font-size:12px;color:var(--dim)">'+esc(hint)+'</p>':'')+((!d&&(t.reflectable||t.act))?'<button class="btn ghost" style="font-size:11px" onclick="Quest.reflect('+n+','+i+')">'+(L==='tr'?'şimdi yap':'do it now')+'</button>':'')+((!d&&!t.reflectable&&!t.act)?'<span style="font-size:11px;color:var(--dim)">'+(L==='tr'?'(ilgili ritüeli yapınca işaretlenir)':'(marked when you do the matching rite)')+'</span>':'')+'</div>';});
+    h+='<p style="color:'+(this.chDone(n)?'var(--accent)':'var(--moon)')+';font-size:12px;margin-top:6px">'+(this.chDone(n)?(L==='tr'?'✦ Bu bölümün iç çalışması tamam. Kütüphanedeki "AI özet · sana göre" ile bağ kur.':'✦ This chapter inner work is complete. Connect via the Library "AI summary · for you".'):(L==='tr'?'Üç temayı da kendi içinde dene.':'Try each theme within yourself.'))+'</p>';
+    UI.doc((L==='tr'?'◇ İÇ ÇALIŞMA — ':'◇ INNER WORK — ')+esc(this.chTitle(n)),h);
+  }
 };
 if(typeof window!=='undefined')window.Quest=Quest;
 const Iz={
