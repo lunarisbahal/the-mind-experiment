@@ -975,6 +975,7 @@ const Rite={
     W3['rite_'+id]&&W3['rite_'+id](val);
     save();refreshHud();
     UI.doc(r.title+' — TAMAMLANDI',`<p>${r.after}</p><p style="color:var(--violet)">◈ Ritüeller: ${riteCount()}/7 — İÇ ÇALIŞMA altında kayıtlı [J]. Yalnızca bu cihazda.</p>`);
+    setTimeout(()=>{try{UI.toast('◈ Bunu yazdın — artık kafanın dışında. Bütün mesele buydu. Uyanış %'+Math.round(((riteCount()/7)*0.4+(echoCount()/16)*0.3+((S.stage||0)/8)*0.3)*100)+'.',7000);}catch(e){}},2800);
   },
   close(){this.closeOnly();Dlg.q=[];},
   closeOnly(){UI.hide('riteModal');Game.setModal(false);}
