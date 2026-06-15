@@ -339,6 +339,7 @@
     <button class="mini" onclick="Cloud.ui()">☁ İLERLEME KODU</button>
     <button class="mini" onclick="Library.show()">📖 KÜTÜPHANE</button>
     <button class="mini" onclick="Quest.show()">◇ İÇ ÇALIŞMA</button>
+    <button class="mini" onclick="Realms.show()">⌖ ARKETİPLER</button>
     <button class="mini" onclick="Daily3.show()">🜂 GÜNLÜK ÜÇLEME</button>
     <button class="mini" onclick="Architect.menu()">✶ MİMAR MODU</button>
     <button class="mini" onclick="Auto.open()">◍ OTONOM DENEK</button>
@@ -2746,6 +2747,34 @@ const Quest={
   }
 };
 if(typeof window!=='undefined')window.Quest=Quest;
+const REALMS=[
+ {k:'lunaris',n:'LUNARIS',arch:{tr:'İç Ses / Yoldaş',en:'Inner Voice / Companion'},ch:[1,7],loc:{tr:'Göl kıyısı (dolunayda)',en:'The lakeshore (under the full moon)'}},
+ {k:'bahal',n:'BAHAL',arch:{tr:'Gölge',en:'The Shadow'},ch:[8,14],loc:{tr:'Seni takip eden gölge',en:'The shadow that follows you'}},
+ {k:'lucida',n:'LUCIDA',arch:{tr:'Aydınlık / Anima',en:'Clarity / Anima'},ch:[15,21],loc:{tr:'Çalan ankesör',en:'The ringing payphone'}},
+ {k:'lucius',n:'LUCIUS',arch:{tr:'Persona / Manipülatör',en:'Persona / The Manipulator'},ch:[22,28],loc:{tr:'Takım elbiseli adam',en:'The man in the pressed suit'}},
+ {k:'noct',n:'MC NOCTORNUS',arch:{tr:'Trickster / İsyancı',en:'Trickster / Rebel'},ch:[29,35],loc:{tr:'Gecenin sesi',en:'The voice of the night'}},
+ {k:'silvanus',n:'SILVANUS',arch:{tr:'Bilge / Münzevi',en:'Sage / Hermit'},ch:[36,42],loc:{tr:'Karavan',en:'The caravan'}},
+ {k:'aelius',n:'AELIUS',arch:{tr:'Üst-Benlik / Anlatıcı',en:'Self / The Narrator'},ch:[43,49],loc:{tr:'Üst katman (Yükseliş Taşı)',en:'The upper layer (Ascension Stone)'}}
+];
+const Realms={
+  T:function(o){return (o&&(o[GAMELANG]||o.en||o.tr))||'';},
+  cDone:function(c){return (window.Quest&&Quest.chDone)?Quest.chDone(c):false;},
+  done:function(r){for(var c=r.ch[0];c<=r.ch[1];c++){if(!this.cDone(c))return false;}return true;},
+  prog:function(r){var d=0;for(var c=r.ch[0];c<=r.ch[1];c++){if(this.cDone(c))d++;}return d;},
+  open:function(i){return i===0||this.done(REALMS[i-1]);},
+  firstOpenCh:function(r){for(var c=r.ch[0];c<=r.ch[1];c++){if(!this.cDone(c))return c;}return r.ch[1];},
+  allDone:function(){for(var i=0;i<REALMS.length;i++){if(!this.done(REALMS[i]))return false;}return true;},
+  show:function(){var L=GAMELANG;var h='<p style="color:var(--dim);font-size:12px">'+(L==='tr'?'Birinci kitap yedi arketip evreninden geçer; her biri 7 bölüm. Bir arketibin iç çalışmasını tamamlayıp o karakterin alanına girince sıradaki açılır. Yedisini de bütünleyince ikinci kitap açılır ve Mimar Modu’nda kendi evrenini yaratırsın.':'Book One passes through seven archetype realms, seven chapters each. Complete an archetype’s inner work and enter that character’s area, and the next opens. Integrate all seven and Book Two opens — in Architect Mode you create your own universe.')+'</p>';
+    REALMS.forEach(function(r,i){var op=Realms.open(i);var dn=Realms.done(r);var p=Realms.prog(r);
+      h+='<div class="jentry" style="'+(op?'':'opacity:.5')+'"><h4 style="color:'+(dn?'var(--accent)':(op?'var(--violet)':'var(--dim)'))+'">'+(dn?'✓ ':(op?(i+1)+'. ':'🔒 '))+esc(r.n)+' — '+esc(Realms.T(r.arch))+'</h4>'+
+        '<p style="font-size:11.5px;color:var(--dim)">'+(L==='tr'?'Bölüm ':'Chapters ')+r.ch[0]+'–'+r.ch[1]+' · '+(L==='tr'?'iç çalışma ':'inner work ')+p+'/7 · ◎ '+esc(Realms.T(r.loc))+'</p>'+
+        (op?'<button class="btn ghost" style="font-size:11px" onclick="Quest.show('+Realms.firstOpenCh(r)+')">'+(L==='tr'?'→ iç çalışmaya gir':'→ enter inner work')+'</button>':'<span style="font-size:11px;color:var(--dim)">'+(L==='tr'?'önce bir önceki arketibi bütünle':'integrate the previous archetype first')+'</span>')+'</div>';});
+    var fin=Realms.allDone();
+    h+='<div class="jentry" style="border-top:1px solid var(--line);'+(fin?'':'opacity:.5')+'"><h4 style="color:'+(fin?'var(--accent)':'var(--dim)')+'">'+(fin?'✦ ':'🔒 ')+(L==='tr'?'SEN — MİMAR':'YOU — THE ARCHITECT')+'</h4><p style="font-size:11.5px;color:var(--dim)">'+(L==='tr'?'Yedi arketibi bütünleyince: ikinci kitap açılır ve bu çatının altında kendi evrenini otonom olarak yaratmaya başlarsın.':'Once the seven are integrated: Book Two opens and you begin creating your own universe, autonomously, under this roof.')+'</p>'+(fin?'<button class="btn v" style="font-size:11px" onclick="if(window.Architect)Architect.menu()">'+(L==='tr'?'→ Mimar Modu':'→ Architect Mode')+'</button>':'')+'</div>';
+    UI.doc((L==='tr'?'⌖ ARKETİP EVRENLERİ':'⌖ ARCHETYPE REALMS'),h);}
+};
+if(typeof window!=='undefined'){window.REALMS=REALMS;window.Realms=Realms;}
+
 const Iz={
   KONSEY:'https://it041-konsey.lunarisbahal.workers.dev',
   id(){let v=localStorage.getItem('it041_trace_id');if(!v){v='t'+Math.random().toString(36).slice(2,10);try{localStorage.setItem('it041_trace_id',v);}catch(e){}}return v;},
