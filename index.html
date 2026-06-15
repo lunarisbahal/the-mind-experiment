@@ -1180,6 +1180,10 @@ function waypoint(){
 
 /* ---------------- Interactions ---------------- */
 function interactTarget(){
+  /* FAZ 3: inside a walkable archetype interior, all interactions are interior-local */
+  if(W3&&W3.inInterior&&W3.Interior)return W3.Interior.target();
+  if(W3&&W3.PORTALS)for(const pg of W3.PORTALS){
+    if(Math.hypot(S.px-pg.x,S.pz-pg.z)<pg.r)return['☽ '+(GAMELANG==='tr'?esc(pg.name)+' alanına gir':'enter '+esc(pg.name)),()=>W3.Interior.enter(pg.k)];}
   /* v8: a nearby subject/character takes priority over zone interactions */
   {const ag=W3.agentNear&&W3.agentNear();
    if(ag&&Math.hypot(S.px-ag.f.g.position.x,S.pz-ag.f.g.position.z)<3)
@@ -1548,7 +1552,7 @@ const Game={
     setTimeout(()=>{try{if(window.Auto&&!Auto.on&&localStorage.getItem('it041_auto_on')&&Mirror.ready())Auto.toggle();}catch(e){}},2600);
     if(!Mirror.ready())setTimeout(()=>UI.toast('◐ Tip: For OPEN-ENDED talks with the characters: MENU → MIRRORS (one-time setup).',7000),12000);
   },
-  toggleMap(){if(this.modal)return;
+  toggleMap(){if(this.modal||(W3&&W3.inInterior))return;
     const w=UI.el('bigmapWrap');
     const open=w.style.display!=='flex';
     w.style.display=open?'flex':'none';
@@ -4069,6 +4073,75 @@ if(HAS3D)(function(){
   };
   W3.applyMoon();
 
+  /* ============ FAZ 3 — walkable archetype INTERIORS (gezilebilir iç alanlar) ============ */
+  const interiorScene=new THREE.Scene();
+  interiorScene.fog=new THREE.FogExp2(0x05060c,0.020);
+  const TYCOL={reframe:0x9d8cc9,reflection:0x6fb0d0,task:0xcdb878,scene:0x7fd4c1,minigame:0x7fe0c1,soon:0x445566};
+  const INTERIORS={
+    lunaris:{floor:0x121a2c,wall:0x1a2440,accent:0xbcd0f0,amb:0x2a3a5c,center:'moon',
+      wake:{tr:'loş bir koridorda uyandın; duvarlarda ay ışığı, ortada sessiz bir havuz',en:'you woke in a dim corridor; moonlight on the walls, a silent pool at the center'}}
+  };
+  const Interior={
+    RS:14, coll:[], scene:interiorScene, cur:null, door:{x:0,z:13.1}, stations:[], _g:null,
+    _clear(){ if(this._g){interiorScene.remove(this._g); this._g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.map)m.map.dispose&&m.map.dispose();m.dispose&&m.dispose();});}}); } this._g=null; this.coll=[]; this.stations=[]; },
+    _label(text,col,sc){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(text,512,96,30,col||'rgba(210,220,240,.96)'),transparent:true,depthWrite:false}));sp.scale.set(6*sc,1.15*sc,1);return sp;},
+    build(k){
+      this._clear();
+      const z=RZONES[k]; const cfg=INTERIORS[k]||{floor:0x141625,wall:0x1c2030,accent:(z&&z.col?parseInt(String(z.col).replace('#',''),16):0x9d8cc9),amb:0x283044,center:'orb'};
+      const g=new THREE.Group(); interiorScene.add(g); this._g=g; const RS=this.RS;
+      const fl=new THREE.Mesh(new THREE.CircleGeometry(RS,48),std(cfg.floor,{roughness:.92}));fl.rotation.x=-Math.PI/2;g.add(fl);
+      const wall=new THREE.Mesh(new THREE.CylinderGeometry(RS,RS,7,48,1,true),new THREE.MeshStandardMaterial({color:cfg.wall,roughness:.96,side:THREE.BackSide}));wall.position.y=3.5;g.add(wall);
+      const ceil=new THREE.Mesh(new THREE.RingGeometry(RS*0.18,RS*0.96,40),new THREE.MeshBasicMaterial({color:cfg.accent,transparent:true,opacity:.05,side:THREE.DoubleSide,depthWrite:false}));ceil.rotation.x=Math.PI/2;ceil.position.y=6.8;g.add(ceil);
+      g.add(new THREE.AmbientLight(cfg.amb,.65));
+      const cl=new THREE.PointLight(cfg.accent,.95,42,2);cl.position.set(0,5.6,0);g.add(cl);
+      if(cfg.center==='moon'){
+        const pool=new THREE.Mesh(new THREE.CircleGeometry(3.2,40),new THREE.MeshStandardMaterial({color:0x0a1424,metalness:.7,roughness:.12,emissive:0x10243f,emissiveIntensity:.6}));pool.rotation.x=-Math.PI/2;pool.position.y=0.03;g.add(pool);
+        const moon=new THREE.Mesh(new THREE.SphereGeometry(1.15,28,28),new THREE.MeshStandardMaterial({color:0xeef0e0,emissive:0xbcd0f0,emissiveIntensity:.75,roughness:.5}));moon.position.set(0,5.0,0);g.add(moon);this.coll.push({x:0,z:0,r:3.3});
+      } else {
+        const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(1.0,1),new THREE.MeshStandardMaterial({color:cfg.accent,emissive:cfg.accent,emissiveIntensity:.5,roughness:.4,flatShading:true}));orb.position.set(0,3.4,0);g.add(orb);this.coll.push({x:0,z:0,r:1.5});
+      }
+      const ttl=this._label('◈ '+(z?z.name:k),'rgba(222,230,246,.97)',2.6);ttl.position.set(0,6.3,0);g.add(ttl);
+      const dfr=new THREE.Mesh(new THREE.TorusGeometry(1.5,.16,8,24,Math.PI),new THREE.MeshStandardMaterial({color:cfg.accent,emissive:cfg.accent,emissiveIntensity:.65,roughness:.5}));dfr.position.set(0,0,RS-0.6);dfr.rotation.x=-Math.PI/2;g.add(dfr);
+      const dl=this._label(GAMELANG==='tr'?'↩ ÇIKIŞ':'↩ EXIT','rgba(200,210,230,.92)',1.7);dl.position.set(0,2.5,RS-0.7);g.add(dl);this.door={x:0,z:RS-0.9};
+      const sts=(z&&z.stations)||[]; const N=sts.length||7; const rr=RS*0.62; const gap=0.62; const start=Math.PI/2+gap, end=Math.PI/2+Math.PI*2-gap; const done=(S.zones&&S.zones[k]&&S.zones[k].done)||{};
+      sts.forEach((s,i)=>{const ang=start+(end-start)*(N>1?i/(N-1):0.5);const x=Math.cos(ang)*rr,zz=Math.sin(ang)*rr;const dn=!!done[s.id];const col=dn?(z.col?parseInt(String(z.col).replace('#',''),16):0x7fd4c1):(TYCOL[s.type]||0x9d8cc9);
+        const pil=new THREE.Mesh(new THREE.CylinderGeometry(.34,.42,2.2,12),std(0x10131f,{emissive:col,emissiveIntensity:dn?.5:.22,roughness:.6}));pil.position.set(x,1.1,zz);g.add(pil);
+        const glo=new THREE.Mesh(new THREE.SphereGeometry(.28,16,16),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:dn?1.4:.85,roughness:.3}));glo.position.set(x,2.75,zz);g.add(glo);
+        const pl=new THREE.PointLight(col,dn?.5:.32,6,2);pl.position.set(x,2.75,zz);g.add(pl);
+        const lab=this._label((dn?'✓ ':'')+'B'+s.ch,'rgba(210,218,238,.95)',1.5);lab.position.set(x,3.55,zz);g.add(lab);
+        this.coll.push({x:x,z:zz,r:.7});
+        this.stations.push({id:s.id,ch:s.ch,t:s.t,type:s.type,x:x,z:zz});
+      });
+      this.cur=k;
+    },
+    enter(k){const z=RZONES[k];if(!z){return;}if(z.stub){UI.toast(GAMELANG==='tr'?'Bu alan henüz inşa edilmedi.':'This area is not built yet.');return;}
+      const idx=(window.REALMS||[]).findIndex(r=>r.k===k);if(idx>0&&window.Realms&&!Realms.open(idx)){UI.toast(GAMELANG==='tr'?'Önce bir önceki arketibi bütünle.':'Integrate the previous archetype first.');return;}
+      this.build(k);W3.IP={px:0,pz:this.RS-3};W3.inInterior=true;meshAng=Math.PI;interiorScene.add(player.g);if(W3.intLamp)W3.intLamp.visible=true;
+      try{if(UI&&UI.closeDoc)UI.closeDoc();}catch(e){}if(Game.setModal)Game.setModal(false);
+      const cfg=INTERIORS[k];UI.toast('◈ '+z.name+' — '+(cfg&&cfg.wake?(cfg.wake[GAMELANG]||cfg.wake.en):(GAMELANG==='tr'?'alanına girdin':'you entered'))+(GAMELANG==='tr'?' · [WASD gez · sütuna yaklaş · E ile performe et]':' · [WASD move · approach a pillar · E to perform]'),6500);
+    },
+    exit(){W3.inInterior=false;scene.add(player.g);if(W3.intLamp)W3.intLamp.visible=false;UI.toast(GAMELANG==='tr'?'Alandan çıktın.':'You left the area.');},
+    target(){const p=W3.IP;if(!p)return null;
+      if(Math.hypot(p.px-this.door.x,p.pz-this.door.z)<2.3)return[GAMELANG==='tr'?'↩ alandan çık':'↩ leave the area',()=>W3.Interior.exit()];
+      let best=null,bd=2.4;for(const st of this.stations){const d=Math.hypot(p.px-st.x,p.pz-st.z);if(d<bd){bd=d;best=st;}}
+      if(best){const dn=!!(S.zones&&S.zones[this.cur]&&S.zones[this.cur].done&&S.zones[this.cur].done[best.id]);return[(dn?'✓ ':'◇ ')+(GAMELANG==='tr'?'Bölüm ':'Ch ')+best.ch+' · '+Scene.T(best.t)+(GAMELANG==='tr'?' — performe et':' — perform'),()=>Scene.run(W3.Interior.cur,best.id)];}
+      return null;},
+  };
+  W3.Interior=Interior;if(typeof window!=='undefined')window.W3=W3;
+  W3.intLamp=new THREE.PointLight(0xbcd0f0,.7,9,2);W3.intLamp.position.set(0,2.0,0);W3.intLamp.visible=false;player.g.add(W3.intLamp);
+  W3.PORTALS=[];W3._portals=[];
+  function buildPortal(k,x,z,name){
+    const col=0xbcd0f0;
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(1.8,.18,10,28),new THREE.MeshStandardMaterial({color:0x1a2238,emissive:col,emissiveIntensity:.7,metalness:.4,roughness:.4}));
+    ring.position.set(x,2.2,z);scene.add(ring);
+    const inner=new THREE.Mesh(new THREE.CircleGeometry(1.62,28),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.12,side:THREE.DoubleSide,depthWrite:false}));inner.position.set(x,2.2,z);scene.add(inner);
+    const pl=new THREE.PointLight(col,.85,13,2);pl.position.set(x,2.4,z);scene.add(pl);
+    box(3,.4,3,std(0x10131f,{emissive:col,emissiveIntensity:.12}),x,.2,z);
+    label(name+' ◈',x,z,4.7,.7);
+    W3.PORTALS.push({k:k,x:x,z:z,r:3.2,name:name});W3._portals.push(ring);
+  }
+  buildPortal('lunaris',250,104,'LUNARIS ☽');
+
   /* ---- camera ---- */
   const Cam={yaw:Math.PI,pitch:.3,dist:7.5};
   renderer.domElement.addEventListener('click',()=>{
@@ -4130,6 +4203,7 @@ if(HAS3D)(function(){
     window.__mmP=window.MP&&MP.on?Object.values(MP.peers).filter(p=>p.tx!==undefined).map(p=>({x:p.tx,z:p.tz,n:p.nm||'traveler'})):[];
 
     let mx=0,mz=0,running=false;
+    const P=(W3.inInterior&&W3.IP)?W3.IP:S;
     if(Game.running&&!Game.modal&&!Game.sitting){
       let ix=0,iz=0;
       if(keys['w']||keys['arrowup'])iz+=1;
@@ -4145,13 +4219,16 @@ if(HAS3D)(function(){
         const fx=-Math.sin(Cam.yaw),fz=-Math.cos(Cam.yaw);
         const rx=-fz,rz=fx;
         mx=(fx*iz+rx*ix)*sp;mz=(fz*iz+rz*ix)*sp;
-        let nx=S.px+mx,nz=S.pz+mz;
-        nx=Math.max(4,Math.min(WX-4,nx));nz=Math.max(4,Math.min(WZ-4,nz));
-        for(const c of COLL){const d=Math.hypot(nx-c.x,nz-c.z);
-          if(d<c.r+.6&&d>0){const push=(c.r+.6-d);nx+=(nx-c.x)/d*push;nz+=(nz-c.z)/d*push;}}
-        for(const tr of TREES){const d=Math.hypot(nx-tr.x,nz-tr.z);
-          if(d<.75&&d>0){nx+=(nx-tr.x)/d*(.75-d);nz+=(nz-tr.z)/d*(.75-d);}}
-        S.px=nx;S.pz=nz;
+        let nx=P.px+mx,nz=P.pz+mz;
+        if(W3.inInterior&&W3.Interior){const RR=W3.Interior.RS-1.0,dd=Math.hypot(nx,nz);if(dd>RR){nx=nx/dd*RR;nz=nz/dd*RR;}
+          for(const c of W3.Interior.coll){const d=Math.hypot(nx-c.x,nz-c.z);
+            if(d<c.r+.5&&d>0){const push=(c.r+.5-d);nx+=(nx-c.x)/d*push;nz+=(nz-c.z)/d*push;}}}
+        else{nx=Math.max(4,Math.min(WX-4,nx));nz=Math.max(4,Math.min(WZ-4,nz));
+          for(const c of COLL){const d=Math.hypot(nx-c.x,nz-c.z);
+            if(d<c.r+.6&&d>0){const push=(c.r+.6-d);nx+=(nx-c.x)/d*push;nz+=(nz-c.z)/d*push;}}
+          for(const tr of TREES){const d=Math.hypot(nx-tr.x,nz-tr.z);
+            if(d<.75&&d>0){nx+=(nx-tr.x)/d*(.75-d);nz+=(nz-tr.z)/d*(.75-d);}}}
+        P.px=nx;P.pz=nz;
         meshAng=lerpAng(meshAng,Math.atan2(mx,mz),.18);
         walkT+=dt*(running?11:7);
       }else walkT+=dt*1.2;
@@ -4160,13 +4237,13 @@ if(HAS3D)(function(){
     if(keys['space']&&jy<=0&&Game.running&&!Game.modal){vy=5.6;}
     if(vy!==0||jy>0){jy+=vy*dt;vy-=15*dt;if(jy<=0){jy=0;vy=0;}}
     S.heading=Math.PI-meshAng; /* v8: minimap arrow now matches travel direction */
-    player.g.position.set(S.px,jy+Math.abs(Math.sin(walkT))*.05,S.pz);
+    player.g.position.set(P.px,jy+Math.abs(Math.sin(walkT))*.05,P.pz);
     player.g.rotation.y=meshAng;
     const moving=Math.abs(mx)+Math.abs(mz)>0.0001;
     const sw=Math.sin(walkT)*(moving?(running?.85:.55):.04);
     player.parts.legL.rotation.x=sw;player.parts.legR.rotation.x=-sw;
     player.parts.armL.rotation.x=-sw*.8;player.parts.armR.rotation.x=sw*.8;
-    lantern.position.set(S.px+Math.sin(meshAng)*.5,1.5,S.pz+Math.cos(meshAng)*.5);
+    lantern.position.set(P.px+Math.sin(meshAng)*.5,1.5,P.pz+Math.cos(meshAng)*.5);
 
     /* camera — completely static while paused */
     if(!paused){
@@ -4174,12 +4251,12 @@ if(HAS3D)(function(){
       camera.fov=58+fovKick;camera.updateProjectionMatrix();
       const cd=Cam.dist,cp=Cam.pitch;
       camera.position.lerp(new THREE.Vector3(
-        S.px+Math.sin(Cam.yaw)*Math.cos(cp)*cd,
+        P.px+Math.sin(Cam.yaw)*Math.cos(cp)*cd,
         Math.max(.55,1.6+Math.sin(cp)*cd), /* v8: no ground clipping when looking up */
-        S.pz+Math.cos(Cam.yaw)*Math.cos(cp)*cd),.18);
-      camera.lookAt(S.px,cp<0?1.9-cp*9:1.9,S.pz); /* v8: low camera tilts the gaze skyward */
-      moonLight.position.set(S.px+130,200,S.pz-60);
-      mlTarget.position.set(S.px,0,S.pz);
+        P.pz+Math.cos(Cam.yaw)*Math.cos(cp)*cd),.18);
+      camera.lookAt(P.px,cp<0?1.9-cp*9:1.9,P.pz); /* v8: low camera tilts the gaze skyward */
+      moonLight.position.set(P.px+130,200,P.pz-60);
+      mlTarget.position.set(P.px,0,P.pz);
     }
 
     /* world anim */
@@ -4351,10 +4428,11 @@ if(HAS3D)(function(){
         else pr.style.display='none';
         UI.el('lucbar').style.width=S.lucidity+'%';
       }else UI.el('prompt').style.display='none';
-      drawMini();
+      if(!W3.inInterior)drawMini();
       saveT+=dt;if(saveT>5){saveT=0;save();}
     }
-    renderer.render(scene,camera);
+    if(W3._portals)for(const pr of W3._portals)pr.rotation.z+=dt*.35;
+    renderer.render(W3.inInterior&&W3.Interior?W3.Interior.scene:scene,camera);
   }
   requestAnimationFrame(animate);
 })();
