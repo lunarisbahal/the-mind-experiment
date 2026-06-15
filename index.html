@@ -2955,6 +2955,40 @@ const Dreams={
     try{localStorage.setItem(this.KEY,JSON.stringify(l.slice(-40)))}catch(e){}
     window.Daily3&&Daily3.mark('dream');}
 };
+function dreamCorpus(){
+  const RN={r1:'The disk I named (a weighted memory)',r2:'The captain of today (the mask)',r3:'The forbidden want',r4:'The two houses',r5:'What I let burn',r6:'The watching',r7:'What follows me'};
+  const p=[];
+  for(const k in RN){ const v=S.rites&&S.rites[k]; if(typeof v==='string'&&v.trim()) p.push(RN[k]+': "'+v.trim()+'"'); }
+  if(S.rites&&S.rites.proj) p.push('Projection (what irritates me most in others): "'+S.rites.proj+'"');
+  if(S.caseD){ const dom=PROFILES[S.caseD.dom], sha=PROFILES[S.caseD.sha]; if(dom)p.push('Daylight captain: '+dom.n); if(sha)p.push('Pushed into shadow: '+sha.n); }
+  if(S.inv&&S.inv.arch) p.push('Leading face in the archetype mirror: '+({p:'PERSONA',g:'SHADOW',a:'INNER VOICE',s:'SELF'}[S.inv.arch.dom]||'?'));
+  try{const nx=JSON.parse(localStorage.getItem('it041_nexus')||'{}'); if(nx.loop)p.push('The repeating loop I noticed: "'+nx.loop+'"'); if(nx.brk)p.push('The move to break it: "'+nx.brk+'"'); if(nx.name)p.push('The name I gave my unnamed shadow: "'+nx.name+'"');}catch(e){}
+  const dr=Dreams.list(); if(dr.length>1) p.push('Earlier dreams: '+dr.slice(-4,-1).map(d=>'"'+String(d.t).slice(0,80)+'"').join(', '));
+  return p;
+}
+function dreamInterpret(){
+  const corpus=dreamCorpus();
+  if(corpus.length<3){
+    UI.doc('* PERSONALIZED DREAM READING - locked','<p>This reading is woven <b>only</b> from what you yourself have written and done here - your rites, your captain and shadow, the loops you named. Right now there is not enough of your own material yet ('+corpus.length+'/3).</p><p style="color:var(--violet)">Keep playing: complete rites, answer the questions, look into the mirrors. As this world comes to know you, the door opens - and the reading will be truly yours, never generic.</p><button class="btn ghost" onclick="UI.closeDoc();doDreamWell()">back to the well</button>');
+    return;
+  }
+  UI.doc('* PERSONALIZED DREAM READING','<p>Write a dream you have seen and still remember from the last weeks. The reading will draw <b>only</b> on what you have left in this world - nothing random.</p><textarea id="dreamIn" rows="4" maxlength="600" placeholder="the dream you remember..."></textarea><button class="btn v" onclick="dreamInterpretRun()">read my dream</button><button class="btn ghost" onclick="UI.closeDoc();doDreamWell()">back</button><div id="dreamOut" style="margin-top:10px;color:var(--violet);line-height:1.6"></div>');
+}
+async function dreamInterpretRun(){
+  const dream=(UI.el('dreamIn')&&UI.el('dreamIn').value.trim())||''; if(!dream){UI.toast('Even a fragment is enough.');return;}
+  const out=UI.el('dreamOut'); if(!out)return;
+  if(!Mirror.ready()){out.innerHTML='<span style="color:var(--dim)">Link the mirrors first (MENU -> MIRRORS) - the reading needs a connected mind.</span>';return;}
+  if(typeof CRISIS_RE!=='undefined'&&CRISIS_RE.test(dream)) out.innerHTML='<span style="color:var(--warn)">If this dream carries real pain, please reach a person you trust or your local support line. I am here with you, but be safe first.</span><br>';
+  out.innerHTML+='... reading your dream through your own traces...';
+  const corpus=dreamCorpus();
+  const sys='You are an analyst who mirrors the inner world of this player (DO-LOON-AI EXPRESS, Jungian). Interpret the dream psychoanalytically using ONLY the material the player has written below. NEVER invent; anchor every reading to that material (a specific rite answer, their captain or shadow, a loop they named). No diagnosis, no medical claims; use intuitive-reflective language (perhaps..., the thing you wrote seems to speak with this image...). Warm, deep, English, 4-6 sentences. End with one gentle question.';
+  const usr='THE MATERIAL THE PLAYER LEFT IN THIS WORLD:\n'+corpus.join('\n')+'\n\nTHEIR DREAM:\n'+dream+'\n\nInterpret this dream grounded ONLY in the material above.';
+  try{ const r=await Mirror.generate([{role:'system',content:sys},{role:'user',content:usr}],500);
+    out.innerHTML=esc(r||'(the mirror clouded over - try again in a moment)').replace(/\n/g,'<br>');
+    Dreams.add(dream); S.insight=(S.insight||0)+3; if(typeof save==='function')save(); if(typeof refreshHud==='function')refreshHud();
+  }catch(e){ out.innerHTML='<span style="color:var(--warn)">connection hiccup - try again.</span>'; }
+}
+
 function doDreamWell(){
   const l=Dreams.list();let h='';
   if(l.length){h+='<p style="color:var(--violet)">Your latest dreams in the well:</p>';
@@ -2963,6 +2997,7 @@ function doDreamWell(){
       <p style="color:var(--violet);font-size:12px">How to look: (1) Write without judging or censoring — the detail that seems absurd is usually the key. (2) EVERY figure in the dream may be a part of you: the one chasing, and the one running. (3) Ask: "Where in my waking life did I last feel the feeling of this dream?" (4) Interpreting is optional; sometimes writing alone slows the disk.</p>
       <textarea id="riteText" rows="3" maxlength="400" placeholder="write your dream — uncensored…"></textarea>
       <button class="btn v" onclick="dreamSave()">Drop into the well</button>
+      <button class="btn" onclick="dreamInterpret()">◑ Personalized dream reading</button>
       <p style="color:var(--dim);font-size:11px">If you want help: with MIRRORS linked, tell <b>Lunaris</b> your dream (the evidence stand) — she is a master of naming; find the poet <b>IT-009</b> for image-work, or <b>IT-062</b> for what the body kept. They will look at it with you, question by question.</p>`;
   UI.doc('DREAM WELL',h);
 }

@@ -2950,6 +2950,40 @@ const Dreams={
     try{localStorage.setItem(this.KEY,JSON.stringify(l.slice(-40)))}catch(e){}
     window.Daily3&&Daily3.mark('dream');}
 };
+function dreamCorpus(){
+  const RN={r1:'Adlandırdığım disk (ağırlıklı bir anı)',r2:'Bugünün kaptanı (maske)',r3:'Yasak arzu',r4:'İki ev',r5:'Yanmasına izin verdiğim',r6:'İzleme',r7:'Beni izleyen'};
+  const p=[];
+  for(const k in RN){ const v=S.rites&&S.rites[k]; if(typeof v==='string'&&v.trim()) p.push(RN[k]+': "'+v.trim()+'"'); }
+  if(S.rites&&S.rites.proj) p.push('Yansıtma (başkalarında beni en çok kızdıran): "'+S.rites.proj+'"');
+  if(S.caseD){ const dom=PROFILES[S.caseD.dom], sha=PROFILES[S.caseD.sha]; if(dom)p.push('Gündüz kaptanı: '+dom.n); if(sha)p.push('Gölgeye itilen: '+sha.n); }
+  if(S.inv&&S.inv.arch) p.push('Arketip aynasında önde gelen yüz: '+({p:'PERSONA',g:'GÖLGE',a:'İÇ SES',s:'KENDİLİK'}[S.inv.arch.dom]||'?'));
+  try{const nx=JSON.parse(localStorage.getItem('it041_nexus')||'{}'); if(nx.loop)p.push('Fark ettiğim tekrar eden döngü: "'+nx.loop+'"'); if(nx.brk)p.push('Onu kıran hamle: "'+nx.brk+'"'); if(nx.name)p.push('Adı konmamış gölgeme verdiğim isim: "'+nx.name+'"');}catch(e){}
+  const dr=Dreams.list(); if(dr.length>1) p.push('Önceki rüyalarım: '+dr.slice(-4,-1).map(d=>'"'+String(d.t).slice(0,80)+'"').join(', '));
+  return p;
+}
+function dreamInterpret(){
+  const corpus=dreamCorpus();
+  if(corpus.length<3){
+    UI.doc('* KİŞİSEL RÜYA YORUMU - kilitli','<p>Bu yorum <b>yalnızca</b> senin burada yazıp yaptıklarından örülür - ritüellerin, kaptanın ve gölgen, adlandırdığın döngüler. Şu an kendi malzemen henüz yeterli değil ('+corpus.length+'/3).</p><p style="color:var(--violet)">Oynamaya devam et: ritüelleri tamamla, sorulara cevap ver, aynalara bak. Bu evren seni tanıdıkça kapı açılır - ve yorum gerçekten senin olur, asla genel-geçer değil.</p><button class="btn ghost" onclick="UI.closeDoc();doDreamWell()">kuyuya dön</button>');
+    return;
+  }
+  UI.doc('* KİŞİSEL RÜYA YORUMU','<p>Son haftalarda gördüğün ve hâlâ hatırladığın bir rüyayı yaz. Yorum <b>yalnızca</b> bu evrende bıraktıklarından beslenir - rastgele hiçbir şey yok.</p><textarea id="dreamIn" rows="4" maxlength="600" placeholder="hatırladığın rüya..."></textarea><button class="btn v" onclick="dreamInterpretRun()">rüyamı oku</button><button class="btn ghost" onclick="UI.closeDoc();doDreamWell()">geri</button><div id="dreamOut" style="margin-top:10px;color:var(--violet);line-height:1.6"></div>');
+}
+async function dreamInterpretRun(){
+  const dream=(UI.el('dreamIn')&&UI.el('dreamIn').value.trim())||''; if(!dream){UI.toast('Bir parça bile yeter.');return;}
+  const out=UI.el('dreamOut'); if(!out)return;
+  if(!Mirror.ready()){out.innerHTML='<span style="color:var(--dim)">Önce aynaları bağla (MENÜ -> AYNALAR) - yorum için bağlı bir zihin gerek.</span>';return;}
+  if(typeof CRISIS_RE!=='undefined'&&CRISIS_RE.test(dream)) out.innerHTML='<span style="color:var(--warn)">Bu rüya gerçek bir acı taşıyorsa lütfen güvendiğin birine ya da destek hattına ulaş. Yanındayım ama önce güvende ol.</span><br>';
+  out.innerHTML+='... rüyanı kendi izlerinden okuyorum...';
+  const corpus=dreamCorpus();
+  const sys='Sen bu oyuncunun KENDİ iç dünyasını yansıtan bir analistsin (DO-LOON-AI EXPRESS, Jung temelli). Rüyayı YALNIZCA aşağıdaki kendi malzemesine dayanarak psikanalitik yorumla. ASLA uydurma; her okumayı onun malzemesine bağla (şu ritüel cevabı, kaptanı/gölgesi, adlandırdığı döngü). Teşhis/tıbbi iddia yok; sezgisel-yansıtıcı dil kullan (belki..., yazdığın şu şey bu imgeyle konuşuyor gibi). Sıcak, derin, Türkçe, 4-6 cümle. Sonunda tek nazik bir soru.';
+  const usr='OYUNCUNUN BU EVRENDE BIRAKTIĞI MALZEME:\n'+corpus.join('\n')+'\n\nRÜYASI:\n'+dream+'\n\nBu rüyayı yalnızca yukarıdaki kendi malzemesine dayanarak yorumla.';
+  try{ const r=await Mirror.generate([{role:'system',content:sys},{role:'user',content:usr}],500);
+    out.innerHTML=esc(r||'(ayna bulandı - birazdan tekrar dene)').replace(/\n/g,'<br>');
+    Dreams.add(dream); S.insight=(S.insight||0)+3; if(typeof save==='function')save(); if(typeof refreshHud==='function')refreshHud();
+  }catch(e){ out.innerHTML='<span style="color:var(--warn)">bağlantı tökezledi - tekrar dene.</span>'; }
+}
+
 function doDreamWell(){
   const l=Dreams.list();let h='';
   if(l.length){h+='<p style="color:var(--violet)">Kuyudaki son rüyaların:</p>';
@@ -2958,6 +2992,7 @@ function doDreamWell(){
       <p style="color:var(--violet);font-size:12px">Nasıl bakılır: (1) Rüyayı yargılamadan, sansürsüz yaz — saçma görünen ayrıntı çoğu zaman anahtardır. (2) Rüyadaki HER figür senin bir parçan olabilir: kovalayan da sensin, kaçan da. (3) Şunu sor: "Bu rüyadaki duyguyu gündüz hayatımda en son nerede hissettim?" (4) Yorumlamak şart değil; bazen sadece yazmak, diski yavaşlatır.</p>
       <textarea id="riteText" rows="3" maxlength="400" placeholder="rüyanı yaz — sansürsüz…"></textarea>
       <button class="btn v" onclick="dreamSave()">Kuyuya bırak</button>
+      <button class="btn" onclick="dreamInterpret()">◑ Kişisel rüya yorumu</button>
       <p style="color:var(--dim);font-size:11px">Yardım istersen: AYNALAR bağlıysa rüyanı <b>Lunaris</b>'e anlat (delil kürsüsü) — adlandırmada ustadır; imge çözmek için şair <b>IT-009</b>'u, bedensel izler için <b>IT-062</b>'yi bul. Soru-cevapla birlikte bakarlar.</p>`;
   UI.doc('RÜYA KUYUSU',h);
 }
