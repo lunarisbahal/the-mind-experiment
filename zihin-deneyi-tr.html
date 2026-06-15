@@ -332,6 +332,7 @@
     <button class="mini" onclick="MindMap.show()">🜨 ZİHİN HARİTASI</button>
     <button class="mini" onclick="NEXUS.show()">⟁ NEXUS — İÇ TAKIMYILDIZ</button>
     <button class="mini" onclick="Iz.show()">◈ İZ ANITI</button>
+    <button class="mini" onclick="Cloud.ui()">☁ İLERLEME KODU</button>
     <button class="mini" onclick="Daily3.show()">🜂 GÜNLÜK ÜÇLEME</button>
     <button class="mini" onclick="Architect.menu()">✶ MİMAR MODU</button>
     <button class="mini" onclick="Auto.open()">◍ OTONOM DENEK</button>
@@ -386,11 +387,29 @@ const ICSES=[
   'Aklını kaybetmek ile bilinci genişletmek arasındaki fark, çoğu zaman, sabah olduğunda hâlâ sevdiklerini arayıp arayamadığındır. Ankesörlü telefonu hatırla.',
 ];
 const SAVEKEY='it041_sw_tr_v1';
-function save(){try{localStorage.setItem(SAVEKEY,JSON.stringify(S));}catch(e){}}
+function save(){try{localStorage.setItem(SAVEKEY,JSON.stringify(S));}catch(e){}try{if(window.Cloud&&Cloud.code())Cloud.schedulePush();}catch(e){}}
 function load(){try{const j=localStorage.getItem(SAVEKEY);if(j){Object.assign(S,JSON.parse(j));
   /* v8: bozuk kayıt onarımı — çekirdek durmuşken Pleroma'da kalan oyuncuyu yüzeye al */
   if(S.flags&&S.flags.inPleroma&&S.flags.coreDown){S.flags.inPleroma=false;S.px=202;S.pz=220;}
   return true;}}catch(e){}return false;}
+
+const Cloud={
+  KON:'https://it041-konsey.lunarisbahal.workers.dev',
+  SKEYS:['it041_mirror_cfg','it041_name','it041_auto_on','it041_trace_id','it041_trace_mask'],
+  _t:null,
+  code(){try{return localStorage.getItem('it041_sync_code')||'';}catch(e){return'';}},
+  score(s){s=s||S;return (s.stage||0)*1000+(s.locks||0)*100+(Object.keys(s.rites||{}).length)*10+((s.echoes||[]).length);},
+  sanitize(){const c=JSON.parse(JSON.stringify(S));if(c.rites){for(const k in c.rites)c.rites[k]='';}return c;},
+  blob(){const ls={};this.SKEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!=null)ls[k]=v;});return {S:this.sanitize(),ls,score:this.score(),ts:Date.now()};},
+  schedulePush(){if(!this.code())return;clearTimeout(this._t);this._t=setTimeout(()=>this.push(),4000);},
+  async push(){const code=this.code();if(!code)return;try{await fetch(this.KON+'/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,blob:this.blob()})});}catch(e){}},
+  async pull(silent){const code=this.code();if(!code)return false;try{const r=await fetch(this.KON+'/save?code='+encodeURIComponent(code),{cache:'no-store'});const d=await r.json();const b=d.blob;if(!b||!b.S)return false;if((b.score||0)<this.score()){this.push();return false;}Object.keys(b.S).forEach(k=>{S[k]=b.S[k];});(b.ls?Object.keys(b.ls):[]).forEach(k=>{try{localStorage.setItem(k,b.ls[k]);}catch(e){}});if(window.Mirror&&Mirror.loadCfg)Mirror.loadCfg();try{const nm=localStorage.getItem('it041_name');const el=document.getElementById('plName');if(el&&nm)el.value=nm;}catch(e){}if(typeof save==='function')save();if(typeof refreshHud==='function')refreshHud();if(window.Mirror&&Mirror.refreshBtn)Mirror.refreshBtn();if(!silent)UI.toast('☁ İlerlemen ve ayarların bu cihaza getirildi.',5000);return true;}catch(e){return false;}},
+  setCode(c){c=String(c||'').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,40);if(c.length<4){UI.toast('Kod en az 4 karakter olmali.');return;}try{localStorage.setItem('it041_sync_code',c);}catch(e){}this.pull().then(found=>{if(!found)this.push();});UI.toast('☁ İlerleme kodun ayarlandı: '+c,4000);this.ui();},
+  gen(){const a='ay yel iz gol kapi tas yol kul nehir tohum gumus golge'.split(' ');return a[Math.random()*a.length|0]+'-'+a[Math.random()*a.length|0]+'-'+(1000+Math.random()*9000|0);},
+  ui(){const code=this.code();UI.doc('☁ İLERLEME KODU — tüm cihazlarda devam','<p style="color:var(--dim);font-size:12.5px">Bir kod belirle; ilerlemen ve ayarların (aynalar/Claude bağlantın, adın, izlerin) bu kodla sunucuda saklanır. Aynı kodu telefonda, tablette, bilgisayarda gir; kaldığın yerden devam et. Kodun yoksa her şey yalnız bu cihazda kalır.<br><span style="color:var(--violet)">Gizlilik: ritüellerde yazdıkların buna DAHİL DEĞİL; onlar cihazından çıkmaz, yalnız ilerleme ve ayarlar taşınır.</span></p><p style="font-size:12px">Şu anki kod: <b style="color:var(--accent)">'+(code||'yok (yalnız bu cihaz)')+'</b></p><input id="syncIn" maxlength="40" placeholder="kodun (ör. ay-gol-7421)" value="'+(code||'')+'" style="width:min(320px,92%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:13px;border-radius:3px;margin:6px 0"><button class="btn v" onclick="Cloud.setCode(document.getElementById(\'syncIn\').value)">bu kodu kullan / getir</button><button class="btn" onclick="document.getElementById(\'syncIn\').value=Cloud.gen()">yeni kod üret</button>'+(code?'<button class="btn ghost" onclick="Cloud.push();UI.toast(\'Bu cihazdaki ilerleme buluta yazildi.\')">şimdi buluta yaz</button>':''));}
+};
+if(typeof window!=='undefined')window.Cloud=Cloud;
+
 
 const WX=380,WZ=290;
 const L={
@@ -1499,6 +1518,8 @@ const Game={
     Snd.init();
     window.Watch&&Watch.enter();
     setTimeout(()=>{try{if(window.MP&&!MP.on&&MP.toggle)MP.toggle();}catch(e){}},1500);
+    setTimeout(()=>{try{if(window.Cloud&&Cloud.code())Cloud.pull(true);}catch(e){}},800);
+    setTimeout(()=>{try{if(Game.running&&typeof riteCount==='function'&&riteCount()===0)UI.toast('◈ Mor işaretler ritüeldir — her biri tek cümle. En çok değiştiren genelde ilki olur. Birini dene.',9000);}catch(e){}},22000);
     setTimeout(()=>{try{if(window.MP&&!MP.on&&MP.toggle)MP.toggle();}catch(e){}},9000);
     setTimeout(()=>{try{if(window.Auto&&!Auto.on&&localStorage.getItem('it041_auto_on')&&Mirror.ready())Auto.toggle();}catch(e){}},2600);
     if(!Mirror.ready())setTimeout(()=>UI.toast('◐ İpucu: Karakterlerle AÇIK UÇLU konuşmak için MENÜ → AYNALAR (tek seferlik kurulum).',7000),12000);
