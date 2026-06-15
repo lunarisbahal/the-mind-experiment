@@ -950,7 +950,7 @@ const Rite={
   },
   complete(val){
     const id=this.cur,r=RITES[id];
-    S.rites[id]=val;S.insight+=8;
+    S.rites[id]=val;S.insight+=8;track('bir ritueel tamamladi');
     this.closeOnly();
     if(r.teach)teachUnlock(r.teach);
     W3['rite_'+id]&&W3['rite_'+id](val);
@@ -1487,7 +1487,7 @@ const Game={
   start(cont){
     if(!cont){try{localStorage.removeItem(SAVEKEY);}catch(e){}}
     else load();
-    UI.hide('intro');this.running=true;
+    UI.hide('intro');this.running=true;track('evrene girdi');
     refreshHud();save();
     if(HAS3D)W3.applyMoon&&W3.applyMoon();
     if(!cont)setTimeout(()=>Dlg.open([
@@ -1738,7 +1738,7 @@ const ECHOES=[
 function echoCount(){return (S.echoes||[]).length;}
 function doEcho(i){
   if(!S.echoes)S.echoes=[];
-  if(!S.echoes.includes(i)){S.echoes.push(i);S.insight+=2;
+  if(!S.echoes.includes(i)){S.echoes.push(i);S.insight+=2;track('bir yanki topladi');
     W3.collectEcho&&W3.collectEcho(i);save();refreshHud();
     window.Daily3&&Daily3.mark('echo');
     UI.toast('◇ YANKI '+echoCount()+'/16 — günlüğüne işlendi [J]');}
@@ -2635,6 +2635,7 @@ const NEXUS={
   download(){const c=document.getElementById('nexC');if(!c)return;const a=document.createElement('a');a.download='nexus.png';a.href=c.toDataURL();a.click();}
 };
 
+function track(a){try{fetch('https://it041-konsey.lunarisbahal.workers.dev/activity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mask:Iz.mask(),act:a,op:(typeof Mirror!=='undefined'&&Mirror.isOp&&Mirror.isOp())})});}catch(e){}}
 const Iz={
   KONSEY:'https://it041-konsey.lunarisbahal.workers.dev',
   id(){let v=localStorage.getItem('it041_trace_id');if(!v){v='t'+Math.random().toString(36).slice(2,10);try{localStorage.setItem('it041_trace_id',v);}catch(e){}}return v;},
@@ -2642,13 +2643,14 @@ const Iz={
   show(){UI.doc('◈ İZ ANITI — bu evrene bıraktığın iz','<p style="color:var(--dim);font-size:12.5px">Bu dünyaya tek bir satır bırak. Kalıcı ve paylaşımlıdır - geri döndüğünde izin hâlâ burada, başkalarının izleri arasında durur. Bir dünya ziyaretçilerle değil, iz bırakanlarla yaşanır kılınır.</p><div id="izList"><p style="color:var(--dim)">anıt okunuyor...</p></div><textarea id="izText" rows="2" maxlength="160" placeholder="kalıcı izin - tek satır..."></textarea><button class="btn v" onclick="Iz.save()">izimi kaz</button><p style="color:var(--dim);font-size:11px">İzin oturumlar arası kalıcıdır ve her yolcu tarafından görülür (anonim, maskenle). İstediğin zaman yeniden yazabilirsin.</p>');this.load();},
   async load(){try{const r=await fetch(this.KONSEY+'/traces',{cache:'no-store'});const d=await r.json();this.render(d.traces||[]);}catch(e){const el=UI.el('izList');if(el)el.innerHTML='<p style="color:var(--dim)">anıta ulaşılamadı - bağlantını kontrol et.</p>';}},
   render(traces){const el=UI.el('izList');if(!el)return;const myId=this.id();const mine=traces.find(t=>t.id===myId);let h='';
-    if(mine){h+='<div class="jentry"><h4 style="color:var(--accent)">◈ SENİN İZİN — '+esc(mine.mask)+'</h4><p class="own">'+esc(mine.text)+'</p></div>';const ta=UI.el('izText');if(ta&&!ta.value)ta.value=mine.text;}
+    if(mine){h+='<div class="jentry"><h4 style="color:var(--accent)">◈ SENİN İZİN — '+esc(mine.mask)+'</h4><p class="own">'+esc(mine.text)+'</p>'+((mine.ack>0)?'<p style="color:var(--accent);font-size:11px">◇ '+mine.ack+' yolcu izine sessizce dokundu — bu yolculukta yalnız değilsin.</p>':'')+'</div>';const ta=UI.el('izText');if(ta&&!ta.value)ta.value=mine.text;}
     const others=traces.filter(t=>t.id!==myId).slice(-12).reverse();
-    if(others.length){h+='<p style="color:var(--violet);font-size:12px;margin-top:8px">diğer yolcuların izleri ('+others.length+'):</p>';others.forEach(t=>{h+='<div class="jentry"><h4 style="color:var(--violet)">'+esc(t.mask)+'</h4><p>'+esc(t.text)+'</p></div>';});}
+    if(others.length){h+='<p style="color:var(--violet);font-size:12px;margin-top:8px">diğer yolcuların izleri ('+others.length+'):</p>';others.forEach(t=>{h+='<div class="jentry"><h4 style="color:var(--violet)">'+esc(t.mask)+(t.ack>0?' <span style="color:var(--dim);font-size:10px">◇'+t.ack+'</span>':'')+'</h4><p>'+esc(t.text)+'</p><button class="btn ghost" style="font-size:11px;padding:2px 8px" onclick="Iz.ack(\''+t.id+'\')">◇ sessizce dokun</button></div>';});}
     else if(!mine){h+='<p style="color:var(--dim)">Henüz iz yok - ilk izi sen bırak.</p>';}
     el.innerHTML=h;},
+  async ack(id){try{await fetch(this.KONSEY+'/trace-ack',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})});UI.toast('◇ İzine dokundun. Geri döndüğünde hissedecek.');track('bir yolcunun izine sessizce dokundu');this.load();}catch(e){UI.toast('anıta ulaşılamadı.');}},
   async save(){const v=(UI.el('izText')&&UI.el('izText').value.trim())||'';if(!v){UI.toast('Tek kelime bile yeter.');return;}
-    try{await fetch(this.KONSEY+'/trace',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:this.id(),mask:this.mask(),text:v})});S.insight=(S.insight||0)+2;if(typeof save==='function')save();if(typeof refreshHud==='function')refreshHud();UI.toast('◈ İzin kazındı - burada seni bekleyecek.');this.load();}catch(e){UI.toast('kaydedilemedi - tekrar dene.');}}
+    try{await fetch(this.KONSEY+'/trace',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:this.id(),mask:this.mask(),text:v})});S.insight=(S.insight||0)+2;if(typeof save==='function')save();if(typeof refreshHud==='function')refreshHud();track('Iz Anitina kalici iz birakti');UI.toast('◈ İzin kazındı - burada seni bekleyecek.');this.load();}catch(e){UI.toast('kaydedilemedi - tekrar dene.');}}
 };
 
 if(typeof window!=='undefined'){window.CBT=CBT;window.Bilat=Bilat;window.Arch=Arch;

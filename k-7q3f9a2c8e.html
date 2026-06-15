@@ -187,6 +187,9 @@
       <div class="sat" id="idents"><div class="empty" style="padding:10px">Kimlikler deneyimle gelişiyor…</div></div>
       <h2 class="v" style="margin-top:6px">Tatmin oranları</h2>
       <div class="sat" id="satBox"></div>
+      <h2 class="v" style="margin-top:6px">Oyuncular · ne yapıyorlar</h2>
+      <div class="sub" style="margin-top:-4px">Anonim eylem akışı — özel diyaloglar ASLA görünmez. Evreni geliştirmek için.</div>
+      <div class="sat" id="playerLog"><div class="empty" style="padding:10px">Henüz oyuncu hareketi yok.</div></div>
       <div class="killbox">
         <h3>⏻ Tüm otonomları durdur (Yasa 1)</h3>
         <p>Açtığında meclis ve tüm otonom AI'lar durur — cron bile çalışmaz. İstediğinde geri başlatırsın.</p>
@@ -232,7 +235,7 @@ $('gear').onclick=()=>{const cur=localStorage.getItem('it041_op_key')||'';const 
 let S=null;
 function setDot(c){$('liveDot').className='dot'+(c?(' '+c):'');}
 async function getState(){setDot('load');
-  try{const r=await fetch(API+'/state',{cache:'no-store'});S=await r.json();setDot(S.autoStopped?'off':'');renderAll();}
+  try{const r=await fetch(API+'/state',{cache:'no-store',headers:{'x-operator-key':(localStorage.getItem('it041_op_key')||'')}});S=await r.json();setDot(S.autoStopped?'off':'');renderAll();}
   catch(e){setDot('off');toast('Bağlanılamadı — Worker/internet?');}}
 async function health(){try{const r=await fetch(API+'/health',{cache:'no-store'});const h=await r.json();
   $('hDot').className='dot'+(h.groq?'':' off');$('hTxt').textContent=h.groq?'beyin bağlı · '+h.model:'beyin BAĞLI DEĞİL — Groq anahtarını ekle';}catch(e){}}
@@ -275,6 +278,15 @@ function renderAll(){if(!S)return;
   $('sDlg').textContent=dl.length;$('sOrd').textContent=ord.length;
   $('updLine').textContent=S.updated?('son güncelleme: '+ago(S.updated)):'';
   $('satBox').innerHTML=SATG.map(g=>{const v=(S.sat&&S.sat[g[0]])||0;return `<div class="r"><div class="top"><b>${g[1]}</b><span style="color:${g[2]}">%${v}</span></div><div class="bar"><i style="width:${v}%;background:${g[2]}"></i></div></div>`;}).join('');
+  // OYUNCU ETKİNLİĞİ — operatörün kendi hareketleri (op:true) hariç; sadece diğer oyuncular.
+  if($('playerLog')){const acts=(S.activity||[]).filter(a=>!a.op);
+    if(acts.length){const today=acts.filter(a=>Date.now()-a.t<86400000);const masks=[...new Set(today.map(a=>a.mask))];
+      const sum={};acts.forEach(a=>{sum[a.act]=(sum[a.act]||0)+1;});
+      const topActs=Object.keys(sum).sort((x,y)=>sum[y]-sum[x]).slice(0,6).map(k=>esc(k)+' ×'+sum[k]).join(' · ');
+      $('playerLog').innerHTML='<div class="sub" style="margin-bottom:6px">Bugün '+masks.length+' yolcu · '+today.length+' hareket</div>'+
+        '<div style="font-size:11.5px;color:var(--moon);margin-bottom:8px">'+topActs+'</div>'+
+        acts.slice(-30).reverse().map(a=>`<div class="d" style="border-left:2px solid var(--violet);padding:6px 0 6px 10px;margin-bottom:8px;font-size:12px"><span class="w" style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;display:block;color:var(--violet)">${esc(a.mask)} · ${ago(a.t)}</span>${esc(a.act)}</div>`).join('');
+    } else $('playerLog').innerHTML='<div class="empty" style="padding:10px">Henüz oyuncu hareketi yok.</div>';}
   const ms=S.mstats||{}, pf=S.profiles||{};
   $('profMembers').innerHTML=Object.keys(MEM).map(kk=>{const st=ms[kk]||{};const p=pf[kk];
     return `<div class="card" style="border-left:3px solid ${mC(kk)}"><h3 style="color:${mC(kk)}">${mN(kk)}</h3>${idn[kk]?`<div style="font-size:12px;color:var(--moon);font-style:italic;margin-bottom:7px">${esc(idn[kk])}</div>`:''}${p&&p.text?`<div style="font-size:11.5px;color:var(--accent);margin-bottom:7px">${esc(p.text)}</div>`:'<div style="font-size:11px;color:var(--dim);margin-bottom:7px">profil gelişiyor…</div>'}<div class="deltas"><span>aktivite ${st.act||0}</span> <span class="pos">fikir ${st.idea||0}</span> <span style="color:var(--gold)">söz/keşif ${st.obs||0}</span></div></div>`;}).join('');
