@@ -1512,7 +1512,7 @@ function refreshHud(){try{if(window.Library)Library.poll();}catch(e){}
   UI.el('lucbar').style.background=S.lucidity<30?'var(--warn)':'var(--accent)';
   UI.el('insbar2').style.width=Math.min(100,S.insight)+'%';
   UI.el('locksRow').textContent=['◇','◇','◇','◇'].map((c,i)=>i<S.locks?'◆':'◇').join(' ');
-  UI.el('ritesRow').textContent=identityName()+' · RITES '+riteCount()+'/7 · ◇'+echoCount()+'/16'+(S.flags.integrated?' · INTEGRATED':'')+(S.flags.initiate?' · ✶':S.solved.s7?' · ⟁':'');
+  UI.el('ritesRow').textContent=identityName()+' · RITES '+riteCount()+'/7 · ◇'+echoCount()+'/16'+' · 📖'+((window.Library&&Library.milestones)?Library.milestones():0)+'/49'+(S.flags.integrated?' · INTEGRATED':'')+(S.flags.initiate?' · ✶':S.solved.s7?' · ⟁':'');
   W3.evolve&&W3.evolve(S.insight>=90?3:S.insight>=55?2:S.insight>=25?1:0);
   UI.renderQuests();
 }
@@ -2674,14 +2674,35 @@ const SoundUI={show(){UI.doc('🔊 SOUND','<p style="color:var(--dim);font-size:
 
 const GAMELANG='en';
 const Library={
-  book:null,
-  L(o,f){if(!o)return '';return (o[f+'_'+GAMELANG]!==undefined?o[f+'_'+GAMELANG]:(o[f]!==undefined?o[f]:(o[f+'_tr']||o[f+'_en']||'')));},
+  book:[], intro:null, loaded:false,
+  L(o,f){if(!o)return '';return (o[f+'_'+GAMELANG]!==undefined&&o[f+'_'+GAMELANG]!==''?o[f+'_'+GAMELANG]:(o[f]!==undefined?o[f]:(o[f+'_tr']||o[f+'_en']||'')));},
   milestones(){let n=0;n+=(typeof riteCount==='function'?riteCount():0);n+=(typeof echoCount==='function'?echoCount():0);n+=['s1','s2','s3','s4','s5','s6','s7'].filter(k=>S.solved&&S.solved[k]).length;n+=(S.plaques?S.plaques.length:0);n+=(S.stage||0);n+=(S.caseD?1:0);['initiate','integrated','coreDown','ovCouncil'].forEach(f=>{if(S.flags&&S.flags[f])n++;});return Math.min(49,n);},
-  async load(){if(this.book)return this.book;try{const r=await fetch('./book.json',{cache:'no-store'});if(r.ok)this.book=await r.json();}catch(e){}if(!Array.isArray(this.book))this.book=[];return this.book;},
-  poll(){const u=this.milestones();if(S.bookSeen===undefined){S.bookSeen=u;return;}if(u>S.bookSeen){S.bookSeen=u;try{UI.toast('📖 A new chapter has opened — the Library now holds chapters up to '+u+'/49.',6000);}catch(e){}}},
-  async show(){await this.load();const u=this.milestones();let h='<p style="color:var(--dim);font-size:12.5px">The book opens as you do. Each milestone you reach unlocks the chapter that belongs to it — read it, download the PDF, or listen. ◎ shows where that chapter lives in the world.</p>';for(let i=1;i<=49;i++){const ch=this.book[i-1]||{};const title=this.L(ch,'title')||('Chapter '+i);const text=this.L(ch,'text'),pdf=this.L(ch,'pdf'),audio=this.L(ch,'audio'),where=this.L(ch,'where');if(i<=u){h+='<div class="jentry"><h4 style="color:var(--accent)">📖 '+esc(title)+'</h4>'+(where?'<div style="font-size:10.5px;color:var(--violet);margin-bottom:3px">◎ '+esc(where)+'</div>':'')+(text?'<button class="btn ghost" style="font-size:11px" onclick="Library.read('+i+')">read</button> ':'')+(pdf?'<a class="btn ghost" style="font-size:11px;text-decoration:none" href="'+esc(pdf)+'" target="_blank" rel="noopener">PDF</a> ':'')+(audio?'<button class="btn ghost" style="font-size:11px" onclick="Library.play('+i+')">🔊 listen</button>':'')+((!text&&!pdf&&!audio)?'<span style="color:var(--dim);font-size:11px">opens here soon</span>':'')+'</div>';}else{h+='<div class="jentry" style="opacity:.55"><h4 style="color:var(--dim)">🔒 Chapter '+i+'</h4><span style="font-size:11px;color:var(--dim)">locked — keep going, it opens as you progress</span></div>';}}h+='<div id="bookAudio" style="margin-top:8px"></div>';UI.doc('📖 LIBRARY — '+u+'/49',h);},
-  read(i){const ch=this.book[i-1]||{};UI.doc('📖 '+esc(this.L(ch,'title')||('Chapter '+i)),'<div style="white-space:pre-wrap;line-height:1.7;color:var(--ink)">'+esc(this.L(ch,'text'))+'</div><button class="btn ghost" style="margin-top:10px" onclick="Library.show()">← back to the library</button>');},
-  play(i){const ch=this.book[i-1]||{};const a=this.L(ch,'audio');if(!a)return;const el=document.getElementById('bookAudio');if(el)el.innerHTML='<audio controls autoplay src="'+esc(a)+'" style="width:100%"></audio>';}
+  async load(){if(this.loaded)return;try{const r=await fetch('./book.json',{cache:'no-store'});if(r.ok){const d=await r.json();if(Array.isArray(d)){this.book=d;this.intro=null;}else{this.book=d.chapters||[];this.intro=d.intro||null;}}}catch(e){}this.loaded=true;},
+  ent(i){return i===0?(this.intro||{}):(this.book[i-1]||{});},
+  poll(){const u=this.milestones();if(S.bookSeen===undefined){S.bookSeen=u;return;}if(u>S.bookSeen){S.bookSeen=u;try{UI.toast('📖 A new chapter of the lost diary has opened — now at '+u+'/49.',6000);}catch(e){}}},
+  stats(){return 'chapters '+this.milestones()+'/49; rites '+(typeof riteCount==='function'?riteCount():0)+'/7; echoes '+(typeof echoCount==='function'?echoCount():0)+'/16; depth '+(S.stage||0)+'/8'+((S.flags&&S.flags.integrated)?'; integration complete':'');},
+  row(i,open){const ch=this.ent(i);const title=this.L(ch,'title')||((i===0?'Introduction':'Chapter '+i));const text=this.L(ch,'text'),pdf=this.L(ch,'pdf'),audio=this.L(ch,'audio'),where=this.L(ch,'where');
+    if(open){return '<div class="jentry"><h4 style="color:var(--accent)">'+(i===0?'✦ ':'📖 ')+esc(title)+'</h4>'+(where?'<div style="font-size:10.5px;color:var(--violet);margin-bottom:3px">◎ '+esc(where)+'</div>':'')+(text?'<button class="btn ghost" style="font-size:11px" onclick="Library.read('+i+')">read</button> ':'')+(pdf?'<a class="btn ghost" style="font-size:11px;text-decoration:none" href="'+esc(pdf)+'" target="_blank" rel="noopener">PDF</a> ':'')+(audio?'<button class="btn ghost" style="font-size:11px" onclick="Library.play('+i+')">🔊 listen</button> ':'')+((text||pdf)?'<button class="btn ghost" style="font-size:11px" onclick="Library.ai(\'chapter\','+i+')">✦ AI summary · for you</button>':'')+((!text&&!pdf&&!audio)?'<span style="color:var(--dim);font-size:11px">opens here soon</span>':'')+'</div>';}
+    return '<div class="jentry" style="opacity:.55"><h4 style="color:var(--dim)">🔒 Chapter '+i+'</h4><span style="font-size:11px;color:var(--dim)">locked — keep going, it opens as you progress</span></div>';},
+  async show(){await this.load();const u=this.milestones();let h='<p style="color:var(--dim);font-size:12.5px">This is the lost diary of Lunaris Bahal — the psychologist who vanished into his own mind. Every step of shadow work you take brings you closer to it. As you unlock its chapters, the scattered diaries gather into meaning — and when the integration inside you completes, Lunaris Bahal is meant to be found again, within all of us. ◎ shows where each chapter lives in the world.</p>';
+    h+='<button class="btn v" style="font-size:11.5px" onclick="Library.ai(\'progress\',0)">✦ Summarize my journey so far</button><div id="bookAI" style="margin:8px 0"></div>';
+    if(this.intro)h+=this.row(0,true);
+    for(let i=1;i<=49;i++){h+=this.row(i, i<=u);}
+    h+='<div id="bookAudio" style="margin-top:8px"></div>';
+    UI.doc('📖 LIBRARY — '+u+'/49',h);},
+  read(i){const ch=this.ent(i);UI.doc((i===0?'✦ ':'📖 ')+esc(this.L(ch,'title')||((i===0?'Introduction':'Chapter '+i))),'<div style="white-space:pre-wrap;line-height:1.7;color:var(--ink)">'+esc(this.L(ch,'text'))+'</div><button class="btn ghost" style="margin-top:10px" onclick="Library.show()">← back to the library</button>');},
+  play(i){const ch=this.ent(i);const a=this.L(ch,'audio');if(!a)return;const el=document.getElementById('bookAudio');if(el)el.innerHTML='<audio controls autoplay src="'+esc(a)+'" style="width:100%"></audio>';},
+  async ai(kind,i){const box=document.getElementById('bookAI');if(box)box.innerHTML='<p style="color:var(--dim)">Aelius is reading…</p>';
+    try{if(window.Mirror&&Mirror.loadCfg)Mirror.loadCfg();const lang=(GAMELANG==='tr'?'Turkce yaz.':'Write in English.');let sys,usr;
+      if(kind==='chapter'){const ch=this.ent(i);const text=this.L(ch,'text');if(!text){if(box)box.innerHTML='';return;}
+        sys='Sen Aelius Ignis, DO-LOON-AI EXPRESS evreninin ust-katman anlaticisisin. Bu metin, kayip psikolog Lunaris Bahal\'in kayip gunlugunun bir bolumu. Okuyucuya: (1) bu bolumu 2-3 cumlede ozetle, (2) bolumdeki golge-calismasi temasini kendi hayatina nasil uyarlayabilecegine dair somut bir-iki yol goster. Sicak, net, teshissiz. '+lang+' En cok 6 cumle.';
+        usr='Bolum:\n'+text.slice(0,6000)+'\n\nOkuyucunun gelisimi: '+this.stats();
+      }else{sys='Sen Aelius Ignis. Okuyucu, kayip psikolog Lunaris Bahal\'in gunlugunu bolum bolum aciyor. Su ana dek actiklarini ve golge-calismasi gelisimini KUMULATIF ozetle; nerede oldugunu ve bir sonraki adimi nazikce goster. Teshissiz, sicak. '+lang+' En cok 6 cumle.';
+        const ttl=[];for(let k=1;k<=this.milestones();k++){ttl.push(k+'. '+this.L(this.ent(k),'title'));}
+        usr='Acilan bolumler: '+(ttl.join(', ')||'henuz yok')+'\nGelisim: '+this.stats();}
+      const out=await Mirror.generate([{role:'system',content:sys},{role:'user',content:usr}],450);
+      if(box)box.innerHTML='<div style="white-space:pre-wrap;line-height:1.6;color:var(--violet);border-left:2px solid var(--violet);padding-left:10px">'+esc(out)+'</div>';
+    }catch(e){if(box)box.innerHTML='<p style="color:var(--warn);font-size:12px">The mirror is busy — try again in a moment.</p>';}}
 };
 if(typeof window!=='undefined')window.Library=Library;
 
