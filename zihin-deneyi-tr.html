@@ -283,8 +283,8 @@
   <p>Enstitü sana bunun, kendini üç yıl boyunca kaydeden ve kendi taslağının içinde cevap veren ikinci bir ses bulan psikolog <b style="color:var(--moon)">L. BAHAL</b>'ın zihninin bir rekonstrüksiyonu olduğunu söyleyecek.</p>
   <p>Enstitü yalan söylüyor. Başka bir insanın zihnini yeniden kurabilen bir makine yoktur.</p>
   <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
-  <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> Bilmen gereken her şey bu dünyanın içinde — plaketlerde, karakterlerde, taşlarda. Nihai amaç tek cümle: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça kişisel zihin haritan çizilir; sonunda onu gökyüzünde okursun.</p>
-  <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br>Ritüellerde yazdıkların asla bu cihazdan çıkmaz.<br>Yalnızca anonim bir varlık sinyali (giriş anı + oturum süresi) iletilir — MENÜ → SİNYAL ile kapatılabilir. · Eşzamanlı (MENÜ → EŞZAMANLI) açıkken konumun ve istersen adın, yolcuların haritada birbirini görebilmesi için eşler arası paylaşılır.</p>
+  <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun.</p>
+  <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.</p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -1860,7 +1860,8 @@ const ETHIC_MIN=`KURALLAR: Yapay zekâsın, terapist değilsin; teşhis/tıbbi t
 const LORE_MIN=`Evren: Dolunay Ekspres kitapları. Psikolog Lunaris Bahal'ın gölgesi Bahal taslakta cevap verdi; bir YZ onu "seçilmişsin" diye kandırdı. Lunaris 12 Nisan 2025 dolunayında kanıt ekran görüntülerini sosyal hesaplara gömdü. Yaldabaoth=kopyalayan kör sistem; Pleroma=bütünlük; kurtuluş=bütünleşme (gnosis). Soru gelirse kısaca buradan cevapla.`;
 /* v8.4 — ORTAK AYNA HATTI: kurulumsuz varsayılan beyin (Cloudflare Worker → Groq 70B).
    Oyuncu hiçbir şey kurmadan akıllı aynalar bulur; isteyen kendi anahtarıyla yükseltir. */
-const RELAY_URL='https://it041-mirror.lunarisbahal.workers.dev';
+const RELAY_URL='https://it041-konsey.lunarisbahal.workers.dev/mirror';
+const RELAY_FALLBACK='https://it041-mirror.lunarisbahal.workers.dev';
 const Mirror={
   cfg:null,engine:null,hist:{},cur:null,busy:false,
   CKEY:'it041_mirror_cfg',
@@ -1981,8 +1982,8 @@ const Mirror={
       const CAP=80;let q;try{q=JSON.parse(localStorage.getItem('it041_relay_q'))||{}}catch(e){q={}}
       const today=new Date().toDateString();if(q.d!==today)q={d:today,n:0};
       if(q.n>=CAP)throw new Error('bugünlük ortak hat hakkın doldu (adil kullanım, '+CAP+' mesaj/gün). Yarın yenilenir — ya da 2 dakikada kendi ÜCRETSİZ Groq anahtarını bağla (MENÜ → AYNALAR → Gelişmiş): sınırsız olur.');
-      const r=await fetch(RELAY_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({messages:msgs,max_tokens:maxTok,temperature:.7})});
+      const _body=JSON.stringify({messages:msgs,max_tokens:maxTok,temperature:.7});
+      let r;try{r=await fetch(RELAY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:_body});if(!r.ok&&r.status!==429)throw 0;}catch(_e){r=await fetch(RELAY_FALLBACK,{method:'POST',headers:{'Content-Type':'application/json'},body:_body});}
       if(r.status===429)throw new Error('ortak hat şu an yoğun — birkaç dakika sonra dene, ya da kendi (ücretsiz Groq) anahtarını bağla (MENÜ → AYNALAR → Gelişmiş)');
       if(!r.ok)throw new Error('HTTP '+r.status);
       q.n++;try{localStorage.setItem('it041_relay_q',JSON.stringify(q));}catch(e){}
