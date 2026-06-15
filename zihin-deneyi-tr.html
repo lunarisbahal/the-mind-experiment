@@ -128,7 +128,7 @@
   .mini{background:rgba(8,10,17,.85);border:1px solid var(--line);color:var(--dim);
     padding:7px 10px;font-family:inherit;font-size:10px;letter-spacing:.15em;cursor:pointer;border-radius:3px;}
     .mini:hover{color:var(--accent);border-color:var(--accent);}
-  #menuPanel{grid-template-columns:repeat(2,minmax(0,1fr));width:min(88vw,340px);max-height:64vh;overflow-y:auto;padding:7px;background:rgba(6,8,14,.95);border:1px solid var(--line);border-radius:10px;}
+  #menuPanel{grid-template-columns:repeat(2,minmax(0,1fr));width:min(88vw,340px);max-height:calc(100vh - 150px);overflow-y:auto;padding:7px;background:rgba(6,8,14,.95);border:1px solid var(--line);border-radius:10px;}
   #menuPanel .mini{width:100%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.06em;}
   @media (min-width:620px){#menuPanel{grid-template-columns:repeat(3,minmax(0,1fr));width:min(82vw,560px);}}
   #bigmapWrap{position:fixed;inset:0;z-index:65;background:rgba(2,3,7,.94);display:none;
@@ -1499,6 +1499,7 @@ const Game={
     Snd.init();
     window.Watch&&Watch.enter();
     setTimeout(()=>{try{if(window.MP&&!MP.on&&MP.toggle)MP.toggle();}catch(e){}},1500);
+    setTimeout(()=>{try{if(window.MP&&!MP.on&&MP.toggle)MP.toggle();}catch(e){}},9000);
     setTimeout(()=>{try{if(window.Auto&&!Auto.on&&localStorage.getItem('it041_auto_on')&&Mirror.ready())Auto.toggle();}catch(e){}},2600);
     if(!Mirror.ready())setTimeout(()=>UI.toast('◐ İpucu: Karakterlerle AÇIK UÇLU konuşmak için MENÜ → AYNALAR (tek seferlik kurulum).',7000),12000);
   },
