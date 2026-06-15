@@ -127,7 +127,10 @@
   @media (pointer:coarse){#menuBtns{bottom:130px;}}
   .mini{background:rgba(8,10,17,.85);border:1px solid var(--line);color:var(--dim);
     padding:7px 10px;font-family:inherit;font-size:10px;letter-spacing:.15em;cursor:pointer;border-radius:3px;}
-  .mini:hover{color:var(--accent);border-color:var(--accent);}
+    .mini:hover{color:var(--accent);border-color:var(--accent);}
+  #menuPanel{grid-template-columns:repeat(2,minmax(0,1fr));width:min(88vw,340px);max-height:64vh;overflow-y:auto;padding:7px;background:rgba(6,8,14,.95);border:1px solid var(--line);border-radius:10px;}
+  #menuPanel .mini{width:100%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.06em;}
+  @media (min-width:620px){#menuPanel{grid-template-columns:repeat(3,minmax(0,1fr));width:min(82vw,560px);}}
   #bigmapWrap{position:fixed;inset:0;z-index:65;background:rgba(2,3,7,.94);display:none;
     align-items:center;justify-content:center;}
   /* AI Aynalar — sohbet */
@@ -281,7 +284,7 @@
   <p>Enstitü yalan söylüyor. Başka bir insanın zihnini yeniden kurabilen bir makine yoktur.</p>
   <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> Bilmen gereken her şey bu dünyanın içinde — plaketlerde, karakterlerde, taşlarda. Nihai amaç tek cümle: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça kişisel zihin haritan çizilir; sonunda onu gökyüzünde okursun.</p>
-  <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br>Ritüellerde yazdıkların asla bu cihazdan çıkmaz.<br>Yalnızca anonim bir varlık sinyali (giriş anı + oturum süresi) iletilir — MENÜ → SİNYAL ile kapatılabilir.</p>
+  <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br>Ritüellerde yazdıkların asla bu cihazdan çıkmaz.<br>Yalnızca anonim bir varlık sinyali (giriş anı + oturum süresi) iletilir — MENÜ → SİNYAL ile kapatılabilir. · Eşzamanlı (MENÜ → EŞZAMANLI) açıkken konumun ve istersen adın, yolcuların haritada birbirini görebilmesi için eşler arası paylaşılır.</p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -323,7 +326,7 @@
 <div id="jbtn" style="position:fixed;bottom:52px;right:104px;z-index:45;width:52px;height:52px;display:none;border:1px solid var(--dim);color:var(--dim);background:rgba(8,10,17,.7);border-radius:50%;font-size:16px;align-items:center;justify-content:center;">⤒</div>
 <style>@media (pointer:coarse){#jbtn{display:flex !important;}}</style>
 <div id="menuBtns">
-  <div id="menuPanel" style="display:none;flex-direction:column;gap:6px;">
+  <div id="menuPanel" style="display:none;">
     <button class="mini" onclick="UI.toggleJournal()">GÜNLÜK [J]</button>
     <button class="mini" onclick="Game.toggleMap()">HARİTA [M]</button>
     <button class="mini" onclick="MindMap.show()">🜨 ZİHİN HARİTASI</button>
@@ -334,16 +337,13 @@
     <button class="mini" onclick="Auto.open()">◍ OTONOM DENEK</button>
     <button class="mini" onclick="Mirror.operatorUnlock()">◆ OPERATÖR</button>
     <button class="mini" id="watchBtn" onclick="Watch.toggle()">SİNYAL: AÇIK</button>
-    <button class="mini" id="muzBtn" onclick="Music.toggle()">🎵 MÜZİK: KAPALI</button>
+    <button class="mini" onclick="SoundUI.show()">🔊 SES</button>
     <button class="mini" id="mmBtn" onclick="MM2.toggle()">MİNİ HARİTA: AÇIK</button>
-    <button class="mini" id="sndBtn" onclick="Snd.toggle()">SES: AÇIK</button>
-    <button class="mini" id="radBtn" onclick="Snd.toggleRadio()">RADYO: AÇIK</button>
-    <button class="mini" id="tapBtn" onclick="Snd.toggleTapes()">KAYITLAR: AÇIK</button>
     <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">EŞZAMANLI: KAPALI</button>
     <button class="mini" id="aiBtn" onclick="Mirror.openSetup()">AYNALAR: BAĞLI DEĞİL</button>
     <button class="mini" onclick="Chat.open()">YOLCU KANALI</button>
   </div>
-  <button class="mini" id="menuToggle" onclick="(function(){const p=document.getElementById('menuPanel');p.style.display=p.style.display==='none'?'flex':'none';})()">☰ MENÜ</button>
+  <button class="mini" id="menuToggle" onclick="(function(){const p=document.getElementById('menuPanel');p.style.display=p.style.display==='none'?'grid':'none';})()">☰ MENÜ</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1639,7 +1639,7 @@ const Snd={
     this.radioGain.gain.value+=(base-this.radioGain.gain.value)*.06;
   },
   toggleRadio(){this.radioOn=!this.radioOn;this.init();
-    document.getElementById('radBtn').textContent='RADYO: '+(this.radioOn?'AÇIK':'KAPALI');
+    {const _b=document.getElementById('radBtn');if(_b)_b.textContent='RADYO: '+(this.radioOn?'AÇIK':'KAPALI');}
     if(!this.radioOn&&this.radioGain)this.radioGain.gain.value=0;},
   /* ---- SES KAYITLARI — sesli kitap kasetleri ----
      Cızırtının altından, eski kayıt cihazından döner gibi; bölgeye göre ilgili bölümler.
@@ -1688,7 +1688,7 @@ const Snd={
     }
   },
   toggleTapes(){this.tapesOn=!this.tapesOn;this.init();
-    document.getElementById('tapBtn').textContent='KAYITLAR: '+(this.tapesOn?'AÇIK':'KAPALI');
+    {const _b=document.getElementById('tapBtn');if(_b)_b.textContent='KAYITLAR: '+(this.tapesOn?'AÇIK':'KAPALI');}
     const w=this._zoneWant;this.tapeIdx=-2;this.zoneTape(w);},
   /* tarayıcı ses kilidi: her kullanıcı hareketinde aç + bekleyen kaseti başlat */
   unlock(){
@@ -1705,7 +1705,7 @@ const Snd={
     }
   },
   toggle(){this.on=!this.on;
-    document.getElementById('sndBtn').textContent='SES: '+(this.on?'AÇIK':'KAPALI');
+    {const _b=document.getElementById('sndBtn');if(_b)_b.textContent='SES: '+(this.on?'AÇIK':'KAPALI');}
     if(this.on){this.init();if(this.master)this.master.gain.value=.5;}
     else if(this.master)this.master.gain.value=0;}
 };
@@ -2636,6 +2636,7 @@ const NEXUS={
 };
 
 function track(a){try{fetch('https://it041-konsey.lunarisbahal.workers.dev/activity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mask:Iz.mask(),act:a,op:(typeof Mirror!=='undefined'&&Mirror.isOp&&Mirror.isOp())})});}catch(e){}}
+const SoundUI={show(){UI.doc('🔊 SES','<p style="color:var(--dim);font-size:12px">Tüm sesler tek yerde — müzik, ortam, radyo, kaset cızırtısı. İstediğini aç/kapat.</p>'+'<button class="btn" id="muzBtn" onclick="Music.toggle()">🎵 MÜZİK: '+(Music.on?'AÇIK':'KAPALI')+'</button>'+'<button class="btn" id="sndBtn" onclick="Snd.toggle()">SES: '+(Snd.on?'AÇIK':'KAPALI')+'</button>'+'<button class="btn" id="radBtn" onclick="Snd.toggleRadio()">RADYO: '+(Snd.radioOn?'AÇIK':'KAPALI')+'</button>'+'<button class="btn" id="tapBtn" onclick="Snd.toggleTapes()">KAYITLAR: '+(Snd.tapesOn?'AÇIK':'KAPALI')+'</button>');}};
 const Iz={
   KONSEY:'https://it041-konsey.lunarisbahal.workers.dev',
   id(){let v=localStorage.getItem('it041_trace_id');if(!v){v='t'+Math.random().toString(36).slice(2,10);try{localStorage.setItem('it041_trace_id',v);}catch(e){}}return v;},
@@ -2654,7 +2655,7 @@ const Iz={
 };
 
 if(typeof window!=='undefined'){window.CBT=CBT;window.Bilat=Bilat;window.Arch=Arch;
-  window.Daily3=Daily3;window.MindMap=MindMap;window.Architect=Architect;window.NEXUS=NEXUS;window.Iz=Iz;}
+  window.Daily3=Daily3;window.MindMap=MindMap;window.Architect=Architect;window.NEXUS=NEXUS;window.Iz=Iz;window.SoundUI=SoundUI;}
 
 /* ============ v8.1 — GÖZCÜ SİNYALİ (ntfy.sh anlık bildirim) ============
    Oyuna giriş anı + oturum süresi, ntfy.sh üzerinden geliştiricinin telefonuna düşer.
@@ -4230,9 +4231,9 @@ function drawBigMap(){
   ctx.fillStyle='rgba(110,210,220,.9)';ctx.font='9px monospace';
   (window.__mmA||[]).forEach(a=>{if(a.nm)ctx.fillText(a.nm,a.x*sx,a.z*sz-6);});
   ctx.fillStyle='rgba(230,195,110,.95)';ctx.font='10px monospace';
-  (window.__mmP||[]).forEach(p=>{if(p.n)ctx.fillText(p.n,p.x*sx,p.z*sz-8);});
+  (window.__mmP||[]).forEach(p=>{ctx.strokeStyle='rgba(230,195,110,.7)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x*sx,p.z*sz,6,0,7);ctx.stroke();if(p.n)ctx.fillText(p.n,p.x*sx,p.z*sz-9);});{const _c=(window.__mmP||[]).length;ctx.fillStyle=_c?'rgba(230,195,110,.95)':'#6b7689';ctx.font='12px monospace';ctx.textAlign='center';ctx.fillText(_c?('● şu an '+_c+' başka yolcu burada'):'● şu an tek yolcu sensin',c.width/2,18);}
   ctx.fillStyle='#9d8cc9';
-  ctx.fillText('◈ mor = ritüeller (senin)',c.width/2,c.height-30);
+  ctx.font='10px monospace';ctx.fillStyle='#9d8cc9';ctx.fillText('◈ mor = ritüellerin',c.width/2-150,c.height-30);ctx.fillStyle='rgba(230,195,110,.95)';ctx.fillText('● altın = yolcular',c.width/2,c.height-30);ctx.fillStyle='rgba(110,210,220,.9)';ctx.fillText('● cyan = ayna-ajanları',c.width/2+150,c.height-30);
   const wp=waypoint();
   if(wp){ctx.fillStyle='#cdb878';ctx.beginPath();ctx.arc(wp.x*sx,wp.z*sz,5,0,7);ctx.fill();
     ctx.fillText('◆ HEDEF',wp.x*sx,wp.z*sz+18);}
