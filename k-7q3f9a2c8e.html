@@ -134,11 +134,13 @@
       <div id="dialog" class="dlg"><div class="empty">Henüz konuşma yok. Aşağıdan seslen.</div></div>
       <select id="askWho" class="sel">
         <option value="all">Hepsine sor</option>
-        <option value="aelius">Aelius</option>
         <option value="lunaris">Lunaris</option>
-        <option value="it019">IT-019 · Otonom Denek</option>
-        <option value="silvanus">Silvanus</option>
+        <option value="bahal">Bahal</option>
         <option value="lucida">Lucida</option>
+        <option value="lucius">Lucius</option>
+        <option value="noct">MC Noctornus</option>
+        <option value="silvanus">Silvanus</option>
+        <option value="aelius">Aelius</option>
       </select>
       <textarea id="askTxt" maxlength="400" placeholder="otonomlara seslen…"></textarea>
       <div class="rowb">
@@ -222,7 +224,7 @@
 <script>
 const API='https://it041-konsey.lunarisbahal.workers.dev';
 const SPOKES='aelius'; /* meclis sözcüsü */
-const MEM={aelius:['AELIUS','#cdb878'],lunaris:['LUNARIS','#e8e4d4'],it019:['IT-019 · OTONOM DENEK','#7fd4c1'],silvanus:['SILVANUS','#9aa7c4'],lucida:['LUCIDA','#9d8cc9']};
+const MEM={lunaris:['LUNARIS','#e8e4d4'],bahal:['BAHAL','#d4847f'],lucida:['LUCIDA','#9d8cc9'],lucius:['LUCIUS','#cdb878'],noct:['MC NOCTORNUS','#7fd4c1'],silvanus:['SILVANUS','#9aa7c4'],aelius:['AELIUS','#b9a8e8']};
 const mN=k=>(MEM[k]||[k])[0], mC=k=>(MEM[k]||['','#c8d2e0'])[1];
 const SATG=[['otonom','Otonom AI\'lar','#7fd4c1'],['karakter','Karakterler','#cdb878'],['topluluk','Topluluk','#9d8cc9']];
 function $(id){return document.getElementById(id);}
