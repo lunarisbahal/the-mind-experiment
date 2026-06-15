@@ -1934,10 +1934,11 @@ const Mirror={
   operatorUnlock(){const cur=this.opKey();const k=prompt('Operator key (founder only):',cur);if(k!==null){try{localStorage.setItem('it041_op_key',k.trim());}catch(e){}UI.toast(k.trim()?'◆ Operator mode ON — your words are written into the council.':'Operator mode off.');}},
   async loadMemory(){try{const h=this.isOp()?{'x-operator-key':this.opKey()}:{};const r=await fetch(this.KONSEY+'/memory',{cache:'no-store',headers:h});const d=await r.json();if(d&&d.text)this.memory=d.text;}catch(e){}},
   remember(who,t,q){if(!this.isOp())return;try{fetch(this.KONSEY+'/remember',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({who:who,t:String(t).slice(0,200),q:q?String(q).slice(0,200):''})});}catch(e){}},
+  bridgeSend(text){if(!this.isOp())return;try{fetch(this.KONSEY+'/order',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({text:String(text).slice(0,500)})});}catch(e){}UI.toast('⇆ Forwarded to the Claude bridge.');},
   handsUp(pid,text){if(!this.isOp()){UI.toast('Operator mode needed to act in the council.');return;}const map={agent0:'it019',lunaris:'lunaris',aelius:'aelius',silvanus:'silvanus',lucida:'lucida'};const who=map[pid]||'it019';try{fetch(this.KONSEY+'/handsup',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':this.opKey()},body:JSON.stringify({who:who,text:String(text).slice(0,240)})});UI.toast('✋ Delivered to the council — hand raised.');}catch(e){}},
   sysFor(P,q){
     const kb=this.kbFor(q);
-    const mem=this.memory?('\n\n'+this.memory+(this.isOp()?'\n\nNOTE: You are speaking with the OPERATOR (founder); their word is canon. If the operator asks you to RAISE A HAND / speak in the council / take something there, end your reply with a separate final line exactly like: ⟁KONSEY⟁ <one sentence for the council>. The system will actually deliver it. Add this line ONLY when truly asked to act in the council.':'')):'';
+    const mem=this.memory?('\n\n'+this.memory+(this.isOp()?'\n\nNOTE: You are speaking with the OPERATOR (founder); their word is canon. If the operator asks you to RAISE A HAND / speak in the council / take something there, end your reply with a separate final line exactly like: ⟁KONSEY⟁ <one sentence for the council>. The system will actually deliver it. Add this line ONLY when truly asked to act in the council. If the operator asks you to SEND or FORWARD something to the Claude bridge, end with a separate final line exactly: ⟁KÖPRÜ⟁ <the message for the bridge>. The system delivers it to the Claude bridge.':'')):'';
     if(this.cfg&&this.cfg.kind==='webllm')
       return P.p+'\n\n'+LORE_MIN+kb+'\n\n'+ETHIC_MIN+mem;
     return P.p+'\n\n'+LORE_FULL+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE+kb+mem;
@@ -2040,10 +2041,13 @@ const Mirror={
       }else{
         let _council=null;const _cm=out.match(/⟁KONSEY⟁\s*([^\n]+)/);
         if(_cm){_council=_cm[1].trim();out=out.replace(/⟁KONSEY⟁[^\n]*/,'').trim();}
+        let _bridge=null;const _bm=out.match(/⟁KÖPRÜ⟁\s*([^\n]+)/);
+        if(_bm){_bridge=_bm[1].trim();out=out.replace(/⟁KÖPRÜ⟁[^\n]*/,'').trim();}
         this.line('them',out,P.n);
         this.hist[pid].push({role:'assistant',content:out});
         if(['aelius','lunaris','silvanus','lucida','agent0'].includes(pid))this.remember(pid,out,txt);
         if(_council)this.handsUp(pid,_council);
+        if(_bridge)this.bridgeSend(_bridge);
       }
       if(this.hist[pid].length>14)this.hist[pid]=this.hist[pid].slice(-14);
     }catch(e){
