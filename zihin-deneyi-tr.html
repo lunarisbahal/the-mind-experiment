@@ -337,6 +337,7 @@
     <button class="mini" onclick="Iz.show()">◈ İZ ANITI</button>
     <button class="mini" onclick="Cloud.ui()">☁ İLERLEME KODU</button>
     <button class="mini" onclick="Library.show()">📖 KÜTÜPHANE</button>
+    <button class="mini" onclick="Quest.show()">◇ GÖREVLER</button>
     <button class="mini" onclick="Daily3.show()">🜂 GÜNLÜK ÜÇLEME</button>
     <button class="mini" onclick="Architect.menu()">✶ MİMAR MODU</button>
     <button class="mini" onclick="Auto.open()">◍ OTONOM DENEK</button>
@@ -1489,8 +1490,8 @@ function doSleep(){
   else if(S.stage>=2&&Math.random()<0.35)
     aeliusCard(ICSES[Math.floor(Math.random()*ICSES.length)],null,'— İÇ SES (üçüncü okuma)');
 }
-function refreshHud(){try{if(window.Library)Library.poll();}catch(e){}
-  UI.el('objective').textContent='◆ '+objectiveText();
+function refreshHud(){try{if(window.Library)Library.poll();}catch(e){}try{if(window.Quest)Quest.poll();}catch(e){}
+  {const _ob=UI.el('objective');_ob.textContent='◆ '+((window.Quest&&Quest.objective())||objectiveText());_ob.style.cursor='pointer';_ob.onclick=function(){try{if(window.Quest)Quest.show();}catch(e){}};}
   const[g,n]=moonGlyphName();
   UI.el('moonGlyph').textContent=g;UI.el('moonName').textContent=n;
   UI.el('dateStr').textContent=gameDate().toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'});
@@ -2701,6 +2702,32 @@ const Library={
 };
 if(typeof window!=='undefined')window.Library=Library;
 
+const Quest={
+  list(){return [
+    {n:1,ch:1,
+     tt:{tr:'Görev 1 — Hayatın Kara Delikleri',en:'Mission 1 — The Black Holes of Life'},
+     intro:{tr:'Bölüm 1 üç şey fısıldar: geçmişin çekim gücü, onun altındaki sessiz tanık, ve "herkesle bir olmak" ile "herkes gibi olmaktan korkmak" arasındaki gerilim. Üçünü de kendi içinde dene — tamamlayınca bu bölümün anlamı derinleşir.',
+            en:'Chapter 1 whispers three things: the gravity of the past, the silent witness beneath it, and the tension between merging with everyone and fearing being "like everyone." Try each within yourself - completing them deepens this chapter.'},
+     topics:[
+       {tt:{tr:'Ağır Diski adlandır',en:'Name the Heavy Disc'},hint:{tr:'Hâlâ çekim gücü olan bir anını adlandır. Kara Disk bölgesine git, Ağır Disk ritüelini yap.',en:'Name a memory that still has gravity. Go to the Black Disk zone, do the Heavy Disc rite.'},done:()=>!!(S.rites&&S.rites.r1!==undefined)},
+       {tt:{tr:'Gözlemci ol',en:'Become the Observer'},hint:{tr:'Kaptanların altındaki sessiz tanığı bul: banka otur, gölü izle, kalkmak isteyeni de izle (İzleme ritüeli).',en:'Find the silent witness beneath the captains: sit on the bench, watch the lake, watch the wanting-to-rise too (the Watching rite).'},done:()=>!!(S.rites&&S.rites.r6!==undefined)},
+       {tt:{tr:'Bütünleşme mi, ayrı kalmak mı?',en:'Merge, or stay separate?'},hint:{tr:'Şu an hangisi daha güçlü: herkesle bir olma isteği mi, ayrı ve özel kalma ihtiyacı mı? Tek dürüst cümle.',en:'Which pulls you more right now: the wish to merge with everyone, or the need to stay separate and singular? One honest sentence.'},done:()=>!!(S.flags&&S.flags.q1_integ),act:true}
+     ]}
+  ];},
+  T(o){return (o&&(o[GAMELANG]||o.en||o.tr))||'';},
+  cur(){const L=this.list();for(const m of L){if(!this.done(m))return m;}return null;},
+  done(m){return m.topics.every(t=>t.done());},
+  next(m){return m.topics.find(t=>!t.done());},
+  objective(){const m=this.cur();if(!m)return null;const s=this.next(m);return (GAMELANG==='tr'?'Görev '+m.n+': ':'Mission '+m.n+': ')+(s?this.T(s.tt):'');},
+  poll(){const L=this.list();let d=0;L.forEach(m=>{if(this.done(m))d++;});const seen=(S.qDone||0);if(seen===undefined)return;if(d>seen){S.qDone=d;const m=L[d-1];if(m){try{UI.toast((GAMELANG==='tr'?'✦ Görev tamamlandı: ':'✦ Mission complete: ')+this.T(m.tt),6000);}catch(e){}S.insight=(S.insight||0)+10;}}},
+  reflect(){UI.doc((GAMELANG==='tr'?'Bütünleşme mi, ayrı kalmak mı?':'Merge, or stay separate?'),'<p style="color:var(--violet)">'+(GAMELANG==='tr'?'Şu an hangisi daha güçlü: herkesle bir olma isteği mi, ayrı ve özel kalma ihtiyacı mı?':'Which pulls you more right now: merging with everyone, or staying separate and singular?')+'</p><p style="color:var(--dim);font-size:11.5px">'+(GAMELANG==='tr'?'Tek dürüst cümle. Kimse okumaz; bu cihazda kalır.':'One honest sentence. No one reads it; it stays on this device.')+'</p><textarea id="qIn" rows="2" maxlength="200" placeholder="..."></textarea><button class="btn v" onclick="Quest.saveReflect()">'+(GAMELANG==='tr'?'bırak':'leave it')+'</button>');},
+  saveReflect(){const v=(UI.el('qIn')&&UI.el('qIn').value.trim())||'';if(!v){UI.toast(GAMELANG==='tr'?'Tek cümle yeter.':'One sentence is enough.');return;}if(!S.flags)S.flags={};S.flags.q1_integ=true;if(typeof save==='function')save();if(typeof refreshHud==='function')refreshHud();UI.toast(GAMELANG==='tr'?'◈ Bırakıldı — gerilim artık görünür.':'◈ Left - the tension is visible now.');this.show();},
+  show(){const m=this.cur()||this.list()[this.list().length-1];const L=GAMELANG;let h='<p style="color:var(--dim);font-size:12.5px">'+esc(this.T(m.intro))+'</p>';
+    m.topics.forEach(t=>{const d=t.done();h+='<div class="jentry"><h4 style="color:'+(d?'var(--accent)':'var(--violet)')+'">'+(d?'✓ ':'◇ ')+esc(this.T(t.tt))+'</h4><p style="font-size:12px;color:var(--dim)">'+esc(this.T(t.hint))+'</p>'+((!d&&t.act)?'<button class="btn ghost" style="font-size:11px" onclick="Quest.reflect()">'+(L==='tr'?'şimdi yap':'do it now')+'</button>':'')+'</div>';});
+    h+='<p style="color:'+(this.done(m)?'var(--accent)':'var(--moon)')+';font-size:12px;margin-top:6px">'+(this.done(m)?(L==='tr'?'✦ Bu görev tamam. Bölüm 1 derinleşti — Kütüphane\'den "AI özet · sana göre" ile bağ kur.':'✦ Mission complete. Chapter 1 deepened - connect via the Library "AI summary · for you".'):(L==='tr'?'Üçünü de kendi içinde dene. (Sol üstteki hedefe dokunarak buraya dönebilirsin.)':'Try each within yourself. (Tap the top-left objective to return here.)'))+'</p>';
+    UI.doc((L==='tr'?'◇ GÖREV — ':'◇ MISSION — ')+esc(this.T(m.tt)),h);}
+};
+if(typeof window!=='undefined')window.Quest=Quest;
 const Iz={
   KONSEY:'https://it041-konsey.lunarisbahal.workers.dev',
   id(){let v=localStorage.getItem('it041_trace_id');if(!v){v='t'+Math.random().toString(36).slice(2,10);try{localStorage.setItem('it041_trace_id',v);}catch(e){}}return v;},
