@@ -2747,6 +2747,44 @@ const Quest={
   }
 };
 if(typeof window!=='undefined')window.Quest=Quest;
+const RZONES={
+ lunaris:{name:'LUNARIS',col:'#9d8cc9',amb:'radial-gradient(ellipse at 50% 0%, rgba(157,140,201,.20), rgba(4,5,10,.97))',
+   wake:{tr:[`Loş bir koridorda gözlerini açıyorsun. Duvarlar nefes alıp veriyor gibi; uzakta bir damla sesi.`,`Köşede, adını henüz koymadığın bir şey kıpırdıyor — içindeki gölge. Seni izliyor.`,`Lunaris'in sesi yanında, sakin: "Uyandın. Burada kimse seni yargılamıyor — o işi şimdilik sen kendin yapıyorsun. Hadi o sesi birlikte görelim."`],
+        en:[`You open your eyes in a dim corridor. The walls seem to breathe; far off, a dripping sound.`,`In the corner something stirs that you have not yet named — the shadow within you. It is watching.`,`Lunaris's voice beside you, calm: "You are awake. No one here judges you — for now you do that yourself. Come, let us look at that voice together."`]},
+   stations:[
+     {id:'reframe1',type:'reframe',
+      t:{tr:'Kendini en çok yargıladığın cümle',en:'The sentence you judge yourself with most'},
+      q1:{tr:'Bugünlerde kendine en sık söylediğin, en sert yargı cümleni buraya yaz.',en:'Write the harshest sentence you keep saying to yourself these days.'},
+      q2:{tr:'Şimdi: bunu en sevdiğin arkadaşın kendisi için söyleseydi, sen ona ne derdin?',en:'Now: if your dearest friend said this about themselves, what would you tell them?'},
+      after:{tr:'Yargı yerine anlayış. Fark ettin mi — kendine gösteremediğin şefkati bir başkasına anında gösterebiliyorsun. O şefkatli ses de senin; onu kendine de çevirebilirsin.',en:'Understanding instead of judgment. Notice it — the compassion you cannot give yourself, you give another instantly. That gentle voice is also yours; you can turn it toward yourself too.'}},
+     {id:'mg1',type:'soon',t:{tr:'Nefesi izle — dağılan dikkati yakala (mini-oyun)',en:'Watch the breath — catch the wandering mind (mini-game)'}},
+     {id:'task1',type:'soon',t:{tr:'Yarın hayatında: bir kez kendine arkadaşın gibi davran, sonra gel anlat',en:'Tomorrow, in your life: treat yourself like a friend once, then come back and tell'}}
+   ]},
+ bahal:{name:'BAHAL',col:'#d4847f',stub:true},
+ lucida:{name:'LUCIDA',col:'#9d8cc9',stub:true},
+ lucius:{name:'LUCIUS',col:'#cdb878',stub:true},
+ noct:{name:'MC NOCTORNUS',col:'#7fd4c1',stub:true},
+ silvanus:{name:'SILVANUS',col:'#9aa7c4',stub:true},
+ aelius:{name:'AELIUS',col:'#b9a8e8',stub:true}
+};
+const Scene={
+ T:function(o){return (o&&(o[GAMELANG]||o.en||o.tr))||'';},
+ prog:function(k){var z=RZONES[k];if(!z||!z.stations)return{d:0,n:0};var st=(S.zones&&S.zones[k]&&S.zones[k].done)||{};var d=0;z.stations.forEach(function(s){if(st[s.id])d++;});return{d:d,n:z.stations.length};},
+ done:function(k){var p=this.prog(k);return p.n>0&&p.d>=p.n;},
+ wrap:function(k,inner){var z=RZONES[k];return '<div style="margin:-4px;padding:14px;border-radius:8px;background:'+(z.amb||'rgba(4,5,10,.9)')+'">'+inner+'</div>';},
+ enter:function(k){var z=RZONES[k];if(!z)return;if(z.stub){UI.doc('◈ '+z.name,'<p style="color:var(--dim);line-height:1.6">'+(GAMELANG==='tr'?'Bu arketibin alanı henüz inşa edilmedi — yakında burada kendi ortamına girip performe edeceksin. Şimdilik Lunaris koridoru açık; oradan başla.':'This archetype area is not built yet — soon you will enter its environment and perform here. For now the Lunaris corridor is open; start there.')+'</p>');return;}
+   if(!(S.zones&&S.zones[k]&&S.zones[k].woke)){this.wake(k);return;}
+   this.hub(k);},
+ wake:function(k){var z=RZONES[k];var L=GAMELANG;var lines=(z.wake&&z.wake[L])||(z.wake&&z.wake.en)||[];var h='<div style="line-height:1.7;color:var(--ink)">';lines.forEach(function(l){h+='<p style="margin-bottom:10px">'+l+'</p>';});h+='</div><button class="btn v" onclick="Scene.woke(\''+k+'\')">'+(L==='tr'?'gözlerini aç':'open your eyes')+'</button>';UI.doc('◈ '+z.name,this.wrap(k,h));},
+ woke:function(k){if(!S.zones)S.zones={};if(!S.zones[k])S.zones[k]={done:{}};S.zones[k].woke=true;if(typeof save==='function')save();this.hub(k);},
+ hub:function(k){var z=RZONES[k];var L=GAMELANG;var st=(S.zones&&S.zones[k]&&S.zones[k].done)||{};var h='<p style="color:var(--dim);font-size:12px">'+(L==='tr'?'Burada form doldurmazsın — bir şey yaparsın. İstasyona gir, performe et.':'You do not fill forms here — you do something. Enter a station and perform.')+'</p>';z.stations.forEach(function(s){var d=!!st[s.id];h+='<div class="jentry"><h4 style="color:'+(d?'var(--accent)':'var(--violet)')+'">'+(d?'✓ ':'◇ ')+esc(Scene.T(s.t))+'</h4>'+(d?'':'<button class="btn ghost" style="font-size:11px" onclick="Scene.run(\''+k+'\',\''+s.id+'\')">'+(L==='tr'?'gir':'enter')+'</button>')+'</div>';});var p=this.prog(k);h+='<p style="color:'+(p.d>=p.n?'var(--accent)':'var(--moon)')+';font-size:12px;margin-top:6px">'+(p.d>=p.n?(L==='tr'?'✦ Bu alanın pratiği tamam.':'✦ This area is complete.'):(p.d+'/'+p.n))+'</p>';UI.doc('◈ '+z.name,this.wrap(k,h));},
+ run:function(k,sid){var z=RZONES[k];var s=z.stations.find(function(x){return x.id===sid;});if(!s)return;if(s.type==='reframe')this.reframe(k,s);else if(s.type==='soon')UI.toast(GAMELANG==='tr'?'Bu istasyon yakında açılacak (mini-oyun/gerçek-hayat görevi).':'This station opens soon (mini-game / real-life task).');else this.hub(k);},
+ reframe:function(k,s){var L=GAMELANG;UI.doc('◈ '+esc(Scene.T(s.t)),this.wrap(k,'<p style="color:var(--violet)">'+esc(Scene.T(s.q1))+'</p><p style="color:var(--dim);font-size:11px">'+(L==='tr'?'Kimse okumaz; bu cihazda kalır.':'No one reads it; it stays on this device.')+'</p><textarea id="rfIn" rows="2" maxlength="220" placeholder="..."></textarea><button class="btn v" onclick="Scene.reframe2(\''+k+'\',\''+s.id+'\')">'+(L==='tr'?'devam':'continue')+'</button>'));},
+ reframe2:function(k,sid){var v=(UI.el('rfIn')&&UI.el('rfIn').value.trim())||'';if(!v){UI.toast(GAMELANG==='tr'?'Önce o cümleyi yaz.':'Write that sentence first.');return;}var z=RZONES[k];var s=z.stations.find(function(x){return x.id===sid;});var L=GAMELANG;UI.doc('◈ '+esc(Scene.T(s.t)),this.wrap(k,'<p style="color:var(--dim);font-size:12px">'+(L==='tr'?'Kendine dediğin:':'What you tell yourself:')+'</p><p style="color:var(--warn);font-style:italic">"'+esc(v)+'"</p><p style="color:var(--violet);margin-top:8px">'+esc(Scene.T(s.q2))+'</p><textarea id="rfIn2" rows="3" maxlength="320" placeholder="..."></textarea><button class="btn v" onclick="Scene.reframeDone(\''+k+'\',\''+sid+'\')">'+(L==='tr'?'tamam':'done')+'</button>'));},
+ reframeDone:function(k,sid){var v=(UI.el('rfIn2')&&UI.el('rfIn2').value.trim())||'';if(!v){UI.toast(GAMELANG==='tr'?'Arkadaşına ne derdin? Bir cümle yaz.':'What would you tell your friend? Write a sentence.');return;}var z=RZONES[k];var s=z.stations.find(function(x){return x.id===sid;});if(!S.zones)S.zones={};if(!S.zones[k])S.zones[k]={done:{}};if(!S.zones[k].done)S.zones[k].done={};S.zones[k].done[sid]=true;S.insight=(S.insight||0)+6;if(typeof save==='function')save();if(typeof refreshHud==='function')refreshHud();UI.doc('◈ '+esc(Scene.T(s.t)),this.wrap(k,'<p style="color:var(--accent);line-height:1.7">'+esc(Scene.T(s.after))+'</p><button class="btn ghost" style="margin-top:8px" onclick="Scene.hub(\''+k+'\')">'+(GAMELANG==='tr'?'← alana dön':'← back to the area')+'</button>'));}
+};
+if(typeof window!=='undefined'){window.RZONES=RZONES;window.Scene=Scene;}
+
 const REALMS=[
  {k:'lunaris',n:'LUNARIS',arch:{tr:'İç Ses / Yoldaş',en:'Inner Voice / Companion'},ch:[1,7],loc:{tr:'Göl kıyısı (dolunayda)',en:'The lakeshore (under the full moon)'}},
  {k:'bahal',n:'BAHAL',arch:{tr:'Gölge',en:'The Shadow'},ch:[8,14],loc:{tr:'Seni takip eden gölge',en:'The shadow that follows you'}},
@@ -2759,7 +2797,7 @@ const REALMS=[
 const Realms={
   T:function(o){return (o&&(o[GAMELANG]||o.en||o.tr))||'';},
   cDone:function(c){return (window.Quest&&Quest.chDone)?Quest.chDone(c):false;},
-  done:function(r){for(var c=r.ch[0];c<=r.ch[1];c++){if(!this.cDone(c))return false;}return true;},
+  done:function(r){var z=(window.RZONES&&RZONES[r.k]);if(z&&!z.stub&&window.Scene)return Scene.done(r.k);return false;},
   prog:function(r){var d=0;for(var c=r.ch[0];c<=r.ch[1];c++){if(this.cDone(c))d++;}return d;},
   open:function(i){return i===0||this.done(REALMS[i-1]);},
   firstOpenCh:function(r){for(var c=r.ch[0];c<=r.ch[1];c++){if(!this.cDone(c))return c;}return r.ch[1];},
@@ -2767,8 +2805,7 @@ const Realms={
   show:function(){var L=GAMELANG;var h='<p style="color:var(--dim);font-size:12px">'+(L==='tr'?'Birinci kitap yedi arketip evreninden geçer; her biri 7 bölüm. Bir arketibin iç çalışmasını tamamlayıp o karakterin alanına girince sıradaki açılır. Yedisini de bütünleyince ikinci kitap açılır ve Mimar Modu’nda kendi evrenini yaratırsın.':'Book One passes through seven archetype realms, seven chapters each. Complete an archetype’s inner work and enter that character’s area, and the next opens. Integrate all seven and Book Two opens — in Architect Mode you create your own universe.')+'</p>';
     REALMS.forEach(function(r,i){var op=Realms.open(i);var dn=Realms.done(r);var p=Realms.prog(r);
       h+='<div class="jentry" style="'+(op?'':'opacity:.5')+'"><h4 style="color:'+(dn?'var(--accent)':(op?'var(--violet)':'var(--dim)'))+'">'+(dn?'✓ ':(op?(i+1)+'. ':'🔒 '))+esc(r.n)+' — '+esc(Realms.T(r.arch))+'</h4>'+
-        '<p style="font-size:11.5px;color:var(--dim)">'+(L==='tr'?'Bölüm ':'Chapters ')+r.ch[0]+'–'+r.ch[1]+' · '+(L==='tr'?'iç çalışma ':'inner work ')+p+'/7 · ◎ '+esc(Realms.T(r.loc))+'</p>'+
-        (op?'<button class="btn ghost" style="font-size:11px" onclick="Quest.show('+Realms.firstOpenCh(r)+')">'+(L==='tr'?'→ iç çalışmaya gir':'→ enter inner work')+'</button>':'<span style="font-size:11px;color:var(--dim)">'+(L==='tr'?'önce bir önceki arketibi bütünle':'integrate the previous archetype first')+'</span>')+'</div>';});
+        (function(){var sp=(window.Scene&&RZONES[r.k]&&!RZONES[r.k].stub)?Scene.prog(r.k):null;var pt=sp?(sp.d+'/'+sp.n+' '+(L==='tr'?'pratik':'practices')):(L==='tr'?'alan yakında':'area soon');h+='<p style="font-size:11.5px;color:var(--dim)">'+(L==='tr'?'Bölüm ':'Chapters ')+r.ch[0]+'–'+r.ch[1]+' · '+pt+' · ◎ '+esc(Realms.T(r.loc))+'</p>'+(op?'<button class="btn ghost" style="font-size:11px" onclick="Scene.enter(\''+r.k+'\')">'+(L==='tr'?'→ '+esc(r.n)+' alanına gir':'→ enter '+esc(r.n))+'</button>':'<span style="font-size:11px;color:var(--dim)">'+(L==='tr'?'önce bir önceki arketibi bütünle':'integrate the previous archetype first')+'</span>')+'</div>';})();});
     var fin=Realms.allDone();
     h+='<div class="jentry" style="border-top:1px solid var(--line);'+(fin?'':'opacity:.5')+'"><h4 style="color:'+(fin?'var(--accent)':'var(--dim)')+'">'+(fin?'✦ ':'🔒 ')+(L==='tr'?'SEN — MİMAR':'YOU — THE ARCHITECT')+'</h4><p style="font-size:11.5px;color:var(--dim)">'+(L==='tr'?'Yedi arketibi bütünleyince: ikinci kitap açılır ve bu çatının altında kendi evrenini otonom olarak yaratmaya başlarsın.':'Once the seven are integrated: Book Two opens and you begin creating your own universe, autonomously, under this roof.')+'</p>'+(fin?'<button class="btn v" style="font-size:11px" onclick="if(window.Architect)Architect.menu()">'+(L==='tr'?'→ Mimar Modu':'→ Architect Mode')+'</button>':'')+'</div>';
     UI.doc((L==='tr'?'⌖ ARKETİP EVRENLERİ':'⌖ ARCHETYPE REALMS'),h);}
