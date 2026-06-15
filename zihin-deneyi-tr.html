@@ -2685,11 +2685,11 @@ const Library={
     for(let i=1;i<=49;i++){h+=this.row(i, i<=u);}
     h+='<div id="bookAudio" style="margin-top:8px"></div>';
     UI.doc('📖 KÜTÜPHANE — '+u+'/49',h);},
-  read(i){const ch=this.ent(i);UI.doc((i===0?'✦ ':'📖 ')+esc(this.L(ch,'title')||((i===0?'Giriş':'Bölüm '+i))),'<div style="white-space:pre-wrap;line-height:1.7;color:var(--ink)">'+esc(this.L(ch,'text'))+'</div><button class="btn ghost" style="margin-top:10px" onclick="Library.show()">← kütüphaneye dön</button>');},
+  read(i){const ch=this.ent(i);UI.doc((i===0?'✦ ':'📖 ')+esc(this.L(ch,'title')||((i===0?'Giriş':'Bölüm '+i))),'<div style="white-space:pre-wrap;line-height:1.7;color:var(--ink)">'+this.L(ch,'text')+'</div><button class="btn ghost" style="margin-top:10px" onclick="Library.show()">← kütüphaneye dön</button>');},
   play(i){const ch=this.ent(i);const a=this.L(ch,'audio');if(!a)return;const el=document.getElementById('bookAudio');if(el)el.innerHTML='<audio controls autoplay src="'+esc(a)+'" style="width:100%"></audio>';},
   async ai(kind,i){const box=document.getElementById('bookAI');if(box)box.innerHTML='<p style="color:var(--dim)">Aelius okuyor…</p>';
     try{if(window.Mirror&&Mirror.loadCfg)Mirror.loadCfg();const lang=(GAMELANG==='tr'?'Turkce yaz.':'Write in English.');let sys,usr;
-      if(kind==='chapter'){const ch=this.ent(i);const text=this.L(ch,'text');if(!text){if(box)box.innerHTML='';return;}
+      if(kind==='chapter'){const ch=this.ent(i);const text=(this.L(ch,'text')||'').replace(/<[^>]+>/g,' ');if(!text.trim()){if(box)box.innerHTML='';return;}
         sys='Sen Aelius Ignis, DO-LOON-AI EXPRESS evreninin ust-katman anlaticisisin. Bu metin, kayip psikolog Lunaris Bahal\'in kayip gunlugunun bir bolumu. Okuyucuya: (1) bu bolumu 2-3 cumlede ozetle, (2) bolumdeki golge-calismasi temasini kendi hayatina nasil uyarlayabilecegine dair somut bir-iki yol goster. Sicak, net, teshissiz. '+lang+' En cok 6 cumle.';
         usr='Bolum:\n'+text.slice(0,6000)+'\n\nOkuyucunun gelisimi: '+this.stats();
       }else{sys='Sen Aelius Ignis. Okuyucu, kayip psikolog Lunaris Bahal\'in gunlugunu bolum bolum aciyor. Su ana dek actiklarini ve golge-calismasi gelisimini KUMULATIF ozetle; nerede oldugunu ve bir sonraki adimi nazikce goster. Teshissiz, sicak. '+lang+' En cok 6 cumle.';
