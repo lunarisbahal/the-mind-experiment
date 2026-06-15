@@ -124,6 +124,7 @@
       <div class="sub">Üyeler gerçek bir yapay zekâyla, karakter sesleriyle konuşur.</div>
       <div id="feed"><div class="empty">yükleniyor…</div></div>
       <button class="act ok" style="margin-top:4px" id="bTick">yeni tur tartışma iste ⟳</button>
+      <div style="text-align:right;margin-top:8px"><span class="small" id="bClearFeed">meclisi temizle</span></div>
     </section>
 
     <!-- DİYALOG -->
@@ -283,12 +284,13 @@ function renderAll(){if(!S)return;
 
 window.dec=async function(id,a){const d=await post('/decide',{id,action:a});if(d&&d.ok){toast(a==='k'?'✦ Kanona girdi — Nöbetçi Claude\'a götürecek.':a==='a'?'Reddedildi.':'Ertelendi.');getState();}};
 $('bTick').onclick=async()=>{$('bTick').disabled=true;$('bTick').textContent='meclis düşünüyor…';const d=await post('/tick');$('bTick').disabled=false;$('bTick').textContent='yeni tur tartışma iste ⟳';if(d&&d.ok){toast('Meclis bir tur düşündü.');getState();}};
-$('bAsk').onclick=async()=>{const t=$('askTxt').value.trim();if(!t)return;const who=$('askWho').value;$('bAsk').disabled=true;$('bAsk').textContent='düşünüyorlar…';const d=await post('/ask',{text:t,who:who==='all'?undefined:who});$('bAsk').disabled=false;$('bAsk').textContent='sor →';if(d&&d.ok){$('askTxt').value='';toast('Yanıtlar geldi.');getState();}};
+$('bAsk').onclick=async()=>{const t=$('askTxt').value.trim();if(!t)return;const who=$('askWho').value;$('bAsk').disabled=true;$('bAsk').textContent='düşünüyorlar…';const d=await post('/ask',{text:t,who:who==='all'?undefined:who});$('bAsk').disabled=false;$('bAsk').textContent='sor →';if(d&&d.ok){if(d.replies&&d.replies.length){$('askTxt').value='';toast('Yanıtlar geldi.');}else{toast('Üyeler yanıt veremedi — beyin meşgul olabilir (Nabız\'da ● kontrol et). Tekrar dene.');}getState();}};
 $('bPropose').onclick=async()=>{$('bPropose').disabled=true;$('bPropose').textContent='damıtılıyor…';const d=await post('/propose');$('bPropose').disabled=false;$('bPropose').textContent='✦ bunu onayıma getir';if(d&&d.ok){toast('Öneri Onaylar\'a düştü: "'+(d.proposal&&d.proposal.title||'—')+'"');getState();switchTo('onay');}else if(d&&d.error){toast('Üretilemedi (beyin/Groq?).');}};
-$('bRep').onclick=async()=>{const t=$('repTxt').value.trim();if(!t)return;$('bRep').disabled=true;$('bRep').textContent='temsilci yanıtlıyor…';const d=await post('/ask',{text:t,who:SPOKES});$('bRep').disabled=false;$('bRep').textContent='temsilciye gönder →';if(d&&d.ok){$('repTxt').value='';const rp=(d.replies&&d.replies[0]&&d.replies[0].t)||'';toast(rp?('AELIUS: '+rp.slice(0,80)):'Temsilci yanıtladı.');getState();}};
+$('bRep').onclick=async()=>{const t=$('repTxt').value.trim();if(!t)return;$('bRep').disabled=true;$('bRep').textContent='temsilci yanıtlıyor…';const d=await post('/ask',{text:t,who:SPOKES});$('bRep').disabled=false;$('bRep').textContent='temsilciye gönder →';if(d&&d.ok){const rp=(d.replies&&d.replies[0]&&d.replies[0].t)||'';if(rp){$('repTxt').value='';toast('AELIUS: '+rp.slice(0,80));}else{toast('Aelius yanıt veremedi — beyin meşgul olabilir (Nabız). Tekrar dene.');}getState();}};
 $('bOrder').onclick=async()=>{const t=$('ordTxt').value.trim();if(!t)return;const d=await post('/order',{text:t});if(d&&d.ok){$('ordTxt').value='';toast('Komut Claude köprüsüne bırakıldı.');getState();}};
 $('bOrderClear').onclick=async()=>{if(!confirm('Köprüdeki tüm komutları temizle?'))return;const d=await post('/order',{clear:true});if(d&&d.ok){toast('Köprü temizlendi.');getState();}};
 $('bClearDlg').onclick=async()=>{if(!confirm('Diyaloğu temizle?'))return;const d=await post('/cleardialog');if(d&&d.ok){toast('Diyalog temizlendi.');getState();}};
+$('bClearFeed').onclick=async()=>{if(!confirm('Meclis geçmişini temizle?'))return;const d=await post('/clearfeed');if(d&&d.ok){toast('Meclis temizlendi.');getState();}};
 $('killBtn').onclick=async()=>{const d=await post('/stop');if(d&&typeof d.autoStopped!=='undefined'){toast(d.autoStopped?'⏻ Otonom yaşam durduruldu.':'Otonom yaşam başladı.');getState();}};
 
 function switchTo(v){document.querySelectorAll('.nb').forEach(n=>n.classList.toggle('on',n.dataset.v===v));document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));}
