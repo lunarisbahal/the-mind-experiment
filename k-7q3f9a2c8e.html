@@ -116,6 +116,8 @@
     color:var(--ink);z-index:6;text-align:left;box-shadow:0 4px 14px rgba(0,0,0,.5);}
   .seat .bub:after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);
     border:5px solid transparent;border-top-color:inherit;}
+  .seat .bub.below{bottom:auto;top:calc(100% + 4px);}
+  .seat .bub.below:after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:inherit;}
   .mbub{display:flex;gap:9px;align-items:flex-start;border-left:2px solid;padding:8px 0 8px 11px;margin-bottom:10px;}
   .mbub .mav{flex:none;width:26px;height:26px;border-radius:50%;border:1px solid;display:flex;align-items:center;justify-content:center;font-size:12px;}
   .mbub .mbody{flex:1;font-size:13px;line-height:1.5;}
@@ -349,7 +351,7 @@ function renderMeclis(){
     const lastLine=[...feed].reverse().find(f=>f[0]===k);
     const active=(k===last);
     const raised=lastLine && /^✋/.test(lastLine[1]);
-    const bub=(active&&lastLine)?`<div class="bub" style="border-color:${mC(k)}">${esc(lastLine[1].replace(/^✋\s*/,'')).slice(0,100)}</div>`:'';
+    const bub=(active&&lastLine)?`<div class="bub${y<50?' below':''}" style="border-color:${mC(k)}">${esc(lastLine[1].replace(/^✋\s*/,'')).slice(0,100)}</div>`:'';
     seats+=`<div class="seat${active?' active':''}" style="left:${x}%;top:${y}%" onclick="openReply('${k}')" title="${mN(k)} — söz vermek için dokun">${bub}<div class="av" style="border-color:${mC(k)};color:${mC(k)}${active?';box-shadow:0 0 16px '+mC(k):''}">${mN(k).replace('MC ','')[0]}${raised?'<span class="hand">✋</span>':''}</div><div class="nm">${mN(k)}</div></div>`;
   });
   $('mtable').innerHTML='<div class="mtsurface"><span class="lbl">konsey masası</span></div>'+seats;
