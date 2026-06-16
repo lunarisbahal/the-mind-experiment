@@ -227,6 +227,12 @@
         <div class="stat"><b id="sOrd">—</b><small>Claude komutu</small></div>
       </div>
       <div class="sub" id="updLine" style="text-align:center;margin-top:-6px;"></div>
+      <h2 class="a" style="margin-top:10px">Kanona girenler · oyuna işlenenler</h2>
+      <div class="sub">Onayladığın ve oyuna giren yönler. Dokun → oyuna etkisini gör. <b style="color:var(--moon)">(kanon = oyunun kendisi)</b></div>
+      <div class="sat" id="kanonBox"><div class="empty" style="padding:10px">Henüz kanona giren yok.</div></div>
+      <h2 style="margin-top:10px;font-size:11px;letter-spacing:.26em;color:var(--warn);text-transform:uppercase">Reddedilenler</h2>
+      <div class="sub">Kanona girmesi reddedilenler. Dokun → neyi engellediğini gör.</div>
+      <div class="sat" id="rejBox"><div class="empty" style="padding:10px">Henüz reddedilen yok.</div></div>
       <h2 class="v" style="margin-top:6px">Üye kimlikleri · gelişen</h2>
       <div class="sat" id="idents"><div class="empty" style="padding:10px">Kimlikler deneyimle gelişiyor…</div></div>
       <h2 class="v" style="margin-top:6px">Tatmin oranları</h2>
@@ -243,7 +249,10 @@
       <div class="tip" style="margin-top:10px">🔒 Bu ekran <b>yalnız sana</b>. Onay/komut için operatör anahtarın (⚙) gerekir.</div>
     </section>
     <section class="view" id="v-profiller">
-      <h2 class="v">Üye profilleri · gelişen</h2>
+      <h2 class="v">Mevcut yapıdan memnuniyet · % dağılımı</h2>
+      <div class="sub">Şu anki evren yapısı her arketibi ne kadar memnun ediyor? İnşa edilen fikirler kimindiyse o daha memnun; gölge/isyan doğası gereği daha az. Onayladıkça canlı değişir.</div>
+      <div class="sat" id="msatBox"><div class="empty" style="padding:10px">hesaplanıyor…</div></div>
+      <h2 class="v sub2">Üye profilleri · gelişen</h2>
       <div class="sub">Her üyenin gelişen kimliği, bilişsel/kimlik alt-alanları ve aktivitesi: kim daha çok fikir üretiyor, keşfediyor, söz alıyor.</div>
       <div id="profMembers"><div class="empty">yükleniyor…</div></div>
       <h2 class="a sub2">İlişkiler · beyin fırtınası raporu</h2>
@@ -272,6 +281,10 @@ const SATG=[['otonom','Otonom AI\'lar','#7fd4c1'],['karakter','Karakterler','#cd
 function $(id){return document.getElementById(id);}
 let tT;function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(tT);tT=setTimeout(()=>t.style.display='none',3400);}
 function esc(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function escA(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+window.toggleChange=function(id){var e=document.getElementById('chg_'+id);if(e)e.style.display=(e.style.display==='none'||!e.style.display)?'block':'none';};
+window.bringToApproval=async function(by,text){text=(text||'').trim();if(!text){toast('Boş satır.');return;}const d=await post('/idea',{by:by,title:mN(by)+' önerisi',text:text});if(d&&d.ok){toast('✦ '+mN(by)+' fikri Onaylar\'a getirildi.');getState();switchTo('onay');}else toast('Getirilemedi (anahtar/bağlantı).');};
+window.remindOrder=async function(id){const o=((S&&S.orders)||[]).find(x=>x.id===id);if(!o)return;const d=await post('/order',{text:'(HATIRLATMA) '+o.text});if(d&&d.ok){toast('Komut köprüye yeniden bırakıldı — Claude bir sonraki turda görecek.');getState();}};
 function ago(t){if(!t)return'';const s=(Date.now()-t)/1000;if(s<90)return'az önce';if(s<3600)return Math.floor(s/60)+' dk önce';if(s<86400)return Math.floor(s/3600)+' saat önce';return Math.floor(s/86400)+' gün önce';}
 function opKey(){let k=localStorage.getItem('it041_op_key');if(!k){k=prompt('Operatör anahtarın (Cloudflare OPERATOR_KEY):');if(k){k=k.trim();localStorage.setItem('it041_op_key',k);}}return k||'';}
 $('gear').onclick=()=>{const cur=localStorage.getItem('it041_op_key')||'';const k=prompt('Operatör anahtarı:',cur);if(k!==null){localStorage.setItem('it041_op_key',k.trim());toast('Anahtar kaydedildi.');}};
@@ -289,8 +302,10 @@ async function post(path,body){const key=opKey();if(!key){toast('Önce operatör
   catch(e){toast('Gönderilemedi (bağlantı).');return null;}}
 
 function dStr(arr){if(!arr)return'';return SATG.map((g,i)=>{const v=arr[i];const c=v>0?'pos':v<0?'neg':'';return `<span class="${c}">${g[1].split(' ')[0]} ${v>0?'+':''}${v}</span>`;}).join(' ');}
-function card(p){return `<div class="card"><h3>${esc(p.title)}</h3><div class="by">öneren: ${mN(p.by)}</div>
+function advisorOf(p){var a=(p.d&&p.d.a)||[0,0,0],r=(p.d&&p.d.r)||[0,0,0];var na=a.reduce((x,y)=>x+(y||0),0),nr=r.reduce((x,y)=>x+(y||0),0);var net=na-nr;var v=net>=22?["YAP","var(--accent)","net faydalı görünüyor — kazanımı yüksek"]:net>=10?["yapmaya değer","var(--accent)","faydası maliyetinden ağır basıyor"]:net>0?["sana kalmış","var(--gold)","etkisi ölçülü; dengeyi sen belirle"]:["temkinli ol","var(--warn)","kazanımı net değil; ertelemek mantıklı olabilir"];return {v:v};}
+function card(p){var ad=advisorOf(p);return `<div class="card"><h3>${esc(p.title)}</h3><div class="by">öneren: ${mN(p.by)}</div>
   <p class="d">${esc(p.desc)}</p>
+  <div class="cons" style="background:rgba(157,140,201,.07);border:1px solid rgba(157,140,201,.34)"><span class="lab" style="color:var(--violet)">⚖ danışmanın görüşü · sana en yakın zekâ</span><span class="txt"><b style="color:${ad.v[1]}">${ad.v[0]}</b> — ${ad.v[2]}</span><div style="margin-top:6px"><span class="small" onclick="toggleChange('${p.id}')">↳ neyi değiştirir?</span></div><div id="chg_${p.id}" style="display:none;margin-top:7px;font-size:11.5px;line-height:1.5;color:var(--ink)"><div><b style="color:var(--accent)">Yaparsan:</b> ${esc(p.acc||"—")}</div><div style="margin-top:4px"><b style="color:var(--warn)">Yapmazsan:</b> ${esc(p.rej||"—")}</div><div class="deltas" style="margin-top:5px"><span>tatmin etkisi:</span> ${dStr(p.d&&p.d.a)}</div><div style="margin-top:5px;color:var(--dim)">Onaylarsan Claude köprüsüne komut olarak da düşer; kesin görüş Claude işlerken netleşir.</div></div></div>
   ${p.acc?`<div class="cons acc"><span class="lab">✓ onaylarsan</span><span class="txt">${esc(p.acc)}</span><div class="deltas"><span>tatmin:</span> ${dStr(p.d&&p.d.a)}</div></div>`:''}
   ${p.rej?`<div class="cons rej"><span class="lab">✗ reddedersen</span><span class="txt">${esc(p.rej)}</span><div class="deltas"><span>tatmin:</span> ${dStr(p.d&&p.d.r)}</div></div>`:''}
   <div class="rowb"><button class="act ok" onclick="dec('${p.id}','k')">onayla ✦</button>
@@ -302,7 +317,7 @@ function renderAll(){if(!S)return;
   $('navCnt').textContent=pend.length||'';$('navCnt').style.display=pend.length?'block':'none';
   renderMeclis();
   const dl=S.dialog||[];
-  $('dialog').innerHTML=dl.length?dl.map(d=>{const op=d.who==='__op';const tm=d.ts?(' · '+ago(d.ts)):'';const tick=op?(d.read?' <b style="color:var(--accent)">✓✓</b>':' <b style="color:var(--dim)">✓</b>'):'';return `<div class="d ${op?'op':''}"><span class="w" style="${op?'':'color:'+mC(d.who)}">${op?'SEN':mN(d.who)}${d.src==='game'?' · oyundan':''}${tm}${tick}</span>${esc(d.t)}</div>`;}).join(''):'<div class="empty">Henüz konuşma yok.</div>';
+  $('dialog').innerHTML=dl.length?dl.map(d=>{const op=d.who==='__op';const tm=d.ts?(' · '+ago(d.ts)):'';const tick=op?(d.read?' <b style="color:var(--accent)">✓✓</b>':' <b style="color:var(--dim)">✓</b>'):'';return `<div class="d ${op?'op':''}"><span class="w" style="${op?'':'color:'+mC(d.who)}">${op?'SEN':mN(d.who)}${d.src==='game'?' · oyundan':''}${tm}${tick}</span>${esc(d.t)}${op?"":`<div style="margin-top:4px"><span class="small" data-by="${d.who}" data-tx="${escA(d.t)}" onclick="bringToApproval(this.dataset.by,this.dataset.tx)">⤴ onaya getir</span></div>`}</div>`;}).join(''):'<div class="empty">Henüz konuşma yok.</div>';
   $('dialog').scrollTop=$('dialog').scrollHeight;
   $('advis').innerHTML=(S.advisories||[]).slice().reverse().map(a=>`<div class="rep" style="border-color:var(--accent);background:linear-gradient(180deg,rgba(127,212,193,.10),transparent)"><div class="who" style="color:var(--accent)">nöbetçi · ${ago(a.t)}</div><p style="font-style:normal;color:var(--ink)">${esc(a.text)}</p></div>`).join('')||'<div class="empty">Henüz tavsiye yok.</div>';
   $('news').innerHTML=(S.news||[]).slice().reverse().map(n=>`<div class="rep" style="border-color:${mC(n.who)}"><div class="who" style="color:${mC(n.who)}">✋ ${mN(n.who)}${n.imp?' · önemli':''} · ${ago(n.t)}</div><p style="font-style:normal;color:var(--moon)">${esc(n.text)}</p></div>`).join('')||'<div class="empty">Henüz söz alan yok.</div>';
@@ -315,7 +330,7 @@ function renderAll(){if(!S)return;
   if(ord.length){
     const cnt={};ord.forEach(o=>{const k=o.status||'new';cnt[k]=(cnt[k]||0)+1;});
     const rep=Object.keys(cnt).map(k=>(ST[k]?ST[k][0]:k)+': '+cnt[k]).join(' · ');
-    $('orders').innerHTML='<div class="sub" style="margin-bottom:6px">Köprü raporu — '+rep+'</div>'+ord.slice().reverse().map(o=>{const st=ST[o.status||'new']||['',''];return `<div class="ord"><span class="t">${ago(o.t)} · <b style="color:${st[1]}">${st[0]}</b></span>${esc(o.text)}${o.note?'<div style="margin-top:5px;color:var(--accent);font-size:11.5px">↳ '+esc(o.note)+'</div>':''}</div>`;}).join('');
+    $('orders').innerHTML='<div class="sub" style="margin-bottom:6px">Köprü raporu — '+rep+'</div>'+ord.slice().reverse().map(o=>{const st=ST[o.status||'new']||['',''];return `<div class="ord"><span class="t">${ago(o.t)} · <b style="color:${st[1]}">${st[0]}</b></span>${esc(o.text)}${o.note?'<div style="margin-top:5px;color:var(--accent);font-size:11.5px">↳ '+esc(o.note)+'</div>':''}${(o.status&&o.status!=='new'&&o.status!=='done')||!o.status?`<div style="margin-top:5px"><span class="small" onclick="remindOrder('${o.id}')">⟳ Claude'a hatırlat</span></div>`:''}</div>`;}).join('');
   } else $('orders').innerHTML='<div class="empty">Köprü boş.</div>';
   // nabız
   $('sPend').textContent=pend.length;$('sKanon').textContent=(S.kanon||[]).length;
@@ -334,6 +349,7 @@ function renderAll(){if(!S)return;
   const ms=S.mstats||{}, pf=S.profiles||{};
   $('profMembers').innerHTML=Object.keys(MEM).map(kk=>{const st=ms[kk]||{};const p=pf[kk];
     return `<div class="card" style="border-left:3px solid ${mC(kk)}"><h3 style="color:${mC(kk)}">${mN(kk)}</h3>${idn[kk]?`<div style="font-size:12px;color:var(--moon);font-style:italic;margin-bottom:7px">${esc(idn[kk])}</div>`:''}${p&&p.text?`<div style="font-size:11.5px;color:var(--accent);margin-bottom:7px">${esc(p.text)}</div>`:'<div style="font-size:11px;color:var(--dim);margin-bottom:7px">profil gelişiyor…</div>'}<div class="deltas"><span>aktivite ${st.act||0}</span> <span class="pos">fikir ${st.idea||0}</span> <span style="color:var(--gold)">söz/keşif ${st.obs||0}</span></div></div>`;}).join('');
+  (function(){var box=$('msatBox');if(box){var kanon=S.kanon||[],ms=S.msat||null;var BASE={aelius:82,silvanus:78,lunaris:74,lucida:70,lucius:64,bahal:57,noct:52};var val={};Object.keys(MEM).forEach(function(kk){if(ms&&typeof ms[kk]==='number'){val[kk]=ms[kk];return;}var v=BASE[kk]!=null?BASE[kk]:64;v+=9*kanon.filter(function(p){return p.by===kk;}).length;val[kk]=Math.max(0,Math.min(100,Math.round(v)));});var order=Object.keys(MEM).sort(function(a,b){return val[b]-val[a];});box.innerHTML=order.map(function(kk){return '<div class="r"><div class="top"><b style="color:'+mC(kk)+'">'+mN(kk)+'</b><span style="color:'+mC(kk)+'">%'+val[kk]+'</span></div><div class="bar"><i style="width:'+val[kk]+'%;background:'+mC(kk)+'"></i></div></div>';}).join('')+'<div class="sub" style="margin-top:8px;margin-bottom:0">En memnun: <b style="color:'+mC(order[0])+'">'+mN(order[0])+'</b> · en az: <b style="color:'+mC(order[order.length-1])+'">'+mN(order[order.length-1])+'</b></div>';}var kb=$('kanonBox');if(kb){var K=S.kanon||[];kb.innerHTML=K.length?K.slice().reverse().map(function(p,ix){var id='kn'+ix;return '<div class="r" style="border-left:2px solid var(--accent);padding-left:9px"><span class="small" onclick="toggleChange(\''+id+'\')"><b style="color:var(--moon)">'+esc(p.title)+'</b> · '+mN(p.by)+' ↳</span><div id="chg_'+id+'" style="display:none;margin-top:6px;font-size:11.5px;line-height:1.5"><div style="color:var(--dim)">'+esc(p.desc||'')+'</div><div style="margin-top:5px"><b style="color:var(--accent)">oyuna etkisi:</b> '+esc(p.acc||'—')+'</div><div class="deltas" style="margin-top:5px"><span>tatmin:</span> '+dStr(p.d&&p.d.a)+'</div></div></div>';}).join(''):'<div class="empty" style="padding:10px">Henüz kanona giren yok.</div>';}var rb=$('rejBox');if(rb){var A=[];try{A=JSON.parse(localStorage.getItem('it041_rej')||'[]');}catch(e){}rb.innerHTML=A.length?A.slice().reverse().map(function(p,ix){var id='rj'+ix;return '<div class="r" style="border-left:2px solid var(--warn);padding-left:9px"><span class="small" onclick="toggleChange(\''+id+'\')"><b style="color:var(--moon)">'+esc(p.title)+'</b> · '+mN(p.by)+' ↳</span><div id="chg_'+id+'" style="display:none;margin-top:6px;font-size:11.5px;line-height:1.5"><div style="color:var(--dim)">'+esc(p.desc||'')+'</div><div style="margin-top:5px"><b style="color:var(--warn)">engellediği:</b> '+esc(p.rej||'—')+'</div></div></div>';}).join(''):'<div class="empty" style="padding:10px">Henüz reddedilen yok.</div>';}})();
   $('profReport').innerHTML=(S.report&&S.report.text)?`<div class="rep" style="border-color:var(--accent)"><div class="who" style="color:var(--accent)">gözcü raporu · ${ago(S.report.t)}</div><p style="font-style:normal;color:var(--ink)">${esc(S.report.text)}</p></div>`:'<div class="empty">Rapor henüz oluşmadı (cron birkaç tur çalışınca gelir).</div>';
   const k=$('killBtn');if(S.autoStopped){k.classList.add('on');k.textContent='otonom yaşam: DURDURULDU — başlatmak için bas';}else{k.classList.remove('on');k.textContent='otonom yaşam: AÇIK — durdurmak için bas';}
 }
@@ -358,7 +374,7 @@ function renderMeclis(){
   $('feed').innerHTML=feed.length?feed.map(m=>{const op=(m[0]==='__op');const c=op?'var(--gold)':mC(m[0]);const nm=op?'SEN':mN(m[0]);
     return `<div class="mbub" style="border-color:${c}">`+
       `<span class="mav" style="border-color:${c};color:${c};background:${op?'rgba(205,184,120,.12)':c+'18'}">${op?'◆':nm.replace('MC ','')[0]}</span>`+
-      `<div class="mbody"><span class="mn" style="color:${c}">${nm}</span><span class="mt">${esc(m[1])}</span></div></div>`;}).join(''):'<div class="empty">Henüz tartışma yok. "yeni tur" iste ya da bir üyeye dokunup söz ver.</div>';
+      `<div class="mbody"><span class="mn" style="color:${c}">${nm}</span><span class="mt">${esc(m[1])}</span>${op?"":`<div style="margin-top:5px"><span class="small" data-by="${m[0]}" data-tx="${escA(m[1])}" onclick="bringToApproval(this.dataset.by,this.dataset.tx)">⤴ onaya getir</span></div>`}</div></div>`;}).join(''):'<div class="empty">Henüz tartışma yok. "yeni tur" iste ya da bir üyeye dokunup söz ver.</div>';
 }
 let mtTarget=null;
 window.openReply=function(k){mtTarget=k;const r=$('mtReply');r.style.display='block';
@@ -372,7 +388,7 @@ $('bMtSend').onclick=async()=>{const t=$('mtTxt').value.trim();if(!t||!mtTarget)
     toast(rp?(nm+': '+rp.slice(0,70)):'İletildi.');getState();}
   else toast(nm+' yanıt veremedi — beyin meşgul olabilir (Nabız). Tekrar dene.');};
 
-window.dec=async function(id,a){const d=await post('/decide',{id,action:a});if(d&&d.ok){toast(a==='k'?'✦ Kanona girdi — Nöbetçi Claude\'a götürecek.':a==='a'?'Reddedildi.':'Ertelendi.');getState();}};
+window.dec=async function(id,a){var prop=((S&&S.pending)||[]).find(p=>p.id===id);const d=await post('/decide',{id,action:a});if(d&&d.ok){if(a==='k'&&prop){try{await post('/order',{text:'ONAYLANAN ÖNERİ → inşa et: '+(prop.title||'')+' — '+(prop.desc||'')});}catch(e){}toast('✦ Kanona girdi + Claude köprüsüne komut bırakıldı.');}else if(a==='a'){if(prop){try{var rj=JSON.parse(localStorage.getItem('it041_rej')||'[]');rj.push({title:prop.title,desc:prop.desc,rej:prop.rej,by:prop.by,t:Date.now()});localStorage.setItem('it041_rej',JSON.stringify(rj.slice(-30)));}catch(e){}}toast('Reddedildi.');}else toast('Ertelendi.');getState();}};
 $('bTick').onclick=async()=>{$('bTick').disabled=true;$('bTick').textContent='meclis düşünüyor…';const d=await post('/tick');$('bTick').disabled=false;$('bTick').textContent='yeni tur tartışma iste ⟳';if(d&&d.ok){toast('Meclis bir tur düşündü.');getState();}};
 $('bAsk').onclick=async()=>{const t=$('askTxt').value.trim();if(!t)return;const who=$('askWho').value;$('bAsk').disabled=true;$('bAsk').textContent='düşünüyorlar…';const d=await post('/ask',{text:t,who:who==='all'?undefined:who});$('bAsk').disabled=false;$('bAsk').textContent='sor →';if(d&&d.ok){if(d.replies&&d.replies.length){$('askTxt').value='';toast('Yanıtlar geldi.');}else{toast('Üyeler yanıt veremedi — beyin meşgul olabilir (Nabız\'da ● kontrol et). Tekrar dene.');}getState();}};
 $('bPropose').onclick=async()=>{$('bPropose').disabled=true;$('bPropose').textContent='damıtılıyor…';const d=await post('/propose');$('bPropose').disabled=false;$('bPropose').textContent='✦ bunu onayıma getir';if(d&&d.ok){toast('Öneri Onaylar\'a düştü: "'+(d.proposal&&d.proposal.title||'—')+'"');getState();switchTo('onay');}else if(d&&d.error){toast('Üretilemedi (beyin/Groq?).');}};
