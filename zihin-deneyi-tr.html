@@ -349,6 +349,7 @@
     <button class="mini" onclick="Mirror.operatorUnlock()">◆ OPERATÖR</button>
     <button class="mini" id="watchBtn" onclick="Watch.toggle()">SİNYAL: AÇIK</button>
     <button class="mini" onclick="SoundUI.show()">🔊 SES</button>
+    <button class="mini" onclick="Therapy.show()">🛋 TERAPİ MERKEZİ</button>
     <button class="mini" onclick="Onboard.show(false)">❖ NASIL OYNANIR</button>
     <button class="mini" onclick="Data.wipe()">⌦ VERİLERİMİ SİL & ÇIK</button>
     <button class="mini" id="mmBtn" onclick="MM2.toggle()">MİNİ HARİTA: AÇIK</button>
@@ -2892,7 +2893,7 @@ const House={
   _step(){var c=this.cur;var st=c.room.steps[c.step];while(st&&st.when&&!this._meets(st.when)){c.step++;st=c.room.steps[c.step];}this.stepMap()['ch'+c.ch]=c.step;this._save();if(!st){return this._roomDone();}
     var ty=st.type;
     if(ty==='quiz')this._quiz(st);else if(ty==='choice'||ty==='fork')this._choice(st);else if(ty==='breath')this._breath(st);else if(ty==='reflect')this._reflect(st);else if(ty==='task')this._task(st);else if(ty==='cbt')this._cbtStart(st);else if(ty==='emdr')this._emdrStart(st);else if(ty==='ask')this._ask(st);else this._after(st,'');},
-  _adv(){this.cur.step++;this.stepMap()['ch'+this.cur.ch]=this.cur.step;this._save();this._step();},
+  _adv(){if(this._standalone){this._standalone=false;try{if(window.Therapy)Therapy.show();}catch(e){}return;}if(!this.cur)return;this.cur.step++;this.stepMap()['ch'+this.cur.ch]=this.cur.step;this._save();this._step();},
   _aictx(st,extra){var t=this.cur&&this.cur.room?this.T(this.cur.room.topic||this.cur.room.room):'';return (GAMELANG==='tr'?'Tema: ':'Theme: ')+t+(extra?(' | '+extra):'');},
   _analysis(o){if(!o||!o.w)return '';var top='',tv=-1;for(var k in o.w){if(o.w[k]>tv){tv=o.w[k];top=k;}}if(!top)return '';var TR={lunaris:['farkindalik ve ice bakis','awareness and introspection'],bahal:['tutku, hiz ve canlilik','passion, speed and aliveness'],lucida:['berraklik ve duzen','clarity and order'],noct:['durustluk ve isyan','honesty and rebellion'],lucius:['strateji ve denetim','strategy and control'],silv:['kabul ve sabir','acceptance and patience'],aelius:['perspektif ve anlam','perspective and meaning'],_balance:['denge','balance']};var t=TR[top]||['',''];var RMAP={silvanus:'silv'};var rk=RMAP[this.realm]||this.realm;var L=GAMELANG;var nm=this.NAMES[this.realm]||this.realm;var trait=L==='tr'?t[0]:t[1];var msg;if(top==='_balance'){msg=L==='tr'?('Bu yanit seni dengeye ceken bir yon gosteriyor - '+nm+'’in aradigi orta yol.'):('This answer leans toward balance - the middle path '+nm+' seeks.');}else if(top===rk){msg=L==='tr'?('Bu secim sende '+trait+' tarafini gosteriyor - '+nm+'’la ayni yonde. Belki onunla bir benzerligin.'):('This choice shows your '+trait+' side - aligned with '+nm+'. Perhaps a kinship.');}else{msg=L==='tr'?('Bu secim sende '+trait+' tarafini gosteriyor - '+nm+'’dan farkli, seni dengeye ceken baska bir ses.'):('This choice shows your '+trait+' side - different from '+nm+', another voice drawing you toward balance.');}return '<p style=\"color:var(--dim);font-size:11.5px;font-style:italic;margin-top:5px\">◦ '+msg+'</p>';},
   _after(st,ctx){var h=(st&&st.after?'<p style="color:var(--accent);line-height:1.7">'+esc(this.T(st.after))+'</p>':'')+(ctx?this.aiBtn(ctx):'')+'<button class="btn v" onclick="House._adv()">'+(GAMELANG==='tr'?'devam':'continue')+'</button>';UI.doc(this._title(),this._wrap(h));},
@@ -2906,7 +2907,7 @@ const House={
   _reflect(st){var L=GAMELANG;var h='<p style="color:var(--violet)">'+esc(this.T(st.prompt))+'</p><p style="color:var(--dim);font-size:11px">'+(L==='tr'?'Tek dürüst cümle. Kimse okumaz; bu cihazda kalır.':'One honest sentence. No one reads it; it stays on this device.')+'</p><textarea id="hRfl" rows="3" maxlength="320" placeholder="..."></textarea>'+this._hintBar()+'<button class="btn v" onclick="House._reflectDone()">'+(L==='tr'?'bırak':'leave it')+'</button>';this._rstep=st;UI.doc(this._title(),this._wrap(h));},
   _reflectDone(){var v=(UI.el('hRfl')&&UI.el('hRfl').value.trim())||'';if(!v){UI.toast(GAMELANG==='tr'?'Bir cümle yaz.':'Write a sentence.');return;}this._after(this._rstep,this._aictx(this._rstep,''));},
   _breath(st){var L=GAMELANG;var h='<p style="line-height:1.6;color:var(--ink)">'+esc(this.T(st.intro))+'</p><div style="text-align:center;margin:10px 0"><div id="breathOrb" style="width:64px;height:64px;border-radius:50%;margin:16px auto;background:radial-gradient(circle,#cdbef0,#6a5a9a);transition:transform 4s ease-in-out;transform:scale(0.55)"></div><div id="breathTxt" style="color:var(--violet);font-size:13px;min-height:18px"></div><div id="breathCnt" style="color:var(--dim);font-size:11px;margin-top:4px"></div></div><button class="btn ghost" id="breathNotice" style="font-size:11px">'+(L==='tr'?'zihnim dağıldı — fark ettim':'my mind wandered — I noticed')+'</button> <button class="btn v" id="breathDone" style="display:none" onclick="House._breathAfter()">'+(L==='tr'?'tamam':'done')+'</button>';this._bstep=st;UI.doc(this._title(),this._wrap(h));if(window.Scene&&Scene._breath)Scene._breath();},
-  _breathAfter(){if(window.Profile)Profile.nudge(1);var st=this._bstep;this._pause({sec:90},function(){House._after(st,House._aictx(st,''));});},
+  _breathAfter(){if(window.Profile)Profile.nudge(1);try{if(window.Skills)Skills.unlock('breath');}catch(e){}var st=this._bstep;this._pause({sec:90},function(){House._after(st,House._aictx(st,''));});},
   /* ---- TASK (real-life homework, multi-part, 12h gate, re-readable) ---- */
   _task(st){var L=GAMELANG;var tm=this.taskMap();var key='ch'+this.cur.ch;var t=tm[key];var parts=st.parts||2;var now=Date.now();
     if(!t){var h='<p style="color:var(--violet);line-height:1.7">'+esc(this.T(st.task))+'</p><p style="color:var(--dim);font-size:11.5px">'+(L==='tr'?'Bu gerçek-hayat ödevi (1/'+parts+'). Önce hayatında yap; bu oda 12 saat boyunca burada bekleyecek, sonra dönüp tamamla. Bu bölüm bitmeden sonraki odaya geçemezsin.':'A real-life task (1/'+parts+'). Do it in your life first; this room waits 12 hours, then return to complete it. You cannot pass to the next room until this is done.')+'</p><button class="btn v" onclick="House._taskAccept('+parts+')">'+(L==='tr'?'kabul: yapacağım (1/'+parts+')':'accept: I will do it (1/'+parts+')')+'</button>';UI.doc(this._title(),this._wrap(h));return;}
@@ -2923,44 +2924,52 @@ const House={
   _safetyBtn(){return '<button class="btn ghost" style="font-size:11px;margin-right:6px" onclick="House._safety()">☂ '+(GAMELANG==='tr'?'zorlanıyorum':'I’m struggling')+'</button>';},
   _cbtStart(st){this._cbt={st:st,i:0,d:{}};var L=GAMELANG;var h='<p style="line-height:1.7;color:var(--ink)">'+esc(this.T(st.intro))+'</p><p style="color:var(--dim);font-size:11.5px">'+(L==='tr'?'Kısa bir kanıt-mahkemesi: adım adım ilerle, acele etme. Yazdıkların cihazda kalır.':'A short court of evidence: step by step, no rush. What you write stays on this device.')+'</p>'+this._safetyBtn()+'<button class="btn v" onclick="House._cbtStep(0)">'+(L==='tr'?'başla':'begin')+'</button>';UI.doc(this._title(),this._wrap(h));},
   _cbtQ(){var L=GAMELANG;return L==='tr'?[
-    {k:'an',q:'Son 1 haftada seni en çok rahatsız hissettiren anı kısaca yaz.',ta:1},
-    {k:'duy',q:'Şimdi o duyguyu adlandır ve 0–100 arası puanla.',ta:1,rate:1},
-    {k:'odak',q:'Şimdi bir an o duyguya odaklan… Hazır olduğunda devam et.',focus:1},
-    {k:'dus',q:'O an aklına gelen ilk otomatik düşünceyi yaz.',ta:1},
-    {k:'delil',q:'Bu düşünceyi destekleyen, mahkemeye sunar gibi SOMUT bir delil yaz.',ta:1},
-    {k:'aksi',q:'Şimdi bu düşüncenin TERSİNE dair bir delil (aksi kanıt) yaz.',ta:1},
-    {k:'tart',q:'Delil ile aksi delili yan yana koy. İlk düşünce ne kadar doğru? (0–100)',rate:1},
-    {k:'karar',q:'Şimdi sentezleyerek daha gerçeğe yakın bir karar ver (hâkimin kararı gibi).',ta:1},
-    {k:'yeni',q:'Şimdi yeni duygunu fark et ve 0–100 puanla.',ta:1,rate:1}
+    {k:'an',q:'Durum: Son 1 haftada seni en çok zorlayan anı kısaca, olgusal yaz (ne oldu, nerede, kiminle).',tip:'İpucu: yorum değil, kameranın kaydedeceği şeyi yaz. Örn. “Toplantıda sustum.”',ta:1},
+    {k:'duy',q:'O an hangi duyguyu hissettin? Listeden seç ve 0–100 şiddetini ver.',tip:'İpucu: tek kelimelik bir duygu seç (düşünce değil). Bedeninde nerede hissettiğine bak.',pick:1,rate:1},
+    {k:'odak',q:'Bir an o duyguya, bedenindeki yerine odaklan… Hazır olduğunda devam et.',focus:1},
+    {k:'dus',q:'Otomatik düşünce: O an zihninden ilk geçen cümle neydi?',tip:'İpucu: ilk, hızlı, sorgusuz cümleyi yakala — “…-meliyim”, “…olacak”, “ben …yim”.',ta:1},
+    {k:'delil',q:'Bu düşünceyi DESTEKLEYEN somut bir kanıt yaz (mahkemeye sunar gibi, gerçek olgu).',tip:'İpucu: duygu değil, gözlemlenebilir olgu. “Geçen sefer de olmuştu” gibi.',ta:1},
+    {k:'aksi',q:'Şimdi bu düşüncenin TERSİNE dair bir kanıt (aksi kanıt) yaz.',tip:'İpucu: “Bunu çürüten ne var? Bir dostum bunu görse ne derdi?” diye sor.',ta:1},
+    {k:'tart',q:'Kanıtları yan yana koy. İlk düşünce ne kadar doğru? (0–100)',recap:1,rate:1},
+    {k:'karar',q:'Gerçekçi düşünce: İki kanıtı sentezleyip daha adil, dengeli bir cümle yaz.',tip:'İpucu: aşırı iyimser değil; “her zaman/asla” yerine “bazen/şu durumda” diyen dengeli bir cümle.',recap:1,ta:1},
+    {k:'yeni',q:'Şimdi duygunu yeniden tara: hangi duygu, kaç şiddetinde?',tip:'İpucu: aynı duyguyu yeniden puanla; küçük bir düşüş bile sürecin işe yaradığını gösterir.',pick:1,rate:1}
   ]:[
-    {k:'an',q:'Briefly write the moment in the last week that most unsettled you.',ta:1},
-    {k:'duy',q:'Now name that emotion and rate it 0–100.',ta:1,rate:1},
-    {k:'odak',q:'Now focus on that feeling for a moment… continue when ready.',focus:1},
-    {k:'dus',q:'Write the first automatic thought that came in that moment.',ta:1},
-    {k:'delil',q:'Write one CONCRETE piece of evidence FOR the thought, as if to a court.',ta:1},
-    {k:'aksi',q:'Now write one piece of COUNTER-evidence against the thought.',ta:1},
-    {k:'tart',q:'Set evidence and counter side by side. How true is the first thought? (0–100)',rate:1},
-    {k:'karar',q:'Now synthesize a fairer, more realistic verdict (like a judge\'s ruling).',ta:1},
-    {k:'yeni',q:'Now notice your new emotion and rate it 0–100.',ta:1,rate:1}
+    {k:'an',q:'Situation: briefly, factually write the moment that challenged you most this week (what happened, where, with whom).',tip:'Tip: write what a camera would record, not your interpretation. e.g. “I went silent in the meeting.”',ta:1},
+    {k:'duy',q:'Which emotion did you feel? Pick from the list and rate its intensity 0–100.',tip:'Tip: pick one single-word emotion (not a thought). Notice where it sits in your body.',pick:1,rate:1},
+    {k:'odak',q:'Focus for a moment on that feeling, on where it lives in your body… continue when ready.',focus:1},
+    {k:'dus',q:'Automatic thought: what was the first sentence that crossed your mind?',tip:'Tip: catch the first, fast, unquestioned line — “I should…”, “this will…”, “I am…”.',ta:1},
+    {k:'delil',q:'Write one CONCRETE piece of evidence FOR the thought (a real fact, as if to a court).',tip:'Tip: an observable fact, not a feeling. e.g. “it happened last time too.”',ta:1},
+    {k:'aksi',q:'Now write one piece of COUNTER-evidence against the thought.',tip:'Tip: ask “what disproves this? what would a friend say seeing it?”',ta:1},
+    {k:'tart',q:'Set the evidence side by side. How true is the first thought? (0–100)',recap:1,rate:1},
+    {k:'karar',q:'Realistic thought: synthesize both sides into a fairer, balanced sentence.',tip:'Tip: not over-optimistic; replace “always/never” with “sometimes/in this case.”',recap:1,ta:1},
+    {k:'yeni',q:'Now scan your emotion again: which one, and how intense?',tip:'Tip: re-rate the same emotion; even a small drop shows the process worked.',pick:1,rate:1}
   ];},
-  _cbtStep(i){var L=GAMELANG;var qs=this._cbtQ();this._cbt.i=i;if(i>=qs.length){return this._cbtDone();}var s=qs[i];
+  _cbtStep(i){var L=GAMELANG;var qs=this._cbtQ();this._cbt.i=i;if(i>=qs.length){return this._cbtDone();}var s=qs[i];var d=this._cbt.d;
     var h='<p style="color:var(--violet);line-height:1.6">'+esc(s.q)+'</p>';
+    if(s.recap){h+='<div style="border:1px dashed var(--line);border-radius:8px;padding:9px 11px;margin:6px 0;font-size:11.5px;line-height:1.5;color:var(--dim)">'+(d.an?'<div><b style="color:var(--moon)">'+(L==='tr'?'Durum: ':'Situation: ')+'</b>'+esc(d.an)+'</div>':'')+(d.dus?'<div><b style="color:var(--moon)">'+(L==='tr'?'Otomatik düşünce: ':'Automatic thought: ')+'</b>'+esc(d.dus)+'</div>':'')+(d.delil?'<div><b style="color:var(--accent)">'+(L==='tr'?'Kanıt: ':'Evidence: ')+'</b>'+esc(d.delil)+'</div>':'')+(d.aksi?'<div><b style="color:var(--accent)">'+(L==='tr'?'Aksi kanıt: ':'Counter: ')+'</b>'+esc(d.aksi)+'</div>':'')+(d.karar?'<div><b style="color:var(--moon)">'+(L==='tr'?'Gerçekçi düşünce: ':'Realistic thought: ')+'</b>'+esc(d.karar)+'</div>':'')+'</div>';}
+    if(s.tip)h+='<p style="color:var(--dim);font-size:11px;font-style:italic">'+esc(s.tip)+'</p>';
+    if(s.pick){this._cbtEmo='';h+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0">';EMO.forEach(function(e,ei){h+='<button class="btn ghost" style="font-size:11.5px;padding:5px 8px" onclick="House._cbtPick('+ei+')">'+e[0]+' '+esc(e[1][L]||e[1].en)+'</button>';});h+='</div><p style="color:var(--dim);font-size:11px" id="cbtEmoSel">'+(L==='tr'?'(bir duygu seç)':'(pick an emotion)')+'</p>';}
     if(s.ta)h+='<textarea id="cbtIn" rows="2" maxlength="240" placeholder="..."></textarea>';
     if(s.rate)h+='<p style="color:var(--dim)"><output id="cbtOut">50</output>/100</p><input type="range" id="cbtR" min="0" max="100" value="50" style="width:100%" oninput="UI.el(\'cbtOut\').textContent=this.value">';
     h+='<button class="btn v" onclick="House._cbtNext('+i+')">'+(s.focus?(L==='tr'?'devam':'continue'):(L==='tr'?'ileri':'next'))+'</button>';
     UI.doc(this._title()+' · '+(L==='tr'?'kanıt mahkemesi':'court of evidence'),this._wrap(h));},
+  _cbtPick(ei){var L=GAMELANG;var e=EMO[ei];if(!e)return;this._cbtEmo=(e[1][L]||e[1].en);var el=UI.el('cbtEmoSel');if(el)el.innerHTML=(L==='tr'?'Seçtiğin: ':'You picked: ')+'<b style="color:var(--accent)">'+e[0]+' '+esc(this._cbtEmo)+'</b>';},
   _cbtNext(i){var qs=this._cbtQ();var s=qs[i];var d=this._cbt.d;
-    if(s.ta){var v=(UI.el('cbtIn')&&UI.el('cbtIn').value.trim())||'';if(!v){UI.toast(GAMELANG==='tr'?'Kısa da olsa yaz.':'Write something, even short.');return;}d[s.k]=v;}
+    if(s.pick){if(!this._cbtEmo){UI.toast(GAMELANG==='tr'?'Bir duygu seç.':'Pick an emotion.');return;}d[s.k]=this._cbtEmo;}
+    else if(s.ta){var v=(UI.el('cbtIn')&&UI.el('cbtIn').value.trim())||'';if(!v){UI.toast(GAMELANG==='tr'?'Kısa da olsa yaz.':'Write something, even short.');return;}d[s.k]=v;}
     if(s.rate){d[s.k+'_r']=parseInt((UI.el('cbtR')&&UI.el('cbtR').value)||'50',10);}
     this._cbtStep(i+1);},
-  _cbtDone(){if(window.Profile)Profile.nudge(2);var L=GAMELANG;var d=this._cbt.d;var st=this._cbt.st;var b=(d['duy_r']!=null?d['duy_r']:null),a=(d['yeni_r']!=null?d['yeni_r']:null);
-    var delta=(b!=null&&a!=null)?(b-a):null;
-    var h='<p style="color:var(--accent);line-height:1.7">'+(L==='tr'?'Karar verildi. Düşünceyi delil ve aksi deliliyle tarttın; ilk inancın sandığın kadar kesin değildi.':'The verdict is in. You weighed the thought against evidence and counter-evidence; your first belief was not as certain as it felt.')+'</p>';
-    if(delta!=null)h+='<p style="color:var(--moon)">'+(L==='tr'?'Duygu: '+b+' → '+a+(delta>0?' (yük '+delta+' puan hafifledi)':delta===0?' (aynı kaldı — bu da veridir)':' (yükseldi; bazen olur, nazikçe nefes al)'):'Emotion: '+b+' → '+a)+'</p>';
-    h+=(st.after?'<p style="color:var(--violet);line-height:1.6">'+esc(this.T(st.after))+'</p>':'')+this.aiBtn(this._aictx(st,'CBT: '+(d['dus']||'')+' / '+(L==='tr'?'karar: ':'verdict: ')+(d['karar']||'')));
+  _cbtDone(){if(window.Profile)Profile.nudge(2);try{if(window.Skills)Skills.unlock('cbt');}catch(e){}var L=GAMELANG;var d=this._cbt.d;var st=this._cbt.st;var b=(d['duy_r']!=null?d['duy_r']:null),a=(d['yeni_r']!=null?d['yeni_r']:null);var delta=(b!=null&&a!=null)?(b-a):null;
+    var h='<p style="color:var(--accent);line-height:1.7">'+(L==='tr'?'Karar verildi. Düşünceyi kanıt ve aksi kanıtla tarttın; ilk inancın sandığın kadar kesin değildi.':'The verdict is in. You weighed the thought against evidence and counter-evidence; your first belief was not as certain as it felt.')+'</p>';
+    h+='<div style="border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:6px 0;font-size:12px;line-height:1.55">'+(d.dus?'<div><b style="color:var(--moon)">'+(L==='tr'?'Otomatik düşünce: ':'Automatic thought: ')+'</b>'+esc(d.dus)+'</div>':'')+(d.karar?'<div><b style="color:var(--accent)">'+(L==='tr'?'Gerçekçi düşünce: ':'Realistic thought: ')+'</b>'+esc(d.karar)+'</div>':'')+(delta!=null?'<div style="color:var(--moon);margin-top:4px">'+(L==='tr'?'Duygu':'Emotion')+' '+(d.duy||'')+': '+b+' → '+a+(delta>0?' ('+(L==='tr'?('yük '+delta+' puan hafifledi'):('down '+delta))+')':delta===0?(L==='tr'?' (aynı — bu da veridir)':' (same — that is data too)'):(L==='tr'?' (yükseldi; nazikçe nefes al)':' (rose; breathe gently)'))+'</div>':'')+'</div>';
+    var sv=(L==='tr'?(delta>0?'Düşünceni kanıtla sınadın ve duygunun yükü '+delta+' puan azaldı — zihnin sana her söylediğine inanmak zorunda değilsin.':'Bir düşünceyi adilce tartmak başlı başına bir beceri; sonuç değişmese bile artık onu sorgulayabiliyorsun.'):(delta>0?'You tested your thought against evidence and the emotion eased '+delta+' points — you need not believe everything the mind says.':'Weighing a thought fairly is itself a skill; even if the number held, you can now question it.'));
+    h+='<p style="color:var(--violet);font-size:12px;font-style:italic;line-height:1.55">◦ <b style="color:var(--moon)">Silvanus:</b> '+esc(sv)+'</p>';
+    h+='<p style="color:var(--dim);font-size:11.5px;line-height:1.5">'+(L==='tr'?'Bu hafta 3 farklı durumda bunu dene. İstediğin zaman 🛋 Terapi Merkezi’nden Lunaris ile tekrar çalışabilirsin.':'Try this on 3 different situations this week. Anytime, practice again with Lunaris at the 🛋 Therapy Center.')+'</p>';
+    h+=(st&&st.after?'<p style="color:var(--violet);line-height:1.6">'+esc(this.T(st.after))+'</p>':'')+this.aiBtn(this._aictx(st||{},'CBT: '+(d['dus']||'')+' / '+(L==='tr'?'karar: ':'verdict: ')+(d['karar']||'')));
     h+='<div id="cbtPause"></div>';
     UI.doc(this._title(),this._wrap(h));
-    this._pause({sec:90,box:'cbtPause'},function(){House._adv();});},
+    var sec=(House._standalone?20:90);
+    this._pause({sec:sec,box:'cbtPause'},function(){House._adv();});},
   /* ---- EMDR-style (bilateral audio) — NOT therapy ---- */
   _emdrStart(st){var L=GAMELANG;this._em={st:st,set:0};
     var h='<p style="line-height:1.7;color:var(--ink)">'+esc(this.T(st.intro))+'</p>'+
@@ -2979,7 +2988,7 @@ const House={
     var left=18;House._emTimer=setInterval(function(){left--;var e=UI.el('emTimer');if(e)e.textContent=Math.max(0,left);if(left<=0)clearInterval(House._emTimer);},1000);},
   _emdrAfterSet(){var L=GAMELANG;var h='<p style="color:var(--violet)">'+(L==='tr'?'Şimdi ne var? Zihninde/bedeninde ne fark ediyorsun? (kısa)':'What is here now? What do you notice in mind/body? (short)')+'</p><textarea id="emNow" rows="2" maxlength="200"></textarea><button class="btn v" onclick="House._emdrNow()">'+(L==='tr'?'ileri':'next')+'</button>';UI.doc(this._title(),this._wrap(h));},
   _emdrNow(){if(this._em.set<2){this._emdrSet();}else{this._emdrFinish();}},
-  _emdrFinish(){if(window.Profile)Profile.nudge(2);var L=GAMELANG;var st=this._em.st;var h='<p style="color:var(--accent);line-height:1.7">'+(L==='tr'?'Burada duruyoruz. Bu yalnızca bir tohumdu; gerçek işlemleme eğitimli bir EMDR terapistiyle yapılır. Devam etmek istersen bir EMDR terapisti bul.':'We stop here. This was only a seed; real processing is done with a trained EMDR therapist. If you want to continue, find an EMDR therapist.')+'</p>'+(st.after?'<p style="color:var(--violet);line-height:1.6">'+esc(this.T(st.after))+'</p>':'')+'<div id="emPause"></div>';UI.doc(this._title(),this._wrap(h));this._pause({sec:90,box:'emPause'},function(){House._adv();});},
+  _emdrFinish(){if(window.Profile)Profile.nudge(2);try{if(window.Skills)Skills.unlock('emdr');}catch(e){}var L=GAMELANG;var st=this._em.st;var h='<p style="color:var(--accent);line-height:1.7">'+(L==='tr'?'Burada duruyoruz. Bu yalnızca bir tohumdu; gerçek işlemleme eğitimli bir EMDR terapistiyle yapılır. Devam etmek istersen bir EMDR terapisti bul.':'We stop here. This was only a seed; real processing is done with a trained EMDR therapist. If you want to continue, find an EMDR therapist.')+'</p>'+(st.after?'<p style="color:var(--violet);line-height:1.6">'+esc(this.T(st.after))+'</p>':'')+'<div id="emPause"></div>';UI.doc(this._title(),this._wrap(h));this._pause({sec:90,box:'emPause'},function(){House._adv();});},
   _emdrAudio(seconds,cb){try{var AC=window.AudioContext||window.webkitAudioContext;if(!AC){setTimeout(cb,seconds*1000);return;}var ctx=this._ac||(this._ac=new AC());if(ctx.state==='suspended')ctx.resume();var osc=ctx.createOscillator();var gain=ctx.createGain();var pan=ctx.createStereoPanner?ctx.createStereoPanner():null;osc.type='sine';osc.frequency.value=210;gain.gain.value=0.05;osc.connect(gain);if(pan){gain.connect(pan);pan.connect(ctx.destination);}else{gain.connect(ctx.destination);}osc.start();var i=0;var iv=setInterval(function(){if(pan)pan.pan.value=(i%2?0.9:-0.9);i++;},520);var stop=function(){clearInterval(iv);try{osc.stop();}catch(e){}};setTimeout(function(){stop();cb&&cb();},seconds*1000);}catch(e){setTimeout(cb,seconds*1000);}},
   /* ---- Silvanus pause-and-notice gate ---- */
   _pause(opts,cb){var L=GAMELANG;var sec=(opts&&opts.sec)||60;var box=opts&&opts.box;
@@ -3049,6 +3058,32 @@ const House={
   leaveAfterFinish(){try{if(UI.closeDoc)UI.closeDoc();}catch(e){}if(window.W3&&W3.Interior)W3.Interior.exit();var idx=(window.REALMS||[]).findIndex(function(r){return r.k===House.realm;});var nx=(window.REALMS&&REALMS[idx+1])?REALMS[idx+1]:null;var nm=nx?(House.NAMES[nx.k]||nx.k):'';UI.toast(GAMELANG==='tr'?(nm?(nm+' alanı açıldı — sıradaki adım.'):'Sıradaki adım açıldı.'):(nm?(nm+' area unlocked — the next step.'):'The next step is open.'),5500);}
 };
 if(typeof window!=='undefined')window.House=House;
+const EMO=[['😟',{tr:'Kaygı',en:'Anxiety'}],['😢',{tr:'Üzüntü',en:'Sadness'}],['😠',{tr:'Öfke',en:'Anger'}],['😨',{tr:'Korku',en:'Fear'}],['😳',{tr:'Utanç',en:'Shame'}],['😔',{tr:'Suçluluk',en:'Guilt'}],['😞',{tr:'Çaresizlik',en:'Helplessness'}],['🫥',{tr:'Yalnızlık',en:'Loneliness'}],['😤',{tr:'Hayal kırıklığı',en:'Disappointment'}],['😬',{tr:'Gerginlik',en:'Tension'}],['😶',{tr:'Boşluk',en:'Emptiness'}],['🥺',{tr:'İncinme',en:'Hurt'}],['😖',{tr:'Bunaltı',en:'Overwhelm'}],['😌',{tr:'Huzur',en:'Calm'}],['🙂',{tr:'Umut',en:'Hope'}]];
+const Skills={
+  NAMES:{cbt:{tr:'Kanıt Mahkemesi (BDT)',en:'Court of Evidence (CBT)'},emdr:{tr:'İkili Uyarım (EMDR temelli)',en:'Bilateral (EMDR-based)'},breath:{tr:'Nefes & Topraklama',en:'Breath & Grounding'},meditation:{tr:'Meditasyon (Zen)',en:'Meditation (Zen)'}},
+  has:function(k){return !!(S.skills&&S.skills[k]);},
+  unlock:function(k){S.skills=S.skills||{};if(S.skills[k])return false;S.skills[k]=Date.now();if(typeof save==='function')save();var L=GAMELANG;var nm=this.NAMES[k]?(this.NAMES[k][L]||this.NAMES[k].en):k;
+    var ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:420;display:flex;align-items:center;justify-content:center;background:rgba(3,4,10,.93)';
+    ov.innerHTML='<div style="text-align:center;max-width:440px;padding:26px 24px;border:1px solid var(--accent);border-radius:14px;background:radial-gradient(ellipse at 50% 0%,rgba(127,212,193,.16),rgba(8,10,18,.97))"><div style="font-size:30px">🛋</div><p style="color:var(--accent);letter-spacing:.14em;margin:8px 0">'+(L==='tr'?'YENİ TERAPÖTİK BECERİ AÇILDI':'NEW THERAPEUTIC SKILL UNLOCKED')+'</p><p style="color:var(--moon);font-size:15px">'+esc(nm)+'</p><p style="color:var(--dim);font-size:12px;line-height:1.5">'+(L==='tr'?'Bütünleşmeye bir adım daha yaklaştın. Bu beceriyi istediğin zaman 🛋 Terapi Merkezi’nde Lunaris ile tekrar çalışabilirsin.':'One step closer to integration. Practice this skill anytime with Lunaris at the 🛋 Therapy Center.')+'</p><button class="btn v" id="skGo">'+(L==='tr'?'devam':'continue')+'</button></div>';
+    document.body.appendChild(ov);var b=ov.querySelector('#skGo');if(b)b.onclick=function(){ov.remove();};return true;}
+};
+const Therapy={
+  _items:[['cbt','🜂'],['emdr','◐'],['breath','◯'],['meditation','☵']],
+  show:function(){var L=GAMELANG;var rows='';this._items.forEach(function(it){var k=it[0];var nm=Skills.NAMES[k][L]||Skills.NAMES[k].en;var open=(k==='meditation')?(Skills.has('breath')||Skills.has('meditation')):Skills.has(k);
+    if(open)rows+='<button class="btn v" style="display:block;width:100%;text-align:left;margin:5px 0;font-size:12.5px" onclick="Therapy.run(\''+k+'\')">'+it[1]+' '+esc(nm)+'</button>';
+    else rows+='<div class="btn ghost" style="display:block;text-align:left;margin:5px 0;opacity:.5;cursor:default;font-size:12px">🔒 '+esc(nm)+' — '+(L==='tr'?'henüz öğrenilmedi':'not yet learned')+'</div>';});
+    var h='<p style="color:var(--dim);font-size:12px;line-height:1.6">'+(L==='tr'?'Lunaris’in evinde ve yolculukta öğrendiğin terapötik beceriler burada birikir. İstediğin zaman gel ve Lunaris ile tekrar çalış — kendi hayatından güncel bir durumla.':'The therapeutic skills you learn in Lunaris’s house and on the journey gather here. Come anytime and practice again with Lunaris — on a current situation from your own life.')+'</p>'+rows;
+    UI.doc((L==='tr'?'🛋 TERAPİ MERKEZİ — Lunaris ile':'🛋 THERAPY CENTER — with Lunaris'),h);},
+  run:function(k){House._standalone=true;House.cur=null;House.realm=House.realm||'lunaris';
+    if(k==='cbt'){House._cbtStart({intro:{tr:'Bugün kendi hayatından güncel bir durumu ele alalım. Adım adım birlikte gideceğiz — acele yok.',en:'Let us take a current situation from your own life today. Step by step, together — no rush.'},after:{tr:'Bu beceriyi ne kadar çok kullanırsan, içindeki o ses o kadar adil olur.',en:'The more you use this skill, the fairer that inner voice becomes.'}});}
+    else if(k==='breath'){House._breath({intro:{tr:'Dört nefes. İçeri… ve dışarı. Bedenine dön; tezgâhın boşalsın.',en:'Four breaths. In… and out. Return to your body; let the counter clear.'},after:{tr:'Buradasın, güvendesin. Tezgâh biraz boşaldı.',en:'You are here, safe. The counter cleared a little.'}});}
+    else if(k==='emdr'){House._emdrStart({intro:{tr:'Çok nazikçe, rahatsız edici bir anının yanında bir an dur. İstediğin an durabilirsin; bu bir alıştırma, terapi değildir.',en:'Very gently, pause beside an uncomfortable memory. You can stop anytime; this is an exercise, not therapy.'},after:{tr:'Donmuş bir anının buzunu gerçekten çözmek için eğitimli bir EMDR terapistiyle çalış.',en:'To truly thaw a frozen memory, work with a trained EMDR therapist.'}});}
+    else if(k==='meditation'){this.meditation();}},
+  meditation:function(){var L=GAMELANG;var ph=L==='tr'?['Otur, omuzlarını bırak. Gözlerini yumabilirsin.','Nefesini takip et — içeri…','…ve dışarı. Onu değiştirme, sadece izle.','Bir düşünce gelince ona “düşünce” de ve nefese dön.','Şu an buradasın. Yeterince.']:['Sit, drop your shoulders. You may close your eyes.','Follow your breath — in…','…and out. Do not change it, just watch.','When a thought comes, name it “thinking” and return to the breath.','You are here, now. Enough.'];
+    var i=0;var self=this;var render=function(){UI.doc((L==='tr'?'☵ Meditasyon — Silvanus’un sessizliği':'☵ Meditation — Silvanus’s silence'),House._wrap('<p style="line-height:1.8;color:var(--ink);min-height:52px">'+esc(ph[i])+'</p><div style="width:72px;height:72px;border-radius:50%;margin:18px auto;background:radial-gradient(circle,#9aa7c4,#3a4763)"></div>'));};
+    render();if(this._miv)clearInterval(this._miv);this._miv=setInterval(function(){i++;if(i>=ph.length){clearInterval(self._miv);try{if(window.Skills)Skills.unlock('meditation');}catch(e){}UI.doc((L==='tr'?'☵ Meditasyon':'☵ Meditation'),House._wrap('<p style="color:var(--accent);line-height:1.7">'+(L==='tr'?'Birkaç nefeslik sessizlik bile zihni biraz aralar. Bunu günde bir kez deneyebilirsin.':'Even a few breaths of silence open the mind a little. You can try this once a day.')+'</p><button class="btn v" onclick="Therapy.show()">'+(L==='tr'?'kapat':'close')+'</button>'));return;}render();},7000);}
+};
+if(typeof window!=='undefined'){window.Skills=Skills;window.Therapy=Therapy;}
 const Interlude={
   _iv:null,_n:null,_cb:null,
   T:function(o){return (o&&(o[GAMELANG]||o.en||o.tr))||"";},
