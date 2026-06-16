@@ -349,8 +349,9 @@
     <button class="mini" onclick="Mirror.operatorUnlock()">◆ OPERATÖR</button>
     <button class="mini" id="watchBtn" onclick="Watch.toggle()">SİNYAL: AÇIK</button>
     <button class="mini" onclick="SoundUI.show()">🔊 SES</button>
-    <button class="mini" onclick="Therapy.show()">🛋 TERAPİ MERKEZİ</button>
+    <button class="mini" onclick="Therapy.menuRedirect()">🛋 TERAPİ MERKEZİ</button>
     <button class="mini" onclick="Onboard.show(false)">❖ NASIL OYNANIR</button>
+    <button class="mini" onclick="Game.exitFlow()">⏏ ÇIKIŞ</button>
     <button class="mini" onclick="Data.wipe()">⌦ VERİLERİMİ SİL & ÇIK</button>
     <button class="mini" id="mmBtn" onclick="MM2.toggle()">MİNİ HARİTA: AÇIK</button>
     <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">EŞZAMANLI: KAPALI</button>
@@ -1186,6 +1187,7 @@ function interactTarget(){
   if(W3&&W3.inInterior&&W3.Interior)return W3.Interior.target();
   if(W3&&W3.PORTALS)for(const pg of W3.PORTALS){
     if(Math.hypot(S.px-pg.x,S.pz-pg.z)<pg.r){
+      if(pg.clinic){return['\uD83D\uDECB '+(GAMELANG==='tr'?esc(pg.name)+'\'ne gir':'enter '+esc(pg.name)),()=>{if(window.W3&&W3.Interior&&W3.Interior.enterClinic)W3.Interior.enterClinic();}];}
       if(pg.house){var rk=pg.k;var woke=S.flags&&S.flags[rk+'Woke'];var _R=(window.REALMS||[]).find(function(x){return x.k===rk;});var nm=(_R&&window.Realms)?Realms.T(_R.n):rk;return[(GAMELANG==='tr'?(woke?'☽ '+nm+' — gir':'☽ '+nm+' — uyan'):(woke?'☽ '+nm+' — enter':'☽ '+nm+' — wake')),function(){if(window.House)House.wake(rk);}];}
       return['☽ '+(GAMELANG==='tr'?esc(pg.name)+' alanına gir':'enter '+esc(pg.name)),()=>{if(window.HOUSES&&HOUSES[pg.k]&&window.House){House.wake(pg.k);}else{W3.Interior.enter(pg.k);}}];}}
   /* v8: bir denek/karakter çok yakındaysa alan etkileşimlerinden ÖNCE o gelir */
@@ -1534,6 +1536,15 @@ const Game={
   setModal(v){this.modal=v;
     try{document.body.classList.toggle('paused',v);}catch(e){}
     if(v&&document.pointerLockElement){try{document.exitPointerLock();}catch(e){}}},
+  exitFlow(){var L=GAMELANG;var has=(window.Cloud&&Cloud.code&&Cloud.code());
+    var h='<p style="line-height:1.65;color:var(--ink)">'+(L==='tr'?'Çıkmadan önce: ilerlemen yalnızca bu cihazda yerel olarak saklanır. Başka bir cihazda (telefon/tablet/bilgisayar) kaldığın yerden devam etmek istersen bir <b style="color:var(--accent)">İlerleme Kodu</b> oluştur; aynı kodu öbür cihaza girince ilerlemen oraya taşınır. (Yazdıkların taşınmaz; yalnız ilerleme ve ayarlar.)':'Before you leave: your progress is stored only locally on this device. To continue where you left off on another device (phone/tablet/computer), create a <b style="color:var(--accent)">Progress Code</b>; entering the same code on the other device brings your progress there. (Your writings do not travel; only progress and settings.)')+'</p>';
+    h+=has?('<p style="color:var(--accent);font-size:12.5px">'+(L==='tr'?'Mevcut kodun: ':'Your code: ')+'<b>'+esc(Cloud.code())+'</b> — '+(L==='tr'?'bunu not al, öbür cihazda gir.':'note it, enter it on the other device.')+'</p>'):('<p style="color:var(--moon);font-size:12.5px">'+(L==='tr'?'Henüz bir kodun yok. Devam edebilmek için şimdi oluşturmak ister misin?':'You have no code yet. Want to create one now so you can continue later?')+'</p>');
+    h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">';
+    h+='<button class="btn v" onclick="if(window.Cloud)Cloud.ui()">\u2601 '+(L==='tr'?'İlerleme Kodu oluştur / göster':'Create / show Progress Code')+'</button>';
+    h+='<button class="btn" onclick="try{if(window.Cloud&&Cloud.code())Cloud.push();}catch(e){}UI.toast(GAMELANG===&#39;tr&#39;?&#39;İlerlemen kaydedildi. Görüşürüz.&#39;:&#39;Progress saved. See you.&#39;);setTimeout(function(){location.reload();},900);">'+(L==='tr'?'kaydet ve çık':'save & exit')+'</button>';
+    h+='<button class="btn ghost" onclick="location.reload();">'+(L==='tr'?'yine de çık':'exit anyway')+'</button>';
+    h+='</div>';
+    UI.doc((L==='tr'?'\u23CF ÇIKIŞ — devam etmek için İlerleme Kodu':'\u23CF EXIT — Progress Code to continue'),h);},
   start(cont){
     if(!cont){try{localStorage.removeItem(SAVEKEY);}catch(e){}}
     else load();
@@ -3076,6 +3087,11 @@ const Skills={
 };
 const Therapy={
   _items:[['cbt','🜂'],['emdr','◐'],['breath','◯'],['meditation','☵']],
+  menuRedirect:function(){var L=GAMELANG;var open=this._open();
+    if(!open){UI.toast(L==='tr'?'\uD83D\uDECB Terapi Merkezi henüz açılmadı. Bölümlerden geçip ilk terapötik beceriyi öğrenince, şehirdeki \uD83D\uDECB Terapi Merkezi binasının kapıları açılır; oraya gidip kapısından girersin.':'\uD83D\uDECB The Therapy Center is not open yet. Once you learn your first therapeutic skill in the chapters, the \uD83D\uDECB Therapy Center building in the city opens; go there and enter its door.',7200);return;}
+    UI.toast(L==='tr'?'\uD83D\uDECB Terapi Merkezi şehirde bir bina — oraya git ve kapısından gir. (Menüden de hızlı erişebilirsin.)':'\uD83D\uDECB The Therapy Center is a building in the city — go there and enter its door. (Quick access from the menu too.)',6500);
+    setTimeout(function(){if(window.Therapy)Therapy.show();},500);},
+  _open:function(){return !!(window.Skills&&(Skills.has('cbt')||Skills.has('emdr')||Skills.has('breath')||Skills.has('meditation')));},
   show:function(){var L=GAMELANG;var rows='';this._items.forEach(function(it){var k=it[0];var nm=Skills.NAMES[k][L]||Skills.NAMES[k].en;var open=(k==='meditation')?(Skills.has('breath')||Skills.has('meditation')):Skills.has(k);
     if(open)rows+='<button class="btn v" style="display:block;width:100%;text-align:left;margin:5px 0;font-size:12.5px" onclick="Therapy.run(\''+k+'\')">'+it[1]+' '+esc(nm)+'</button>';
     else rows+='<div class="btn ghost" style="display:block;text-align:left;margin:5px 0;opacity:.5;cursor:default;font-size:12px">🔒 '+esc(nm)+' — '+(L==='tr'?'henüz öğrenilmedi':'not yet learned')+'</div>';});
@@ -4570,6 +4586,37 @@ if(HAS3D)(function(){
       const dl=this._label(GAMELANG==='tr'?'↩ ÇIKIŞ':'↩ EXIT','rgba(206,216,236,.92)',1.6);dl.position.set(0,2.4,RS-0.7);g.add(dl);this.door={x:0,z:RS-0.9};
       this.stations=[];this.cur=null;
     },
+    buildClinic(){
+      this._clear();const g=new THREE.Group();interiorScene.add(g);this._g=g;const RS=this.RS;this.houseCh=null;this.clinic=true;this.house=false;
+      const warm=0xffce7a,accent=0x9d8cc9;
+      const fl=new THREE.Mesh(new THREE.CircleGeometry(RS,48),std(0x1a1622,{roughness:.96}));fl.rotation.x=-Math.PI/2;g.add(fl);
+      const wall=new THREE.Mesh(new THREE.CylinderGeometry(RS,RS,7,48,1,true),new THREE.MeshStandardMaterial({color:0x241f2b,roughness:.97,side:THREE.BackSide}));wall.position.y=3.5;g.add(wall);
+      g.add(new THREE.AmbientLight(0x2a2433,.7));
+      const rug=new THREE.Mesh(new THREE.CircleGeometry(5.4,40),std(0x6b3f4a,{roughness:1}));rug.rotation.x=-Math.PI/2;rug.position.y=0.02;g.add(rug);
+      const rug2=new THREE.Mesh(new THREE.RingGeometry(4.2,4.8,40),new THREE.MeshStandardMaterial({color:0xcdb878,roughness:1,side:THREE.DoubleSide}));rug2.rotation.x=-Math.PI/2;rug2.position.y=0.03;g.add(rug2);
+      const couch=std(0x4a5a72,{roughness:.85});
+      box(3.0,0.7,1.3,couch,0,0.55,-3.4,0,g);box(3.0,1.25,0.35,couch,0,1.2,-4.0,0,g);box(0.35,0.95,1.3,couch,-1.5,0.92,-3.4,0,g);box(0.35,0.95,1.3,couch,1.5,0.92,-3.4,0,g);
+      box(0.95,0.7,0.95,std(0x3a2e26,{roughness:.8}),2.7,0.45,-3.0,0,g);
+      box(0.12,1.35,0.12,std(0x20242e),2.7,1.38,-3.0,0,g);
+      const shade=new THREE.Mesh(new THREE.ConeGeometry(0.5,0.55,16,1,true),new THREE.MeshStandardMaterial({color:warm,emissive:warm,emissiveIntensity:.95,roughness:.5,side:THREE.DoubleSide}));shade.position.set(2.7,2.15,-3.0);g.add(shade);
+      const lampL=new THREE.PointLight(warm,1.0,13,2);lampL.position.set(2.7,2.0,-3.0);g.add(lampL);
+      box(1.7,0.4,0.95,std(0x2e241e,{roughness:.8}),0,0.25,-1.9,0,g);
+      box(0.55,0.5,0.55,std(0x2a2420),-3.1,0.3,-2.6,0,g);
+      const plant=new THREE.Mesh(new THREE.IcosahedronGeometry(0.62,0),std(0x3f6b46,{roughness:.8,flatShading:true}));plant.position.set(-3.1,1.05,-2.6);g.add(plant);
+      const cl=new THREE.PointLight(accent,.5,40,2);cl.position.set(0,5.4,0);g.add(cl);
+      const ttl=this._label('\uD83D\uDECB '+(GAMELANG==='tr'?'TERAPİ MERKEZİ':'THERAPY CENTER'),'rgba(226,224,212,.97)',2.4);ttl.position.set(0,6.0,0);g.add(ttl);
+      const flab=this._label((GAMELANG==='tr'?'\u25C8 koltuğa otur — terapötik çalışma':'\u25C8 sit — therapeutic exercise'),'rgba(220,225,240,.95)',1.5);flab.position.set(0,2.35,-2.3);g.add(flab);
+      this._foc={position:{x:0,z:-3.4}};
+      this.coll=[{x:0,z:-3.4,r:1.5},{x:2.7,z:-3.0,r:.7},{x:-3.1,z:-2.6,r:.6},{x:0,z:-1.9,r:1.0}];
+      const dfr=new THREE.Mesh(new THREE.TorusGeometry(1.5,.16,8,24,Math.PI),new THREE.MeshStandardMaterial({color:warm,emissive:warm,emissiveIntensity:.55,roughness:.5}));dfr.position.set(0,0,RS-0.6);dfr.rotation.x=-Math.PI/2;g.add(dfr);
+      const dl=this._label(GAMELANG==='tr'?'\u21A9 ÇIKIŞ':'\u21A9 EXIT','rgba(206,216,236,.92)',1.6);dl.position.set(0,2.4,RS-0.7);g.add(dl);this.door={x:0,z:RS-0.9};
+      this.stations=[];this.cur='therapy';
+    },
+    enterClinic(){var L=GAMELANG;var open=!!(window.Skills&&(Skills.has('cbt')||Skills.has('emdr')||Skills.has('breath')||Skills.has('meditation')));
+      if(!open){UI.toast(L==='tr'?'\uD83D\uDECB Terapi Merkezi henüz açılmadı — bir bölümde ilk terapötik beceriyi (BDT/EMDR/nefes/meditasyon) öğrenince kapıları açılır.':'\uD83D\uDECB The Therapy Center is not open yet — its doors open once you learn your first therapeutic skill (CBT/EMDR/breath/meditation) in a chapter.',6800);return false;}
+      this.buildClinic();W3.IP={px:0,pz:this.RS-3};W3.inInterior=true;meshAng=Math.PI;interiorScene.add(player.g);if(W3.intLamp)W3.intLamp.visible=true;
+      try{if(UI&&UI.closeDoc)UI.closeDoc();}catch(e){}if(Game.setModal)Game.setModal(false);
+      UI.toast(L==='tr'?'\uD83D\uDECB Terapi Merkezi — koltuğa yaklaş [E] ve bir terapötik çalışma seç.':'\uD83D\uDECB Therapy Center — approach the couch [E] and choose a therapeutic exercise.',6000);return true;},
     advanceHouse(){const ch=window.House.curChapter();if(ch>7){if(window.House&&House.realmGate){House.realmGate();}else{this.exit();}return;}
       this.buildHouseRoom(ch);W3.IP={px:0,pz:this.RS-3};
       const room=(window.House&&House.data().rooms[ch-1]);if(room)UI.toast('→ '+(room.room[GAMELANG]||room.room.en),3500);},
@@ -4585,6 +4632,7 @@ if(HAS3D)(function(){
     exit(){W3.inInterior=false;scene.add(player.g);if(W3.intLamp)W3.intLamp.visible=false;try{if(window.House){if(House._emCancel)House._emCancel();if(House._pz)clearInterval(House._pz);}}catch(e){}UI.toast(GAMELANG==='tr'?'Alandan çıktın.':'You left the area.');},
     target(){const p=W3.IP;if(!p)return null;
       if(Math.hypot(p.px-this.door.x,p.pz-this.door.z)<2.3)return[GAMELANG==='tr'?'↩ alandan çık':'↩ leave the area',()=>W3.Interior.exit()];
+      if(this.cur==='therapy'){const f=this._foc;if(f&&Math.hypot(p.px-f.position.x,p.pz-f.position.z)<2.3)return['\uD83D\uDECB '+(GAMELANG==='tr'?'terapötik çalışma seç':'choose a therapeutic exercise'),()=>{if(window.Therapy)Therapy.show();}];return null;}
       if(this.house){const f=this._foc;if(f&&Math.hypot(p.px-f.position.x,p.pz-f.position.z)<2.4){const ch=this.houseCh;const rooms=(window.House&&House.data().rooms)||[];const room=rooms[ch-1]||{};const allDone=window.House&&House.curChapter()>7;return['◈ '+(GAMELANG==='tr'?'Bölüm ':'Chapter ')+(window.House?House.abs(ch):ch)+' · '+(room.room?(room.room[GAMELANG]||room.room.en):'')+(GAMELANG==='tr'?' — başla':' — begin'),()=>{if(allDone&&window.House){House.realmGate();}else if(window.House){House.openRoom(ch);}}];}return null;}
       let best=null,bd=2.4;for(const st of this.stations){const d=Math.hypot(p.px-st.x,p.pz-st.z);if(d<bd){bd=d;best=st;}}
       if(best){const dn=!!(S.zones&&S.zones[this.cur]&&S.zones[this.cur].done&&S.zones[this.cur].done[best.id]);return[(dn?'✓ ':'◇ ')+(GAMELANG==='tr'?'Bölüm ':'Ch ')+best.ch+' · '+Scene.T(best.t)+(GAMELANG==='tr'?' — performe et':' — perform'),()=>Scene.run(W3.Interior.cur,best.id)];}
@@ -4626,6 +4674,16 @@ if(HAS3D)(function(){
   }
   buildHouse('lunaris',250,104,(GAMELANG==='tr'?"LUNARIS'IN EVİ ☽":"LUNARIS'S HOUSE ☽"));
   buildHotel('bahal',96,118,(GAMELANG==='tr'?'BAHAL-ROMA DENEYİ ✶':'THE BAHAL-ROME EXPERIMENT ✶'));
+  function buildClinicBldg(x,z,name){
+    box(6,4.2,5,std(0x2a2230,{roughness:.9}),x,2.1,z);collide(x,z,5);
+    box(1.7,2.7,.3,std(0x140f12,{emissive:0xffce7a,emissiveIntensity:.5}),x,1.35,z+2.55);
+    box(2.6,.7,.2,std(0x100a12,{emissive:0x9d8cc9,emissiveIntensity:.85}),x,3.5,z+2.62,0,scene,false);
+    const pl=new THREE.PointLight(0xffce7a,.7,15,2);pl.position.set(x,3,z+4);scene.add(pl);
+    const pv=new THREE.PointLight(0x9d8cc9,.5,13,2);pv.position.set(x,4.4,z);scene.add(pv);
+    label(name,x,z,5.6,.82);
+    W3.PORTALS.push({k:'therapy',x:x,z:z+5,r:3.4,name:name,clinic:true});
+  }
+  buildClinicBldg(150,150,(GAMELANG==='tr'?'TERAPİ MERKEZİ \u2695':'THERAPY CENTER \u2695'));
   function buildCity(k,x,z,name){
     for(let i=0;i<7;i++){const a=(i/7)*Math.PI*2;const r=3+(i%3);const bx=x+Math.cos(a)*r,bz=z+Math.sin(a)*r;const h=3+((i*53)%7);
       box(1.6,h,1.6,std(0x14182a,{emissive:0xbcd0f0,emissiveIntensity:.18+(i%3)*0.04,roughness:.9}),bx,h/2,bz);}
