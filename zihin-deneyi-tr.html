@@ -2552,7 +2552,7 @@ const MindMap={
 const Architect={
   on(){return !!((S.flags.initiate||S.solved.s7)&&(window.Profile?Profile.balanced():true)&&(S.flags&&S.flags.collectiveConsent==='keep'));},
   menu(){
-    if((S.flags.initiate||S.solved.s7)&&window.Profile&&!Profile.balanced()){var L=GAMELANG;UI.doc('✶ '+(L==='tr'?'MİMAR MODU — denge gerekli':'ARCHITECT MODE — balance required'),'<p style="line-height:1.6">'+(L==='tr'?'Yolu yürüdün ama içindeki altı arketip henüz dengede değil. Mimar Modu yalnızca dengeye ulaşanlara açılır. ⚖ Zihin Profili ekranına bak; en zayıf yönünü besleyerek ortalan.':'You walked the road, but your six inner archetypes are not yet in balance. Architect Mode opens only to those who reach balance. See ⚖ Mind Profile; feed your weakest side to recenter.')+'</p><button class="btn ghost" onclick="if(window.Profile)Profile.show()">⚖ '+(L==='tr'?'Zihin Profili':'Mind Profile')+'</button>');return;}
+    if((S.flags.initiate||S.solved.s7)&&window.Profile&&!Profile.balanced()){var L=GAMELANG;UI.doc('✶ '+(L==='tr'?'MİMAR MODU — denge gerekli':'ARCHITECT MODE — balance required'),'<p style="line-height:1.6">'+(L==='tr'?'Yolu yürüdün ama içindeki yedi arketip henüz dengede değil. Mimar Modu yalnızca dengeye ulaşanlara açılır. ⚖ Zihin Profili ekranına bak; en zayıf yönünü besleyerek ortalan.':'You walked the road, but your seven inner archetypes are not yet in balance. Architect Mode opens only to those who reach balance. See ⚖ Mind Profile; feed your weakest side to recenter.')+'</p><button class="btn ghost" onclick="if(window.Profile)Profile.show()">⚖ '+(L==='tr'?'Zihin Profili':'Mind Profile')+'</button>');return;}
     if((S.flags.initiate||S.solved.s7)&&window.Profile&&Profile.balanced()&&!(S.flags&&S.flags.collectiveConsent==='keep')){if(typeof consentGate==='function')consentGate();return;}
     if(!this.on()){UI.doc('✶ MİMAR MODU','<p>Henüz değil. Mimar olmak için ya çekirdeği durdur (⟁) ya da inisiyasyonu tamamla (✶).</p><p style="color:var(--dim)">Yatay düzlemde yürüyen, haritayı gezer. Dikey sıçrayan, haritayı yazar.</p>');return;}
     const st=this.stars().length,ch=this.story().length;
@@ -2853,7 +2853,7 @@ const Realms={
       h+='<div class="jentry" style="'+(op?'':'opacity:.5')+'"><h4 style="color:'+(dn?'var(--accent)':(op?'var(--violet)':'var(--dim)'))+'">'+(dn?'✓ ':(op?(i+1)+'. ':'🔒 '))+esc(Realms.T(r.n))+' — '+esc(Realms.T(r.arch))+'</h4>'+
         (function(){var sp=(window.Scene&&RZONES[r.k]&&!RZONES[r.k].stub)?Scene.prog(r.k):null;var pt=sp?(sp.d+'/'+sp.n+' '+(L==='tr'?'pratik':'practices')):(L==='tr'?'alan yakında':'area soon');h+='<p style="font-size:11.5px;color:var(--dim)">'+(L==='tr'?'Bölüm ':'Chapters ')+r.ch[0]+'–'+r.ch[1]+' · '+pt+' · ◎ '+esc(Realms.T(r.loc))+'</p>'+(op?'<button class="btn ghost" style="font-size:11px" onclick="if(window.HOUSES&&HOUSES[\''+r.k+'\']){House.wake(\''+r.k+'\');}else{Scene.enter(\''+r.k+'\');}">'+(L==='tr'?'→ '+esc(Realms.T(r.n))+' alanına gir':'→ enter '+esc(Realms.T(r.n)))+'</button>':'<span style="font-size:11px;color:var(--dim)">'+(L==='tr'?'önce bir önceki arketibi bütünle':'integrate the previous archetype first')+'</span>')+'</div>';})();});
     var fin=Realms.allDone();
-    h+='<div class="jentry" style="border-top:1px solid var(--line);'+(fin?'':'opacity:.5')+'"><h4 style="color:'+(fin?'var(--accent)':'var(--dim)')+'">'+(fin?'✦ ':'🔒 ')+(L==='tr'?'SEN — MİMAR':'YOU — THE ARCHITECT')+'</h4><p style="font-size:11.5px;color:var(--dim)">'+(L==='tr'?'Yedi arketibi bütünleyince: ikinci kitap açılır ve bu çatının altında kendi evrenini otonom olarak yaratmaya başlarsın.':'Once the seven are integrated: Book Two opens and you begin creating your own universe, autonomously, under this roof.')+'</p>'+(fin?((window.Profile&&!Profile.balanced())?('<p style="font-size:11px;color:var(--moon);line-height:1.5">'+(L==='tr'?'✦ İkinci kitap açıldı. Mimar Modu için içindeki altı arketibi dengele.':'✦ Book Two opened. Balance your six inner archetypes to open Architect Mode.')+'</p><button class="btn ghost" style="font-size:11px" onclick="if(window.Profile)Profile.show()">⚖ '+(L==='tr'?'Zihin Profili':'Mind Profile')+'</button>'):('<button class="btn v" style="font-size:11px" onclick="if(window.Architect)Architect.menu()">'+(L==='tr'?'→ Mimar Modu':'→ Architect Mode')+'</button>')):'')+'</div>';
+    h+='<div class="jentry" style="border-top:1px solid var(--line);'+(fin?'':'opacity:.5')+'"><h4 style="color:'+(fin?'var(--accent)':'var(--dim)')+'">'+(fin?'✦ ':'🔒 ')+(L==='tr'?'SEN — MİMAR':'YOU — THE ARCHITECT')+'</h4><p style="font-size:11.5px;color:var(--dim)">'+(L==='tr'?'Yedi arketibi bütünleyince: ikinci kitap açılır ve bu çatının altında kendi evrenini otonom olarak yaratmaya başlarsın.':'Once the seven are integrated: Book Two opens and you begin creating your own universe, autonomously, under this roof.')+'</p>'+(fin?((window.Profile&&!Profile.balanced())?('<p style="font-size:11px;color:var(--moon);line-height:1.5">'+(L==='tr'?'✦ İkinci kitap açıldı. Mimar Modu için içindeki yedi arketibi dengele.':'✦ Book Two opened. Balance your seven inner archetypes to open Architect Mode.')+'</p><button class="btn ghost" style="font-size:11px" onclick="if(window.Profile)Profile.show()">⚖ '+(L==='tr'?'Zihin Profili':'Mind Profile')+'</button>'):('<button class="btn v" style="font-size:11px" onclick="if(window.Architect)Architect.menu()">'+(L==='tr'?'→ Mimar Modu':'→ Architect Mode')+'</button>')):'')+'</div>';
     UI.doc((L==='tr'?'⌖ ARKETİP EVRENLERİ':'⌖ ARCHETYPE REALMS'),h);}
 };
 if(typeof window!=='undefined'){window.REALMS=REALMS;window.Realms=Realms;}
@@ -4006,7 +4006,7 @@ if(HAS3D)(function(){
     box(8,3,4,std(0x8a7048,{map:plankTex,emissive:0x3a3014,emissiveIntensity:.15}),L.caravan.x,1.5,L.caravan.z);collide(L.caravan.x,L.caravan.z,5);
     cyl(.8,.8,.4,std(0x111111),L.caravan.x-2.4,.8,L.caravan.z+2.2).rotation.z=Math.PI/2;
     cyl(.8,.8,.4,std(0x111111),L.caravan.x+2.4,.8,L.caravan.z+2.2).rotation.z=Math.PI/2;
-    label("SILVANUS'UN BAHÇESİ",L.caravan.x,L.caravan.z,9,.7);
+    label((GAMELANG==='tr'?"SILVANUS'UN KARAVANI":"SILVANUS'S CARAVAN"),L.caravan.x,L.caravan.z,9,.7);
   })();
   const fire=new THREE.PointLight(0xffa050,1.6,20,2);
   fire.position.set(L.caravan.x+6,1.2,L.caravan.z+3);scene.add(fire);
@@ -4696,7 +4696,7 @@ if(HAS3D)(function(){
   buildCity('lucida',176,235,(GAMELANG==='tr'?"LUCIDA'NIN ŞEHRİ ✦":"LUCIDA'S CITY ✦"));
   buildCity('lucius',210,175,(GAMELANG==='tr'?"LUCIUS'UN KULESİ ✦":"LUCIUS'S TOWER ✦"));
   buildCity('noct',300,190,(GAMELANG==='tr'?'NOCTORNUS GECESİ ✦':'NOCTORNUS NIGHT ✦'));
-  buildCity('silvanus',130,215,(GAMELANG==='tr'?"SILVANUS'UN KARAVANI ✦":"SILVANUS'S CARAVAN ✦"));
+  W3.PORTALS.push({k:'silvanus',x:L.caravan.x,z:L.caravan.z+4,r:3.6,name:(GAMELANG==='tr'?"SILVANUS'UN KARAVANI ☽":"SILVANUS'S CARAVAN ☽"),house:true});
   buildCity('aelius',310,90,(GAMELANG==='tr'?'AELIUS SEANSI ✦':'THE AELIUS SESSION ✦'));
 
   /* ---- camera ---- */
@@ -5056,7 +5056,7 @@ function drawBigMap(){
   ctx.fillStyle='#9d8cc9';
   ctx.font='10px monospace';ctx.fillStyle='#9d8cc9';ctx.fillText('◈ mor = ritüellerin',c.width/2-150,c.height-30);ctx.fillStyle='rgba(230,195,110,.95)';ctx.fillText('● altın = yolcular',c.width/2,c.height-30);ctx.fillStyle='rgba(110,210,220,.9)';ctx.fillText('● cyan = ayna-ajanları',c.width/2+150,c.height-30);
   ctx.font='11px monospace';
-  (window.W3&&W3.PORTALS||[]).forEach(function(p){if(!p.house)return;var X=p.x*sx,Z=p.z*sz;var integ=S.flags&&S.flags[p.k+'Integrated'];ctx.strokeStyle=integ?'rgba(127,212,193,.95)':'rgba(205,184,120,.95)';ctx.fillStyle=ctx.strokeStyle;ctx.lineWidth=2;ctx.beginPath();ctx.arc(X,Z,8,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(X,Z-4);ctx.lineTo(X+3.5,Z+3);ctx.lineTo(X-3.5,Z+3);ctx.closePath();ctx.fill();ctx.fillText((integ?'✓ ':'☽ ')+((window.House&&House.NAMES[p.k])||p.k)+(GAMELANG==='tr'?' evi':String.fromCharCode(8217)+'s house'),X,Z-11);});
+  (window.W3&&W3.PORTALS||[]).forEach(function(p){if(!p.house)return;var X=p.x*sx,Z=p.z*sz;var integ=S.flags&&S.flags[p.k+'Integrated'];ctx.strokeStyle=integ?'rgba(127,212,193,.95)':'rgba(205,184,120,.95)';ctx.fillStyle=ctx.strokeStyle;ctx.lineWidth=2;ctx.beginPath();ctx.arc(X,Z,8,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(X,Z-4);ctx.lineTo(X+3.5,Z+3);ctx.lineTo(X-3.5,Z+3);ctx.closePath();ctx.fill();ctx.fillText((integ?'✓ ':'☽ ')+(function(){var R=(window.REALMS||[]).find(function(x){return x.k===p.k;});return R&&window.Realms?Realms.T(R.n):((window.House&&House.NAMES[p.k])||p.k);})(),X,Z-11);});
   const wp=waypoint();
   if(wp){ctx.fillStyle='#cdb878';ctx.beginPath();ctx.arc(wp.x*sx,wp.z*sz,5,0,7);ctx.fill();
     ctx.fillText('◆ HEDEF',wp.x*sx,wp.z*sz+18);}
