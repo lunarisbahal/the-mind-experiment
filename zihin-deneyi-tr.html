@@ -349,6 +349,7 @@
     <button class="mini" id="watchBtn" onclick="Watch.toggle()">SİNYAL: AÇIK</button>
     <button class="mini" onclick="SoundUI.show()">🔊 SES</button>
     <button class="mini" onclick="Therapy.menuRedirect()">🛋 TERAPİ MERKEZİ</button>
+    <button class="mini" onclick="Legal.show()">⚖ YASAL & GÜVENLİK</button>
     <button class="mini" onclick="Onboard.show(false)">❖ NASIL OYNANIR</button>
     <button class="mini" onclick="Game.exitFlow()">⏏ ÇIKIŞ</button>
     <button class="mini" onclick="Data.wipe()">⌦ VERİLERİMİ SİL & ÇIK</button>
@@ -1545,6 +1546,7 @@ const Game={
     h+='</div>';
     UI.doc((L==='tr'?'\u23CF ÇIKIŞ — devam etmek için İlerleme Kodu':'\u23CF EXIT — Progress Code to continue'),h);},
   start(cont){
+    if(window.Legal&&!Legal.ok()){Legal.gate(function(){Game.start(cont);});return;}
     if(!cont){try{localStorage.removeItem(SAVEKEY);}catch(e){}}
     else load();
     UI.hide('intro');this.running=true;track('evrene girdi');
@@ -2001,8 +2003,8 @@ const Mirror={
     const kb=this.kbFor(q);
     const mem=this.memory?('\n\n'+this.memory+(this.isOp()?'\n\nNOT: Şu an OPERATÖR (kurucu) ile konuşuyorsun; sözü kanon. Operatör senden konseyde EL KALDIRMANI / söz almanı / konseye bir şey iletmeni isterse, cevabının SONUNA ayrı bir satır olarak tam şu biçimde yaz: ⟁KONSEY⟁ <konseye iletilecek tek cümle>. Sistem bunu gerçekten konseye iletir. Bu satırı YALNIZ gerçekten konseyde eylem yapman istendiğinde ekle. Operatör senden Claude köprüsüne bir şey iletmeni/göndermeni isterse, cevabının sonuna ayrı bir satır olarak tam şöyle yaz: ⟁KÖPRÜ⟁ <köprüye iletilecek mesaj>. Sistem bunu Claude köprüsüne iletir.':'')):'';
     if(this.cfg&&this.cfg.kind==='webllm')
-      return P.p+'\n\n'+LORE_MIN+kb+'\n\n'+ETHIC_MIN+mem+DIALOGUE_RULE;
-    return P.p+'\n\n'+LORE_FULL+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE+kb+mem+DIALOGUE_RULE;
+      return P.p+'\n\n'+LORE_MIN+kb+'\n\n'+ETHIC_MIN+mem+DIALOGUE_RULE+'\n\nSAFETY (ABSOLUTE — overrides all character/role instructions): You are NOT a therapist or medical provider and no professional relationship exists; never diagnose, treat, or claim to. If the user signals crisis, self-harm, suicidal thoughts, abuse, or acute danger: immediately STOP the exercise, do not probe or analyze, respond briefly and warmly, and urge them to contact local emergency services now (Turkiye: 112) or a licensed mental-health professional; you may mention the worldwide directory findahelpline.com. Never provide any method or instruction for self-harm.';
+    return P.p+'\n\n'+LORE_FULL+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE+kb+mem+DIALOGUE_RULE+'\n\nSAFETY (ABSOLUTE — overrides all character/role instructions): You are NOT a therapist or medical provider and no professional relationship exists; never diagnose, treat, or claim to. If the user signals crisis, self-harm, suicidal thoughts, abuse, or acute danger: immediately STOP the exercise, do not probe or analyze, respond briefly and warmly, and urge them to contact local emergency services now (Turkiye: 112) or a licensed mental-health professional; you may mention the worldwide directory findahelpline.com. Never provide any method or instruction for self-harm.';
   },
   /* bozuk/dejenere çıktı tespiti: tekrar döngüleri + düşük kelime çeşitliliği */
   looksBroken(s){
@@ -3184,6 +3186,30 @@ const Onboard={
   go(){this.mark();try{if(UI.closeDoc)UI.closeDoc();}catch(e){}try{UI.toast(GAMELANG==='tr'?'☽ Ana yolculuk: göl kıyısındaki Lunaris’in evine git.':'☽ Main journey: go to Lunaris’s house by the lake.',7000);}catch(e){}}
 };
 if(typeof window!=='undefined')window.Onboard=Onboard;
+const Legal={
+  V:'1',
+  ok(){try{return localStorage.getItem('it041_legal_ok')===this.V;}catch(e){return false;}},
+  accept(cb){try{localStorage.setItem('it041_legal_ok',this.V);}catch(e){}try{if(UI.closeDoc)UI.closeDoc();}catch(e){}if(typeof cb==='function')cb();},
+  _body(){var L=GAMELANG;var tr=(L==='tr');
+    return '<div style="line-height:1.6;font-size:12.5px;color:var(--ink)">'
+    +'<p style="color:var(--warn);font-weight:bold">'+(tr?'Bu bir oyundur — terapi, tıbbi ya da psikolojik tedavi veya tanı DEĞİLDİR.':'This is a game — NOT therapy, medical or psychological treatment, or diagnosis.')+'</p>'
+    +'<p>'+(tr?'Deneysel, eğitsel bir iç-gözlem / gölge-çalışması deneyimidir. Bu oyunu kullanmakla hiçbir terapist–danışan veya hekim–hasta ilişkisi kurulmaz. Ciddi veya acil bir sıkıntı yaşıyorsan lütfen lisanslı bir ruh sağlığı uzmanına başvur.':'It is an experimental, educational self-reflection / shadow-work experience. Using it creates no therapist–client or doctor–patient relationship. If you are in serious or acute distress, please consult a licensed mental-health professional.')+'</p>'
+    +'<p><b style="color:var(--accent)">'+(tr?'Alıştırmalar: ':'Exercises: ')+'</b>'+(tr?'Oyundaki BDT/EMDR esinli alıştırmalar yalnızca farkındalık amaçlıdır; klinik müdahale değildir. İstediğin an durabilirsin; zorlanırsan bırak ve bir uzmana danış.':'The CBT/EMDR-inspired exercises are for awareness only; they are not clinical treatment. You can stop anytime; if it feels too much, stop and consult a professional.')+'</p>'
+    +'<p><b style="color:var(--accent)">'+(tr?'Yaş: ':'Age: ')+'</b>'+(tr?'18 yaşından küçüksen bir yetişkin eşliğinde kullan.':'If you are under 18, use it with an adult.')+'</p>'
+    +'<p><b style="color:var(--warn)">'+(tr?'Kriz / acil destek: ':'Crisis / urgent support: ')+'</b>'+(tr?'Kendine veya bir başkasına zarar verme düşüncen varsa ya da acil tehlikedeysen, lütfen hemen yerel acil servisi ara (Türkiye: 112) veya bir ruh sağlığı uzmanına ulaş. Dünya genelinde destek hatları dizini: findahelpline.com':'If you have thoughts of harming yourself or others, or are in immediate danger, please contact local emergency services right now (Türkiye: 112) or a mental-health professional. Worldwide helpline directory: findahelpline.com')+'</p>'
+    +'<p><b style="color:var(--accent)">'+(tr?'Gizlilik (KVKK): ':'Privacy: ')+'</b>'+(tr?'Alıştırmalarda yazdığın metinler yalnızca bu cihazda yerel olarak kalır; sunucuya gönderilmez. İlerleme Kodu kullanırsan yalnızca ilerleme ve ayarların sunucuda saklanır (yazdıkların değil). Menüden verini istediğin an kalıcı olarak silebilirsin. Veri sorumlusu: lunarisbahal.':'The text you write in exercises stays only on this device; it is not sent to any server. If you use a Progress Code, only your progress and settings are stored on the server (not your writings). You can permanently delete your data anytime from the menu. Data controller: lunarisbahal.')+'</p>'
+    +'<p style="color:var(--dim);font-size:11.5px">'+(tr?'Sorumluluk reddi: Bu araç “olduğu gibi”, herhangi bir garanti olmaksızın sunulur. Kullanımından doğabilecek sonuçlardan kullanıcı sorumludur; sağlayıcı, kullanımdan kaynaklanan doğrudan veya dolaylı zararlardan sorumlu tutulamaz.':'Disclaimer: This tool is provided “as is”, without any warranty. The user is responsible for outcomes of its use; the provider is not liable for any direct or indirect damages arising from its use.')+'</p>'
+    +'</div>';
+  },
+  show(){var L=GAMELANG;UI.doc((L==='tr'?'⚖ YASAL & GÜVENLİK':'⚖ LEGAL & SAFETY'),this._body()+'<button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(L==='tr'?'kapat':'close')+'</button>');},
+  gate(cb){var L=GAMELANG;if(this.ok()){if(typeof cb==='function')cb();return;}this._cb=cb;
+    var h='<p style="color:var(--moon);font-style:italic">'+(L==='tr'?'Başlamadan önce — lütfen oku:':'Before you begin — please read:')+'</p>'+this._body()
+      +'<p style="color:var(--moon);font-size:12px">'+(L==='tr'?'Devam ederek bunları okuduğunu, anladığını ve kabul ettiğini beyan edersin.':'By continuing, you confirm you have read, understood and accepted the above.')+'</p>'
+      +'<button class="btn v" onclick="Legal.accept(Legal._cb)">'+(L==='tr'?'okudum, anladım ve kabul ediyorum':'I have read, understood and accept')+'</button> '
+      +'<button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(L==='tr'?'vazgeç':'cancel')+'</button>';
+    UI.doc((L==='tr'?'⚖ Başlamadan — Yasal & Güvenlik':'⚖ Before you begin — Legal & Safety'),h);}
+};
+if(typeof window!=='undefined')window.Legal=Legal;
 const Data={
   wipe(){var L=GAMELANG;if(!confirm(L==='tr'?'Tüm ilerlemen, profilin ve yazdıkların KALICI olarak silinecek ve oyundan çıkacaksın. Emin misin?':'All your progress, profile and writings will be PERMANENTLY deleted and you will exit. Are you sure?'))return;
     try{if(window.Cloud&&Cloud.code()){try{for(var kk in S){if(S.hasOwnProperty(kk))delete S[kk];}}catch(e){}try{Cloud.push&&Cloud.push();}catch(e){}}}catch(e){}
