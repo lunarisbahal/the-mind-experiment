@@ -148,6 +148,14 @@
         <button class="act v" id="bPropose">✦ bunu onayıma getir</button>
       </div>
       <div style="text-align:right;margin-top:8px"><span class="small" id="bClearDlg">diyaloğu temizle</span></div>
+      <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px">
+        <div class="sub"><b style="color:var(--gold)">◆ Oyun güncellemesini konseye işle</b> — "oyunda ne değişti"yi üyelerin hafızasına yazar (kronik). Hazır 4 dijest var ya da kendi metnini yaz.</div>
+        <textarea id="updTxt" maxlength="400" placeholder="kendi güncelleme metnin (opsiyonel)…"></textarea>
+        <div class="rowb">
+          <button class="act v" id="bUpdAll">◆ Hazır 4 dijesti gönder</button>
+          <button class="act ok" id="bUpdOne">bu metni gönder →</button>
+        </div>
+      </div>
     </section>
 
     <!-- SİNYAL -->
@@ -312,6 +320,23 @@ document.querySelectorAll('.nb').forEach(n=>n.onclick=()=>switchTo(n.dataset.v))
 
 getState();health();
 setInterval(getState,60000);
+
+const UPD_DIGESTS=[
+"Lunaris evi (B1-7) ve Bahal evi (Roma, B8-14) yeni paradigmada acildi: kapida uyanis + oda-oda kendi-hayatindan shadow-work + CBT/EMDR/odev + odul.",
+"7-arketip zihin/denge profili kuruldu (Lunaris-farkindalik, Bahal-dirilik, Lucida-berraklik, Noctornus-durustluk, Lucius-duzen, Silvanus-kabul, Aelius-perspektif); orta seviyeden baslar.",
+"Mimar Modu artik denge>=%55 + kolektife-kal onayi ister; isim duser (ego serbest). Onaylar topluluk istatistigine islenir.",
+"Onboarding, veri-silme, guvenlik cikislari, ana/yan gorev ayrimi, harita ev isaretleri eklendi. Sirada: Lucida evi (Kitap 2 ile)."
+];
+async function sendUpdate(text){
+  const key=opKey(); if(!key){toast('Once operator anahtarini gir (gear).');return false;}
+  const h={'Content-Type':'application/json','x-operator-key':key};
+  try{const r=await fetch(API+'/update',{method:'POST',headers:h,body:JSON.stringify({text})});if(r.ok)return true;}catch(e){}
+  try{const r2=await fetch(API+'/handsup',{method:'POST',headers:h,body:JSON.stringify({who:'aelius',text:'OYUN GUNCELLEMESI: '+text})});return r2.ok;}catch(e){}
+  return false;
+}
+if($('bUpdAll'))$('bUpdAll').onclick=async()=>{$('bUpdAll').disabled=true;$('bUpdAll').textContent='gonderiliyor...';let ok=0;for(const d of UPD_DIGESTS){if(await sendUpdate(d))ok++;}$('bUpdAll').disabled=false;$('bUpdAll').textContent='◆ Hazir 4 dijesti gonder';toast(ok+'/'+UPD_DIGESTS.length+' guncelleme konseye islendi.');try{getState();}catch(e){}};
+if($('bUpdOne'))$('bUpdOne').onclick=async()=>{const t=$('updTxt').value.trim();if(!t)return;$('bUpdOne').disabled=true;const ok=await sendUpdate(t);$('bUpdOne').disabled=false;if(ok){$('updTxt').value='';toast('Guncelleme konseye islendi.');}else{toast('Gonderilemedi - anahtari/baglantiyi kontrol et.');}try{getState();}catch(e){}};
+
 </script>
 </body>
 </html>

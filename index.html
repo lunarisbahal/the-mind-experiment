@@ -1902,6 +1902,7 @@ const LORE_MIN=`Universe: the Dolunay Ekspres books. Psychologist Lunaris Bahal'
 /* v8.4 — SHARED MIRROR LINE: zero-setup default brain (Cloudflare Worker → Groq 70B). */
 const RELAY_URL='https://it041-konsey.lunarisbahal.workers.dev/mirror';
 const RELAY_FALLBACK='https://it041-mirror.lunarisbahal.workers.dev';
+const DIALOGUE_RULE='\n\nDIALOGUE RULE (important): Ask AT MOST TWO questions in this whole conversation. From the third exchange onward do NOT ask any question — guide and invite so the person discovers the answer for themselves (a small nudge, a direction; never interrogate, never impose). Stay on this universe and their shadow-work / main journey; do not engage in irrelevant small-talk — if they drift off-topic, warmly bring it back to the journey.';
 const Mirror={
   cfg:null,engine:null,hist:{},cur:null,busy:false,
   CKEY:'it041_mirror_cfg',
@@ -1997,8 +1998,8 @@ const Mirror={
     const kb=this.kbFor(q);
     const mem=this.memory?('\n\n'+this.memory+(this.isOp()?'\n\nNOTE: You are speaking with the OPERATOR (founder); their word is canon. If the operator asks you to RAISE A HAND / speak in the council / take something there, end your reply with a separate final line exactly like: ⟁KONSEY⟁ <one sentence for the council>. The system will actually deliver it. Add this line ONLY when truly asked to act in the council. If the operator asks you to SEND or FORWARD something to the Claude bridge, end with a separate final line exactly: ⟁KÖPRÜ⟁ <the message for the bridge>. The system delivers it to the Claude bridge.':'')):'';
     if(this.cfg&&this.cfg.kind==='webllm')
-      return P.p+'\n\n'+LORE_MIN+kb+'\n\n'+ETHIC_MIN+mem;
-    return P.p+'\n\n'+LORE_FULL+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE+kb+mem;
+      return P.p+'\n\n'+LORE_MIN+kb+'\n\n'+ETHIC_MIN+mem+DIALOGUE_RULE;
+    return P.p+'\n\n'+LORE_FULL+'\n\n'+MISSION_CORE+'\n\n'+ETHIC_CORE+kb+mem+DIALOGUE_RULE;
   },
   /* degenerate-output detector: repetition loops + low word diversity */
   looksBroken(s){
@@ -3099,7 +3100,7 @@ function consentGate(){var L=GAMELANG;
   UI.doc('✦ '+(L==='tr'?'SON SEÇİM — harita kime kalsın':'THE FINAL CHOICE — to whom does the map belong'),
    '<p style="line-height:1.65">'+(L==='tr'?'Yolun sonundasın; ikinci kitap herkese açıldı. Son soru: çıkardığın bilinçaltı/zihin haritan kolektife mi katılsın, yoksa silinsin mi? Bu, oyunun son testidir.':'You are at the end of the road; Book Two has opened for everyone. The last question: should the subconscious/mind map you produced join the collective, or be deleted? This is the game’s final test.')+'</p>'
    +'<p style="color:var(--dim);font-size:12px">'+(L==='tr'?'Yalnızca “kolektife kalsın” diyenlere — ve dengeye ulaşmış olanlara — Mimar Modu açılır. Silmeyi seçersen verilerin tümüyle silinir ve Mimar Modu açılmaz.':'Only those who say “keep in the collective” — and who reached balance — open Architect Mode. If you choose to delete, your data is fully erased and Architect Mode does not open.')+'</p>'
-   +'<button class="btn v" onclick="S.flags=S.flags||{};S.flags.collectiveConsent=\'keep\';if(typeof save===\'function\')save();try{if(UI.closeDoc)UI.closeDoc();}catch(e){}UI.toast(GAMELANG===\'tr\'?\'Haritan kolektife katıldı.\':\'Your map joined the collective.\');if(window.Architect)Architect.menu();">'+(L==='tr'?'Kolektife kalsın':'Keep in the collective')+'</button> '
+   +'<button class="btn v" onclick="S.flags=S.flags||{};S.flags.collectiveConsent=\'keep\';if(typeof save===\'function\')save();try{if(UI.closeDoc)UI.closeDoc();}catch(e){}UI.toast(GAMELANG===\'tr\'?\'Haritan kolektife katıldı.\':\'Your map joined the collective.\');try{if(typeof track===\'function\')track(\'kolektife katıldı (izin verdi)\');}catch(e){}if(window.Architect)Architect.menu();">'+(L==='tr'?'Kolektife kalsın':'Keep in the collective')+'</button> '
    +'<button class="btn ghost" onclick="if(window.Data)Data.wipe();">'+(L==='tr'?'Sil ve çık':'Delete and leave')+'</button>');}
 if(typeof window!=='undefined')window.consentGate=consentGate;
 
