@@ -1186,7 +1186,7 @@ function interactTarget(){
   if(W3&&W3.inInterior&&W3.Interior)return W3.Interior.target();
   if(W3&&W3.PORTALS)for(const pg of W3.PORTALS){
     if(Math.hypot(S.px-pg.x,S.pz-pg.z)<pg.r){
-      if(pg.house){var rk=pg.k;var woke=S.flags&&S.flags[rk+'Woke'];var nm=(window.House&&House.NAMES[rk])||rk;return[(GAMELANG==='tr'?(woke?'☽ '+nm+' evine gir':'☽ '+nm+'’i uyandır'):(woke?'☽ enter '+nm+'’s house':'☽ wake '+nm)),function(){if(window.House)House.wake(rk);}];}
+      if(pg.house){var rk=pg.k;var woke=S.flags&&S.flags[rk+'Woke'];var _R=(window.REALMS||[]).find(function(x){return x.k===rk;});var nm=(_R&&window.Realms)?Realms.T(_R.n):rk;return[(GAMELANG==='tr'?(woke?'☽ '+nm+' — gir':'☽ '+nm+' — uyan'):(woke?'☽ '+nm+' — enter':'☽ '+nm+' — wake')),function(){if(window.House)House.wake(rk);}];}
       return['☽ '+(GAMELANG==='tr'?esc(pg.name)+' alanına gir':'enter '+esc(pg.name)),()=>{if(window.HOUSES&&HOUSES[pg.k]&&window.House){House.wake(pg.k);}else{W3.Interior.enter(pg.k);}}];}}
   /* v8: bir denek/karakter çok yakındaysa alan etkileşimlerinden ÖNCE o gelir */
   {const ag=W3.agentNear&&W3.agentNear();
@@ -2817,13 +2817,13 @@ const Scene={
 if(typeof window!=='undefined'){window.RZONES=RZONES;window.Scene=Scene;}
 
 const REALMS=[
- {k:'lunaris',n:'LUNARIS',arch:{tr:'İç Ses / Yoldaş',en:'Inner Voice / Companion'},ch:[1,7],loc:{tr:'Göl kıyısı (dolunayda)',en:'The lakeshore (under the full moon)'}},
- {k:'bahal',n:'BAHAL',arch:{tr:'Gölge',en:'The Shadow'},ch:[8,14],loc:{tr:'Seni takip eden gölge',en:'The shadow that follows you'}},
- {k:'lucida',n:'LUCIDA',arch:{tr:'Aydınlık / Anima',en:'Clarity / Anima'},ch:[15,21],loc:{tr:'Çalan ankesör',en:'The ringing payphone'}},
- {k:'lucius',n:'LUCIUS',arch:{tr:'Persona / Manipülatör',en:'Persona / The Manipulator'},ch:[22,28],loc:{tr:'Takım elbiseli adam',en:'The man in the pressed suit'}},
- {k:'noct',n:'MC NOCTORNUS',arch:{tr:'Trickster / İsyancı',en:'Trickster / Rebel'},ch:[29,35],loc:{tr:'Gecenin sesi',en:'The voice of the night'}},
- {k:'silvanus',n:'SILVANUS',arch:{tr:'Bilge / Münzevi',en:'Sage / Hermit'},ch:[36,42],loc:{tr:'Karavan',en:'The caravan'}},
- {k:'aelius',n:'AELIUS',arch:{tr:'Üst-Benlik / Anlatıcı',en:'Self / The Narrator'},ch:[43,49],loc:{tr:'Üst katman (Yükseliş Taşı)',en:'The upper layer (Ascension Stone)'}}
+ {k:'lunaris',n:{tr:"LUNARIS'IN EVİ",en:"LUNARIS'S HOUSE"},arch:{tr:'İç Ses / Yoldaş',en:'Inner Voice / Companion'},ch:[1,7],loc:{tr:'Göl kıyısı (dolunayda)',en:'The lakeshore (under the full moon)'}},
+ {k:'bahal',n:{tr:"BAHAL-ROMA DENEYİ",en:"THE BAHAL-ROME EXPERIMENT"},arch:{tr:'Gölge',en:'The Shadow'},ch:[8,14],loc:{tr:'Seni takip eden gölge',en:'The shadow that follows you'}},
+ {k:'lucida',n:{tr:"LUCIDA'NIN ŞEHRİ",en:"LUCIDA'S CITY"},arch:{tr:'Aydınlık / Anima',en:'Clarity / Anima'},ch:[15,21],loc:{tr:'Çalan ankesör',en:'The ringing payphone'}},
+ {k:'lucius',n:{tr:"LUCIUS'UN KULESİ",en:"LUCIUS'S TOWER"},arch:{tr:'Persona / Manipülatör',en:'Persona / The Manipulator'},ch:[22,28],loc:{tr:'Takım elbiseli adam',en:'The man in the pressed suit'}},
+ {k:'noct',n:{tr:"NOCTORNUS GECESİ",en:"NOCTORNUS NIGHT"},arch:{tr:'Trickster / İsyancı',en:'Trickster / Rebel'},ch:[29,35],loc:{tr:'Gecenin sesi',en:'The voice of the night'}},
+ {k:'silvanus',n:{tr:"SILVANUS'UN KARAVANI",en:"SILVANUS'S CARAVAN"},arch:{tr:'Bilge / Münzevi',en:'Sage / Hermit'},ch:[36,42],loc:{tr:'Karavan',en:'The caravan'}},
+ {k:'aelius',n:{tr:"AELIUS SEANSI",en:"THE AELIUS SESSION"},arch:{tr:'Üst-Benlik / Anlatıcı',en:'Self / The Narrator'},ch:[43,49],loc:{tr:'Üst katman (Yükseliş Taşı)',en:'The upper layer (Ascension Stone)'}}
 ];
 const Realms={
   T:function(o){return (o&&(o[GAMELANG]||o.en||o.tr))||'';},
@@ -2835,8 +2835,8 @@ const Realms={
   allDone:function(){for(var i=0;i<REALMS.length;i++){if(!this.done(REALMS[i]))return false;}return true;},
   show:function(){var L=GAMELANG;var h='<p style="color:var(--dim);font-size:12px">'+(L==='tr'?'Birinci kitap yedi arketip evreninden geçer; her biri 7 bölüm. Bir arketibin iç çalışmasını tamamlayıp o karakterin alanına girince sıradaki açılır. Yedisini de bütünleyince ikinci kitap açılır ve Mimar Modu’nda kendi evrenini yaratırsın.':'Book One passes through seven archetype realms, seven chapters each. Complete an archetype’s inner work and enter that character’s area, and the next opens. Integrate all seven and Book Two opens — in Architect Mode you create your own universe.')+'</p>';
     REALMS.forEach(function(r,i){var op=Realms.open(i);var dn=Realms.done(r);var p=Realms.prog(r);
-      h+='<div class="jentry" style="'+(op?'':'opacity:.5')+'"><h4 style="color:'+(dn?'var(--accent)':(op?'var(--violet)':'var(--dim)'))+'">'+(dn?'✓ ':(op?(i+1)+'. ':'🔒 '))+esc(r.n)+' — '+esc(Realms.T(r.arch))+'</h4>'+
-        (function(){var sp=(window.Scene&&RZONES[r.k]&&!RZONES[r.k].stub)?Scene.prog(r.k):null;var pt=sp?(sp.d+'/'+sp.n+' '+(L==='tr'?'pratik':'practices')):(L==='tr'?'alan yakında':'area soon');h+='<p style="font-size:11.5px;color:var(--dim)">'+(L==='tr'?'Bölüm ':'Chapters ')+r.ch[0]+'–'+r.ch[1]+' · '+pt+' · ◎ '+esc(Realms.T(r.loc))+'</p>'+(op?'<button class="btn ghost" style="font-size:11px" onclick="if(window.HOUSES&&HOUSES[\''+r.k+'\']){House.wake(\''+r.k+'\');}else{Scene.enter(\''+r.k+'\');}">'+(L==='tr'?'→ '+esc(r.n)+' alanına gir':'→ enter '+esc(r.n))+'</button>':'<span style="font-size:11px;color:var(--dim)">'+(L==='tr'?'önce bir önceki arketibi bütünle':'integrate the previous archetype first')+'</span>')+'</div>';})();});
+      h+='<div class="jentry" style="'+(op?'':'opacity:.5')+'"><h4 style="color:'+(dn?'var(--accent)':(op?'var(--violet)':'var(--dim)'))+'">'+(dn?'✓ ':(op?(i+1)+'. ':'🔒 '))+esc(Realms.T(r.n))+' — '+esc(Realms.T(r.arch))+'</h4>'+
+        (function(){var sp=(window.Scene&&RZONES[r.k]&&!RZONES[r.k].stub)?Scene.prog(r.k):null;var pt=sp?(sp.d+'/'+sp.n+' '+(L==='tr'?'pratik':'practices')):(L==='tr'?'alan yakında':'area soon');h+='<p style="font-size:11.5px;color:var(--dim)">'+(L==='tr'?'Bölüm ':'Chapters ')+r.ch[0]+'–'+r.ch[1]+' · '+pt+' · ◎ '+esc(Realms.T(r.loc))+'</p>'+(op?'<button class="btn ghost" style="font-size:11px" onclick="if(window.HOUSES&&HOUSES[\''+r.k+'\']){House.wake(\''+r.k+'\');}else{Scene.enter(\''+r.k+'\');}">'+(L==='tr'?'→ '+esc(Realms.T(r.n))+' alanına gir':'→ enter '+esc(Realms.T(r.n)))+'</button>':'<span style="font-size:11px;color:var(--dim)">'+(L==='tr'?'önce bir önceki arketibi bütünle':'integrate the previous archetype first')+'</span>')+'</div>';})();});
     var fin=Realms.allDone();
     h+='<div class="jentry" style="border-top:1px solid var(--line);'+(fin?'':'opacity:.5')+'"><h4 style="color:'+(fin?'var(--accent)':'var(--dim)')+'">'+(fin?'✦ ':'🔒 ')+(L==='tr'?'SEN — MİMAR':'YOU — THE ARCHITECT')+'</h4><p style="font-size:11.5px;color:var(--dim)">'+(L==='tr'?'Yedi arketibi bütünleyince: ikinci kitap açılır ve bu çatının altında kendi evrenini otonom olarak yaratmaya başlarsın.':'Once the seven are integrated: Book Two opens and you begin creating your own universe, autonomously, under this roof.')+'</p>'+(fin?((window.Profile&&!Profile.balanced())?('<p style="font-size:11px;color:var(--moon);line-height:1.5">'+(L==='tr'?'✦ İkinci kitap açıldı. Mimar Modu için içindeki altı arketibi dengele.':'✦ Book Two opened. Balance your six inner archetypes to open Architect Mode.')+'</p><button class="btn ghost" style="font-size:11px" onclick="if(window.Profile)Profile.show()">⚖ '+(L==='tr'?'Zihin Profili':'Mind Profile')+'</button>'):('<button class="btn v" style="font-size:11px" onclick="if(window.Architect)Architect.menu()">'+(L==='tr'?'→ Mimar Modu':'→ Architect Mode')+'</button>')):'')+'</div>';
     UI.doc((L==='tr'?'⌖ ARKETİP EVRENLERİ':'⌖ ARCHETYPE REALMS'),h);}
@@ -4617,8 +4617,8 @@ if(HAS3D)(function(){
     label(name,x,z,9.2,.85);
     W3.PORTALS.push({k:k,x:x,z:z+5,r:3.4,name:name,house:true});
   }
-  buildHouse('lunaris',250,104,'LUNARIS ☽');
-  buildHotel('bahal',96,118,'ROMA ✶');
+  buildHouse('lunaris',250,104,(GAMELANG==='tr'?"LUNARIS'IN EVİ ☽":"LUNARIS'S HOUSE ☽"));
+  buildHotel('bahal',96,118,(GAMELANG==='tr'?'BAHAL-ROMA DENEYİ ✶':'THE BAHAL-ROME EXPERIMENT ✶'));
   function buildCity(k,x,z,name){
     for(let i=0;i<7;i++){const a=(i/7)*Math.PI*2;const r=3+(i%3);const bx=x+Math.cos(a)*r,bz=z+Math.sin(a)*r;const h=3+((i*53)%7);
       box(1.6,h,1.6,std(0x14182a,{emissive:0xbcd0f0,emissiveIntensity:.18+(i%3)*0.04,roughness:.9}),bx,h/2,bz);}
@@ -4628,11 +4628,11 @@ if(HAS3D)(function(){
     label(name,x,z,7.4,.85);
     W3.PORTALS.push({k:k,x:x,z:z+6,r:3.6,name:name,house:true});
   }
-  buildCity('lucida',176,235,'İSTANBUL ✦');
-  buildCity('lucius',210,175,(GAMELANG==='tr'?'CAM KULE ✦':'THE GLASS TOWER ✦'));
-  buildCity('noct',300,190,(GAMELANG==='tr'?'GECE ŞEHRİ ✦':'THE NIGHT CITY ✦'));
-  buildCity('silvanus',130,215,(GAMELANG==='tr'?'SESSİZLİK ORMANI ✦':'FOREST OF STILLNESS ✦'));
-  buildCity('aelius',310,90,(GAMELANG==='tr'?"ANLATICI'NIN KÜRSÜSÜ ✦":"THE NARRATOR'S SEAT ✦"));
+  buildCity('lucida',176,235,(GAMELANG==='tr'?"LUCIDA'NIN ŞEHRİ ✦":"LUCIDA'S CITY ✦"));
+  buildCity('lucius',210,175,(GAMELANG==='tr'?"LUCIUS'UN KULESİ ✦":"LUCIUS'S TOWER ✦"));
+  buildCity('noct',300,190,(GAMELANG==='tr'?'NOCTORNUS GECESİ ✦':'NOCTORNUS NIGHT ✦'));
+  buildCity('silvanus',130,215,(GAMELANG==='tr'?"SILVANUS'UN KARAVANI ✦":"SILVANUS'S CARAVAN ✦"));
+  buildCity('aelius',310,90,(GAMELANG==='tr'?'AELIUS SEANSI ✦':'THE AELIUS SESSION ✦'));
 
   /* ---- camera ---- */
   const Cam={yaw:Math.PI,pitch:.3,dist:7.5};
