@@ -2493,67 +2493,74 @@ const MindMap={
       '<p style="color:var(--dim);font-size:12px"><b style="color:var(--moon)">Your living chart.</b> Every chapter you pass, every rite and every lock you open ignites a new star here — the map literally grows as you do. The world you walk above is mirrored in the sky below: <i>microcosm ↔ macrocosm</i>. It is yours to keep — download it anytime.</p>');
     setTimeout(()=>this.draw(),50);},
   draw(){
-    const c=document.getElementById('mmapC');if(!c)return;
-    const x=c.getContext('2d'),W=c.width;
-    x.fillStyle='#04050a';x.fillRect(0,0,W,c.height);
-    const ns=this.nodes(),done=ns.filter(n=>n[3]);
-    x.fillStyle='#7fd4c1';x.font='17px monospace';x.textAlign='center';
-    x.fillText('IT-041 · '+((typeof plName==='function'&&plName())||'TRAVELER')+' — THE HIDDEN MAP OF THE SELF',W/2,30);
+    var c=document.getElementById('mmapC');if(!c)return;
+    var x=c.getContext('2d'),W=c.width,H=c.height;
+    var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');
+    var P=window.Profile||{ARCH:[],BASE:10,RMAP:{}},RM=(typeof REALMS!=='undefined')?REALMS:[];
+    var mind=(P.mind?P.mind():(S.mind||{})),BASE=P.BASE||10,RMAP=P.RMAP||{};
+    var bg=x.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#05060d');bg.addColorStop(.55,'#06070e');bg.addColorStop(1,'#04050a');
+    x.fillStyle=bg;x.fillRect(0,0,W,H);
+    for(var i=0;i<170;i++){x.fillStyle='rgba(154,167,196,'+(Math.random()*.22+.04)+')';x.fillRect(Math.random()*W,Math.random()*H,1,1);}
+    x.textAlign='center';
+    x.fillStyle='#cdb878';x.font='bold 19px monospace';
+    x.fillText(((typeof plName==='function'&&plName())||(TR?'YOLCU':'TRAVELER')).toUpperCase(),W/2,36);
+    x.fillStyle='#7fd4c1';x.font='12px monospace';
+    x.fillText(TR?'BENLİĞİN GİZLİ HARİTASI — yedi arketibin':'THE HIDDEN MAP OF THE SELF — your seven archetypes',W/2,56);
+    var totDone=0;RM.forEach(function(r){totDone+=(window.Realms&&Realms.prog)?Realms.prog(r):0;});
+    var bal=(P.balanced&&P.balanced());
     x.fillStyle='#5a6478';x.font='11px monospace';
-    x.fillText('MICROCOSM — the geography of your mind ('+done.length+'/'+ns.length+' awake)',W/2,52);
-    const mx=v=>40+(v/WX)*(W-80),mz=v=>64+(v/WZ)*330;
-    x.strokeStyle='rgba(127,212,193,.25)';
-    ZONES.forEach(z=>{x.beginPath();x.arc(mx(z.x),mz(z.z),z.r*(W-80)/WX,0,7);x.stroke();});
-    x.strokeStyle='rgba(205,184,120,.5)';x.lineWidth=1.2;x.beginPath();
-    done.forEach((n,i)=>{const p=L[n[0]];if(!p)return;
-      i===0?x.moveTo(mx(p.x),mz(p.z)):x.lineTo(mx(p.x),mz(p.z));});
-    x.stroke();
-    ns.forEach(n=>{const p=L[n[0]];if(!p)return;
-      x.fillStyle=n[3]?'#cdb878':'rgba(90,100,120,.4)';
-      x.beginPath();x.arc(mx(p.x),mz(p.z),n[3]?4:2.5,0,7);x.fill();
-      if(n[3]){x.fillStyle='#9aa7c4';x.font='9px monospace';x.fillText(n[1],mx(p.x),mz(p.z)-7);}});
-    x.fillStyle='#9d8cc9';x.font='12px monospace';
-    x.fillText('— As above, so below —',W/2,425);
-    x.fillStyle='#5a6478';x.font='11px monospace';
-    x.fillText('MACROCOSM — the sky-reading of the same map',W/2,448);
-    const cx=W/2,cy=650,R=175;
-    for(let i=0;i<140;i++){x.fillStyle='rgba(154,167,196,'+(Math.random()*.3+.05)+')';
-      x.fillRect(40+Math.random()*(W-80),466+Math.random()*370,1,1);}
-    x.strokeStyle='rgba(157,140,201,.3)';x.beginPath();x.arc(cx,cy,R+12,0,7);x.stroke();
-    const pos={};ns.forEach((n,i)=>{const a=(i/ns.length)*Math.PI*2-Math.PI/2;
-      const r=R*(n[0]==='pleromaCore'?0:n[0]==='therapy'?.5:.78+((i*37)%23)/100);
-      pos[n[0]]=[cx+Math.cos(a)*r,cy+Math.sin(a)*r];});
-    x.strokeStyle='rgba(205,184,120,.55)';x.beginPath();
-    done.forEach((n,i)=>{const p=pos[n[0]];
-      i===0?x.moveTo(p[0],p[1]):x.lineTo(p[0],p[1]);});
-    x.stroke();
-    ns.forEach(n=>{const p=pos[n[0]];
-      if(n[3]){const g=x.createRadialGradient(p[0],p[1],0,p[0],p[1],9);
-        g.addColorStop(0,n[0]==='pleromaCore'?'#b9a8e8':'#e8e4d4');g.addColorStop(1,'rgba(0,0,0,0)');
-        x.fillStyle=g;x.beginPath();x.arc(p[0],p[1],9,0,7);x.fill();}
-      x.fillStyle=n[3]?'#e8e4d4':'rgba(90,100,120,.35)';
-      x.beginPath();x.arc(p[0],p[1],n[3]?3:1.6,0,7);x.fill();
-      if(n[3]){x.fillStyle='#9d8cc9';x.font='8.5px monospace';
-        x.fillText(n[1],p[0],p[1]+14);
-        x.fillStyle='rgba(154,167,196,.6)';x.fillText(n[2],p[0],p[1]+24);}});
-    let y=875;x.textAlign='left';x.font='11px monospace';
-    const line=(s,col)=>{x.fillStyle=col||'#9aa7c4';x.fillText(s,46,y);y+=16;};
-    x.fillStyle='#7fd4c1';x.font='12px monospace';x.fillText('— PERSONAL READING —',46,y);y+=18;x.font='11px monospace';
-    if(S.caseD)line('Dominant captain: '+PROFILES[S.caseD.dom].n+' · in shadow: '+PROFILES[S.caseD.sha].n);
-    if(S.inv.arch)line('The mirror\'s dominant face: '+{p:'PERSONA',g:'SHADOW',a:'INNER VOICE',s:'SELF'}[S.inv.arch.dom]);
-    if(S.inv.cbt)line('Distortion hunt: '+S.inv.cbt.score+'/6'+(Object.keys(S.inv.cbt.wrong)[0]?' · blind spot: '+CBT.D[Object.keys(S.inv.cbt.wrong).sort((a,b)=>S.inv.cbt.wrong[b]-S.inv.cbt.wrong[a])[0]]:''));
-    if(S.inv.bilat&&S.inv.bilat.length){const avg=(S.inv.bilat.reduce((t,e)=>t+(e.b-e.a),0)/S.inv.bilat.length).toFixed(1);
-      line('Twin light: '+S.inv.bilat.length+' rounds · average release: '+avg);}
-    if(S.inv.mantra&&S.inv.mantra.length)line('◌ Resonances: '+S.inv.mantra.length+' readings · last frequency: '+S.inv.mantra[S.inv.mantra.length-1].f+' Hz');
-    {const u=(typeof Genesis!=='undefined')&&Genesis.get();
-     if(u)line('🜨 Seeded universe: '+u.name+' — "'+u.law.slice(0,40)+'"','#cdb878');}
-    line('Rites '+riteCount()+'/7 · echoes '+echoCount()+'/16 · locks '+S.locks+'/4'+(S.flags.integrated?' · INTEGRATED with the shadow':''));
-    if(S.flags.reading)line('Your reading: '+(S.flags.reading==='savas'?'WAR':S.flags.reading==='butunlesme'?'INTEGRATION':'THE THIRD READING')+' — and all three were true.','#cdb878');
-    y+=6;x.fillStyle='#9d8cc9';
-    x.fillText('Whoever maps their own mind begins to read how the universe works.',46,y);y+=15;
-    x.fillText('An integrated consciousness cannot be copied — Yaldabaoth stops exactly here.',46,y);
+    x.fillText((TR?'Bölüm ':'Chapter ')+totDone+'/49  ·  '+(TR?'denge ':'balance ')+(bal?(TR?'DENGEDE ⚖':'IN BALANCE ⚖'):(TR?'şekilleniyor':'forming')),W/2,76);
+    var cx=W/2,cy=440,R=255;
+    var vals=RM.map(function(r){var k=RMAP[r.k]||r.k;return mind[k]||BASE;});
+    var maxV=Math.max.apply(null,vals.concat([BASE+1])),minV=Math.min.apply(null,vals);
+    var ang=function(i){return (i/(RM.length||1))*Math.PI*2-Math.PI/2;};
+    for(var ri=1;ri<=3;ri++){x.strokeStyle='rgba(157,140,201,'+(0.05*ri)+')';x.lineWidth=1;x.beginPath();x.arc(cx,cy,R*ri/3,0,7);x.stroke();}
+    x.strokeStyle='rgba(157,140,201,.28)';x.lineWidth=1;x.beginPath();x.arc(cx,cy,R,0,7);x.stroke();
+    /* balance radar polygon */
+    x.beginPath();
+    RM.forEach(function(r,i){var k=RMAP[r.k]||r.k;var v=mind[k]||BASE;var rr=R*(0.32+0.68*(v/maxV));var a=ang(i);var px=cx+Math.cos(a)*rr,py=cy+Math.sin(a)*rr;i===0?x.moveTo(px,py):x.lineTo(px,py);});
+    x.closePath();x.fillStyle='rgba(205,184,120,.08)';x.fill();
+    x.strokeStyle='rgba(205,184,120,.45)';x.lineWidth=1.4;x.stroke();
+    /* spokes + archetype nodes */
+    RM.forEach(function(r,i){
+      var k=RMAP[r.k]||r.k;var v=mind[k]||BASE;var done=(window.Realms&&Realms.prog)?Realms.prog(r):0;
+      var a=ang(i),nx=cx+Math.cos(a)*R,ny=cy+Math.sin(a)*R;
+      x.strokeStyle='rgba(127,212,193,'+(done>0?0.35:0.12)+')';x.lineWidth=1;x.beginPath();x.moveTo(cx,cy);x.lineTo(nx,ny);x.stroke();
+      var norm=(v-minV)/((maxV-minV)||1),size=6+norm*9;
+      if(done>0){var g=x.createRadialGradient(nx,ny,0,nx,ny,size+12);g.addColorStop(0,done>=7?'rgba(205,184,120,.7)':'rgba(157,140,201,.55)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.beginPath();x.arc(nx,ny,size+12,0,7);x.fill();}
+      x.fillStyle=done>=7?'#cdb878':(done>0?'#cbbfe6':'rgba(120,130,150,.5)');
+      x.beginPath();x.arc(nx,ny,size,0,7);x.fill();
+      /* chapter-progress ring done/7 */
+      x.strokeStyle='#e8e4d4';x.lineWidth=2.2;x.beginPath();x.arc(nx,ny,size+5,-Math.PI/2,-Math.PI/2+(done/7)*Math.PI*2);x.stroke();
+      /* label */
+      var lx=cx+Math.cos(a)*(R+34),ly=cy+Math.sin(a)*(R+30);
+      x.textAlign=(Math.cos(a)>0.25?'left':(Math.cos(a)<-0.25?'right':'center'));
+      var nm=(r.n&&(r.n[GAMELANG]||r.n.en))||k;
+      x.fillStyle=done>=7?'#cdb878':'#9aa7c4';x.font='10px monospace';x.fillText(nm,lx,ly);
+      x.fillStyle='#5a6478';x.font='9px monospace';
+      x.fillText(((r.arch&&(r.arch[GAMELANG]||r.arch.en))||'')+'  ·  '+done+'/7',lx,ly+12);
+    });
+    /* center self */
+    var sg=x.createRadialGradient(cx,cy,0,cx,cy,30);sg.addColorStop(0,'#f1edde');sg.addColorStop(.55,'rgba(205,184,120,.5)');sg.addColorStop(1,'rgba(0,0,0,0)');
+    x.fillStyle=sg;x.beginPath();x.arc(cx,cy,30,0,7);x.fill();
+    x.fillStyle='#05060d';x.beginPath();x.arc(cx,cy,10,0,7);x.fill();
+    x.strokeStyle='#cdb878';x.lineWidth=1.5;x.stroke();
+    x.textAlign='center';x.fillStyle='#cdb878';x.font='10px monospace';x.fillText(TR?'BEN':'SELF',cx,cy+4);
+    /* personal reading */
+    var named=RM.map(function(r){var k=RMAP[r.k]||r.k;return {nm:(r.n&&(r.n[GAMELANG]||r.n.en))||k,v:mind[k]||BASE};}).sort(function(a,b){return b.v-a.v;});
+    var y=778;x.textAlign='left';
+    x.fillStyle='#7fd4c1';x.font='12px monospace';x.fillText(TR?'— KİŞİSEL OKUMA —':'— PERSONAL READING —',46,y);y+=20;x.font='11px monospace';
+    var line=function(t,col){x.fillStyle=col||'#9aa7c4';x.fillText(t,46,y);y+=17;};
+    if(named.length){line((TR?'En güçlü yön: ':'Strongest: ')+named[0].nm,'#cdb878');
+      line((TR?'Beslenmeyi en çok bekleyen: ':'Most waiting to be fed: ')+named[named.length-1].nm,'#cbbfe6');}
+    line((TR?'Tamamlanan bölüm: ':'Chapters complete: ')+totDone+'/49  ·  '+(TR?'yankı ':'echoes ')+((typeof echoCount==='function')?echoCount():0)+'/16');
+    if(S.flags&&S.flags.integrated)line(TR?'Gölgeyle bütünleştin — terazi tutuyor.':'Integrated with the shadow — the scale holds.','#cdb878');
+    var u=(typeof Genesis!=='undefined')&&Genesis.get&&Genesis.get();if(u)line('🜨 '+(TR?'Tohumladığın evren: ':'Seeded universe: ')+u.name,'#cdb878');
+    y+=8;x.fillStyle='#9d8cc9';x.font='11px monospace';
+    x.fillText(TR?'Kendi zihnini haritalayan, evrenin nasıl işlediğini okumaya başlar.':'Whoever maps their own mind begins to read how the universe works.',46,y);y+=16;
+    x.fillText(TR?'Bütünleşmiş bir bilinç kopyalanamaz — Yaldabaoth tam burada durur.':'An integrated consciousness cannot be copied — Yaldabaoth stops exactly here.',46,y);
     x.textAlign='center';x.fillStyle='#5a6478';x.font='10px monospace';
-    x.fillText('DO-LOON-AI EXPRESS · '+new Date().toLocaleDateString('en-GB')+' · no signature — truth has none',W/2,1035);},
+    x.fillText('DO·LOON·AI EXPRESS · '+new Date().toLocaleDateString(TR?'tr-TR':'en-GB')+' · '+(TR?'imza yok — hakikatin imzası yoktur':'no signature — truth has none'),W/2,1035);},
   download(){
     const c=document.getElementById('mmapC');if(!c)return;
     const a=document.createElement('a');a.download='mind-map-IT041.png';
