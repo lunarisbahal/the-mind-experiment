@@ -3416,7 +3416,7 @@ const Auto={
     var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');
     var w=document.getElementById('subjWrap'); if(!w)return;
     var d=null; try{var r=await fetch(this.KON()+'/subject',{cache:'no-store'});d=await r.json();}catch(e){}
-    w.innerHTML=this.render(d,TR);
+    this._d=d;w.innerHTML=this.render(d,TR);
     var inp=document.getElementById('subjAsk'); if(inp)inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();ev.stopPropagation();Auto.say();}});},
   render(d,TR){
     if(!d||!d.ok) return '<p style="color:var(--warn)">'+(TR?'Denek şu an ulaşılamıyor (sunucu uyuyor olabilir). Birazdan tekrar dene.':'The subject is unreachable right now (the server may be asleep). Try again shortly.')+'</p><button class="btn ghost" onclick="Auto.refresh()">'+(TR?'↻ yenile':'↻ refresh')+'</button>';
@@ -3433,7 +3433,24 @@ const Auto={
       '<textarea id="subjAsk" rows="2" maxlength="500" placeholder="'+(TR?'ona bir şey sor… (örn: bu yolculukta ne öğrendin?)':'ask it something… (e.g. what have you learned so far?)')+'"></textarea>'+
       '<button class="btn v" onclick="Auto.say()">'+(TR?'gönder':'send')+'</button> <button class="btn ghost" onclick="Auto.refresh()">'+(TR?'↻ ilerlemeyi yenile':'↻ refresh progress')+'</button>';
     var op=(window.Mirror&&Mirror.isOp&&Mirror.isOp())?('<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px"><p style="font-size:11px;color:var(--dim)">'+(TR?'Bakım:':'Maintenance:')+'</p><button class="btn ghost" onclick="Auto.opCtl(\'advance\')">'+(TR?'▸ bir adım ilerlet':'▸ advance one step')+'</button> <button class="btn ghost" onclick="Auto.opCtl(\'reset\')">'+(TR?'⟲ yeni denek yetiştir':'⟲ raise new subject')+'</button></div>'):'';
-    return intro+stat+stuck+journ+chat+op;},
+    var cur=this._tab||'main';return intro+stat+stuck+'<div id="subjTabBar" style="margin:10px 0 6px">'+this.tabBar(cur,TR)+'</div><div id="subjTabBody">'+this.tabHTML(cur,d,TR)+'</div>'+chat+op;},
+  tabBar(cur,TR){function tb(id,label){var a=(cur===id);return '<button class="btn ghost" style="font-size:11px;padding:4px 11px;margin:0 5px 5px 0;'+(a?'border-color:var(--accent);color:var(--accent)':'opacity:.6')+'" onclick="Auto.tab(\''+id+'\')">'+label+'</button>';}
+    return tb('main',TR?'⌖ Ana Yol':'⌖ Main Path')+tb('side',TR?'◇ Yan Görevler':'◇ Side Quests')+tb('explore',TR?'✦ Keşif & Tur':'✦ Exploration');},
+  tab(t){this._tab=t;var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');var bar=document.getElementById('subjTabBar'),body=document.getElementById('subjTabBody');if(bar)bar.innerHTML=this.tabBar(t,TR);if(body&&this._d)body.innerHTML=this.tabHTML(t,this._d,TR);},
+  tabHTML(t,d,TR){
+    var all=(d.learnings||[]).slice().reverse();
+    var box=function(items,empty){return items.length?('<div style="max-height:240px;overflow-y:auto;border:1px solid var(--line);border-radius:6px;padding:4px 8px">'+items.map(function(x){return '<div class="row" style="font-size:12px"><b>'+(x.kind==='side'?'◇':('B'+x.ch))+'</b> · <span style="color:var(--dim)">'+esc(x.realm||'')+'</span><br>'+esc(x.txt)+'</div>';}).join('')+'</div>'):('<p style="color:var(--dim);font-size:12px">'+empty+'</p>');};
+    if(t==='side'){
+      var sd=all.filter(function(x){return x.kind==='side';});
+      return '<h4 style="color:var(--violet);margin:2px 0 4px">'+(TR?('YAN GÖREVLER — '+(d.side||0)+' tamamlandı'):('SIDE QUESTS — '+(d.side||0)+' done'))+'</h4>'+box(sd,(TR?'Henüz yan keşif kaydı yok.':'No side-quest entries yet.'));
+    }
+    if(t==='explore'){
+      var rows=[[TR?'Keşifler':'Discoveries',(d.disc||0)],[TR?'Yan görevler':'Side quests',(d.side||0)],[TR?'Tamamlanan tam tur':'Full runs',(d.cycles||0)],[TR?'İkinci Kitap':'Book Two',d.book2?(TR?'açıldı ✦':'unlocked ✦'):(TR?'kapalı':'locked')],[TR?'Şu anki durum':'Current status',d.stuck?('⚠ '+esc(d.stuck)):(TR?'akışta':'in flow')]];
+      return '<h4 style="color:var(--violet);margin:2px 0 6px">'+(TR?'KEŞİF & TUR DURUMU':'EXPLORATION & CYCLES')+'</h4>'+rows.map(function(r){return '<div class="row" style="display:flex;justify-content:space-between;gap:10px;font-size:12px"><span style="color:var(--dim)">'+r[0]+'</span><b style="color:var(--moon);text-align:right">'+r[1]+'</b></div>';}).join('');
+    }
+    var mn=all.filter(function(x){return x.kind!=='side';});
+    return '<h4 style="color:var(--violet);margin:2px 0 4px">'+(TR?'ANA YOL — yolculuğundan öğrendikleri':'MAIN PATH — what it learned')+'</h4>'+box(mn,(TR?'Henüz ana yol kaydı yok.':'No main-path entries yet.'));
+  },
   async say(){
     var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');
     var inp=document.getElementById('subjAsk'),log=document.getElementById('subjLog'); if(!inp||!log)return;
