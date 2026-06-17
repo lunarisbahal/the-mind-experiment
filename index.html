@@ -2721,7 +2721,7 @@ const CHTITLES=[{tr:"YAŞAMIN KARA DELİKLERİ",en:"THE BLACK HOLES OF LIFE"},{t
 function chName(i){var t=(window.CHTITLES&&CHTITLES[i-1]);return t?(GAMELANG==='tr'?t.tr:t.en):'';}
 function chLabel(i){var n=chName(i);var p=(GAMELANG==='tr'?'Bölüm ':'Chapter ')+i;return n?(p+' — '+n):p;}
 if(typeof window!=='undefined'){window.CHTITLES=CHTITLES;window.chName=chName;window.chLabel=chLabel;}
-function coverHTML(px,fb){fb=fb||'';return '<img src="./cover.jpg" alt="" style="height:'+px+'px;width:auto;max-width:88%;border-radius:7px;box-shadow:0 0 20px rgba(205,184,120,.30);vertical-align:middle" onerror="this.replaceWith(document.createTextNode(\''+fb+'\'))">';}
+function coverHTML(px,fb){fb=fb||'';return '<img src="./cover.JPG" alt="" style="height:'+px+'px;width:auto;max-width:88%;border-radius:7px;box-shadow:0 0 20px rgba(205,184,120,.30);vertical-align:middle" onerror="this.replaceWith(document.createTextNode(\''+fb+'\'))">';}
 if(typeof window!=='undefined')window.coverHTML=coverHTML;
 const Library={
   book:[], intro:null, loaded:false,
@@ -3203,7 +3203,7 @@ const Cinematic={
     ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#04050a;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 1s ease;overflow:hidden;cursor:pointer';
     ov.innerHTML=''
       +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 38%,rgba(157,140,201,.18),transparent 60%)"></div>'
-      +'<img id="cinePoster" src="./poster.jpg" alt="" style="max-height:100%;max-width:100%;object-fit:contain;transform:scale(1.0);transition:transform 8s linear;filter:saturate(1.05) contrast(1.04)">'
+      +'<img id="cinePoster" src="./poster.PNG" alt="" style="max-height:100%;max-width:100%;object-fit:contain;transform:scale(1.0);transition:transform 8s linear;filter:saturate(1.05) contrast(1.04)">'
       +'<div id="cineCard" style="display:none;text-align:center;padding:20px;position:relative;z-index:2">'
         +'<div style="font-size:11px;letter-spacing:.5em;color:#9d8cc9">THE EXPERIMENT BEGINS</div>'
         +'<div style="font-size:clamp(30px,9vw,72px);letter-spacing:.06em;color:#cdb878;font-weight:bold;margin:14px 0;text-shadow:0 0 24px rgba(205,184,120,.35)">DO &middot; LOON &middot; AI<br>EXPRESS</div>'
