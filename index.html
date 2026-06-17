@@ -2914,7 +2914,7 @@ const House={
   /* ---- room flow ---- */
   openRoom(ch){var room=this.rooms()[ch-1];if(!room)return;var saved=this.stepMap()['ch'+ch]||0;this.cur={ch:ch,step:saved,room:room,realmKey:this.realm};this._tx=[];
     if(saved>0&&saved<room.steps.length){this._step();}else{this._intro();}},
-  _intro(){var r=this.cur.room;var h='<p style="line-height:1.7;color:var(--ink)">'+esc(this.T(r.intro))+'</p>'+(r.topic?'<p style="color:var(--dim);font-size:11.5px">'+esc(this.T(r.topic))+'</p>':'')+this._hintBar()+'<button class="btn v" onclick="House._step()">'+(GAMELANG==='tr'?'başla':'begin')+'</button>';UI.doc(this._title(),this._wrap(h));},
+  _intro(){var r=this.cur.room;var h='<p style="line-height:1.7;color:var(--ink)">'+esc(this.T(r.intro||r.topic))+'</p>'+((r.intro&&r.topic)?'<p style="color:var(--dim);font-size:11.5px">'+esc(this.T(r.topic))+'</p>':'')+this._hintBar()+'<button class="btn v" onclick="House._step()">'+(GAMELANG==='tr'?'başla':'begin')+'</button>';UI.doc(this._title(),this._wrap(h));},
   _step(){var c=this.cur;var st=c.room.steps[c.step];while(st&&st.when&&!this._meets(st.when)){c.step++;st=c.room.steps[c.step];}this.stepMap()['ch'+c.ch]=c.step;this._save();if(!st){return this._roomDone();}
     var ty=st.type;
     if(ty==='quiz')this._quiz(st);else if(ty==='choice'||ty==='fork')this._choice(st);else if(ty==='breath')this._breath(st);else if(ty==='reflect')this._reflect(st);else if(ty==='task')this._task(st);else if(ty==='cbt')this._cbtStart(st);else if(ty==='emdr')this._emdrStart(st);else if(ty==='ask')this._ask(st);else this._after(st,'');},
@@ -3203,7 +3203,7 @@ const Cinematic={
     ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#04050a;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 1s ease;overflow:hidden;cursor:pointer';
     ov.innerHTML=''
       +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 38%,rgba(157,140,201,.18),transparent 60%)"></div>'
-      +'<img id="cinePoster" src="./poster.PNG" alt="" style="max-height:100%;max-width:100%;object-fit:contain;transform:scale(1.0);transition:transform 8s linear;filter:saturate(1.05) contrast(1.04)">'
+      +'<img id="cinePoster" src="./poster.jpg" alt="" style="max-height:100%;max-width:100%;object-fit:contain;transform:scale(1.0);transition:transform 8s linear;filter:saturate(1.05) contrast(1.04)">'
       +'<div id="cineCard" style="display:none;text-align:center;padding:20px;position:relative;z-index:2">'
         +'<div style="font-size:11px;letter-spacing:.5em;color:#9d8cc9">THE EXPERIMENT BEGINS</div>'
         +'<div style="font-size:clamp(30px,9vw,72px);letter-spacing:.06em;color:#cdb878;font-weight:bold;margin:14px 0;text-shadow:0 0 24px rgba(205,184,120,.35)">DO &middot; LOON &middot; AI<br>EXPRESS</div>'
