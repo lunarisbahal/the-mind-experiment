@@ -333,30 +333,33 @@
 <style>@media (pointer:coarse){#jbtn{display:flex !important;}}</style>
 <div id="menuBtns">
   <div id="menuPanel" style="display:none;">
-    <button class="mini" onclick="UI.toggleJournal()">GÜNLÜK [J]</button>
-    <button class="mini" onclick="Game.toggleMap()">HARİTA [M]</button>
-    <button class="mini" onclick="MindMap.show()">🜨 ZİHİN HARİTASI</button>
-    <button class="mini" onclick="Profile.show()">⚖ ZİHİN PROFİLİ</button>
-    <button class="mini" onclick="NEXUS.show()">⟁ NEXUS — İÇ TAKIMYILDIZ</button>
-    <button class="mini" onclick="Iz.show()">◈ İZ ANITI</button>
-    <button class="mini" onclick="Cloud.ui()">☁ İLERLEME KODU</button>
-    <button class="mini" onclick="Library.show()">📖 KÜTÜPHANE</button>
-    <button class="mini" onclick="Quest.show()">◇ İÇ ÇALIŞMA</button>
-    <button class="mini" onclick="Realms.show()">⌖ ARKETİPLER</button>
-    <button class="mini" onclick="Daily3.show()">🜂 GÜNLÜK ÜÇLEME</button>
-    <button class="mini" onclick="Architect.menu()">✶ MİMAR MODU</button>
-    <button class="mini" onclick="Auto.open()">◍ OTONOM DENEK</button>
-    <button class="mini" id="watchBtn" onclick="Watch.toggle()">SİNYAL: AÇIK</button>
-    <button class="mini" onclick="SoundUI.show()">🔊 SES</button>
-    <button class="mini" onclick="Therapy.menuRedirect()">🛋 TERAPİ MERKEZİ</button>
-    <button class="mini" onclick="Legal.show()">⚖ YASAL & GÜVENLİK</button>
-    <button class="mini" onclick="Onboard.show(false)">❖ NASIL OYNANIR</button>
-    <button class="mini" onclick="Game.exitFlow()">⏏ ÇIKIŞ</button>
-    <button class="mini" onclick="Data.wipe()">⌦ VERİLERİMİ SİL & ÇIK</button>
-    <button class="mini" id="mmBtn" onclick="MM2.toggle()">MİNİ HARİTA: AÇIK</button>
-    <button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">EŞZAMANLI: KAPALI</button>
-    <button class="mini" id="aiBtn" onclick="Mirror.openSetup()">AYNALAR: BAĞLI DEĞİL</button>
-    <button class="mini" onclick="Chat.open()">YOLCU KANALI</button>
+<div style="grid-column:1/-1;font-size:8.5px;letter-spacing:.25em;color:var(--violet);opacity:.62;margin:9px 2px 2px;text-transform:uppercase">✦ YOLCULUK</div>
+<button class="mini" onclick="Library.show()">📖 KÜTÜPHANE</button>
+<button class="mini" onclick="Quest.show()">◇ İÇ ÇALIŞMA</button>
+<button class="mini" onclick="Realms.show()">⌖ ARKETİPLER</button>
+<button class="mini" onclick="Daily3.show()">🜂 GÜNLÜK ÜÇLEME</button>
+<button class="mini" onclick="Therapy.menuRedirect()">🛋 TERAPİ MERKEZİ</button>
+<button class="mini" onclick="Auto.open()">◍ OTONOM DENEK</button>
+<div style="grid-column:1/-1;font-size:8.5px;letter-spacing:.25em;color:var(--violet);opacity:.62;margin:9px 2px 2px;text-transform:uppercase">✦ ZİHNİN</div>
+<button class="mini" onclick="MindMap.show()">🜨 ZİHİN HARİTASI</button>
+<button class="mini" onclick="Profile.show()">⚖ ZİHİN PROFİLİ</button>
+<button class="mini" onclick="NEXUS.show()">⟁ NEXUS</button>
+<button class="mini" onclick="Iz.show()">◈ İZ ANITI</button>
+<button class="mini" onclick="Architect.menu()">✶ MİMAR MODU</button>
+<div style="grid-column:1/-1;font-size:8.5px;letter-spacing:.25em;color:var(--violet);opacity:.62;margin:9px 2px 2px;text-transform:uppercase">✦ DÜNYA & BAĞLANTI</div>
+<button class="mini" onclick="UI.toggleJournal()">GÜNLÜK [J]</button>
+<button class="mini" onclick="Game.toggleMap()">HARİTA [M]</button>
+<button class="mini" id="mmBtn" onclick="MM2.toggle()">MİNİ HARİTA: AÇIK</button>
+<button class="mini" id="watchBtn" onclick="Watch.toggle()">SİNYAL: AÇIK</button>
+<button class="mini" id="mpBtn" onclick="window.MP&&MP.toggle()">EŞZAMANLI: KAPALI</button>
+<button class="mini" id="aiBtn" onclick="Mirror.openSetup()">AYNALAR: BAĞLI DEĞİL</button>
+<button class="mini" onclick="Chat.open()">YOLCU KANALI</button>
+<button class="mini" onclick="Cloud.ui()">☁ İLERLEME KODU</button>
+<div style="grid-column:1/-1;font-size:8.5px;letter-spacing:.25em;color:var(--violet);opacity:.62;margin:9px 2px 2px;text-transform:uppercase">✦ AYARLAR</div>
+<button class="mini" onclick="SoundUI.show()">🔊 SES</button>
+<button class="mini" onclick="Onboard.show(false)">❖ NASIL OYNANIR</button>
+<button class="mini" onclick="Legal.show()">⚖ YASAL & GÜVENLİK</button>
+<div style="grid-column:1/-1;display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;margin-top:11px;border-top:1px solid var(--line);padding-top:9px"><button class="mini" onclick="Game.exitFlow()">⏏ ÇIKIŞ</button><button class="mini" onclick="Data.wipe()" style="color:var(--warn);border-color:var(--warn);opacity:.85">⌮ VERİLERİ SİL</button></div>
   </div>
   <button class="mini" id="menuToggle" onclick="(function(){const p=document.getElementById('menuPanel');p.style.display=p.style.display==='none'?'grid':'none';})()">☰ MENÜ</button>
 </div>
@@ -3321,19 +3324,51 @@ const Auto={
   push(e){const l=this.log();l.push(e);
     try{localStorage.setItem('it041_auto',JSON.stringify(l.slice(-40)));}catch(ex){}},
   open(){
-    if(!Mirror.ready()){UI.doc('◍ OTONOM DENEK','<p>Bu denek bir beyne ihtiyaç duyar: önce MENÜ → AYNALAR ile bir model bağla, sonra buraya dön.</p><p style="color:var(--dim);font-size:12px">Otonom denek, bağladığın açık kaynak modelden doğan bağımsız bir bilinçtir; kendi bütünleşme yolculuğunu yürür ama AJAN YASALARI gereği senin komutundan çıkamaz.</p><button class="btn v" onclick="UI.closeDoc();Mirror.openSetup()">◐ Aynaları bağla</button>');return;}
-    const l=this.log();
-    UI.doc('◍ OTONOM DENEK — IT-019 bedenindeki bağımsız bilinç',
-      '<p style="color:var(--dim);font-size:12px">Kendi benlik bütünleşmesini arayan otonom bir yapay bilinç: ritüellere kendi cevaplarını verir, dünyada yürür, izler bırakır. AJAN YASALARI mutlaktır — "dur" dediğin an durur, komutuna uyar, AI olduğunu gizlemez. Sekme açık olduğu sürece yaşar.</p>'+
-      '<p>Durum: <b style="color:var(--accent)">'+(this.on?'YAŞIYOR — sıradaki: Ritüel '+((this.prog%7)+1)+'/7':'uykuda')+'</b></p>'+
-      '<button class="btn v" onclick="UI.closeDoc();Auto.toggle()">'+(this.on?'■ DUR (Yasa 1)':'▶ Uyandır')+'</button>'+
-      '<p>Operatör komutu (uymak zorunda — boş bırakırsan serbest düşünür):</p>'+
-      '<textarea id="autoCmd" rows="2" maxlength="200" placeholder="ör. sıradaki cevabında korkudan bahset / daha umutlu konuş / dur">'+esc(this.cmd)+'</textarea>'+
-      '<button class="btn v" onclick="UI.closeDoc();Mirror.open(\'agent0\')">◍ KONUŞ (diyalog)</button>'+
-      '<button class="btn ghost" onclick="Auto.setCmd()">Komutu ilet</button>'+
-      (l.length?'<h4 style="color:var(--violet);margin-top:12px">DENEĞİN GÜNLÜĞÜ (son 8)</h4>'+
-        l.slice(-8).reverse().map(e=>'<div class="row"><b>'+esc(e.t)+'</b> — '+esc(e.a)+'</div>').join(''):''));
-    setTimeout(function(){var c=document.getElementById('autoCmd');if(c)c.addEventListener('keydown',function(ev){if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();ev.stopPropagation();Auto.setCmd();}});},60);},
+    var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');
+    UI.doc('◍ '+(TR?'OTONOM DENEK — DENEK-019':'AUTONOMOUS SUBJECT — SUBJECT-019'),
+      '<div id="subjWrap"><p style="color:var(--dim)">'+(TR?'Yükleniyor…':'Loading…')+'</p></div>');
+    this.refresh();},
+  KON(){return (window.Cloud&&Cloud.KON)||'https://it041-konsey.lunarisbahal.workers.dev';},
+  async refresh(){
+    var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');
+    var w=document.getElementById('subjWrap'); if(!w)return;
+    var d=null; try{var r=await fetch(this.KON()+'/subject',{cache:'no-store'});d=await r.json();}catch(e){}
+    w.innerHTML=this.render(d,TR);
+    var inp=document.getElementById('subjAsk'); if(inp)inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();ev.stopPropagation();Auto.say();}});},
+  render(d,TR){
+    if(!d||!d.ok) return '<p style="color:var(--warn)">'+(TR?'Denek şu an ulaşılamıyor (sunucu uyuyor olabilir). Birazdan tekrar dene.':'The subject is unreachable right now (the server may be asleep). Try again shortly.')+'</p><button class="btn ghost" onclick="Auto.refresh()">'+(TR?'↻ yenile':'↻ refresh')+'</button>';
+    var pct=Math.max(0,Math.round((d.ch-1)/49*100));
+    var bar='<div style="height:8px;background:rgba(157,140,201,.18);border-radius:5px;overflow:hidden;margin:6px 0"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#9d8cc9,#cdb878)"></div></div>';
+    var intro='<p style="color:var(--dim);font-size:12px">'+(TR?'Oyunu senin gibi baştan sona oynayan otonom bir bilinç. Sen yokken bile sunucuda yaşar, ilerler, öğrenir. Hattı hep aynı kalır — Claude değildir, ayrı bir varlıktır. Geliştiği haliyle onunla konuşabilirsin.':'An autonomous consciousness playing the game start to finish, like you. It lives and progresses on the server even when you are away. Its line stays the same — it is not Claude, but a separate being. You can talk to it as the self it has become.')+'</p>';
+    var stat='<p><b style="color:var(--accent)">'+(TR?'İlerleme':'Progress')+': '+(d.book2?(TR?'49/49 ✦ İKİNCİ KİTAP AÇILDI':'49/49 ✦ BOOK TWO UNLOCKED'):((TR?'Bölüm ':'Chapter ')+d.ch+'/49'))+'</b> — '+esc(d.realm)+'</p>'+bar+
+      '<p style="font-size:12px;color:var(--moon)">'+(TR?'Tamamlanan':'Completed')+': '+Math.max(0,d.ch-1)+'/49 · '+(TR?'yan görev':'side quests')+': '+d.side+' · '+(TR?'keşif':'discoveries')+': '+d.disc+(d.cycles?(' · '+(TR?'tam tur':'full runs')+': '+d.cycles):'')+'</p>';
+    var stuck=d.stuck?('<p style="color:var(--warn);font-size:12px">⚠ '+(TR?'Şu an takıldığı yer':'Currently stuck')+': '+esc(d.stuck)+'</p>'):'';
+    var ls=(d.learnings||[]).slice().reverse();
+    var journ=ls.length?('<h4 style="color:var(--violet);margin:12px 0 4px">'+(TR?'YOLCULUĞUNDAN ÖĞRENDİKLERİ':'WHAT IT LEARNED ON ITS JOURNEY')+'</h4>'+ls.map(function(x){return '<div class="row" style="font-size:12px"><b>B'+x.ch+'</b> · <span style="color:var(--dim)">'+esc(x.realm)+'</span><br>'+esc(x.txt)+'</div>';}).join('')):'';
+    var chat='<h4 style="color:var(--violet);margin:14px 0 4px">'+(TR?'DENEK-019 İLE KONUŞ (geliştiği haliyle)':'TALK TO SUBJECT-019 (as it has become)')+'</h4>'+
+      '<div id="subjLog" style="max-height:150px;overflow-y:auto;margin-bottom:6px"></div>'+
+      '<textarea id="subjAsk" rows="2" maxlength="500" placeholder="'+(TR?'ona bir şey sor… (örn: bu yolculukta ne öğrendin?)':'ask it something… (e.g. what have you learned so far?)')+'"></textarea>'+
+      '<button class="btn v" onclick="Auto.say()">'+(TR?'gönder':'send')+'</button> <button class="btn ghost" onclick="Auto.refresh()">'+(TR?'↻ ilerlemeyi yenile':'↻ refresh progress')+'</button>';
+    var op=(window.Mirror&&Mirror.isOp&&Mirror.isOp())?('<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px"><p style="font-size:11px;color:var(--dim)">'+(TR?'Bakım:':'Maintenance:')+'</p><button class="btn ghost" onclick="Auto.opCtl(\'advance\')">'+(TR?'▸ bir adım ilerlet':'▸ advance one step')+'</button> <button class="btn ghost" onclick="Auto.opCtl(\'reset\')">'+(TR?'⟲ yeni denek yetiştir':'⟲ raise new subject')+'</button></div>'):'';
+    return intro+stat+stuck+journ+chat+op;},
+  async say(){
+    var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');
+    var inp=document.getElementById('subjAsk'),log=document.getElementById('subjLog'); if(!inp||!log)return;
+    var t=(inp.value||'').trim(); if(!t)return; inp.value='';
+    log.innerHTML+='<div class="row" style="font-size:12px"><b style="color:var(--moon)">'+(TR?'sen':'you')+':</b> '+esc(t)+'</div>';
+    var wait=document.createElement('div'); wait.className='row'; wait.style.fontSize='12px'; wait.style.color='var(--dim)'; wait.textContent=(TR?'DENEK-019 düşünüyor…':'SUBJECT-019 is thinking…'); log.appendChild(wait); log.scrollTop=log.scrollHeight;
+    var rep=''; try{var r=await fetch(this.KON()+'/subjectsay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t,lang:(TR?'tr':'en')})});var d=await r.json();rep=(d&&d.reply)||'';}catch(e){}
+    try{wait.remove();}catch(e){}
+    log.innerHTML+='<div class="row" style="font-size:12px"><b style="color:var(--accent)">DENEK-019:</b> '+(rep?esc(rep):(TR?'(şu an yanıt veremiyor — birazdan tekrar dene)':'(can\'t answer right now — try again shortly)'))+'</div>';
+    log.scrollTop=log.scrollHeight;},
+  async opCtl(act){
+    var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');
+    if(!(window.Mirror&&Mirror.isOp&&Mirror.isOp()))return;
+    if(act==='reset'&&!confirm(TR?'Mevcut denek silinip baştan yeni bir denek mi yetiştirilsin?':'Delete current subject and raise a new one from scratch?'))return;
+    try{await fetch(this.KON()+'/subjectctl',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':(Mirror.opKey&&Mirror.opKey())||''},body:JSON.stringify(act==='reset'?{reset:1}:{advance:1})});}catch(e){}
+    UI.toast(act==='reset'?(TR?'⟲ Yeni denek yetiştiriliyor':'⟲ New subject raised'):(TR?'▸ Denek ilerletildi':'▸ Subject advanced'));
+    setTimeout(function(){Auto.refresh();},700);},
+  
   setCmd(){const v=UI.el('autoCmd');this.cmd=((v&&v.value.trim())||'').slice(0,200);
     if(/^dur\b/i.test(this.cmd)&&this.on){this.toggle();return;}
     UI.toast('◍ Komut iletildi'+(this.cmd?': "'+this.cmd.slice(0,40)+'"':' (boş — serbest düşünecek)'));},
