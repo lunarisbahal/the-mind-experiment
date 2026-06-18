@@ -2895,7 +2895,7 @@ const REALMS=[
  {k:'lunaris',n:{tr:"LUNARIS'IN EVİ",en:"LUNARIS'S HOUSE"},arch:{tr:'İç Ses / Yoldaş',en:'Inner Voice / Companion'},ch:[1,7],loc:{tr:'Göl kıyısı (dolunayda)',en:'The lakeshore (under the full moon)'}},
  {k:'bahal',n:{tr:"BAHAL-ROMA DENEYİ",en:"THE BAHAL-ROME EXPERIMENT"},arch:{tr:'Gölge',en:'The Shadow'},ch:[8,14],loc:{tr:'Seni takip eden gölge',en:'The shadow that follows you'}},
  {k:'lucida',n:{tr:"LUCIDA'NIN ŞEHRİ",en:"LUCIDA'S CITY"},arch:{tr:'Aydınlık / Anima',en:'Clarity / Anima'},ch:[15,21],loc:{tr:'Çalan ankesör',en:'The ringing payphone'}},
- {k:'lucius',n:{tr:"LUCIUS'UN KULESİ",en:"LUCIUS'S TOWER"},arch:{tr:'Persona / Manipülatör',en:'Persona / The Manipulator'},ch:[22,28],loc:{tr:'Takım elbiseli adam',en:'The man in the pressed suit'}},
+ {k:'lucius',n:{tr:"LUCIUS'UN PLAZASI",en:"LUCIUS'S PLAZA"},arch:{tr:'Persona / Manipülatör',en:'Persona / The Manipulator'},ch:[22,28],loc:{tr:'Takım elbiseli adam',en:'The man in the pressed suit'}},
  {k:'noct',n:{tr:"NOCTORNUS GECESİ",en:"NOCTORNUS NIGHT"},arch:{tr:'Trickster / İsyancı',en:'Trickster / Rebel'},ch:[29,35],loc:{tr:'Gecenin sesi',en:'The voice of the night'}},
  {k:'silvanus',n:{tr:"SILVANUS'UN KARAVANI",en:"SILVANUS'S CARAVAN"},arch:{tr:'Bilge / Münzevi',en:'Sage / Hermit'},ch:[36,42],loc:{tr:'Karavan',en:'The caravan'}},
  {k:'aelius',n:{tr:"AELIUS SEANSI",en:"THE AELIUS SESSION"},arch:{tr:'Üst-Benlik / Anlatıcı',en:'Self / The Narrator'},ch:[43,49],loc:{tr:'Üst katman (Yükseliş Taşı)',en:'The upper layer (Ascension Stone)'}}
@@ -4721,15 +4721,53 @@ if(HAS3D)(function(){
       this.stations=[];this.cur=null;
     },
     _houseProp(g,pal,p){
-      const m=std(p.wall,{roughness:.9});
+      var RS=this.RS, ac=(p&&p.accent)||0x9d8cc9, wlc=(p&&p.wall)||0x222;
+      var wood=0x2e241c, metal=0x8a96a0, dark=0x16131c;
+      var B=function(w,h,d,col,x,y,z,ry,em,ei){var mat=std(col,{roughness:.9,emissive:(em||0),emissiveIntensity:(ei||0)});return box(w,h,d,mat,x,y,z,ry||0,g,false);};
+      var wall=function(w,h,col,ang,y,em,ei){var mat=std(col,{roughness:.9,emissive:(em||0),emissiveIntensity:(ei||0)});var mh=box(w,h,0.12,mat,0,0,0,0,g,false);var r=RS-0.5;mh.position.set(Math.cos(ang)*r,y,Math.sin(ang)*r);mh.lookAt(0,y,0);return mh;};
+      var plant=function(x,z){B(0.5,0.5,0.5,0x3a2a22,x,0.28,z);var f=new THREE.Mesh(new THREE.IcosahedronGeometry(0.66,0),std(0x3f6b46,{roughness:.85,flatShading:true}));f.position.set(x,1.05,z);g.add(f);};
       try{
-        if(pal==='kitchen'){box(4,1,1.4,m,3,1,-2,0,g);box(1.4,1.6,.1,std(0x111,{emissive:0xd8c89a,emissiveIntensity:.3}),-4,2,-1,0,g,false);}
-        else if(pal==='bathroom'){const mir=new THREE.Mesh(new THREE.PlaneGeometry(2.2,3),new THREE.MeshStandardMaterial({color:0x8fb6c0,metalness:.8,roughness:.1,emissive:0x1a2a30,emissiveIntensity:.45}));mir.position.set(0,2.6,-RS+1.2);g.add(mir);}
-        else if(pal==='bedroom'){box(3.6,.8,5,m,4,.5,2,0,g);}
-        else if(pal==='livingroom'){box(3,.7,1.6,m,-4,.4,2,0.3,g);box(1.6,.5,1.6,m,4,.3,-3,-0.4,g);}
-        else if(pal==='therapy'){box(2.2,.7,1,m,3.5,.5,1,0,g);box(1,1.4,.8,m,-3.5,.7,1,0,g);}
-        else if(pal==='basement'){box(.6,5,.6,m,5,2.5,-5,0,g);box(.6,5,.6,m,-5,2.5,-5,0,g);}
-        else if(pal==='corridor'){box(.3,5,8,m,-RS+2,2.5,0,0,g);box(.3,5,8,m,RS-2,2.5,0,0,g);}
+        /* ---- universal base dressing (every room) ---- */
+        var rug=new THREE.Mesh(new THREE.CircleGeometry(5.2,40),std(ac,{roughness:1}));rug.rotation.x=-Math.PI/2;rug.position.set(0,0.02,-0.8);rug.material.color.multiplyScalar(0.45);g.add(rug);
+        var rugb=new THREE.Mesh(new THREE.RingGeometry(4.7,5.2,40),std(0xffffff,{roughness:1,emissive:ac,emissiveIntensity:.05}));rugb.rotation.x=-Math.PI/2;rugb.position.set(0,0.03,-0.8);g.add(rugb);
+        var base=new THREE.Mesh(new THREE.CylinderGeometry(RS-0.04,RS-0.04,0.45,48,1,true),std(wood,{roughness:.8}));base.position.y=0.22;g.add(base);
+        var corn=new THREE.Mesh(new THREE.CylinderGeometry(RS-0.04,RS-0.04,0.32,48,1,true),std(wlc,{roughness:.85,emissive:ac,emissiveIntensity:.05,side:THREE.DoubleSide}));corn.position.y=6.55;g.add(corn);
+        [Math.PI*1.33,Math.PI*1.5,Math.PI*1.67].forEach(function(a,k){wall(2.0,1.4,dark,a,3.7,ac,.18);wall(1.7,1.15,[0x6b3f4a,0x3f5a6b,0x4a3f6b][k],a,3.7,[0x6b3f4a,0x3f5a6b,0x4a3f6b][k],.16);});
+        var win=wall(2.4,2.9,0x0c1426,-0.32,3.4,0xbcd0f0,.5);var wlite=new THREE.PointLight(0xbcd0f0,.5,15,2);wlite.position.set(Math.cos(-0.32)*(RS-1.8),3.2,Math.sin(-0.32)*(RS-1.8));g.add(wlite);
+        var lx=Math.cos(3.66)*10,lz=Math.sin(3.66)*10;B(0.12,3,0.12,0x20242e,lx,1.5,lz);var sh=new THREE.Mesh(new THREE.ConeGeometry(0.55,0.62,16,1,true),new THREE.MeshStandardMaterial({color:0xffce7a,emissive:0xffce7a,emissiveIntensity:.95,roughness:.5,side:THREE.DoubleSide}));sh.position.set(lx,3.18,lz);g.add(sh);var ll=new THREE.PointLight(0xffce7a,.85,13,2);ll.position.set(lx,3.0,lz);g.add(ll);
+        plant(Math.cos(5.76)*10,Math.sin(5.76)*10);
+        /* ---- per-palette furniture (radius<=9; central lane kept clear) ---- */
+        if(pal==='bedroom'){
+          B(3.4,0.55,5,wood,-7,0.3,0);B(3.2,0.35,4.6,0x3a3346,-7,0.72,0);B(1.3,0.45,0.7,0xcfc7d8,-7,1.02,-1.7);B(3.0,0.18,3.0,ac,-7,0.96,0.7,0,ac,.06);
+          B(0.95,0.95,0.7,wood,-7,0.47,2.6);var nl=new THREE.PointLight(0xffce7a,.45,7,2);nl.position.set(-7,1.6,2.6);g.add(nl);
+          B(2.2,3.4,1.0,0x241c2c,7,1.7,-2);
+        } else if(pal==='livingroom'||pal==='therapy'){
+          B(3.6,0.5,1.4,0x4a3340,-7,0.45,0);B(3.6,1.05,0.4,0x4a3340,-7,1.02,-0.75);B(0.4,0.95,1.4,0x4a3340,-8.6,0.9,0);B(0.4,0.95,1.4,0x4a3340,-5.4,0.9,0);
+          B(1.9,0.5,1.05,wood,-7,0.4,2.3);
+          B(2.6,3.0,0.5,wood,8.4,1.5,-1);for(var r=0;r<3;r++)for(var b=0;b<7;b++){B(0.2,0.5,0.34,[0x6b3f4a,0x3f5a6b,0x6b5a2f,0x4a3f6b][(r+b)%4],8.4-0.95+b*0.27,0.66+r*0.85,-0.75);}
+          B(1.3,0.5,1.3,0x3a3346,6,0.45,3.2);B(1.3,1.0,0.35,0x3a3346,6,1.0,3.8);
+        } else if(pal==='kitchen'){
+          B(5,1.5,1.2,0x2a2620,-6,0.75,-5.5);B(5,2.2,0.55,0x241f18,-6,3.4,-6.4);B(1.1,0.2,0.9,metal,-6,1.55,-5.5,0,0xffffff,.03);
+          B(1.5,1.45,1.2,0x20242a,-2,0.9,-6.2,0,0xd4847f,.12);
+          B(2.4,0.5,1.3,wood,5,0.4,3);for(var i=0;i<4;i++)B(0.18,0.9,0.18,wood,4+i*0.6,0.85,3.5);
+          plant(8,3);
+        } else if(pal==='bathroom'){
+          var mir=new THREE.Mesh(new THREE.PlaneGeometry(2.2,3),new THREE.MeshStandardMaterial({color:0x8fb6c0,metalness:.85,roughness:.1,emissive:0x1a2a30,emissiveIntensity:.42}));var ma=Math.PI*1.5;mir.position.set(Math.cos(ma)*(RS-0.5),3.0,Math.sin(ma)*(RS-0.5));mir.lookAt(0,3,0);g.add(mir);
+          B(1.5,1.0,0.85,0xcfd6da,0,0.7,-8.5);B(3.0,1.3,1.7,0xdfe4e6,7,0.65,2);B(1.2,0.1,0.4,ac,-7,2.0,2,0,ac,.1);
+        } else if(pal==='study'){
+          B(3.0,1.2,1.6,wood,-5,0.6,-7);B(1.4,0.85,0.1,dark,-5,2.05,-7.7,0,ac,.3);B(0.55,0.6,0.5,0x20242e,-4,1.55,-7);
+          B(2.8,3.2,0.5,wood,8,1.6,-1);for(var rr=0;rr<4;rr++)for(var bb=0;bb<7;bb++)B(0.18,0.6,0.34,[0x6b3f4a,0x3f5a6b,0x6b5a2f,0xcdb878][(rr+bb)%4],8-0.95+bb*0.27,0.7+rr*0.78,-1);
+          B(1.2,0.5,1.2,0x3a3346,-5,0.45,-4.6);
+        } else if(pal==='basement'){
+          B(0.4,5,0.4,0x2a2e36,5,2.5,-5,0,0x6f7fa0,.05);B(0.4,5,0.4,0x2a2e36,-5,2.5,-5,0,0x6f7fa0,.05);
+          B(0.3,0.3,18,0x3a3e46,3,6.2,0);B(0.3,0.3,18,0x3a3e46,-3,6.2,0);
+          for(var c=0;c<5;c++)B(1,1,1,wood,7-(c%3)*1.1,0.5+(c>2?1:0),-6+(c%2)*1.1,0.3);
+        } else if(pal==='corridor'){
+          [Math.PI*1.3,Math.PI*1.5,Math.PI*1.7].forEach(function(a){wall(0.5,1.3,0x1a1620,a,2.2,0xffce7a,.5);});
+          B(2.0,0.5,0.7,wood,-7,0.4,3);
+        } else {
+          B(2.6,0.5,0.85,wood,-7,0.4,2);plant(7,-4);plant(-7.5,3.5);
+        }
       }catch(e){}
     },
     buildCityRoom(ch){
@@ -4894,7 +4932,7 @@ if(HAS3D)(function(){
     W3.PORTALS.push({k:k,x:x,z:z+6,r:3.6,name:name,house:true});
   }
   buildCity('lucida',176,235,(GAMELANG==='tr'?"LUCIDA'NIN ŞEHRİ ✦":"LUCIDA'S CITY ✦"));
-  buildCity('lucius',210,175,(GAMELANG==='tr'?"LUCIUS'UN KULESİ ✦":"LUCIUS'S TOWER ✦"));
+  buildCity('lucius',210,175,(GAMELANG==='tr'?"LUCIUS'UN PLAZASI ✦":"LUCIUS'S PLAZA ✦"));
   buildCity('noct',300,190,(GAMELANG==='tr'?'NOCTORNUS GECESİ ✦':'NOCTORNUS NIGHT ✦'));
   W3.PORTALS.push({k:'silvanus',x:L.caravan.x,z:L.caravan.z+4,r:3.6,name:(GAMELANG==='tr'?"SILVANUS'UN KARAVANI ☽":"SILVANUS'S CARAVAN ☽"),house:true});
   buildCity('aelius',310,90,(GAMELANG==='tr'?'AELIUS SEANSI ✦':'THE AELIUS SESSION ✦'));
