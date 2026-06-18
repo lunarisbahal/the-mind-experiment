@@ -3631,7 +3631,7 @@ const Auto={
   async refresh(){
     var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');
     var w=document.getElementById('subjWrap'); if(!w)return;
-    var d=null; try{var r=await fetch(this.KON()+'/subject',{cache:'no-store'});d=await r.json();}catch(e){}
+    var d=null; try{var r=await fetch(this.KON()+'/subject?lang='+(GAMELANG==='tr'?'tr':'en'),{cache:'no-store'});d=await r.json();}catch(e){}
     this._d=d;w.innerHTML=this.render(d,TR);
     var inp=document.getElementById('subjAsk'); if(inp)inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();ev.stopPropagation();Auto.say();}});},
   render(d,TR){
@@ -4989,8 +4989,8 @@ if(HAS3D)(function(){
       };
       drawScr();var tex=new THREE.CanvasTexture(cv);
       box(1.7,0.05,1.05,std(0x2b2e35,{roughness:.4,metalness:.6}),0,1.0,5.55,0,g,false);
-      var lidM=new THREE.Mesh(new THREE.PlaneGeometry(1.7,1.06),new THREE.MeshBasicMaterial({map:tex}));lidM.position.set(0,1.58,6.02);lidM.rotation.x=-0.14;g.add(lidM);
-      var lb=box(1.78,1.14,0.05,std(0x14171c,{roughness:.5}),0,1.58,6.1,0,g,false);lb.rotation.x=-0.14;
+      var lb=box(1.78,1.14,0.05,std(0x14171c,{roughness:.5}),0,1.58,6.18,0,g,false);lb.rotation.x=-0.14;
+      var lidM=new THREE.Mesh(new THREE.PlaneGeometry(1.7,1.06),new THREE.MeshBasicMaterial({map:tex,depthWrite:false}));lidM.position.set(0,1.58,6.0);lidM.rotation.x=-0.14;lidM.renderOrder=5;g.add(lidM);
       var sl=new THREE.PointLight(0x9fc0ff,.65,6,2);sl.position.set(0,1.8,5.6);g.add(sl);
       if(this._mbBlink)clearInterval(this._mbBlink);
       this._mbBlink=setInterval(function(){on=!on;drawScr();tex.needsUpdate=true;},530);
@@ -5361,8 +5361,8 @@ if(HAS3D)(function(){
     if(!paused){
       if(W3.inInterior&&W3.Interior&&W3.Interior.seatMode){
         camera.fov=56;camera.updateProjectionMatrix();
-        camera.position.lerp(new THREE.Vector3(P.px+0.30,1.74,P.pz+0.55),.18);
-        camera.lookAt(P.px,1.46,P.pz-1.7);
+        camera.position.lerp(new THREE.Vector3(P.px+0.32,1.82,P.pz+1.05),.18);
+        camera.lookAt(P.px,1.40,P.pz-1.7);
         try{player.g.visible=false;player.g.rotation.y=Math.PI;}catch(e){}
       } else {
         try{player.g.visible=true;}catch(e){}
