@@ -2783,13 +2783,15 @@ const Voices={
   _mind:function(){return (window.Profile&&Profile.mind)?Profile.mind():(S.mind||{});},
   _dom:function(m){var b='lunaris',bv=-1;for(var k in m){if(m[k]>bv){bv=m[k];b=k;}}return b;},
   _sha:function(m){var w='aelius',wv=1e9;for(var k in m){if(m[k]<wv){wv=m[k];w=k;}}return w;},
+  AB:[{n:1,lo:1,hi:6,end:6},{n:2,lo:6,hi:12,end:12},{n:3,lo:12,hi:16,end:16},{n:4,lo:16,hi:25,end:25},{n:5,lo:25,hi:38,end:38},{n:6,lo:38,hi:49,end:49}],
+  ABURL:'https://github.com/lunarisbahal/the-mind-experiment/releases/download/audiobooks/',
   onChapterDone:function(abs){
     try{S.voices=S.voices||{ch:{},unlocked:{},audio:{}};
       var m=this._mind();S.voices.ch[abs]={rk:this.RKEY(abs),dom:this._dom(m),sha:this._sha(m),t:Date.now()};
       try{House._vAbs=abs;}catch(e){}
       var rk=this.RKEY(abs),hi=this.REALM[rk][1];
       if(abs>=hi&&rk!=='silv'&&!S.voices.unlocked[rk]){S.voices.unlocked[rk]=true;UI.toast((GAMELANG==='tr'?'✦ Başarı kilidi açıldı: ':'✦ Unlocked: ')+this.short[rk]+(GAMELANG==='tr'?' yorumları':' commentary'),6800);try{window.FX&&FX.reward();}catch(e){}}
-      if(abs%7===0){var n=abs/7;if(n>=1&&n<=6&&!S.voices.audio[n]){S.voices.audio[n]=true;UI.toast((GAMELANG==='tr'?'🎧 Sesli kayıt açıldı: Bölüm ':'🎧 Audiobook unlocked: Part ')+n+' — MENU → '+(GAMELANG==='tr'?'Sesli Kayıtlar':'Audiobook'),7000);}}
+      this.AB.forEach(function(a){if(abs>=a.end&&!S.voices.audio[a.n]){S.voices.audio[a.n]=true;UI.toast((GAMELANG==='tr'?'🎧 Sesli kayıt açıldı: Bölüm ':'🎧 Audiobook unlocked: Ch ')+a.lo+'-'+a.hi+' — MENU → '+(GAMELANG==='tr'?'Sesli Kayıtlar':'Audiobook'),7000);try{window.FX&&FX.reward();}catch(e){}}});
       if(typeof save==='function')save();
     }catch(e){}
   },
@@ -2836,10 +2838,9 @@ const Voices={
     h+= ks.length?('<div style="max-height:230px;overflow-y:auto;border:1px solid var(--line);border-radius:6px;padding:6px 8px">'+ks.map(function(a){return '<button class="btn ghost" style="font-size:11px;margin:3px 4px 0 0" onclick="Voices.show(\'silv\',\'chapter\','+a+')">'+(tr?'Bölüm ':'Ch ')+a+'</button>';}).join('')+'</div>'):('<p style="color:var(--dim);font-size:12px">'+(tr?'Henüz bölüm tamamlamadın.':'No chapters completed yet.')+'</p>');
     UI.doc((tr?'◈ ARKETİP YORUMLARI':'◈ ARCHETYPE VOICES'),h);
   },
-  audio:function(){var tr=(GAMELANG==='tr');var got=(S.voices&&S.voices.audio)||{};
-    var h='<p style="color:var(--dim);font-size:12px">'+(tr?'Her 7 bölümde bir sesli kayıt açılır; açıldıkça burada birikir.':'An audiobook unlocks every 7 chapters; they accumulate here.')+'</p>';
-    for(var n=1;n<=6;n++){var u=!!got[n];h+='<div class="row" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>'+(u?'🎧 ':'🔒 ')+(tr?'Bölüm ':'Part ')+n+'</span>'+(u?('<audio controls preload="none" style="height:32px;max-width:60%" src="./audiobook'+n+'.mp3"></audio>'):('<span style="color:var(--dim);font-size:11px">'+(tr?((n*7)+'. bölümde açılır'):('unlocks at chapter '+(n*7)))+'</span>'))+'</div>';}
-    h+='<p style="color:var(--dim);font-size:11px;margin-top:8px">'+(tr?'(Ses dosyaları repoda audiobook1.mp3 … audiobook6.mp3 olarak yer almalı.)':'(Audio files should sit in the repo as audiobook1.mp3 … audiobook6.mp3.)')+'</p>';
+  audio:function(){var tr=(GAMELANG==='tr');var got=(S.voices&&S.voices.audio)||{};var base=this.ABURL;
+    var h='<p style="color:var(--dim);font-size:12px">'+(tr?'Sesli kitabın bölümleri ilerledikçe açılır; açıldıkça burada birikir. Tıkla ve dinle.':'The audiobook parts unlock as you progress; they accumulate here. Tap and listen.')+'</p>';
+    this.AB.forEach(function(a){var u=!!got[a.n];h+='<div class="row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:6px 0"><span style="white-space:nowrap">'+(u?'🎧 ':'🔒 ')+(tr?'Bölüm ':'Ch ')+a.lo+'–'+a.hi+'</span>'+(u?('<audio controls preload="none" style="height:32px;max-width:62%" src="'+base+'audiobook'+a.n+'.mp3"></audio>'):('<span style="color:var(--dim);font-size:11px">'+(tr?(a.end+'. bölümde açılır'):('unlocks at chapter '+a.end))+'</span>'))+'</div>';});
     UI.doc((tr?'🎧 SESLİ KAYITLAR':'🎧 AUDIOBOOK'),h);
   }
 };
