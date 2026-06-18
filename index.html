@@ -443,17 +443,27 @@ const Cloud={
 };
 if(typeof window!=='undefined')window.Cloud=Cloud;
 function enterWithCode(){var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');
-  var v=prompt(TR?'İlerleme kodunu gir (başka bir cihazda oluşturduğun kod):':'Enter your progress code (the code you created on another device):');
-  if(v==null)return;v=String(v).replace(/[^a-zA-Z0-9_-]/g,'').slice(0,40);
-  if(v.length<4){alert(TR?'Kod en az 4 karakter olmalı.':'Code must be at least 4 characters.');return;}
-  try{localStorage.setItem('it041_sync_code',v);}catch(e){}
-  try{if(window.UI&&UI.toast)UI.toast(TR?'☁ İlerleme getiriliyor…':'☁ Fetching your progress…');}catch(e){}
-  if(window.Cloud&&Cloud.pull){Cloud.pull(true).then(function(found){
-    if(found){try{if(typeof refreshHud==='function')refreshHud();}catch(e){}if(window.Game&&Game.start){Game.start(true);}else{location.reload();}}
-    else{alert(TR?'Bu kodla kayıt bulunamadı. Kodu doğru girdiğinden emin ol. Yeni başlıyorsan normal "Giriş" yap.':'No save found for this code. Make sure it is correct. If you are new, just use Enter.');}
-  }).catch(function(){alert(TR?'Bağlantı kurulamadı — internet bağlantını kontrol et.':'Could not connect — check your internet.');});}
+  if(!(window.UI&&UI.doc)){var pv=prompt(TR?'İlerleme kodunu gir:':'Enter your progress code:');if(pv){try{localStorage.setItem('it041_sync_code',String(pv).replace(/[^a-zA-Z0-9_-]/g,'').slice(0,40));}catch(e){}location.reload();}return;}
+  UI.doc(TR?'☁ İlerleme Kodu ile Devam Et':'☁ Continue with Progress Code',
+    '<p style="color:var(--dim);font-size:12.5px;line-height:1.55">'+(TR?'Ana cihazında <b>MENÜ → İlerleme Kodu</b>’ndan oluşturduğun kodu buraya gir; o cihazdaki ilerlemen bu cihaza gelir. (Henüz kod oluşturmadıysan önce ana cihazında oluştur — ilerlemen o anda o koda yüklenir.)':'Enter the code you created on your main device (<b>MENU → Progress Code</b>); the progress from that device will load here. (If you have not created one yet, do it on your main device first — your progress is pushed to that code right then.)')+'</p>'+
+    '<input id="introCodeIn" maxlength="40" placeholder="'+(TR?'kodun (örn: ay-gol-7421)':'your code (e.g. moon-lake-7421)')+'" style="width:min(320px,92%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:9px 11px;font-family:inherit;font-size:14px;border-radius:4px;margin:8px 0">'+
+    '<div id="introCodeMsg" style="font-size:12px;color:var(--moon);min-height:18px;margin:2px 0 8px"></div>'+
+    '<button class="btn v" onclick="enterWithCodeGo()">'+(TR?'getir ve devam et':'fetch & continue')+'</button> <button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(TR?'kapat':'close')+'</button>');
+  setTimeout(function(){var el=document.getElementById('introCodeIn');if(el){el.focus();el.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();enterWithCodeGo();}});}},90);
 }
-if(typeof window!=='undefined')window.enterWithCode=enterWithCode;
+function enterWithCodeGo(){var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');
+  var el=document.getElementById('introCodeIn'),msg=document.getElementById('introCodeMsg');
+  var v=((el&&el.value)||'').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,40);
+  if(v.length<4){if(msg)msg.textContent=TR?'Kod en az 4 karakter olmalı.':'Code must be at least 4 characters.';return;}
+  try{localStorage.setItem('it041_sync_code',v);}catch(e){}
+  if(msg)msg.textContent=TR?'☁ İlerleme getiriliyor…':'☁ Fetching…';
+  if(!(window.Cloud&&Cloud.pull)){location.reload();return;}
+  Cloud.pull(true).then(function(found){
+    if(found){try{if(typeof refreshHud==='function')refreshHud();}catch(e){}try{if(UI.closeDoc)UI.closeDoc();}catch(e){}if(window.Game&&Game.start){Game.start(true);}else{location.reload();}}
+    else{if(msg)msg.textContent=TR?'Bu kodla kayıt bulunamadı. Kodu kontrol et — ya da ana cihazında MENÜ → İlerleme Kodu’ndan oluştur.':'No save found for this code. Check it — or create it on your main device (MENU → Progress Code).';}
+  }).catch(function(){if(msg)msg.textContent=TR?'Bağlantı kurulamadı — interneti kontrol edip tekrar dene.':'Connection failed — check your internet and retry.';});
+}
+if(typeof window!=='undefined'){window.enterWithCode=enterWithCode;window.enterWithCodeGo=enterWithCodeGo;}
 function sitAtDesk(){try{if(window.UI&&UI.closeDoc)UI.closeDoc();}catch(e){}try{if(window.Game&&Game.setModal)Game.setModal(false);}catch(e){}
   if(window.W3&&W3.inInterior&&W3.Interior&&W3.Interior.sitDesk){W3.Interior.sitDesk();}
   else if(window.Journal){Journal.desk();}}
