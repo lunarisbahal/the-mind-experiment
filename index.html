@@ -349,6 +349,7 @@
   <button class="mini" onclick="SideQuests.show()">✧ SIDE QUEST PROGRESS</button>
   <button class="mini" onclick="Voices.menu()">◈ ARCHETYPE VOICES</button>
   <button class="mini" onclick="Voices.audio()">🎧 AUDIOBOOK</button>
+  <button class="mini" onclick="Journal.menu()">📖 MY BOOK</button>
 <button class="mini" onclick="Daily3.show()">🜂 DAILY TRIAD</button>
 <button class="mini" onclick="Therapy.menuRedirect()">🛋 THERAPY CENTER</button>
 <button class="mini" onclick="Auto.open()">◍ AUTONOMOUS SUBJECT</button>
@@ -377,6 +378,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 "use strict";
 /* ============================================================
@@ -429,7 +431,7 @@ const Cloud={
   _t:null,
   code(){try{return localStorage.getItem('it041_sync_code')||'';}catch(e){return'';}},
   score(s){s=s||S;return (s.stage||0)*1000+(s.locks||0)*100+(Object.keys(s.rites||{}).length)*10+((s.echoes||[]).length);},
-  sanitize(){const c=JSON.parse(JSON.stringify(S));if(c.rites){for(const k in c.rites)c.rites[k]='';}if(c.voices&&c.voices.ch){for(const k in c.voices.ch){if(c.voices.ch[k])c.voices.ch[k].ans=[];}}return c;},
+  sanitize(){const c=JSON.parse(JSON.stringify(S));if(c.rites){for(const k in c.rites)c.rites[k]='';}if(c.voices&&c.voices.ch){for(const k in c.voices.ch){if(c.voices.ch[k])c.voices.ch[k].ans=[];}}if(c.journal)c.journal={entries:{},started:!!(S.journal&&S.journal.started)};return c;},
   blob(){const ls={};this.SKEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!=null)ls[k]=v;});return {S:this.sanitize(),ls,score:this.score(),ts:Date.now()};},
   schedulePush(){if(!this.code())return;clearTimeout(this._t);this._t=setTimeout(()=>this.push(),4000);},
   async push(){const code=this.code();if(!code)return;try{await fetch(this.KON+'/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,blob:this.blob()})});}catch(e){}},
@@ -469,6 +471,7 @@ const L={
   lucius:{x:186,z:154,r:5,name:'A MAN IN A PRESSED SUIT'},
   payphone:{x:176,z:247,r:4.5,name:'THE PAYPHONE'},
   lunaris:{x:274,z:66,r:6,name:'A FIGURE IN THE WATERLIGHT'},
+  journal:{x:267,z:73,r:4.4,name:'WRITING DESK'},
   caseD:{x:101,z:7,r:4.5,name:'CASE D TERMINAL'},
   /* rite sites */
   diskAltar:{x:68,z:106,r:4.5,name:'THE HEAVY DISK'},
@@ -1236,6 +1239,7 @@ function interactTarget(){
   if(near(L.bench))return[S.rites.r6!==undefined?(Daily.doneToday()?'Question of the day (done ✓)':'🜂 Question of the day'):'◈ Sit on the bench',S.rites.r6!==undefined?doDaily:()=>Rite.open('r6')];
   if(near(L.dreamWell))return['◯ Dream well',doDreamWell];
   if(near(L.traceStone))return['◈ Trace Monument — leave a permanent mark',()=>Iz.show()];
+  if(window.Journal&&Journal.reached&&Journal.reached()&&near(L.journal))return['✍ '+(GAMELANG==='tr'?'Günlüğe otur — kendi kitabına yaz':'Sit at the desk — write your own book'),()=>{Journal.desk();}];
   if(S.flags.initiate&&near(L.ascend))return['✶ Ascend to the upper layer',()=>{S.px=362;S.pz=282;save();UI.toast('✶ THE AELIUS LAYER — one floor up. Everything is both smaller and clearer.',5000);}];
   if(near(L.skyAelius))return['✶ Speak with Aelius',()=>{if(Mirror.ready()){Mirror.open('aelius');return;}
     Dlg.open([['AELIUS IGNIS','Welcome, traveler. This is the narrators\' balcony. Look down: the disks, the lake, the train — all of them words inside one sentence.'],
@@ -2657,6 +2661,76 @@ const Architect={
     S.insight+=3;S.lucidity=Math.min(100,S.lucidity+10);save();refreshHud();Rite.closeOnly();
     UI.toast('◈ '+r.t+' practiced — the record is yours.');}
 };
+const Journal={
+  data(){S.journal=S.journal||{entries:{},started:false};if(!S.journal.entries)S.journal.entries={};return S.journal;},
+  reached(){try{if(window.Library&&Library.milestones&&Library.milestones()>=5)return true;}catch(e){}try{if(S.flags&&S.flags.lunarisIntegrated)return true;}catch(e){}return false;},
+  curCh(){try{if(window.House&&House.cur&&House.cur.ch)return House.abs(House.cur.ch);}catch(e){}try{if(window.Library&&Library.milestones)return Math.max(1,Library.milestones());}catch(e){}return 1;},
+  desk(){var TR=(GAMELANG==='tr');try{if(window.Music&&Music._on&&localStorage.getItem('it041_music_off')!=='1'&&!Music.on)Music._on();}catch(e){}
+    var icon=function(glyph,label,href,onclick){return '<a '+(href?('href="'+href+'" target="_blank" rel="noopener"'):('onclick="'+onclick+'" style="cursor:pointer"'))+' style="text-decoration:none;text-align:center;width:62px;display:inline-block;margin:2px 4px"><div style="font-size:28px;line-height:1.1">'+glyph+'</div><div style="font-size:10px;color:var(--dim)">'+label+'</div></a>';};
+    var desktop='<div style="max-width:430px;margin:8px auto;background:linear-gradient(180deg,#0b1020,#070910);border:1px solid var(--line);border-radius:12px;padding:14px 12px 16px"><div style="font-size:9px;letter-spacing:.2em;color:var(--violet);opacity:.6;margin-bottom:8px">'+(TR?'MASAÜSTÜ':'DESKTOP')+'</div><div style="display:flex;justify-content:center;flex-wrap:wrap">'
+      +icon('📄',(TR?'Günlük':'Journal'),'','UI.closeDoc&&UI.closeDoc();Journal.write()')
+      +icon('🐙','GitHub','https://github.com/lunarisbahal','')
+      +icon('𝕏','X','https://x.com/lunarisbahal','')
+      +icon('👽','Reddit','https://www.reddit.com/user/lunarisbahal','')
+      +'</div></div>';
+    UI.doc(TR?'✍ Yazı Masası':'✍ The Writing Desk','<div style="text-align:center"><p style="color:var(--ink);line-height:1.7">'+(TR?'Masaya oturuyorsun; dizüstünün ekranı usulca aydınlanıyor. Tıpkı Lunaris gibi — ekranda hep aynı simgeler: yazdığı günlük (Word) ve sürekli uğradığı yerler. Sen de bu yolculukta öğrendiklerini, sana dokunanı kendi sözlerinle yazmaya başla; bu sayfalar zamanla senin kitabın olacak.':'You sit at the desk; the laptop glows softly. Just like Lunaris — the same icons on screen: the journal he wrote (Word) and the places he kept returning to. Begin writing what you learned, what touched you, in your own words; these pages will become your book.')+'</p>'+desktop+'<p style="color:var(--dim);font-size:11.5px">'+(TR?'(Sol altta müzik listesi açıldı — dilersen kapat. Yazdıkların yalnızca bu cihazda kalır.)':'(The playlist opened bottom-left — close it if you like. Your writing stays only on this device.)')+'</p><button class="btn v" onclick="Journal.write()">'+(TR?'💻 Yazmaya başla':'💻 Begin writing')+'</button> <button class="btn ghost" onclick="Journal.menu()">'+(TR?'📖 tüm sayfalarım':'📖 all my pages')+'</button></div>');},
+  write(ch){var TR=(GAMELANG==='tr');ch=ch||this.curCh();var d=this.data();var cur=d.entries[ch]||'';
+    UI.doc((TR?'📓 Kendi Kitabın — Bölüm ':'📓 Your Book — Chapter ')+ch,
+      '<p style="color:var(--dim);font-size:12px">'+(TR?'Bu bölümde ne öğrendin, ne hissettin, hayatında ne değişti? Kendi sözlerinle yaz. Bölüm bölüm biriken bu sayfalar sonunda kitabını oluşturacak.':'What did you learn, feel, change in this chapter? Write in your own words. These pages, gathering chapter by chapter, become your book.')+'</p>'
+      +'<textarea id="jrlIn" rows="11" style="width:100%;background:#0a0c14;border:1px solid var(--line);color:var(--ink);padding:10px;font-family:inherit;font-size:13.5px;line-height:1.6;border-radius:6px" placeholder="'+(TR?'Bugün şunu fark ettim…':'Today I noticed…')+'">'+esc(cur)+'</textarea>'
+      +'<div style="margin-top:8px"><button class="btn v" onclick="Journal.save('+ch+')">'+(TR?'kaydet':'save')+'</button> <button class="btn ghost" onclick="Journal.menu()">'+(TR?'📖 Kitabım / tüm sayfalar':'📖 My Book / all pages')+'</button></div>');
+    setTimeout(function(){var t=UI.el('jrlIn');if(t)t.focus();},90);},
+  save(ch){var TR=(GAMELANG==='tr');var t=UI.el('jrlIn');if(!t)return;var d=this.data();d.entries[ch]=String(t.value||'').slice(0,20000);d.started=true;if(typeof save==='function')save();try{if(window.FX)FX.sfx('soft');}catch(e){}UI.toast(TR?('✍ Bölüm '+ch+' sayfan kaydedildi (bu cihazda).'):('✍ Chapter '+ch+' page saved (on this device).'));},
+  _list(d){return Object.keys(d.entries||{}).map(Number).filter(function(c){return (d.entries[c]||'').trim();}).sort(function(a,b){return a-b;});},
+  menu(){var TR=(GAMELANG==='tr');var d=this.data();var ks=this._list(d);
+    var list=ks.length?ks.map(function(c){return '<button class="btn ghost" style="font-size:11.5px;margin:2px 4px 0 0" onclick="Journal.write('+c+')">'+(TR?'Bölüm ':'Ch ')+c+'</button>';}).join(''):('<p style="color:var(--dim);font-size:12px">'+(TR?'Henüz sayfa yok. Lunaris’in göl evindeki yazı masasına otur (E) ya da bekleme anlarında yazmaya başla.':'No pages yet. Sit at the writing desk by Lunaris’s lake house (E), or start during a waiting moment.')+'</p>');
+    UI.doc((TR?'📖 KENDİ KİTABIM':'📖 MY BOOK'),
+      '<p style="color:var(--dim);font-size:12px">'+(TR?'Oyun boyunca yazdığın günlük sayfaları. Birleşince senin kitabın olur — kendi yolculuğundan, kendi sözlerinle.':'The journal pages you wrote through the game. Merged, they become your book — from your journey, in your words.')+'</p>'
+      +'<div style="margin:6px 0">'+list+'</div>'
+      +'<div style="margin-top:6px"><button class="btn ghost" style="font-size:11.5px" onclick="Journal.write()">✍ '+(TR?'bu bölüme yaz':'write this chapter')+'</button></div>'
+      +'<hr style="border-color:var(--line);margin:12px 0">'
+      +'<button class="btn v" onclick="Journal.compile()">📚 '+(TR?'Sayfaları birleştir — kitabımı oluştur':'Merge pages — build my book')+'</button>');},
+  compile(){var TR=(GAMELANG==='tr');var d=this.data();var ks=this._list(d);
+    if(!ks.length){UI.toast(TR?'Önce birkaç sayfa yaz.':'Write a few pages first.');return;}
+    var nm='';try{nm=(localStorage.getItem('it041_name')||'').trim();}catch(e){}
+    var title=(TR?'BENİM KİTABIM':'MY BOOK')+(nm?(' — '+nm):'');
+    var bodyHtml=ks.map(function(c){var t=(window.chLabel?chLabel(c):((TR?'Bölüm ':'Chapter ')+c));return '<h3 style="color:var(--violet);margin:12px 0 4px">'+esc(t)+'</h3><p style="white-space:pre-wrap;line-height:1.7;color:var(--ink)">'+esc(d.entries[c])+'</p>';}).join('');
+    UI.doc('📚 '+title,'<div style="max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:6px;padding:10px;background:#0a0c14">'+bodyHtml+'</div><p style="color:var(--dim);font-size:11.5px;margin-top:8px">'+(TR?'Bu senin kitabın — kendi yolculuğundan, kendi sözlerinle.':'This is your book — from your own journey, in your own words.')+'</p><div style="margin-top:8px"><button class="btn v" onclick="Journal.pdf()">📕 '+(TR?'PDF indir':'Download PDF')+'</button> <button class="btn ghost" onclick="Journal.txt()">⬇ .txt</button></div>');},
+  pdf(){var TR=(GAMELANG==='tr');var d=this.data();var ks=this._list(d);if(!ks.length){UI.toast(TR?'Önce birkaç sayfa yaz.':'Write a few pages first.');return;}
+    if(!(window.jspdf&&window.jspdf.jsPDF)){this._print();return;}
+    var self=this;UI.toast(TR?'PDF hazırlanıyor…':'Building PDF…');
+    this._ensureFont(function(){try{ if(self._fontB64||GAMELANG!=='tr'){ self._buildPdf(d,ks,TR);} else { self._print(); } }catch(e){ self._print(); }});},
+  _ensureFont(cb){
+    if(this._fontB64!==undefined){cb();return;}var self=this;
+    try{fetch('https://cdn.jsdelivr.net/gh/google/fonts/apache/roboto/static/Roboto-Regular.ttf').then(function(r){if(!r.ok)throw 0;return r.arrayBuffer();}).then(function(buf){
+      var bytes=new Uint8Array(buf),bin='',CH=8192;for(var i=0;i<bytes.length;i+=CH){bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH));}
+      self._fontB64=btoa(bin);cb();}).catch(function(){self._fontB64='';cb();});}catch(e){this._fontB64='';cb();}},
+  _buildPdf(d,ks,TR){
+    var nm='';try{nm=(localStorage.getItem('it041_name')||'').trim();}catch(e){}
+    var title=(TR?'BENİM KİTABIM':'MY BOOK')+(nm?(' — '+nm):'');
+    var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF({unit:'pt',format:'a4'});var fam='helvetica';
+    if(this._fontB64){try{doc.addFileToVFS('Roboto-Regular.ttf',this._fontB64);doc.addFont('Roboto-Regular.ttf','Roboto','normal');fam='Roboto';}catch(e){fam='helvetica';}}
+    var M=56,W=doc.internal.pageSize.getWidth(),Hh=doc.internal.pageSize.getHeight(),y=92;
+    doc.setFont(fam,'normal');doc.setFontSize(22);doc.text(title,W/2,y,{align:'center'});y+=16;
+    doc.setFontSize(10);doc.setTextColor(120);doc.text('DO-LOON-AI EXPRESS',W/2,y,{align:'center'});doc.setTextColor(20);y+=30;
+    for(var j=0;j<ks.length;j++){var c=ks[j];var t=(window.chLabel?chLabel(c):((TR?'Bölüm ':'Chapter ')+c));
+      if(y>Hh-90){doc.addPage();y=80;}
+      doc.setFontSize(13);doc.setTextColor(90,75,138);doc.text(String(t),M,y);y+=8;doc.setDrawColor(200);doc.line(M,y,W-M,y);y+=18;doc.setTextColor(20);doc.setFontSize(11.5);
+      var lines=doc.splitTextToSize(String(d.entries[c]||''),W-M*2);
+      for(var i=0;i<lines.length;i++){if(y>Hh-60){doc.addPage();y=80;}doc.text(lines[i],M,y);y+=16;}
+      y+=16;}
+    doc.save((nm?nm.replace(/[^\w\- ]/g,''):'benim-kitabim')+'.pdf');
+    try{if(window.FX)FX.reward();}catch(e){}
+    UI.toast(TR?'📚 Kitabın PDF olarak indirildi.':'📚 Your book was downloaded as a PDF.');},
+  _print(){var TR=(GAMELANG==='tr');var d=this.data();var ks=this._list(d);var nm='';try{nm=(localStorage.getItem('it041_name')||'').trim();}catch(e){}
+    var title=(TR?'BENİM KİTABIM':'MY BOOK')+(nm?(' — '+nm):'');var esc2=function(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');};
+    var html='<!doctype html><html><head><meta charset="utf-8"><title>'+esc2(title)+'</title><style>body{font-family:Georgia,serif;max-width:680px;margin:42px auto;padding:0 26px;line-height:1.75;color:#1a1a1a}h1{text-align:center;letter-spacing:.05em}h2{margin-top:30px;color:#5a4b8a;border-bottom:1px solid #ccc;padding-bottom:4px}p{white-space:pre-wrap}</style></head><body><h1>'+esc2(title)+'</h1>'+ks.map(function(c){var t=(window.chLabel?chLabel(c):((TR?'Bölüm ':'Chapter ')+c));return '<h2>'+esc2(t)+'</h2><p>'+esc2(d.entries[c])+'</p>';}).join('')+'<p style="text-align:center;color:#888;margin-top:42px">DO·LOON·AI EXPRESS</p></body></html>';
+    var w=window.open('','_blank');if(w&&w.document){w.document.open();w.document.write(html);w.document.close();setTimeout(function(){try{w.focus();w.print();}catch(e){}},500);}else{UI.toast(TR?'Açılır pencere engellendi — .txt indir seçeneğini kullan.':'Popup blocked — use the .txt download.');}},
+  txt(){var TR=(GAMELANG==='tr');var d=this.data();var ks=this._list(d);var nm='';try{nm=(localStorage.getItem('it041_name')||'').trim();}catch(e){}
+    var txt=((TR?'BENİM KİTABIM':'MY BOOK')+(nm?(' — '+nm):''))+'\n\n'+ks.map(function(c){var t=(window.chLabel?chLabel(c):((TR?'Bölüm ':'Chapter ')+c));return t+'\n'+Array(t.length+1).join('-')+'\n'+(d.entries[c]||'')+'\n';}).join('\n')+'\nDO·LOON·AI EXPRESS';
+    try{var b=new Blob([txt],{type:'text/plain;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='benim-kitabim.txt';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();},500);}catch(e){UI.toast('indirilemedi');}}
+};
+if(typeof window!=='undefined')window.Journal=Journal;
 const NEXUS={
   load(){try{return JSON.parse(localStorage.getItem('it041_nexus'))||{}}catch(e){return{}}},
   store(o){try{localStorage.setItem('it041_nexus',JSON.stringify(o));}catch(e){}},
@@ -3209,7 +3283,7 @@ const House={
   _pause(opts,cb){var L=GAMELANG;var sec=(opts&&opts.sec)||60;var box=opts&&opts.box;this._inPause=!!(opts&&opts.sum);this._pauseDone=false;this._pauseCh=(this.cur&&this.cur.ch)||null;
     var first=!(S.flags&&S.flags.sawPause);S.flags=S.flags||{};S.flags.sawPause=true;if(!first)sec=Math.min(sec,40);
     var sv=(window.LUNHOUSE&&LUNHOUSE.silvanus&&LUNHOUSE.silvanus.pause)?this.T(LUNHOUSE.silvanus.pause):(L==='tr'?'Dur ve fark et. Acele etme; içeride olup biteni sindirmesi için zihnine kısa bir süre tanı.':'Stop and notice. Don\'t rush; give your mind a short while to let what happened settle.');
-    var body='<div style="text-align:center"><p style="color:var(--moon);font-style:italic;line-height:1.7">'+esc(first?sv:(L==='tr'?'Dur ve fark et. Bu kısa sessizlik, kavrayışın yerine oturması içindir.':'Stop and notice. This short silence is for the insight to settle.'))+'</p><div id="pzC" style="font-size:30px;color:var(--violet);margin:14px">'+sec+'</div><button class="btn v" id="pzGo" style="display:none" onclick="House._pauseGo()">'+(L==='tr'?'fark ettim — devam':'I noticed — continue')+'</button>'+((opts&&opts.sum&&this._tx&&this._tx.length)?'<div style="margin-top:12px"><button class="btn ghost" style="font-size:11px" onclick="House._chapterSummary()">'+(L==='tr'?'📋 bu bölümün özetine son bir kez bak':'📋 glance at this chapter’s summary')+'</button></div>'+(window.Voices?Voices.pauseButtons():'')+'':'')+'</div>';
+    var body='<div style="text-align:center"><p style="color:var(--moon);font-style:italic;line-height:1.7">'+esc(first?sv:(L==='tr'?'Dur ve fark et. Bu kısa sessizlik, kavrayışın yerine oturması içindir.':'Stop and notice. This short silence is for the insight to settle.'))+'</p><div id="pzC" style="font-size:30px;color:var(--violet);margin:14px">'+sec+'</div><button class="btn v" id="pzGo" style="display:none" onclick="House._pauseGo()">'+(L==='tr'?'fark ettim — devam':'I noticed — continue')+'</button>'+((opts&&opts.sum&&this._tx&&this._tx.length)?'<div style="margin-top:12px"><button class="btn ghost" style="font-size:11px" onclick="House._chapterSummary()">'+(L==='tr'?'📋 bu bölümün özetine son bir kez bak':'📋 glance at this chapter’s summary')+'</button></div>'+((window.Journal&&Journal.reached&&Journal.reached())?'<div style="margin-top:6px"><button class="btn ghost" style="font-size:11px" onclick="Journal.desk()">🖥 '+(L==='tr'?'Bilgisayara geç — bu bölümün günlüğünü yaz':'Go to the computer — write this chapter')+'</button></div>':'')+(window.Voices?Voices.pauseButtons():'')+'':'')+'</div>';
     var html=this._wrap(body);
     if(box){var b=UI.el(box);if(b){b.innerHTML=body;}else{UI.doc('☽ '+(L==='tr'?'Silvanus — dur ve fark et':'Silvanus — pause & notice'),html);}}
     else{UI.doc('☽ '+(L==='tr'?'Silvanus — dur ve fark et':'Silvanus — pause & notice'),html);}
@@ -3219,7 +3293,7 @@ const House={
   /* ---- room complete ---- */
   _roomDone(){var c=this.cur;var room=c.room;var dm=this.doneMap();if(!dm['ch'+this.abs(c.ch)]){dm['ch'+this.abs(c.ch)]=true;S.insight=(S.insight||0)+8;this.stepMap()['ch'+c.ch]=0;this._save();try{if(window.Voices)Voices.onChapterDone(this.abs(c.ch));}catch(e){}}
     var h='<p style="color:var(--accent);line-height:1.7">'+esc(this.T(room.done))+'</p><button class="btn v" onclick="House._afterRoom()">'+(GAMELANG==='tr'?'devam':'continue')+'</button>';UI.doc(this._title(),this._wrap(h));},
-  _afterRoom(){var ch=this.cur.ch;this._reward(ch,function(){House._pause({sec:30,sum:true},function(){var an=House.abs(ch);var proceed=function(){var L=GAMELANG;var allNow=House.curChapter()>7;var rec='<div style="margin:4px 0 12px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:rgba(157,140,201,.07)"><p style="color:var(--moon);font-size:12px;line-height:1.55;margin:0 0 7px">'+(L==='tr'?'<b>Öneri:</b> Sonraki bölüme geçmeden, az önce kilidi açılan bu bölümün <b>kayıp günlüğünü</b> oku. Oynadığın bölümle günlüğü eş zamanlı okumak deneyimi tam yaşatır. (İstediğin an Menü → Zihin Deneyi’nden de okuyabilirsin.)':'<b>Tip:</b> Before the next chapter, read this chapter’s just-unlocked <b>lost diary</b>. Reading the diary in sync with the chapter you played gives the full experience. (Also anytime from Menu → The Mind Experiment.)')+'</p><button class="btn ghost" style="font-size:11.5px" onclick="House._diaryOverlay('+an+')">📖 '+(L==='tr'?'Bu bölümün günlüğünü oku':'Read this chapter’s diary')+'</button></div>';var h='<p style="color:var(--accent);line-height:1.6">'+(L==='tr'?'Bir oda tamamlandı. Hazır olduğunda devam et.':'A room is complete. Continue when you are ready.')+'</p>'+rec+(allNow?'<button class="btn v" onclick="House.realmGate()">'+(L==='tr'?'→ devam':'→ continue')+'</button>':'<button class="btn v" onclick="House.toNextRoom()">'+(L==='tr'?'→ sonraki odaya geç':'→ to the next room')+'</button>');UI.doc(House._title(),House._wrap(h));};if(window.Interlude&&Interlude.due(an)){Interlude.show(an,proceed);}else{proceed();}});});},
+  _afterRoom(){var ch=this.cur.ch;this._reward(ch,function(){House._pause({sec:30,sum:true},function(){var an=House.abs(ch);var proceed=function(){var L=GAMELANG;var allNow=House.curChapter()>7;var rec='<div style="margin:4px 0 12px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:rgba(157,140,201,.07)"><p style="color:var(--moon);font-size:12px;line-height:1.55;margin:0 0 7px">'+(L==='tr'?'<b>Öneri:</b> Sonraki bölüme geçmeden, az önce kilidi açılan bu bölümün <b>kayıp günlüğünü</b> oku. Oynadığın bölümle günlüğü eş zamanlı okumak deneyimi tam yaşatır. (İstediğin an Menü → Zihin Deneyi’nden de okuyabilirsin.)':'<b>Tip:</b> Before the next chapter, read this chapter’s just-unlocked <b>lost diary</b>. Reading the diary in sync with the chapter you played gives the full experience. (Also anytime from Menu → The Mind Experiment.)')+'</p><button class="btn ghost" style="font-size:11.5px" onclick="House._diaryOverlay('+an+')">📖 '+(L==='tr'?'Bu bölümün günlüğünü oku':'Read this chapter’s diary')+'</button> <button class="btn ghost" style="font-size:11.5px" onclick="if(window.Journal)Journal.write('+an+')">✍ '+(L==='tr'?'Bu bölümün günlüğünü yaz (kendi kitabın)':'Write this chapter’s journal (your book)')+'</button></div>';var h='<p style="color:var(--accent);line-height:1.6">'+(L==='tr'?'Bir oda tamamlandı. Hazır olduğunda devam et.':'A room is complete. Continue when you are ready.')+'</p>'+rec+(allNow?'<button class="btn v" onclick="House.realmGate()">'+(L==='tr'?'→ devam':'→ continue')+'</button>':'<button class="btn v" onclick="House.toNextRoom()">'+(L==='tr'?'→ sonraki odaya geç':'→ to the next room')+'</button>');UI.doc(House._title(),House._wrap(h));};if(window.Interlude&&Interlude.due(an)){Interlude.show(an,proceed);}else{proceed();}});});},
   _reward(ch,cb){var L=GAMELANG;var room=this.rooms()[ch-1]||{};var page=this.T(room.reward||room.room||{});var absn=this.abs(ch);
     var old=document.getElementById('rwOv');if(old)old.remove();
     var ov=document.createElement('div');ov.id='rwOv';ov.style.cssText='position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;background:rgba(3,4,10,.92)';
@@ -3246,7 +3320,7 @@ const House={
     var elapsed=now-S.flags[R+'ObsStart'];
     var gate=(this.data()&&this.data().silvanus&&this.data().silvanus.gate)?this.T(this.data().silvanus.gate):(L==='tr'?'Yedi odayı gezdin. Şimdi 12 saat boyunca öğrendiklerini gün içinde gözlemle; sonra küçük bir sınavla Bahal’a geçeceğiz.':'You walked the seven rooms. Now observe what you learned for 12 hours; then a small test opens Bahal.');
     if(elapsed<this.H12){var endT=S.flags[R+'ObsStart']+this.H12;var fmt=function(ms){if(ms<0)ms=0;var s=Math.floor(ms/1000);var hh=Math.floor(s/3600),mn=Math.floor((s%3600)/60),sc=s%60;return (hh<10?'0':'')+hh+':'+(mn<10?'0':'')+mn+':'+(sc<10?'0':'')+sc;};
-      UI.doc('☽ '+(L==='tr'?'Silvanus — eşik':'Silvanus — the threshold'),this._wrap('<p style="color:var(--moon);font-style:italic;line-height:1.7">'+esc(gate)+'</p><p style="color:var(--violet);margin-top:6px">'+(L==='tr'?'Bu süre, öğrendiğini hayatında gözlemlemen içindir. Geri sayım:':'This time is for observing what you learned, in your life. Countdown:')+'</p><div id="rgC" style="font-size:30px;letter-spacing:.06em;color:var(--accent);text-align:center;margin:12px;font-family:monospace">'+fmt(endT-Date.now())+'</div><div id="rgGo" style="text-align:center"></div><button class="btn ghost" style="margin-top:6px" onclick="if(UI.closeDoc)UI.closeDoc()">'+(L==='tr'?'kapat':'close')+'</button>'));
+      UI.doc('☽ '+(L==='tr'?'Silvanus — eşik':'Silvanus — the threshold'),this._wrap('<p style="color:var(--moon);font-style:italic;line-height:1.7">'+esc(gate)+'</p><p style="color:var(--violet);margin-top:6px">'+(L==='tr'?'Bu süre, öğrendiğini hayatında gözlemlemen içindir. Geri sayım:':'This time is for observing what you learned, in your life. Countdown:')+'</p><div id="rgC" style="font-size:30px;letter-spacing:.06em;color:var(--accent);text-align:center;margin:12px;font-family:monospace">'+fmt(endT-Date.now())+'</div><div id="rgGo" style="text-align:center"></div><div style="text-align:center;margin:8px 0"><button class="btn v" style="font-size:12px" onclick="Journal.desk()">🖥 '+(L==='tr'?'Bilgisayara geç — bu uzun bekleyişte günlüğüne yaz':'Go to the computer — journal during this long wait')+'</button></div><button class="btn ghost" style="margin-top:6px" onclick="if(UI.closeDoc)UI.closeDoc()">'+(L==='tr'?'kapat':'close')+'</button>'));
       clearInterval(this._rgIv);this._rgIv=setInterval(function(){var rem=endT-Date.now();var e=UI.el('rgC');if(!e){clearInterval(House._rgIv);return;}e.textContent=fmt(rem);if(rem<=0){clearInterval(House._rgIv);var g=UI.el('rgGo');if(g&&!g.innerHTML)g.innerHTML='<button class="btn v" onclick="House.realmGate()">'+(L==='tr'?'→ eşiği geç (küçük sınav)':'→ cross the threshold (short test)')+'</button>';}},1000);
       return;}
     this._testStart();},
@@ -4411,6 +4485,21 @@ if(HAS3D)(function(){
   };
   const lun=makeFigure(0xe8e4d4,0xf2efe2,0xfff8d8);
   lun.g.position.set(L.lunaris.x,0,L.lunaris.z);lun.g.visible=false;scene.add(lun.g);
+  /* ✍ Yazı masası — kendi kitabını yazma (Lunaris göl evi yanı) */
+  (function(){try{var JX=L.journal.x,JZ=L.journal.z;
+    var wood=new THREE.MeshStandardMaterial({color:0x3a2c1e,roughness:.85});
+    var dark=new THREE.MeshStandardMaterial({color:0x20242e,roughness:.8});
+    var metal=new THREE.MeshStandardMaterial({color:0x8a96a0,roughness:.4,metalness:.5});
+    var scr=new THREE.MeshStandardMaterial({color:0x0c1426,emissive:0xbcd0f0,emissiveIntensity:.85,roughness:.4});
+    box(2.4,0.16,1.1,wood,JX,1.0,JZ);
+    box(2.0,1.0,0.9,dark,JX,0.5,JZ);
+    box(0.6,0.06,0.42,metal,JX,1.10,JZ-0.04);
+    box(0.6,0.44,0.05,scr,JX,1.32,JZ-0.24);
+    box(0.62,0.1,0.62,dark,JX,0.5,JZ+1.0);
+    box(0.62,0.62,0.1,dark,JX,0.92,JZ+1.28);
+    try{var gl=new THREE.PointLight(0xbcd0f0,.5,9,2);gl.position.set(JX,1.5,JZ);scene.add(gl);}catch(e){}
+    label('✍ '+(GAMELANG==='tr'?'YAZI MASASI':'WRITING DESK'),JX,JZ,2.5,.5);
+  }catch(e){}})();
   const noct=makeFigure(0x0c0a14,0x161020,0xd4847f);
   noct.g.position.set(L.blackdisk.x,0,L.blackdisk.z);scene.add(noct.g);
   const silv=makeFigure(0x4c3c24,0xc9b8a6,0xffa050);
