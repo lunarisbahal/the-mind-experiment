@@ -454,6 +454,10 @@ function enterWithCode(){var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr')
   }).catch(function(){alert(TR?'Bağlantı kurulamadı — internet bağlantını kontrol et.':'Could not connect — check your internet.');});}
 }
 if(typeof window!=='undefined')window.enterWithCode=enterWithCode;
+function sitAtDesk(){try{if(window.UI&&UI.closeDoc)UI.closeDoc();}catch(e){}try{if(window.Game&&Game.setModal)Game.setModal(false);}catch(e){}
+  if(window.W3&&W3.inInterior&&W3.Interior&&W3.Interior.sitDesk){W3.Interior.sitDesk();}
+  else if(window.Journal){Journal.desk();}}
+if(typeof window!=='undefined')window.sitAtDesk=sitAtDesk;
 
 
 /* ---------------- World layout ---------------- */
@@ -3296,7 +3300,7 @@ const House={
   _pause(opts,cb){var L=GAMELANG;var sec=(opts&&opts.sec)||60;var box=opts&&opts.box;this._inPause=!!(opts&&opts.sum);this._pauseDone=false;this._pauseCh=(this.cur&&this.cur.ch)||null;
     var first=!(S.flags&&S.flags.sawPause);S.flags=S.flags||{};S.flags.sawPause=true;if(!first)sec=Math.min(sec,40);
     var sv=(window.LUNHOUSE&&LUNHOUSE.silvanus&&LUNHOUSE.silvanus.pause)?this.T(LUNHOUSE.silvanus.pause):(L==='tr'?'Dur ve fark et. Acele etme; içeride olup biteni sindirmesi için zihnine kısa bir süre tanı.':'Stop and notice. Don\'t rush; give your mind a short while to let what happened settle.');
-    var body='<div style="text-align:center"><p style="color:var(--moon);font-style:italic;line-height:1.7">'+esc(first?sv:(L==='tr'?'Dur ve fark et. Bu kısa sessizlik, kavrayışın yerine oturması içindir.':'Stop and notice. This short silence is for the insight to settle.'))+'</p><div id="pzC" style="font-size:30px;color:var(--violet);margin:14px">'+sec+'</div><button class="btn v" id="pzGo" style="display:none" onclick="House._pauseGo()">'+(L==='tr'?'fark ettim — devam':'I noticed — continue')+'</button>'+((opts&&opts.sum&&this._tx&&this._tx.length)?'<div style="margin-top:12px"><button class="btn ghost" style="font-size:11px" onclick="House._chapterSummary()">'+(L==='tr'?'📋 bu bölümün özetine son bir kez bak':'📋 glance at this chapter’s summary')+'</button></div>'+((window.Journal&&Journal.reached&&Journal.reached())?'<div style="margin-top:6px"><button class="btn ghost" style="font-size:11px" onclick="Journal.desk()">🖥 '+(L==='tr'?'Bilgisayara geç — bu bölümün günlüğünü yaz':'Go to the computer — write this chapter')+'</button></div>':'')+(window.Voices?Voices.pauseButtons():'')+'':'')+'</div>';
+    var body='<div style="text-align:center"><p style="color:var(--moon);font-style:italic;line-height:1.7">'+esc(first?sv:(L==='tr'?'Dur ve fark et. Bu kısa sessizlik, kavrayışın yerine oturması içindir.':'Stop and notice. This short silence is for the insight to settle.'))+'</p><div id="pzC" style="font-size:30px;color:var(--violet);margin:14px">'+sec+'</div><button class="btn v" id="pzGo" style="display:none" onclick="House._pauseGo()">'+(L==='tr'?'fark ettim — devam':'I noticed — continue')+'</button>'+((opts&&opts.sum&&this._tx&&this._tx.length)?'<div style="margin-top:12px"><button class="btn ghost" style="font-size:11px" onclick="House._chapterSummary()">'+(L==='tr'?'📋 bu bölümün özetine son bir kez bak':'📋 glance at this chapter’s summary')+'</button></div>'+((window.Journal&&Journal.reached&&Journal.reached())?'<div style="margin-top:6px"><button class="btn ghost" style="font-size:11px" onclick="sitAtDesk()">🪑 '+(L==='tr'?'Masaya otur — günlüğünü yaz':'Sit at the desk — write your journal')+'</button></div>':'')+(window.Voices?Voices.pauseButtons():'')+'':'')+'</div>';
     var html=this._wrap(body);
     if(box){var b=UI.el(box);if(b){b.innerHTML=body;}else{UI.doc('☽ '+(L==='tr'?'Silvanus — dur ve fark et':'Silvanus — pause & notice'),html);}}
     else{UI.doc('☽ '+(L==='tr'?'Silvanus — dur ve fark et':'Silvanus — pause & notice'),html);}
@@ -3333,7 +3337,7 @@ const House={
     var elapsed=now-S.flags[R+'ObsStart'];
     var gate=(this.data()&&this.data().silvanus&&this.data().silvanus.gate)?this.T(this.data().silvanus.gate):(L==='tr'?'Yedi odayı gezdin. Şimdi 12 saat boyunca öğrendiklerini gün içinde gözlemle; sonra küçük bir sınavla Bahal’a geçeceğiz.':'You walked the seven rooms. Now observe what you learned for 12 hours; then a small test opens Bahal.');
     if(elapsed<this.H12){var endT=S.flags[R+'ObsStart']+this.H12;var fmt=function(ms){if(ms<0)ms=0;var s=Math.floor(ms/1000);var hh=Math.floor(s/3600),mn=Math.floor((s%3600)/60),sc=s%60;return (hh<10?'0':'')+hh+':'+(mn<10?'0':'')+mn+':'+(sc<10?'0':'')+sc;};
-      UI.doc('☽ '+(L==='tr'?'Silvanus — eşik':'Silvanus — the threshold'),this._wrap('<p style="color:var(--moon);font-style:italic;line-height:1.7">'+esc(gate)+'</p><p style="color:var(--violet);margin-top:6px">'+(L==='tr'?'Bu süre, öğrendiğini hayatında gözlemlemen içindir. Geri sayım:':'This time is for observing what you learned, in your life. Countdown:')+'</p><div id="rgC" style="font-size:30px;letter-spacing:.06em;color:var(--accent);text-align:center;margin:12px;font-family:monospace">'+fmt(endT-Date.now())+'</div><div id="rgGo" style="text-align:center"></div><div style="text-align:center;margin:8px 0"><button class="btn v" style="font-size:12px" onclick="Journal.desk()">🖥 '+(L==='tr'?'Bilgisayara geç — bu uzun bekleyişte günlüğüne yaz':'Go to the computer — journal during this long wait')+'</button></div><button class="btn ghost" style="margin-top:6px" onclick="if(UI.closeDoc)UI.closeDoc()">'+(L==='tr'?'kapat':'close')+'</button>'));
+      UI.doc('☽ '+(L==='tr'?'Silvanus — eşik':'Silvanus — the threshold'),this._wrap('<p style="color:var(--moon);font-style:italic;line-height:1.7">'+esc(gate)+'</p><p style="color:var(--violet);margin-top:6px">'+(L==='tr'?'Bu süre, öğrendiğini hayatında gözlemlemen içindir. Geri sayım:':'This time is for observing what you learned, in your life. Countdown:')+'</p><div id="rgC" style="font-size:30px;letter-spacing:.06em;color:var(--accent);text-align:center;margin:12px;font-family:monospace">'+fmt(endT-Date.now())+'</div><div id="rgGo" style="text-align:center"></div><div style="text-align:center;margin:8px 0"><button class="btn v" style="font-size:12px" onclick="sitAtDesk()">🪑 '+(L==='tr'?'Masaya otur — bu uzun bekleyişte günlüğüne yaz':'Sit at the desk — journal during this long wait')+'</button></div><button class="btn ghost" style="margin-top:6px" onclick="if(UI.closeDoc)UI.closeDoc()">'+(L==='tr'?'kapat':'close')+'</button>'));
       clearInterval(this._rgIv);this._rgIv=setInterval(function(){var rem=endT-Date.now();var e=UI.el('rgC');if(!e){clearInterval(House._rgIv);return;}e.textContent=fmt(rem);if(rem<=0){clearInterval(House._rgIv);var g=UI.el('rgGo');if(g&&!g.innerHTML)g.innerHTML='<button class="btn v" onclick="House.realmGate()">'+(L==='tr'?'→ eşiği geç (küçük sınav)':'→ cross the threshold (short test)')+'</button>';}},1000);
       return;}
     this._testStart();},
@@ -4940,7 +4944,38 @@ if(HAS3D)(function(){
       });
       this.cur=k;
     },
+    seatMode:false,_mb:false,_mbG:null,_mbBlink:null,
+    sitDesk(){var TR=(GAMELANG==='tr');
+      if(!(W3.inInterior&&this._g)){ if(window.Journal)Journal.desk(); return; }
+      try{if(W3.IP){W3.IP.px=0;W3.IP.pz=7.3;}}catch(e){}
+      this._macbook();this.seatMode=true;try{Game.sitting=true;}catch(e){}
+      try{if(window.Music&&Music._on&&localStorage.getItem('it041_music_off')!=='1'&&!Music.on)Music._on();}catch(e){}
+      this._seatHUD();
+      try{UI.toast(TR?'🪑 Masaya oturdun. Karşında ekran, arkanda salon. ✍ ile yazmaya başla.':'🪑 You sat at the desk. Screen ahead, the salon behind. Press ✍ to write.',5200);}catch(e){}},
+    standUp(){this.seatMode=false;try{Game.sitting=false;}catch(e){}var h=document.getElementById('seatHUD');if(h)h.remove();},
+    _seatHUD(){var TR=(GAMELANG==='tr');var old=document.getElementById('seatHUD');if(old)old.remove();
+      var d=document.createElement('div');d.id='seatHUD';d.style.cssText='position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:70;display:flex;gap:10px';
+      d.innerHTML='<button class="btn v" onclick="if(window.Journal)Journal.write()">✍ '+(TR?'yazmaya başla':'start writing')+'</button><button class="btn ghost" onclick="W3.Interior.standUp()">↩ '+(TR?'kalk':'stand up')+'</button>';
+      document.body.appendChild(d);},
+    _macbook(){if(this._mb&&this._mbG===this._g)return;var g=this._g;if(!g)return;this._mbG=this._g;
+      var cv=document.createElement('canvas');cv.width=512;cv.height=320;var cx=cv.getContext('2d');var on=true;
+      var drawScr=function(){cx.fillStyle='#0a0f1c';cx.fillRect(0,0,512,320);
+        cx.fillStyle='#0e1730';cx.fillRect(0,0,512,26);cx.fillStyle='#6b7b96';cx.font='12px sans-serif';cx.fillText('benim-kitabim.txt — DO·LOON·AI',12,18);
+        cx.fillStyle='#0d1426';cx.fillRect(18,40,476,206);
+        cx.fillStyle='#cfe0ff';cx.font='16px monospace';cx.fillText((GAMELANG==='tr'?'Bugün şunu fark ettim':'Today I noticed'),34,76);
+        if(on){cx.fillStyle='#7fb0ff';cx.fillRect(34,86,2,20);}
+        cx.fillStyle='#8b94a6';cx.font='11px sans-serif';cx.fillText((GAMELANG==='tr'?'son kapatılanlar':'recently closed'),34,298);
+        cx.font='22px serif';cx.fillText('👽',150,304);cx.fillText('🐙',196,304);cx.fillText('𝕏',244,304);};
+      drawScr();var tex=new THREE.CanvasTexture(cv);
+      box(1.5,0.05,1.0,std(0x2b2e35,{roughness:.4,metalness:.6}),0,1.0,5.6,0,g,false);
+      var lidM=new THREE.Mesh(new THREE.PlaneGeometry(1.34,0.84),new THREE.MeshBasicMaterial({map:tex}));lidM.position.set(0,1.5,6.02);lidM.rotation.x=-0.16;g.add(lidM);
+      var lb=box(1.42,0.92,0.04,std(0x1f2228,{roughness:.5}),0,1.5,6.1,0,g,false);lb.rotation.x=-0.16;
+      var sl=new THREE.PointLight(0x9fc0ff,.5,5,2);sl.position.set(0,1.7,5.7);g.add(sl);
+      if(this._mbBlink)clearInterval(this._mbBlink);
+      this._mbBlink=setInterval(function(){on=!on;drawScr();tex.needsUpdate=true;},530);
+      this._mb=true;},
     buildHouseRoom(ch){
+      this.seatMode=false;var _h=document.getElementById('seatHUD');if(_h)_h.remove();this._mb=false;if(this._mbBlink){clearInterval(this._mbBlink);this._mbBlink=null;}
       if(window.House&&House.data&&House.data()&&House.data().env==='city'){return this.buildCityRoom(ch);}
       this._clear();
       const rooms=(window.House&&House.data().rooms)||[];const room=rooms[ch-1]||{};
@@ -5303,6 +5338,12 @@ if(HAS3D)(function(){
 
     /* camera — completely static while paused */
     if(!paused){
+      if(W3.inInterior&&W3.Interior&&W3.Interior.seatMode){
+        camera.fov=50;camera.updateProjectionMatrix();
+        camera.position.lerp(new THREE.Vector3(P.px+0.55,1.98,P.pz+1.15),.16);
+        camera.lookAt(P.px,1.42,P.pz-1.5);
+        try{player.g.rotation.y=Math.PI;}catch(e){}
+      } else {
       fovKick+= ((running?4:0)-fovKick)*.08;
       camera.fov=58+fovKick;camera.updateProjectionMatrix();
       const cd=Cam.dist,cp=Cam.pitch;
@@ -5313,6 +5354,7 @@ if(HAS3D)(function(){
       camera.lookAt(P.px,cp<0?1.9-cp*9:1.9,P.pz); /* v8: low camera tilts the gaze skyward */
       moonLight.position.set(P.px+130,200,P.pz-60);
       mlTarget.position.set(P.px,0,P.pz);
+      }
     }
 
     /* world anim */
