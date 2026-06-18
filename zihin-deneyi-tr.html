@@ -4785,6 +4785,19 @@ if(HAS3D)(function(){
       box(0.55,0.5,0.55,std(0x2a2420),-3.1,0.3,-2.6,0,g);
       const plant=new THREE.Mesh(new THREE.IcosahedronGeometry(0.62,0),std(0x3f6b46,{roughness:.8,flatShading:true}));plant.position.set(-3.1,1.05,-2.6);g.add(plant);
       const cl=new THREE.PointLight(accent,.5,40,2);cl.position.set(0,5.4,0);g.add(cl);
+      /* ---- sicak klinik dekoru (gorsel detay) ---- */
+      (function(){
+        box(2.2,2.6,0.5,std(0x2a2018,{roughness:.9}),-RS+1.1,1.3,-1.4,0,g);
+        var cols=[0x6b3f4a,0x3f5a6b,0x6b5a2f,0x4a3f6b];
+        for(var rr=0;rr<3;rr++)for(var bb=0;bb<6;bb++){var bc=cols[(rr+bb)%4];box(0.18,0.5,0.34,std(bc,{roughness:.85,emissive:bc,emissiveIntensity:.06}),-RS+0.5+bb*0.28,0.6+rr*0.78,-1.4,0,g,false);}
+        [-2.3,2.3].forEach(function(fx,k){box(1.5,1.1,0.08,std(k?0x2e2740:0x3a2f24,{emissive:k?accent:warm,emissiveIntensity:.3}),fx,3.3,-RS+0.35,0,g,false);});
+        box(1.8,2.2,0.12,std(0x0c1426,{emissive:0xbcd0f0,emissiveIntensity:.5}),RS-0.35,3.1,0,0,g,false);
+        var mw=new THREE.PointLight(0xbcd0f0,.5,11,2);mw.position.set(RS-1.5,3.0,0);g.add(mw);
+        var cu=new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.62,0.3,16),std(0x5a3f55,{roughness:1}));cu.position.set(1.5,0.16,-1.3);g.add(cu);
+        var hp=new THREE.Mesh(new THREE.IcosahedronGeometry(0.42,0),std(0x3f6b46,{roughness:.8,flatShading:true}));hp.position.set(2.9,2.5,-RS+0.7);g.add(hp);
+        var t2=std(0x241c14,{roughness:.9});box(0.7,0.45,0.7,t2,-2.7,0.22,2.4,0,g);
+        var cup=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.1,0.18,12),std(0xcdb878,{emissive:0xcdb878,emissiveIntensity:.25}));cup.position.set(-2.7,0.52,2.4);g.add(cup);
+      })();
       const ttl=this._label('\uD83D\uDECB '+(GAMELANG==='tr'?'TERAPİ MERKEZİ':'THERAPY CENTER'),'rgba(226,224,212,.97)',2.4);ttl.position.set(0,6.0,0);g.add(ttl);
       const flab=this._label((GAMELANG==='tr'?'\u25C8 koltuğa otur — terapötik çalışma':'\u25C8 sit — therapeutic exercise'),'rgba(220,225,240,.95)',1.5);flab.position.set(0,2.35,-2.3);g.add(flab);
       this._foc={position:{x:0,z:-3.4}};
@@ -4864,7 +4877,13 @@ if(HAS3D)(function(){
     label(name,x,z,5.6,.82);
     W3.PORTALS.push({k:'therapy',x:x,z:z+5,r:3.4,name:name,clinic:true});
   }
-  buildClinicBldg(150,150,(GAMELANG==='tr'?'TERAPİ MERKEZİ \u2695':'THERAPY CENTER \u2695'));
+  /* TEK terapi merkezi: ayrı klinik binası kaldirildi; klinik girisi MEVCUT terapi binasina (L.therapy) tasindi (harita isaretiyle de ayni yer) */
+  (function(){var tx=L.therapy.x,tz=L.therapy.z+13;
+    box(3,.4,3,std(0x10131f,{emissive:0x9d8cc9,emissiveIntensity:.18}),tx,.2,tz);
+    var pl=new THREE.PointLight(0x9d8cc9,.7,14,2);pl.position.set(tx,2.4,tz);scene.add(pl);
+    label((GAMELANG==='tr'?'TERAPİ MERKEZİ \u2695 — gir':'THERAPY CENTER \u2695 — enter'),tx,tz,4.4,.72);
+    W3.PORTALS.push({k:'therapy',x:tx,z:tz,r:3.4,name:(GAMELANG==='tr'?'TERAPİ MERKEZİ \u2695':'THERAPY CENTER \u2695'),clinic:true});
+  })();
   function buildCity(k,x,z,name){
     for(let i=0;i<7;i++){const a=(i/7)*Math.PI*2;const r=3+(i%3);const bx=x+Math.cos(a)*r,bz=z+Math.sin(a)*r;const h=3+((i*53)%7);
       box(1.6,h,1.6,std(0x14182a,{emissive:0xbcd0f0,emissiveIntensity:.18+(i%3)*0.04,roughness:.9}),bx,h/2,bz);}
