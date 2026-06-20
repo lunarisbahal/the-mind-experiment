@@ -594,9 +594,10 @@ const RITES={
   r1:{site:'diskAltar',title:'RITE I — NAME THE DISK',
     intro:[['LUNARIS','This one is heavier than the others. Feel how the air leans toward it?'],
       ['LUNARIS','Bahal\'s rule was simple: a memory that carries feeling is stored frozen at the core, and it bends every new day toward itself. He never said the rule was only his.'],
-      ['LUNARIS','Name one of yours. One memory that still has gravity. One sentence is enough. Naming is not reliving — naming is putting your hand on the surface and saying: I know you are there.']],
-    prompt:'A memory of mine that still has gravity…',kind:'text',teach:'disk',
-    after:'The disk accepts the name. It does not vanish — it slows. Above the field, one disk now carries your words on its rim, orbiting a little farther from the center than before.'},
+      ['LUNARIS','And look at what that memory taught you to believe about <i>yourself</i> — its <b>negative cognition</b>. It always begins with “I am…”: “I am not enough.” “I am not safe.” “It is my fault.” “I am unlovable.” That belief becomes a lens; without noticing, you keep pulling new moments that confirm it into the same orbit.'],
+      ['LUNARIS','Name one of yours — a memory that still has gravity, and, looking at it, the “I am…” it left in you. Naming is not reliving — it is putting your hand on the surface and saying: I know you are there.']],
+    prompt:'A memory that still has gravity — and the belief about myself it left (“I am…”)',kind:'text',teach:'disk',
+    after:'The disk accepts the name. It does not vanish — it slows. Naming the belief is the first crack in its orbit: a lens you can see is a lens you can set down. This week, watch for the moments your day quietly bends to confirm that “I am…” — and notice that you are the one who can stop bending.'},
   r2:{site:'maskMirror',title:'RITE II — THE CAPTAIN OF TODAY',
     intro:[['LUNARIS','A waiting-room mirror. I wrote, in the diary, that every morning a captain takes the wheel — the Expert, the Pleaser, the Ghost, the Fighter — while I watched the road from a reserved window.'],
       ['LUNARIS','No mask is a lie. A mask is a tool that forgot it was being held. Which captain drove you, today?']],
@@ -2863,6 +2864,21 @@ const NEXUS={
       f.push({n:((PROFILES[S.caseD.sha]||{}).n||'IN-SHADOW').split(' - ')[0].split(' — ')[0],dark:true,t:'THE_SHA'});}
     if(S.inv&&S.inv.arch){f.push({n:FACE[S.inv.arch.dom]||'FACE',dark:S.inv.arch.dom==='g',t:'THE_FACE'});}
     for(const k in RN) if(S.rites[k]!==undefined) f.push({n:RN[k],small:true,t:'THE_RITE'});
+    /* TÜM YOLCULUĞUN ORTALAMASI: arketip ağırlıkları, bölümler, iç çalışma, tekrar eden örüntü, yankılar — Nexus artık yalnız ilk ritüelleri değil bütün oyunu yansıtır */
+    try{var TRn=(GAMELANG==='tr');
+      var m=(window.Voices&&Voices._mind)?Voices._mind():null;
+      if(m){var dk=(window.Voices&&Voices._dom)?Voices._dom(m):null,sk=(window.Voices&&Voices._sha)?Voices._sha(m):null;
+        if(dk)f.push({n:String((Voices.NM?Voices.NM(dk):dk)).toUpperCase(),t:'DOM_ARCH'});
+        if(sk)f.push({n:String((Voices.NM?Voices.NM(sk):sk)).toUpperCase(),dark:true,t:'SHA_ARCH'});}
+      var ch=(window.Library&&Library.milestones)?Library.milestones():0;
+      if(ch>0)f.push({n:(TRn?'YOLCULUK ':'JOURNEY ')+ch+'/49',small:true,t:'JOURNEY'});
+      var ex=0;try{if(S.skills)ex=Object.keys(S.skills).length;}catch(e){}ex+=(S.ground||0);
+      if(ex>0)f.push({n:(TRn?'İÇ ÇALIŞMA ×':'INNER WORK ×')+ex,small:true,t:'INNERWORK'});
+      var ag=(window.Voices&&Voices._aggTheme)?Voices._aggTheme():'';
+      if(ag)f.push({n:(TRn?'ÖRÜNTÜ: ':'PATTERN: ')+String(ag).toUpperCase(),small:true,dark:true,t:'PATTERN'});
+      var ec=(typeof echoCount==='function')?echoCount():0;
+      if(ec>0)f.push({n:(TRn?'YANKILAR ':'ECHOES ')+ec+'/16',small:true,t:'ECHOES'});
+    }catch(e){}
     return f;},
   show(){
     UI.doc('⟁ NEXUS — THE INNER CONSTELLATION',

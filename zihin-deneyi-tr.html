@@ -582,9 +582,10 @@ const RITES={
   r1:{site:'diskAltar',title:'RİTÜEL I — DİSKİ ADLANDIR',
     intro:[['LUNARIS','Bu, diğerlerinden daha ağır. Havanın ona doğru eğildiğini hissediyor musun?'],
       ['LUNARIS','Bahal\'ın kuralı basitti: duygu taşıyan anı, çekirdekte donmuş saklanır ve her yeni günü kendine doğru büker. Kuralın yalnızca kendine ait olduğunu hiç söylemedi.'],
-      ['LUNARIS','Seninkilerden birini adlandır. Hâlâ çekim gücü olan bir anı. Tek cümle yeter. Adlandırmak yeniden yaşamak değildir — adlandırmak, elini yüzeye koyup şunu demektir: Orada olduğunu biliyorum.']],
-    prompt:'Hâlâ çekim gücü olan bir anım…',kind:'text',teach:'disk',
-    after:'Disk, adı kabul ediyor. Yok olmuyor — yavaşlıyor. Tarlanın üzerinde artık bir disk, kenarında senin sözlerini taşıyor ve merkeze eskisinden biraz daha uzak bir yörüngede dönüyor.'},
+      ['LUNARIS','Ve o anının sana <i>kendinle</i> ilgili neye inandırdığına bak — onun <b>negatif inancı</b> (negatif kognisyon). Hep “Ben…” diye başlar: “Ben yetersizim.” “Ben güvende değilim.” “Benim suçum.” “Ben sevilmeye değmem.” Bu inanç bir merceğe dönüşür; fark etmeden, onu doğrulayan yeni anları aynı yörüngeye çekersin.'],
+      ['LUNARIS','Seninkilerden birini adlandır — hâlâ çekim gücü olan bir anı ve ona baktığında sende bıraktığı “Ben…” inancı. Adlandırmak yeniden yaşamak değildir — elini yüzeye koyup şunu demektir: Orada olduğunu biliyorum.']],
+    prompt:'Hâlâ çekim gücü olan bir anım — ve ona baktığımda kendimle ilgili inancım (“Ben…”)',kind:'text',teach:'disk',
+    after:'Disk, adı kabul ediyor. Yok olmuyor — yavaşlıyor. İnancı adlandırmak, yörüngedeki ilk çatlaktır: görebildiğin bir mercek, bırakabileceğin bir merceğe dönüşür. Bu hafta, gününün o “Ben…” inancını doğrulamak için usulca büküldüğü anları izle — ve bükeni durdurabilecek olanın sen olduğunu fark et.'},
   r2:{site:'maskMirror',title:'RİTÜEL II — BUGÜNÜN KAPTANI',
     intro:[['LUNARIS','Bir bekleme odası aynası. Günlüğe ben yazmıştım: her sabah bir kaptan direksiyona geçer — Uzman, Memnun Eden, Hayalet, Savaşçı — ben ise kendime ayrılmış pencereden yolu izlerdim.'],
       ['LUNARIS','Hiçbir maske yalan değildir. Maske, tutulduğunu unutmuş bir araçtır. Bugün seni hangi kaptan sürdü?']],
@@ -2842,6 +2843,21 @@ const NEXUS={
       f.push({n:((PROFILES[S.caseD.sha]||{}).n||'IN-SHADOW').split(' - ')[0].split(' — ')[0],dark:true,t:'THE_SHA'});}
     if(S.inv&&S.inv.arch){f.push({n:FACE[S.inv.arch.dom]||'FACE',dark:S.inv.arch.dom==='g',t:'THE_FACE'});}
     for(const k in RN) if(S.rites[k]!==undefined) f.push({n:RN[k],small:true,t:'THE_RITE'});
+    /* TÜM YOLCULUĞUN ORTALAMASI: arketip ağırlıkları, bölümler, iç çalışma, tekrar eden örüntü, yankılar — Nexus artık yalnız ilk ritüelleri değil bütün oyunu yansıtır */
+    try{var TRn=(GAMELANG==='tr');
+      var m=(window.Voices&&Voices._mind)?Voices._mind():null;
+      if(m){var dk=(window.Voices&&Voices._dom)?Voices._dom(m):null,sk=(window.Voices&&Voices._sha)?Voices._sha(m):null;
+        if(dk)f.push({n:String((Voices.NM?Voices.NM(dk):dk)).toUpperCase(),t:'DOM_ARCH'});
+        if(sk)f.push({n:String((Voices.NM?Voices.NM(sk):sk)).toUpperCase(),dark:true,t:'SHA_ARCH'});}
+      var ch=(window.Library&&Library.milestones)?Library.milestones():0;
+      if(ch>0)f.push({n:(TRn?'YOLCULUK ':'JOURNEY ')+ch+'/49',small:true,t:'JOURNEY'});
+      var ex=0;try{if(S.skills)ex=Object.keys(S.skills).length;}catch(e){}ex+=(S.ground||0);
+      if(ex>0)f.push({n:(TRn?'İÇ ÇALIŞMA ×':'INNER WORK ×')+ex,small:true,t:'INNERWORK'});
+      var ag=(window.Voices&&Voices._aggTheme)?Voices._aggTheme():'';
+      if(ag)f.push({n:(TRn?'ÖRÜNTÜ: ':'PATTERN: ')+String(ag).toUpperCase(),small:true,dark:true,t:'PATTERN'});
+      var ec=(typeof echoCount==='function')?echoCount():0;
+      if(ec>0)f.push({n:(TRn?'YANKILAR ':'ECHOES ')+ec+'/16',small:true,t:'ECHOES'});
+    }catch(e){}
     return f;},
   show(){
     UI.doc('⟁ NEXUS — İÇ TAKIMYILDIZ',
