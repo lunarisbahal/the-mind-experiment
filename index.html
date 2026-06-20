@@ -1270,6 +1270,7 @@ function interactTarget(){
   if(near(L.archStone))return['◮ Archetype Mirror — inner inventory',()=>Arch.open()];
   if(near(L.blackBox))return['◈ The black box',()=>Rite.open('r3')];
   if(near(L.twoHouses))return['◈ Stand between the two houses',()=>Rite.open('r4')];
+  if(near(L.prison,-14))return['☾ '+(GAMELANG==='tr'?'Yeniay hücreleri — içeride kim var?':'New Moon Cells — who is inside?'),doNewMoonCells];
   if(near(L.burntTree))return['◈ The burnt snag',()=>Rite.open('r5')];
   if(near(L.bench))return[S.rites.r6!==undefined?(Daily.doneToday()?'Question of the day (done ✓)':'🜂 Question of the day'):'◈ Sit on the bench',S.rites.r6!==undefined?doDaily:()=>Rite.open('r6')];
   if(near(L.dreamWell))return['◯ Dream well',doDreamWell];
@@ -1462,6 +1463,18 @@ function pickReading(r){
     nobet:'The third reading. The bravest one. Lunaris: “You never stopped asking — that is the only solid proof you have not lost your mind. And the other two readings are, at the same time, also true.”'};
   aeliusCard(M[r]+' — A signature grants identity. Truth has none. The experiment is not over; it is yours now.',()=>Game.finale());
 }
+function doNewMoonCells(){var tr=(GAMELANG==='tr');
+  if(!(S.flags&&S.flags.nmCells)){S.flags=S.flags||{};S.flags.nmCells=true;S.insight=(S.insight||0)+4;try{save();}catch(e){}try{refreshHud();}catch(e){}}
+  var h='<p style="line-height:1.7;color:var(--ink)">'+(tr?'Demir parmaklıklar bitki gibi büyümüş. Yeniay — gökyüzünün en karanlık hâli. Burada ışıktan saklanan yan tutulur: senin kafese koyduğun parça.':'Iron bars grown like plants. The new moon — the sky at its darkest. Here the part that hides from light is kept: the piece you put in a cell.')+'</p>'+
+    '<p style="color:var(--violet);line-height:1.6">'+(tr?'İçinde, görülmesine izin vermediğin, kafese koyduğun bir yan var mı? (öfke, bir ihtiyaç, bir arzu, bir korku…) Tek cümleyle adlandır:':'Is there a part of you you cage, that you don’t let be seen? (anger, a need, a wish, a fear…) Name it in one sentence:')+'</p>'+
+    '<textarea id="nmIn" rows="2" maxlength="240" placeholder="'+(tr?'kafese koyduğum yan…':'the part I caged…')+'" style="width:100%;background:#0a0c14;border:1px solid var(--line);color:var(--ink);padding:8px;font-family:inherit;font-size:13px;border-radius:6px"></textarea>'+
+    '<p style="color:var(--dim);font-size:11px">'+(tr?'Kimse okumaz; bu cihazda kalır.':'No one reads it; it stays on this device.')+'</p>'+
+    '<button class="btn v" onclick="doNewMoonCellsGo()">'+(tr?'bırak →':'leave it →')+'</button>';
+  UI.doc(tr?'☾ Yeniay Hücreleri':'☾ New Moon Cells',h);}
+function doNewMoonCellsGo(){var tr=(GAMELANG==='tr');var v=(UI.el('nmIn')&&UI.el('nmIn').value.trim())||'';if(!v){UI.toast(tr?'Bir cümle yaz.':'Write a sentence.');return;}
+  try{if(window.Safe&&Safe.scan(v)>=2){Safe.trigger(2,v);return;}}catch(e){}
+  UI.doc(tr?'☾ Yeniay Hücreleri':'☾ New Moon Cells','<p style="line-height:1.7;color:var(--accent)">'+(tr?'Parmaklığı sen koydun; anahtar da sende. Bir şeyi kafese koymak onu yok etmez — sadece karanlıkta büyütür. Yeniaydan sonra ay yeniden dolar: kabul, kapının açıldığı yerdir.':'You set the bars; you hold the key too. Caging a thing does not end it — it only grows it in the dark. After the new moon the moon fills again: acceptance is where the door opens.')+'</p><button class="btn v" onclick="if(UI.closeDoc)UI.closeDoc()">'+(tr?'tamam':'ok')+'</button>');}
+if(typeof window!=='undefined'){window.doNewMoonCells=doNewMoonCells;window.doNewMoonCellsGo=doNewMoonCellsGo;}
 function doRadio(){
   S.flags.radio=true;save();
   UI.doc('CRACKLING RADIO',
