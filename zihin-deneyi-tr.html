@@ -40,7 +40,9 @@
   #hudTR{position:fixed;right:12px;top:auto;bottom:118px;z-index:40;text-align:right;}
   @media (pointer:coarse){#hudTR{bottom:208px;}}
   @media (pointer:coarse){#hudTL{max-width:58vw;}#hudTL .chip{font-size:10px;padding:4px 7px;line-height:1.25;}#hudBL{font-size:10px;}#hudBL .bar{height:6px;}}
-  #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;transition:opacity .3s;}
+  #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;margin-left:auto;transition:opacity .3s;}
+  #moonchip{margin-left:auto;display:inline-block;}
+  @media (pointer:coarse){#onlineChip{display:none;}}
   /* v8.6 mobil: mini harita küçük + saydam — oyunu engellemez; menüden tamamen gizlenebilir */
   @media (pointer:coarse){#minimap{width:96px;height:74px;opacity:.5;}}
   body.mmHide #minimap{display:none;}
@@ -345,6 +347,7 @@
   <button class="mini" onclick="Voices.menu()">◈ ARKETİP YORUMLARI</button>
   <button class="mini" onclick="Voices.audio()">🎧 SESLİ KAYITLAR</button>
   <button class="mini" onclick="Journal.menu()">📖 KİTABIM</button>
+<button class="mini" onclick="if(window.Roster)Roster.show()">◈ EVRENDE KİMLER VAR</button>
 <button class="mini" onclick="Daily3.show()">🜂 GÜNLÜK ÜÇLEME</button>
 <button class="mini" onclick="Therapy.menuRedirect()">🛋 TERAPİ MERKEZİ</button>
 <button class="mini" onclick="Auto.open()">◍ OTONOM DENEK</button>

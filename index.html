@@ -41,10 +41,13 @@
   #hudTR{position:fixed;right:12px;top:auto;bottom:118px;z-index:40;text-align:right;}
   @media (pointer:coarse){#hudTR{bottom:208px;}}
   @media (pointer:coarse){#hudTL{max-width:58vw;}#hudTL .chip{font-size:10px;padding:4px 7px;line-height:1.25;}#hudBL{font-size:10px;}#hudBL .bar{height:6px;}}
-  #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;transition:opacity .3s;}
+  #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;margin-left:auto;transition:opacity .3s;}
   /* v8.6 mobile: minimap small + translucent; fully hideable from the menu */
   @media (pointer:coarse){#minimap{width:96px;height:74px;opacity:.5;}}
   body.mmHide #minimap{display:none;}
+  #moonchip{margin-left:auto;display:inline-block;}
+  /* mobil: roster satırı ana ekranda yer kaplamasın — Menü → Evrende Kimler Var'dan açılır; harita sağda kalsın */
+  @media (pointer:coarse){#onlineChip{display:none;}}
   #musicPanel{position:fixed;left:12px;bottom:64px;z-index:45;width:min(330px,82vw);}
   @media (pointer:coarse){#musicPanel{bottom:200px;width:min(300px,74vw);}}
   #moonchip{margin-top:6px;}
@@ -351,6 +354,7 @@
   <button class="mini" onclick="Voices.menu()">◈ ARCHETYPE VOICES</button>
   <button class="mini" onclick="Voices.audio()">🎧 AUDIOBOOK</button>
   <button class="mini" onclick="Journal.menu()">📖 MY BOOK</button>
+<button class="mini" onclick="if(window.Roster)Roster.show()">◈ WHO IS IN THIS UNIVERSE</button>
 <button class="mini" onclick="Daily3.show()">🜂 DAILY TRIAD</button>
 <button class="mini" onclick="Therapy.menuRedirect()">🛋 THERAPY CENTER</button>
 <button class="mini" onclick="Auto.open()">◍ AUTONOMOUS SUBJECT</button>
