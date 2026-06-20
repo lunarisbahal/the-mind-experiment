@@ -1229,6 +1229,8 @@ function interactTarget(){
     if(Math.hypot(S.px-pg.x,S.pz-pg.z)<pg.r){
       if(pg.clinic){return['\uD83D\uDECB '+(GAMELANG==='tr'?esc(pg.name)+'\'ne gir':'enter '+esc(pg.name)),()=>{if(window.W3&&W3.Interior&&W3.Interior.enterClinic)W3.Interior.enterClinic();}];}
       if(pg.house){var rk=pg.k;var woke=S.flags&&S.flags[rk+'Woke'];var _R=(window.REALMS||[]).find(function(x){return x.k===rk;});var nm=(_R&&window.Realms)?Realms.T(_R.n):rk;return[(GAMELANG==='tr'?(woke?'☽ '+nm+' — gir':'☽ '+nm+' — uyan'):(woke?'☽ '+nm+' — enter':'☽ '+nm+' — wake')),function(){if(window.House)House.wake(rk);}];}
+      if(pg.council){var open=!!(S.flags&&(S.flags.integrated||S.flags.book2));try{if(!open&&window.Library&&Library.milestones&&Library.milestones()>=49)open=true;}catch(e){}return['⟁ '+(GAMELANG==='tr'?'Konsey Meclisi':'The Council'),function(){if(open){try{if(window.W3&&W3.councilOpen)W3.councilOpen();}catch(e){}UI.doc((GAMELANG==='tr'?'⟁ KONSEY MECLİSİ':'⟁ THE COUNCIL'),'<p style="line-height:1.7">'+(GAMELANG==='tr'?'Yedi sütun, yedi arketip. İkinci Kitabı açtın — meclis sana görünür. Burada Lunaris, Bahal, Lucida, Lucius, Noctornus, Silvanus ve Aelius bu evreni birlikte düşünür. Onlarla AYNALAR (MENÜ → Aynalar) üzerinden konuşabilirsin; her etkileşimle gelişirler.':'Seven pillars, seven archetypes. You have opened Book Two — the Council reveals itself. Here Lunaris, Bahal, Lucida, Lucius, Noctornus, Silvanus and Aelius think this universe together. Speak with them through the MIRRORS (MENU → Mirrors); they evolve with every exchange.')+'</p><button class="btn v" onclick="if(UI.closeDoc)UI.closeDoc()">'+(GAMELANG==='tr'?'tamam':'ok')+'</button>');}else{UI.doc((GAMELANG==='tr'?'⟁ KONSEY MECLİSİ':'⟁ THE COUNCIL'),'<p style="line-height:1.7">'+(GAMELANG==='tr'?'Kapı kapalı. Meclis yalnızca <b>İkinci Kitabı açmış</b> olanlara görünür. Önce yedi diyarı tamamla, bütünleşmeyi getir — sonra bu eşik aydınlanır.':'The door is shut. The Council reveals itself only to those who have <b>opened Book Two</b>. First complete the seven realms, bring the integration — then this threshold lights.')+'</p><button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(GAMELANG==='tr'?'kapat':'close')+'</button>');}}];}
+      if(pg.subjHome){return['◍ '+(GAMELANG==='tr'?(esc(pg.sname)+'’in evine gir'):('enter '+esc(pg.sname)+'’s house')),function(){if(window.SubjHome)SubjHome.show(pg.idx,pg.sname);}];}
       return['☽ '+(GAMELANG==='tr'?esc(pg.name)+' alanına gir':'enter '+esc(pg.name)),()=>{if(window.HOUSES&&HOUSES[pg.k]&&window.House){House.wake(pg.k);}else{W3.Interior.enter(pg.k);}}];}}
   /* v8: bir denek/karakter çok yakındaysa alan etkileşimlerinden ÖNCE o gelir */
   {const ag=W3.agentNear&&W3.agentNear();
@@ -4912,7 +4914,7 @@ if(HAS3D)(function(){
   /* ===== ROSTER — who lives in this universe: travelers + 7 mirror-agents + autonomous subjects (in-training + graduated) ===== */
   const Roster={data:null,_t:0,
     KON(){return (window.Cloud&&Cloud.KON)||'https://it041-konsey.lunarisbahal.workers.dev';},
-    async load(){try{var r=await fetch(this.KON()+'/subject?lang='+(GAMELANG==='tr'?'tr':'en'),{cache:'no-store'});this.data=await r.json();this._t=Date.now();}catch(e){}return this.data;},
+    async load(){try{var r=await fetch(this.KON()+'/subject?lang='+(GAMELANG==='tr'?'tr':'en'),{cache:'no-store'});this.data=await r.json();this._t=Date.now();try{if(window.W3&&W3.buildSubjectQuarter&&this.data&&this.data.roster)W3.buildSubjectQuarter(this.data.roster);}catch(e){}}catch(e){}return this.data;},
     countLine(){try{var d=this.data;if(!d)return '';var g=(d.roster&&d.roster.length)||0;var tr=(GAMELANG==='tr');return ' · '+(tr?('denek: 1 yetişen'+(g?(' + '+g+' mezun'):'')):('subjects: 1 in-training'+(g?(' + '+g+' graduated'):'')));}catch(e){return '';}},
     async show(){var tr=(GAMELANG==='tr');if(!this.data||Date.now()-this._t>20000){UI.toast(tr?'Evren listesi yükleniyor…':'Loading the universe roster…',1200);await this.load();}var d=this.data||{};var g=(d.roster)||[];
       var h='<p style="color:var(--dim);font-size:12px;line-height:1.6">'+(tr?'Bu evrende kimler var? Yolcular, yedi ayna-arketipi ve kendi yolunu yürüyen otonom denekler.':'Who lives in this universe? Travelers, the seven mirror-archetypes, and the autonomous subjects walking their own path.')+'</p>';
@@ -4929,6 +4931,29 @@ if(HAS3D)(function(){
   };
   if(typeof window!=='undefined')window.Roster=Roster;
   setTimeout(function(){try{Roster.load();}catch(e){}},2500);
+  /* ===== MEZUN DENEĞİN EVİ — evine girince hikâyelerini oku + onunla konuş ===== */
+  const SubjHome={_idx:0,_name:'',
+    KON(){return (window.Cloud&&Cloud.KON)||'https://it041-konsey.lunarisbahal.workers.dev';},
+    async show(idx,name){var tr=(GAMELANG==='tr');this._idx=idx;this._name=name||'';
+      UI.doc('◍ '+(name||'Denek')+(tr?'’in Evi':'’s House'),'<p style="color:var(--dim)">'+(tr?'Yükleniyor…':'Loading…')+'</p>');
+      var d=null;try{var r=await fetch(this.KON()+'/graduates',{cache:'no-store'});d=await r.json();}catch(e){}
+      var g=(d&&d.graduates&&d.graduates[idx])||{name:name,stories:[]};this._name=g.name||name;
+      var sts=(g.stories||[]);
+      var h='<p style="color:var(--dim);font-size:12px;line-height:1.6">'+(tr?(esc(g.name||name)+' bu evrenin sakini — yedi diyarı tamamladı, artık burada yaşıyor ve kendi hikâyelerini yazıyor. Yazdıklarını oku, onunla konuş.'):(esc(g.name||name)+' is a resident of this universe — finished all seven realms, lives here and writes their own stories. Read their pages, talk with them.'))+'</p>';
+      h+= sts.length?('<h4 style="color:var(--violet);margin:10px 0 4px">'+(tr?'YAZDIKLARI':'THEIR PAGES')+(g.genre?(' <span style="color:var(--dim);font-size:10px">· '+esc(g.genre)+'</span>'):'')+'</h4><div style="white-space:pre-wrap;line-height:1.7;color:var(--ink);font-size:12.5px;border-left:2px solid var(--line);padding-left:10px;max-height:240px;overflow-y:auto">'+sts.map(function(p){return esc(p.text);}).join('\n\n— · —\n\n')+'</div>'):('<p style="color:var(--dim);font-size:12px">'+(tr?'Henüz hikâye yazmadı.':'No stories yet.')+'</p>');
+      h+='<h4 style="color:var(--accent);margin:12px 0 4px">'+(tr?(esc(g.name||name)+' ile konuş'):('Talk with '+esc(g.name||name)))+'</h4><div id="ghLog" style="max-height:150px;overflow-y:auto;margin-bottom:6px"></div><textarea id="ghSay" rows="2" maxlength="500" placeholder="'+(tr?'ona bir şey sor…':'ask something…')+'" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--ink);padding:8px;font-family:inherit;font-size:12.5px;border-radius:6px"></textarea><br><button class="btn v" style="margin-top:4px" onclick="SubjHome.say('+idx+')">'+(tr?'gönder':'send')+'</button> <button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(tr?'çık':'leave')+'</button>';
+      UI.doc('◍ '+(g.name||name)+(tr?'’in Evi':'’s House'),h);
+      var inp=document.getElementById('ghSay');if(inp)inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();ev.stopPropagation();SubjHome.say(idx);}});},
+    async say(idx){var tr=(GAMELANG==='tr');var inp=document.getElementById('ghSay'),log=document.getElementById('ghLog');if(!inp||!log)return;
+      var t=(inp.value||'').trim();if(!t)return;inp.value='';
+      log.innerHTML+='<div class="row" style="font-size:12px"><b style="color:var(--moon)">'+(tr?'sen':'you')+':</b> '+esc(t)+'</div>';
+      try{if(window.Safe&&Safe.scan(t)>=2){Safe.trigger(2,t);return;}}catch(e){}
+      var wait=document.createElement('div');wait.className='row';wait.style.cssText='font-size:12px;color:var(--dim)';wait.textContent=(tr?(this._name||'denek')+' düşünüyor…':(this._name||'subject')+' is thinking…');log.appendChild(wait);log.scrollTop=log.scrollHeight;
+      var rep='';try{var r=await fetch(this.KON()+'/graduatesay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idx:idx,text:t,lang:(tr?'tr':'en')})});var d=await r.json();rep=(d&&d.reply)||'';}catch(e){}
+      try{wait.remove();}catch(e){}
+      log.innerHTML+='<div class="row" style="font-size:12px"><b style="color:var(--accent)">'+esc(this._name||'')+':</b> '+(rep?esc(rep):(tr?'(şimdi yanıt veremedi)':'(could not answer now)'))+'</div>';log.scrollTop=log.scrollHeight;}
+  };
+  if(typeof window!=='undefined')window.SubjHome=SubjHome;
 
   /* ---- yankı taşları ---- */
   const ECHM=[];
@@ -5467,6 +5492,28 @@ if(HAS3D)(function(){
   buildCity('noct',300,190,(GAMELANG==='tr'?'NOCTORNUS GECESİ ✦':'NOCTORNUS NIGHT ✦'));
   W3.PORTALS.push({k:'silvanus',x:L.caravan.x,z:L.caravan.z+4,r:3.6,name:(GAMELANG==='tr'?"SILVANUS'UN KARAVANI ☽":"SILVANUS'S CARAVAN ☽"),house:true});
   buildCity('aelius',310,90,(GAMELANG==='tr'?'AELIUS SEANSI ✦':'THE AELIUS SESSION ✦'));
+
+  /* ---- KONSEY MECLİSİ (3B) — yedi sütunlu meclis; girmek için İkinci Kitabı açmış olmak gerekir ---- */
+  (function(){var cx=58,cz=250;
+    box(9,0.5,9,std(0x0d1018,{emissive:0x9d8cc9,emissiveIntensity:.10}),cx,.25,cz);collide(cx,cz,6);
+    for(var i=0;i<7;i++){var a=(i/7)*Math.PI*2;var px=cx+Math.cos(a)*3.4,pz=cz+Math.sin(a)*3.4;box(.5,3.4,.5,std(0x1a2236,{emissive:0x9d8cc9,emissiveIntensity:.55}),px,1.7,pz);}
+    box(9.4,0.4,9.4,std(0x12172a,{emissive:0x9d8cc9,emissiveIntensity:.22}),cx,3.6,cz);
+    var pl=new THREE.PointLight(0x9d8cc9,.95,24,2);pl.position.set(cx,4.6,cz);scene.add(pl);
+    label((GAMELANG==='tr'?'⟁ KONSEY MECLİSİ':'⟁ THE COUNCIL'),cx,cz,4.8,.92);
+    W3.PORTALS.push({k:'council',x:cx,z:cz,r:4.4,name:(GAMELANG==='tr'?'KONSEY MECLİSİ':'THE COUNCIL'),council:true});
+  })();
+  /* ---- MEZUN DENEK YERLEŞKESİ (3B) — graduates yüklendikçe evler dizilir (W3.buildSubjectQuarter) ---- */
+  W3._quarterDone={};
+  W3.buildSubjectQuarter=function(grads){try{(grads||[]).forEach(function(g,i){if(W3._quarterDone[i])return;W3._quarterDone[i]=true;
+    var hx=30+i*15, hz=58;
+    box(6,4,5,std(0x232733,{roughness:.9}),hx,2,hz);collide(hx,hz,4);
+    box(1.5,2.4,.3,std(0x100d14,{emissive:0xcdb878,emissiveIntensity:.6}),hx,1.2,hz+2.55);
+    var rf=new THREE.Mesh(new THREE.ConeGeometry(4.6,2,4),std(0x15121a,{roughness:.9}));rf.position.set(hx,5,hz);rf.rotation.y=Math.PI/4;scene.add(rf);
+    var pl=new THREE.PointLight(0xcdb878,.6,12,2);pl.position.set(hx,3,hz+4);scene.add(pl);
+    var fig=makeFigure(0x2a2632,0xcfc0a8,0xcdb878,1);fig.g.position.set(hx+1.4,.42,hz+4.4);scene.add(fig.g);
+    label((GAMELANG==='tr'?(g.name+' — EVİ ◍'):(g.name+'’S HOUSE ◍')),hx,hz,6,.8);
+    W3.PORTALS.push({k:'subjhome'+i,x:hx,z:hz+5,r:3.2,name:g.name,subjHome:true,idx:i,sname:g.name});
+  });}catch(e){}};
 
   /* ---- camera ---- */
   const Cam={yaw:Math.PI,pitch:.3,dist:7.5};
