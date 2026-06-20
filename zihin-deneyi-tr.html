@@ -298,7 +298,7 @@
   <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ BUILD 2026-06-20 · b16 · <span style="color:var(--accent)">EMDR: read first, then begin (light+sound on cue)</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ BUILD 2026-06-20 · b17 · <span style="color:var(--accent)">agents talk in dialog + smoother mac + ordos fix</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -2911,7 +2911,6 @@ const NEXUS={
         {on:fl.silvanus, n:'SILVANUS',  t:'CH_SILVANUS', sub:(TRc?'inanç · bilge':'faith · sage')},
         {on:fl.noct,     n:'NOCTORNUS', t:'CH_NOCT', dark:true, sub:(TRc?'kaçınma · bağlanma':'avoidance · attachment')},
         {on:lun,         n:'LUNARIS',   t:'CH_LUNARIS',  sub:(TRc?'ay · isimlendiren':'moon · the namer')},
-        {on:(fl.ov||fl.ovCouncil), n:'ORDOS', t:'CH_ORDOS', dark:true, sub:(TRc?'kör sistem · kopyalayan':'the blind system · the copier')},
         {on:(fl.shadowFought||fl.integrated), n:'BAHAL', t:'CH_BAHAL', dark:true, sub:(TRc?'gölge · bütünleşme':'shadow · integration')},
         {on:(fl.book2||fl.uploadNight||sv.s2), n:'AELIUS', t:'CH_AELIUS', sub:(TRc?'yorumcu · güneş':'interpreter · sun')}
       ];
@@ -3019,9 +3018,9 @@ const ECHO_SEEDS=[
     origin:{who:'LUCIUS',frag:{tr:'“Düzen bozulmasın diye her şeyi…',en:'“To keep order from breaking, I held…'}},
     echoes:[
       {who:'LUNARIS',line:{tr:'“…her şeyi avucumda tuttum, ta ki avucum taşa dönene dek.”',en:'“…everything in my palm, until my palm turned to stone.”'}},
-      {who:'ORDOS',line:{tr:'“…her şeyi tekrar tekrar aynı kalıba döktüm. Güvenlik buydu, hapis de.”',en:'“…cast everything into the same mold, again and again. That was safety, and the prison.”'}}
+      {who:'BAHAL',line:{tr:'“…her şeyi tekrar tekrar aynı kalıba döktüm. Güvenlik buydu, hapis de.”',en:'“…cast everything into the same mold, again and again. That was safety, and the prison.”'}}
     ],
-    reveal:{tr:'Kontrol, korkunun kibar adıdır. Lucius’un yarım cümlesi kör sisteme kadar yankılandı: tutmak, bazen bırakmamaktır.',en:'Control is fear in polite clothes. Lucius’s unfinished line echoed all the way to the blind system: to hold can mean to never let go.'}},
+    reveal:{tr:'Kontrol, korkunun kibar adıdır. Lucius’un yarım cümlesi Bahal’a kadar yankılandı: tutmak, bazen bırakmamaktır.',en:'Control is fear in polite clothes. Lucius’s unfinished line echoed all the way to Bahal: to hold can mean to never let go.'}},
   {id:'yetersiz',at:5,theme:{tr:'YETERSİZLİK',en:'NOT ENOUGH'},
     origin:{who:'NOCTORNUS',frag:{tr:'“Ne yaparsam yapayım yetmediği için…',en:'“Because nothing I did was ever enough, I…'}},
     echoes:[
@@ -3040,16 +3039,16 @@ const ECHO_SEEDS=[
     origin:{who:'SILVANUS',frag:{tr:'“Fark edilmek tehlikeliydi, o yüzden…',en:'“Being noticed was dangerous, so I…'}},
     echoes:[
       {who:'LUCIDA',line:{tr:'“…sesimi kıstım, sonra fikrimi, sonra varlığımı.”',en:'“…turned down my voice, then my opinion, then my presence.”'}},
-      {who:'ORDOS',line:{tr:'“…herkese benzedim ki kimse bana bakmasın. Mükemmel kamuflaj, mükemmel yalnızlık.”',en:'“…became like everyone so no one would look. Perfect camouflage, perfect loneliness.”'}}
+      {who:'NOCTORNUS',line:{tr:'“…herkese benzedim ki kimse bana bakmasın. Mükemmel kamuflaj, mükemmel yalnızlık.”',en:'“…became like everyone so no one would look. Perfect camouflage, perfect loneliness.”'}}
     ],
     reveal:{tr:'Görünmezlik bir kalkandı; ama kalkanın arkasında kimsenin göremediği biri açlıktan soldu.',en:'Invisibility was a shield; but behind it, someone no one could see wilted from hunger.'}},
   {id:'haklicik',at:20,theme:{tr:'HAKLI ÇIKMA İHTİYACI',en:'THE NEED TO BE RIGHT'},
-    origin:{who:'ORDOS',frag:{tr:'“Haklı çıkmazsam dağılacağım için…',en:'“Because I’d fall apart if I weren’t right, I…'}},
+    origin:{who:'LUCIUS',frag:{tr:'“Haklı çıkmazsam dağılacağım için…',en:'“Because I’d fall apart if I weren’t right, I…'}},
     echoes:[
-      {who:'LUCIUS',line:{tr:'“…tartışmayı kazandım ve ilişkiyi kaybettim, her seferinde.”',en:'“…won the argument and lost the relationship, every time.”'}},
+      {who:'NOCTORNUS',line:{tr:'“…tartışmayı kazandım ve ilişkiyi kaybettim, her seferinde.”',en:'“…won the argument and lost the relationship, every time.”'}},
       {who:'AELIUS',line:{tr:'“…haklılığı bir kale yaptım, sonra o kalede tek başıma kaldım.”',en:'“…made being right into a fortress, then stood alone inside it.”'}}
     ],
-    reveal:{tr:'Haklı çıkma ihtiyacı, kırılganlığın zırhıdır. Ordos’un yarım cümlesi Aelius’a kadar geldi: kazanmak bazen yalnız kalmaktır.',en:'The need to be right is the armor of fragility. Ordos’s half-line reached even Aelius: to win can mean to be left alone.'}}
+    reveal:{tr:'Haklı çıkma ihtiyacı, kırılganlığın zırhıdır. Lucius’un yarım cümlesi Aelius’a kadar geldi: kazanmak bazen yalnız kalmaktır.',en:'The need to be right is the armor of fragility. Lucius’s half-line reached even Aelius: to win can mean to be left alone.'}}
 ];
 const EchoRoom={
   load(){try{return JSON.parse(localStorage.getItem('it041_echoroom'))||{traced:[]}}catch(e){return{traced:[]}}},
@@ -3072,7 +3071,7 @@ const EchoRoom={
     h+='</div><p style="color:var(--dim);font-size:11px;margin-top:6px">'+(tr?'İzini sürdüğün: ':'Traced: ')+st.traced.length+'/'+ECHO_SEEDS.length+' — '+(tr?'evrenin derin hafızası':'the universe’s deep memory')+'</p>';
     UI.doc('◌ '+(tr?'YANKI ODASI':'ECHO CHAMBER'),h);},
   trace(id){var tr=(GAMELANG==='tr');var s=null;for(var i=0;i<ECHO_SEEDS.length;i++)if(ECHO_SEEDS[i].id===id)s=ECHO_SEEDS[i];if(!s)return;
-    var pool=['LUCIDA','LUCIUS','SILVANUS','NOCTORNUS','LUNARIS','BAHAL','AELIUS','ORDOS'];
+    var pool=['LUCIDA','LUCIUS','SILVANUS','NOCTORNUS','LUNARIS','BAHAL','AELIUS'];
     var opts=[s.origin.who];pool.filter(function(p){return p!==s.origin.who;}).sort(function(){return Math.random()-0.5;}).slice(0,3).forEach(function(p){opts.push(p);});
     opts.sort(function(){return Math.random()-0.5;});
     var dr=s.echoes[0];
@@ -3323,7 +3322,7 @@ const Voices={
   },
   audio:function(){var tr=(GAMELANG==='tr');var got=(S.voices&&S.voices.audio)||{};var base=this.ABURL;
     var h='<p style="color:var(--dim);font-size:12px;line-height:1.55">'+(tr?'Sesli kitabın bölümleri ilerledikçe açılır; açıldıkça burada birikir. <b style="color:var(--moon)">Kayıtlar büyük (saatlerce) dosyalardır; yavaş bağlantıda yüklenmesi biraz sürebilir.</b> Gömülü oynatıcı çalışmazsa altındaki “↗ doğrudan aç / indir” ile cihazının kendi oynatıcısında dinle.':'The audiobook parts unlock as you progress; they accumulate here. <b style="color:var(--moon)">The recordings are large (hours long); on a slow connection they may take a while to load.</b> If the embedded player won’t work, use the “↗ open / download” link below to listen in your device’s own player.')+'</p>';
-    this.AB.forEach(function(a){var u=!!got[a.n];var url=base+'audiobook'+a.n+'.mp3';h+='<div class="row" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin:8px 0"><span style="white-space:nowrap;padding-top:7px">'+(u?'🎧 ':'🔒 ')+(tr?'Bölüm ':'Ch ')+a.lo+'–'+a.hi+'</span>'+(u?('<div style="max-width:64%;text-align:right"><audio controls playsinline preload="none" style="height:34px;width:100%" src="'+url+'"></audio><div style="margin-top:2px"><a href="'+url+'" target="_blank" rel="noopener" style="font-size:11px;color:var(--accent)">↗ '+(tr?'oynatılamıyorsa: doğrudan aç / indir':'won’t play? open / download')+'</a></div></div>'):('<span style="color:var(--dim);font-size:11px;padding-top:7px">'+(tr?(a.end+'. bölümde açılır'):('unlocks at chapter '+a.end))+'</span>'))+'</div>';});
+    this.AB.forEach(function(a){var u=!!got[a.n];var url=base+'audiobook'+a.n+'.mp3';h+='<div class="row" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin:8px 0"><span style="white-space:nowrap;padding-top:7px">'+(u?'🎧 ':'🔒 ')+(tr?'Bölüm ':'Ch ')+a.lo+'–'+a.hi+'</span>'+(u?('<div style="max-width:64%;text-align:right"><audio controls playsinline preload="metadata" style="height:34px;width:100%" src="'+url+'"></audio><div style="margin-top:2px"><a href="'+url+'" target="_blank" rel="noopener" style="font-size:11px;color:var(--accent)">↗ '+(tr?'oynatılamıyorsa: doğrudan aç / indir':'won’t play? open / download')+'</a></div></div>'):('<span style="color:var(--dim);font-size:11px;padding-top:7px">'+(tr?(a.end+'. bölümde açılır'):('unlocks at chapter '+a.end))+'</span>'))+'</div>';});
     UI.doc((tr?'🎧 SESLİ KAYITLAR':'🎧 AUDIOBOOK'),h);
   }
 };
@@ -4520,10 +4519,10 @@ if(HAS3D)(function(){
   const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,900);
   const _coarse=(typeof matchMedia!=='undefined'&&matchMedia('(pointer:coarse)').matches);
   const renderer=new THREE.WebGLRenderer({antialias:!_coarse,powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,_coarse?1.5:2));
+  renderer.setPixelRatio(Math.min(devicePixelRatio,_coarse?1.25:1.5));
   renderer.setSize(innerWidth,innerHeight);
   renderer.shadowMap.enabled=true;
-  renderer.shadowMap.type=_coarse?THREE.PCFShadowMap:THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type=THREE.PCFShadowMap;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure=1.15;
   renderer.outputEncoding=THREE.sRGBEncoding;
@@ -6193,8 +6192,8 @@ if(HAS3D)(function(){
     });
     /* proaktif: dolaşan denekler oyuncuya yaklaşınca kendileri konu açar — merak uyandırıp oyuna çekerler */
     if(!Game.modal&&!W3.inInterior&&typeof AG_HOOKS!=='undefined'){W3._hookT=(W3._hookT||0)+dt;
-      if(W3._hookT>30){for(var _ai=0;_ai<AGENTS.length;_ai++){var _ag=AGENTS[_ai];var _hd=Math.hypot(S.px-_ag.f.g.position.x,S.pz-_ag.f.g.position.z);
-        if(_hd<6.2){W3._hookT=0;_ag.wait=Math.max(_ag.wait||0,4);_ag.f.g.rotation.y=Math.atan2(S.px-_ag.f.g.position.x,S.pz-_ag.f.g.position.z);var _hk=AG_HOOKS[(W3._hookI=((W3._hookI||0)+1))%AG_HOOKS.length];try{UI.toast('◍ '+_ag.nm+': '+_hk+'  —  [E]',7200);}catch(e){}break;}}}}
+      if(W3._hookT>42){for(var _ai=0;_ai<AGENTS.length;_ai++){var _ag=AGENTS[_ai];var _hd=Math.hypot(S.px-_ag.f.g.position.x,S.pz-_ag.f.g.position.z);
+        if(_hd<6.0){W3._hookT=0;_ag.wait=Math.max(_ag.wait||0,10);_ag.f.g.rotation.y=Math.atan2(S.px-_ag.f.g.position.x,S.pz-_ag.f.g.position.z);var _hk=AG_HOOKS[(W3._hookI=((W3._hookI||0)+1))%AG_HOOKS.length];try{Dlg.open([[_ag.nm,_hk]]);}catch(e){}break;}}}}
     /* ---- v5: eşzamanlı mod ---- */
     if(MP.on&&MP.send){mpT+=dt;
       if(mpT>.15){mpT=0;try{MP.send({x:S.px,z:S.pz,h:meshAng,n:travelerName()+(S.solved.s7?'·⟁':'')});}catch(e){}}
