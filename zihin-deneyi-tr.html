@@ -71,9 +71,10 @@
   #dlgText{font-size:14.5px;line-height:1.55;min-height:44px;white-space:pre-wrap;}
   #dlgNext{font-size:11px;color:var(--dim);text-align:right;margin-top:6px;}
   .modal{position:fixed;inset:0;background:rgba(2,3,7,.9);z-index:90;display:none;
-    align-items:center;justify-content:center;padding:18px;}
+    align-items:flex-start;justify-content:center;padding:18px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
   .panel{background:var(--panel);border:1px solid var(--line);width:min(680px,96vw);
-    max-height:88vh;overflow:auto;padding:26px 28px;border-radius:4px;}
+    max-height:88vh;overflow:auto;padding:26px 28px;border-radius:4px;margin:auto;}
+  @media (pointer:coarse){.modal{padding:max(10px,env(safe-area-inset-top)) 10px max(16px,env(safe-area-inset-bottom));}.panel{max-height:none;margin:0;}}
   .panel h2{font-size:13px;letter-spacing:.3em;color:var(--gold);margin-bottom:14px;text-transform:uppercase;}
   .panel h2.v{color:var(--violet);}
   .panel p{font-size:13.5px;line-height:1.6;margin-bottom:10px;}
@@ -103,8 +104,9 @@
   .jentry p.own{color:var(--ink);font-style:italic;}
   .locked{color:#3a4154 !important;}
   .screen{position:fixed;inset:0;z-index:80;background:var(--bg);display:none;
-    align-items:center;justify-content:center;padding:20px;overflow:auto;}
-  .screen .inner{max-width:660px;text-align:center;}
+    align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .screen .inner{max-width:660px;text-align:center;margin:auto;}
+  @media (pointer:coarse){.screen{padding:max(12px,env(safe-area-inset-top)) 14px max(18px,env(safe-area-inset-bottom));}}
   .screen h1{font-size:clamp(20px,4vw,34px);letter-spacing:.35em;color:var(--moon);
     margin-bottom:8px;font-weight:normal;}
   .screen h3{font-size:12px;letter-spacing:.4em;color:var(--accent);margin-bottom:28px;}
@@ -296,6 +298,7 @@
   <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.</p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ BUILD 2026-06-20 · b15 · <span style="color:var(--accent)">roaming subjects greet you + lore</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -354,9 +357,7 @@
 <div style="grid-column:1/-1;font-size:8.5px;letter-spacing:.25em;color:var(--violet);opacity:.62;margin:9px 2px 2px;text-transform:uppercase">✦ ZİHNİN</div>
 <button class="mini" onclick="MindMap.show()">🜨 ZİHİN HARİTASI</button>
 <button class="mini" onclick="Profile.show()">⚖ ZİHİN PROFİLİ</button>
-<button class="mini" onclick="NEXUS.show()">⟁ NEXUS</button>
-<button class="mini" onclick="Iz.show()">◈ İZ ANITI</button>
-<button class="mini" onclick="Architect.menu()">✶ MİMAR MODU</button>
+<button class="mini" onclick="NEXUS.show()">⟁ NEXUS</button><button class="mini" onclick="Architect.menu()">✶ MİMAR MODU</button>
 <div style="grid-column:1/-1;font-size:8.5px;letter-spacing:.25em;color:var(--violet);opacity:.62;margin:9px 2px 2px;text-transform:uppercase">✦ DÜNYA & BAĞLANTI</div>
 <button class="mini" onclick="UI.toggleJournal()">GÜNLÜK [J]</button>
 <button class="mini" onclick="Game.toggleMap()">HARİTA [M]</button>
@@ -522,6 +523,11 @@ const L={
   pleromaGate:{x:202,z:214,r:5,name:'PLEROMA KAPISI'},
   pleromaCore:{x:44,z:266,r:5,name:'YALDABAOTH ÇEKİRDEĞİ'},
   pleromaExit:{x:44,z:242,r:5,name:'YÜZEYE ÇIKIŞ'},
+  /* shadow-work landmarks (world-integrated council features) */
+  lucidaMirror:{x:170,z:252,r:3.4,name:"LUCIDA'NIN AYNASI"},
+  crackedDoor:{x:130,z:96,r:3.4,name:'YARIK KAPI'},
+  emptyDoor:{x:210,z:90,r:3.4,name:'BOŞ ODA'},
+  echoChamber:{x:90,z:150,r:3.8,name:'YANKI ODASI'},
 };
 const PLEROMA={x:44,z:256,r:22}; // Enstitü'nün yeraltı sunucu salonu
 const ZONES=[L.blackdisk,L.forest,L.prison,L.therapy,L.labyrinth,L.lake,L.institute,L.caravan,L.station];
@@ -1233,7 +1239,7 @@ function interactTarget(){
       if(pg.clinic){return['\uD83D\uDECB '+(GAMELANG==='tr'?esc(pg.name)+'\'ne gir':'enter '+esc(pg.name)),()=>{if(window.W3&&W3.Interior&&W3.Interior.enterClinic)W3.Interior.enterClinic();}];}
       if(pg.house){var rk=pg.k;var woke=S.flags&&S.flags[rk+'Woke'];var _R=(window.REALMS||[]).find(function(x){return x.k===rk;});var nm=(_R&&window.Realms)?Realms.T(_R.n):rk;return[(GAMELANG==='tr'?(woke?'☽ '+nm+' — gir':'☽ '+nm+' — uyan'):(woke?'☽ '+nm+' — enter':'☽ '+nm+' — wake')),function(){if(window.House)House.wake(rk);}];}
       if(pg.council){var open=!!(S.flags&&(S.flags.integrated||S.flags.book2));try{if(!open&&window.Library&&Library.milestones&&Library.milestones()>=49)open=true;}catch(e){}return['⟁ '+(GAMELANG==='tr'?'Konsey Meclisi':'The Council'),function(){if(open){try{if(window.W3&&W3.councilOpen)W3.councilOpen();}catch(e){}UI.doc((GAMELANG==='tr'?'⟁ KONSEY MECLİSİ':'⟁ THE COUNCIL'),'<p style="line-height:1.7">'+(GAMELANG==='tr'?'Yedi sütun, yedi arketip. İkinci Kitabı açtın — meclis sana görünür. Burada Lunaris, Bahal, Lucida, Lucius, Noctornus, Silvanus ve Aelius bu evreni birlikte düşünür. Onlarla AYNALAR (MENÜ → Aynalar) üzerinden konuşabilirsin; her etkileşimle gelişirler.':'Seven pillars, seven archetypes. You have opened Book Two — the Council reveals itself. Here Lunaris, Bahal, Lucida, Lucius, Noctornus, Silvanus and Aelius think this universe together. Speak with them through the MIRRORS (MENU → Mirrors); they evolve with every exchange.')+'</p><button class="btn v" onclick="if(UI.closeDoc)UI.closeDoc()">'+(GAMELANG==='tr'?'tamam':'ok')+'</button>');}else{UI.doc((GAMELANG==='tr'?'⟁ KONSEY MECLİSİ':'⟁ THE COUNCIL'),'<p style="line-height:1.7">'+(GAMELANG==='tr'?'Kapı kapalı. Meclis yalnızca <b>İkinci Kitabı açmış</b> olanlara görünür. Önce yedi diyarı tamamla, bütünleşmeyi getir — sonra bu eşik aydınlanır.':'The door is shut. The Council reveals itself only to those who have <b>opened Book Two</b>. First complete the seven realms, bring the integration — then this threshold lights.')+'</p><button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(GAMELANG==='tr'?'kapat':'close')+'</button>');}}];}
-      if(pg.subjHome){return['◍ '+(GAMELANG==='tr'?(esc(pg.sname)+'’in evine gir'):('enter '+esc(pg.sname)+'’s house')),function(){if(window.SubjHome)SubjHome.show(pg.idx,pg.sname);}];}
+      if(pg.subjHome){return['◍ '+(GAMELANG==='tr'?(esc(pg.sname)+'’in evine gir'):('enter '+esc(pg.sname)+'’s house')),function(){if(window.W3&&W3.Interior&&W3.Interior.enterSubjHome)W3.Interior.enterSubjHome(pg.idx,pg.sname);else if(window.SubjHome)SubjHome.show(pg.idx,pg.sname);}];}
       return['☽ '+(GAMELANG==='tr'?esc(pg.name)+' alanına gir':'enter '+esc(pg.name)),()=>{if(window.HOUSES&&HOUSES[pg.k]&&window.House){House.wake(pg.k);}else{W3.Interior.enter(pg.k);}}];}}
   /* v8: bir denek/karakter çok yakındaysa alan etkileşimlerinden ÖNCE o gelir */
   {const ag=W3.agentNear&&W3.agentNear();
@@ -1259,6 +1265,10 @@ function interactTarget(){
   if(near(L.bench))return[S.rites.r6!==undefined?(Daily.doneToday()?'Günün sorusu (tamam ✓)':'🜂 Günün sorusu'):'◈ Banka otur',S.rites.r6!==undefined?doDaily:()=>Rite.open('r6')];
   if(near(L.dreamWell))return['◯ Rüya kuyusu',doDreamWell];
   if(near(L.traceStone))return['◈ İz Anıtı — kalıcı iz bırak',()=>Iz.show()];
+  if(near(L.lucidaMirror))return['◑ '+(GAMELANG==='tr'?'Lucida’nın Aynası — bir kalıba tanık ol':'Lucida’s Mirror — witness a pattern'),()=>{if(window.LucidaMirror)LucidaMirror.show();}];
+  if(near(L.crackedDoor))return['⟡ '+(GAMELANG==='tr'?'Yarık Kapı — eksikken geç':'The Cracked Door — cross while incomplete'),()=>{if(window.CrackedDoor)CrackedDoor.show();}];
+  if(near(L.emptyDoor))return['▢ '+(GAMELANG==='tr'?'Boş Oda — içeri gir':'The Empty Room — step inside'),()=>{if(window.EmptyRoom)EmptyRoom.enter();}];
+  if(near(L.echoChamber))return['◌ '+(GAMELANG==='tr'?'Yankı Odası’na gir':'Enter the Echo Chamber'),()=>{if(window.W3&&W3.Interior&&W3.Interior.enterEchoChamber)W3.Interior.enterEchoChamber();else if(window.EchoRoom)EchoRoom.show();}];
   if(S.flags.initiate&&near(L.ascend))return['✶ Üst katmana yüksel',()=>{S.px=362;S.pz=282;save();UI.toast('✶ AELIUS KATMANI — bir kat yukarısı. Her şey hem daha küçük hem daha net.',5000);}];
   if(near(L.skyAelius))return['✶ Aelius ile konuş',()=>{if(Mirror.ready()){Mirror.open('aelius');return;}
     Dlg.open([['AELIUS IGNIS','Hoş geldin, yolcu. Burası anlatıcıların balkonu. Aşağıya bak: diskler, göl, tren — hepsi bir cümlenin içindeki kelimeler.'],
@@ -1446,6 +1456,10 @@ function pickReading(r){
   aeliusCard(M[r]+' — İmza, kimlik verir. Hakikat, kimliksizdir. Deney bitmedi; artık senin deneyin.',()=>Game.finale());
 }
 function doSilvanus(){
+  if(S.flags.silvanus&&S.flags.noct&&!S.flags.fricSilv){S.flags.fricSilv=true;save();Dlg.open([
+    ['SILVANUS','Demek disk tarlalarındaki rapçiyi buldun. Noctornus. Bir zamanlar göründüğümden daha yakındık — aynı kırık sokağın iki çocuğu.'],
+    ['SILVANUS','Ben ateşin içinden yürüyüp bu derenin başına oturdum. O kendi ateşinin üstüne bir sahne kurdu ve dumana "atmosfer" dedi. Hiçbir zaman başaramadığım tek kabul bu — yarayı, çıkış yoluna tercih etmesi. Yine de fincanını dolduruyorum. Hiç gelmiyor.']
+  ]);return;}
   if(S.flags.silvanus&&Mirror.ready()){S.lucidity=Math.min(100,S.lucidity+15);Mirror.open('silvanus');return;}
   S.flags.silvanus=true;S.lucidity=Math.min(100,S.lucidity+40);teachUnlock('silv');save();refreshHud();
   Dlg.open([
@@ -1477,6 +1491,10 @@ function doRadio(){
      <p style="color:var(--violet)">İç ses: “Radyoyu kapatabilirsin; menüde düğmesi var. Ama önce bir dakika dur. Altmış kalp atışı.”</p>`);
 }
 function doLucida(){
+  if(S.flags.lucida&&S.flags.lucius&&!S.flags.fricLucida){S.flags.fricLucida=true;save();Dlg.open([
+    ['LUCIDA','Demek Lucius\'la tanıştın. Duygularını alfabetik sıraya dizen adam. Odayı yeterince düzenli tutarsa kederin adresi bulamayacağını sanıyor. Hiçbir konuda anlaşamadık.'],
+    ['LUCIDA','O bana sel diyor. Ben onun düzenine çok temiz bir kafes diyorum. Onun yapısını güvenlikle, benim çekimimi kaosla karıştırma. İkimize de ihtiyacın var — ve biz birbirimize tahammül edemiyoruz. O gerilim sende de yaşıyor.']
+  ]);return;}
   if(S.flags.lucida&&Mirror.ready()){S.lucidity=Math.min(100,S.lucidity+10);Mirror.open('lucida');return;}
   S.flags.lucida=true;S.lucidity=Math.min(100,S.lucidity+30);teachUnlock('lucida');save();refreshHud();
   Dlg.open([
@@ -1488,6 +1506,10 @@ function doLucida(){
   ]);
 }
 function doLucius(){
+  if(S.flags.lucida&&S.flags.lucius&&!S.flags.fricLucius){S.flags.fricLucius=true;save();Dlg.open([
+    ['LUCIUS','Telefon kulübesindeki kadınla konuşmuşsun. Lucida. Sana "sadece hisset" der. Yapı olmadan hissetmek, düzenlemeyi reddettiği bir odada boğulan bir adamdır.'],
+    ['LUCIUS','O benim düzenimi hapishane sanıyor. Ben onun topraklamasını telefon numarası olan bir sel sanıyorum. Yıllardır anlaşamadık — yine de ikimizi de taşıyorsun. Bugün bir şeye karar verme; sadece hangimizi susturduğunu fark et.']
+  ]);return;}
   S.flags.lucius=true;teachUnlock('lucius');save();
   Dlg.open([
     ['LUCIUS','Bir denek. Karanlık çöktükten sonra labirentin dışında. Bunun ne kadar usulsüz olduğunun farkında mısın?'],
@@ -1506,9 +1528,13 @@ function doNoctornus(){
     ['MC NOCTORNUS','Yürüyüp geldin. Ayık. Kimse ayık gelmez.'],
     ['MC NOCTORNUS','Vaka C. Dosyaları bana öyle diyor. “İlişkiler üzerinden kimlik. Risk: kaçınma, kibir, maddeler.” Soğuk, değil mi? Ne yazmıyor biliyor musun? Ekmeğin acıdan geldiğini. Sattığım her parçayı bir yaradan kazıp çıkardım.'],
     ['MC NOCTORNUS','Benim repliğim şuydu: onların seni bıraktığı gibi sen de onları arkanda bırakabilirsin. Güç gibi ses veriyordu. Daha iyi prodüksiyonla kaçmaktı sadece.'],
-    ['MC NOCTORNUS','Şu duvarı işaretleyen çocuk — Microp — o da burada bir yerlerde. Sonsuza dek on altı. Söyle ona, isterse ritim hâlâ onun. Ben bu tarlada insan kovalamayı bıraktım.'],
+    ['MC NOCTORNUS','Şu duvarı işaretleyen çocuk — Microp — o da burada bir yerlerde. Sonsuza dek on altı. Söyle ona, isterse ritim hâlâ onun. Ben bu tarlada insan kovalamayı bıraktım.']
+  ].concat(S.flags.silvanus?[
+    ['MC NOCTORNUS','Dere gibi kokuyorsun. Silvanus\'a gitmişsin. Hiç başlatma — orada öyle oturuyor, iyileşmiş, dingin. Dünya senin için nihayet sustuğunda affetmek kolay.'],
+    ['MC NOCTORNUS','Dersi reddettiğimi sanıyor. Belki. Ya da belki onun huzuru sadece önce yorulan bir yaradır. Konuşmuyoruz. Onun sükuneti duyduğum en gürültülü şey.']
+  ]:[]).concat([
     ['LUNARIS','Artık seni avlamayacak. Gölgenin fon müziğine irkilmeyi reddeden birine olan budur.']
-  ]);
+  ]));
 }
 function doLunaris(){
   S.stage=4;
@@ -2876,12 +2902,28 @@ const NEXUS={
       var ec=(typeof echoCount==='function')?echoCount():0;
       if(ec>0)f.push({n:(TRn?'YANKILAR ':'ECHOES ')+ec+'/16',small:true,t:'ECHOES'});
     }catch(e){}
+    /* TANIŞILAN KADRO — karşılaştığın her yüz takımyıldıza eklenir; harita yolculukla giderek şekillenir */
+    try{var TRc=(GAMELANG==='tr');var fl=(S&&S.flags)||{};var sv=(S&&S.solved)||{};
+      var lun=((typeof lunarisMoon==='function'&&lunarisMoon())||sv.s2||fl.uploadNight);
+      var cast=[
+        {on:fl.lucida,   n:'LUCIDA',    t:'CH_LUCIDA',   sub:(TRc?'rehber · yerçekimi':'guide · gravity')},
+        {on:fl.lucius,   n:'LUCIUS',    t:'CH_LUCIUS',   sub:(TRc?'düzen · strateji':'order · strategy')},
+        {on:fl.silvanus, n:'SILVANUS',  t:'CH_SILVANUS', sub:(TRc?'inanç · bilge':'faith · sage')},
+        {on:fl.noct,     n:'NOCTORNUS', t:'CH_NOCT', dark:true, sub:(TRc?'kaçınma · bağlanma':'avoidance · attachment')},
+        {on:lun,         n:'LUNARIS',   t:'CH_LUNARIS',  sub:(TRc?'ay · isimlendiren':'moon · the namer')},
+        {on:(fl.ov||fl.ovCouncil), n:'ORDOS', t:'CH_ORDOS', dark:true, sub:(TRc?'kör sistem · kopyalayan':'the blind system · the copier')},
+        {on:(fl.shadowFought||fl.integrated), n:'BAHAL', t:'CH_BAHAL', dark:true, sub:(TRc?'gölge · bütünleşme':'shadow · integration')},
+        {on:(fl.book2||fl.uploadNight||sv.s2), n:'AELIUS', t:'CH_AELIUS', sub:(TRc?'yorumcu · güneş':'interpreter · sun')}
+      ];
+      cast.forEach(function(c){ if(c.on) f.push({n:c.n,dark:!!c.dark,t:c.t,sub:c.sub,cast:true}); });
+    }catch(e){}
     return f;},
   show(){
     UI.doc('⟁ NEXUS — İÇ TAKIMYILDIZ',
       '<p style="color:var(--dim);font-size:12.5px"><b style="color:var(--moon)">Bu nedir?</b> NEXUS, <i>senin</i> iç kadronun yaşayan haritasıdır — seçimlerinin açığa çıkardığı figürler, dürtüler ve gölgeler, tek bir bağlı ağ olarak çizili. Parlak düğümler bütünleşmiş parçalar; <b style="color:var(--violet)">karanlık düğümler gölgendir</b>. Bir düğüme <b>dokun</b> ve onunla otur (gölgeyi silmezsin — ona bir sandalye verirsin). Aynı desen karşılaştığın karakterlerde ve yukarıdaki yıldızlarda yankılanır: <i style="color:var(--moon)">yukarıda ne varsa aşağıda da o</i>. Henüz adı olmayan bir düğümü adlandırmak için <b>adsızı adlandır</b>, tekrarladığın döngüyü görmek için <b>zamanın gözü</b>.</p>'+
       '<canvas id="nexC" width="740" height="760" style="width:100%;border:1px solid var(--line);border-radius:4px;background:#04050a;cursor:pointer"></canvas>'+
       '<div style="margin-top:10px">'+
+      '<button class="btn v" onclick="NEXUS.aelius()">✶ '+(GAMELANG==='tr'?'AELIUS’UN YORUMU':'AELIUS READS THIS')+'</button>'+
       '<button class="btn v" onclick="NEXUS.eye()">▴ ZAMANIN GÖZÜ — döngüyü gör</button>'+
       '<button class="btn" onclick="NEXUS.name()">adı konmamışa isim ver</button>'+
       '<button class="btn ghost" onclick="NEXUS.gate()">↩ geri dönüş kapısı</button>'+
@@ -2909,7 +2951,7 @@ const NEXUS={
     const TT={THE_CENTER:'henüz adını koymadığın gölge',THE_CAP:'çoğu gün direğe geçen kaptan',THE_SHA:'yorgunken direğe geçen',THE_FACE:'aynanın önde gördüğü yüz',THE_RITE:'tamamladığın bir ritüel'};
     c.onclick=(e)=>{const r=c.getBoundingClientRect();const mx=(e.clientX-r.left)*(W/r.width),my=(e.clientY-r.top)*(H/r.height);
       let best=null,bd=34;f.forEach(n=>{const d=Math.hypot(mx-n.x,my-n.y);if(d<bd){bd=d;best=n;}});
-      if(best)this.msg((best.dark?'◑ ':'◇ ')+best.n+' — '+(TT[best.t]||'')+(best.dark?'  Bunu, sen taşımayasın diye kim taşıdı?':''));};},
+      if(best)this.msg((best.dark?'◑ ':'◇ ')+best.n+' — '+(TT[best.t]||best.sub||'')+(best.dark?'  Bunu, sen taşımayasın diye kim taşıdı?':''));};},
   msg(t){const m=document.getElementById('nexMsg');if(m)m.textContent=t;},
   eye(){UI.doc('▴ ZAMANIN GÖZÜ',
     '<p>Yaldabaoth senin dışında değil; seni sürekli eski kalıba kopyalayan kör makinedir. Hayatında tekrar eden bir desen:</p>'+
@@ -2933,9 +2975,208 @@ const NEXUS={
     if(window.Mirror&&Mirror.remember)Mirror.remember('silvanus','Adı konmamışa bir isim verildi: '+v.slice(0,40));
     UI.closeDoc();UI.toast('◈ Merkezin artık bir adı var. Takımyıldız tutuyor.');this.show();},
   gate(){this.msg('↩ Geri dönüş kapısı. Bir kez, yavaşça nefes al. Burada ne gördüysen, onu izleyen sensin - izlenen şey değil. İstediğin an yüzeye dön.');},
-  download(){const c=document.getElementById('nexC');if(!c)return;const a=document.createElement('a');a.download='nexus.png';a.href=c.toDataURL();a.click();}
+  download(){const c=document.getElementById('nexC');if(!c)return;const a=document.createElement('a');a.download='nexus.png';a.href=c.toDataURL();a.click();},
+  aelius(){var tr=(GAMELANG==='tr');var f=this.figures();
+    var cast=f.filter(function(n){return n.cast;}).map(function(n){return n.n;});
+    var darks=f.filter(function(n){return n.dark&&!n.center&&!n.cast;}).map(function(n){return n.n;});
+    var dom=((f.filter(function(n){return n.t==='DOM_ARCH';})[0])||{}).n||'';
+    var sha=((f.filter(function(n){return n.t==='SHA_ARCH';})[0])||{}).n||'';
+    var pat=((f.filter(function(n){return n.t==='PATTERN';})[0])||{}).n||'';
+    var jr=((f.filter(function(n){return n.t==='JOURNEY';})[0])||{}).n||'';
+    var integrated=!!(S.flags&&S.flags.integrated);
+    var center=((this.load().name)||'').trim();
+    var P=[];
+    if(tr){
+      P.push('Haritana baktım. '+(cast.length?('Şimdiye dek '+cast.length+' yüzle karşılaştın — '+cast.join(', ')+'. Her biri dışarıda duruyor gibi görünse de, senin bir parçanı taşıyor.'):'Haritan henüz ilk ışıklarını yakıyor; yol açıldıkça yüzler birer birer belirecek.'));
+      if(dom)P.push('Çoğu gün dümeni <b>'+esc(dom)+'</b> tutuyor — görünen yüzün, gücün. Ama tek başına bırakılırsa aynı güç bir hapishaneye dönüşebilir.');
+      if(sha||darks.length)P.push('Yorulduğunda ise <b>'+esc(sha||darks[0])+'</b> devralıyor. Onu yenmeye çalışma; ona bir sandalye ver. '+(integrated?'Zaten oturttun — gölge artık tekerlekte değil, masanda.':'Henüz tekerleği bırakmadı; Yedinci Ritüel onu oturtmanı bekliyor.'));
+      if(pat)P.push('Tekrar eden örüntün: <i>'+esc(pat.replace(/^ÖRÜNTÜ:\s*/,''))+'</i>. Yaldabaoth bu kopyayı her seferinde geri çiziyor — ama artık onu fark ettin, ve fark etmek kopyayı durduran tek harekettir.');
+      if(jr)P.push(esc(jr)+' kadar yol kat ettin. Bu küçük değil — harita giderek senin gerçek yüzüne benziyor.');
+      P.push((center?('Merkeze <b>'+esc(center)+'</b> adını verdin. '):'Merkez hâlâ adsız duruyor; bir gün ona bir isim ver. ')+'Ve unutma: bütün bunları izleyen sensin — izlenen şey değil.');
+    } else {
+      P.push('I looked at your map. '+(cast.length?('So far you have met '+cast.length+' faces — '+cast.join(', ')+'. Each seems to stand outside you, yet each carries a part of you.'):'Your map is lighting its first points; as the road opens, the faces will appear one by one.'));
+      if(dom)P.push('Most days <b>'+esc(dom)+'</b> holds the wheel — your visible face, your strength. But left alone, that same strength can become a prison.');
+      if(sha||darks.length)P.push('When you are tired, <b>'+esc(sha||darks[0])+'</b> takes over. Do not try to defeat it; give it a chair. '+(integrated?'You already seated it — the shadow has a seat now, not the wheel.':'It has not let go of the wheel yet; the Seventh Rite waits for you to seat it.'));
+      if(pat)P.push('Your repeating pattern: <i>'+esc(pat.replace(/^PATTERN:\s*/,''))+'</i>. Yaldabaoth redraws this copy each time — but you have noticed it now, and noticing is the only move that stops the copy.');
+      if(jr)P.push('You have walked '+esc(jr)+'. That is not small — the map is starting to look like your true face.');
+      P.push((center?('You named the center <b>'+esc(center)+'</b>. '):'The center still stands unnamed; one day, give it a name. ')+'And remember: you are the one watching all of this — not the thing watched.');
+    }
+    var html='<p style="color:var(--dim);font-size:12px;letter-spacing:.2em">✶ '+(tr?'AELIUS IGNIS — ZİHİN HARİTASI OKUMASI':'AELIUS IGNIS — A READING OF YOUR MIND MAP')+'</p>'+P.map(function(s){return '<p style="line-height:1.7;color:var(--ink);font-size:13.5px">'+s+'</p>';}).join('')+'<p style="text-align:right;color:var(--violet);letter-spacing:.25em;font-size:12px">— AELIUS IGNIS</p><div style="margin-top:8px"><button class="btn ghost" onclick="UI.closeDoc();NEXUS.show()">↩ '+(tr?'haritaya dön':'back to the map')+'</button></div>';
+    UI.doc('✶ '+(tr?'AELIUS — HARİTANI OKUR':'AELIUS — READS YOUR MAP'),html);
+  }
 };
 
+/* ============ YANKI ODASI — ECHO CHAMBER ============ */
+const ECHO_SEEDS=[
+  {id:'memnun',at:0,theme:{tr:'BİRİNİ MEMNUN ETME',en:'PLEASING OTHERS'},
+    origin:{who:'LUCIDA',frag:{tr:'“Onları kırmamak için kendimi…',en:'“So as not to hurt them, I…'}},
+    echoes:[
+      {who:'SILVANUS',line:{tr:'“…kendimi ikinci sıraya koydum, sonra üçüncü, sonra hiçbir yere.”',en:'“…put myself second, then third, then nowhere at all.”'}},
+      {who:'NOCTORNUS',line:{tr:'“…kendimi sildim ki kimse gitmesin — yine de gittiler.”',en:'“…erased myself so no one would leave — they left anyway.”'}}
+    ],
+    reveal:{tr:'Aynı yarım cümle iki ayrı ağızdan döndü: incinmemek için yok olmak. Oda bunu bir örüntü olarak tutuyor — belki senin de tanıdığın bir örüntü.',en:'The same half-sentence returned from two different mouths: vanishing to avoid being hurt. The chamber holds it as a pattern — perhaps one you know too.'}},
+  {id:'kontrol',at:2,theme:{tr:'HER ŞEYİ KONTROL ETME',en:'CONTROLLING EVERYTHING'},
+    origin:{who:'LUCIUS',frag:{tr:'“Düzen bozulmasın diye her şeyi…',en:'“To keep order from breaking, I held…'}},
+    echoes:[
+      {who:'LUNARIS',line:{tr:'“…her şeyi avucumda tuttum, ta ki avucum taşa dönene dek.”',en:'“…everything in my palm, until my palm turned to stone.”'}},
+      {who:'ORDOS',line:{tr:'“…her şeyi tekrar tekrar aynı kalıba döktüm. Güvenlik buydu, hapis de.”',en:'“…cast everything into the same mold, again and again. That was safety, and the prison.”'}}
+    ],
+    reveal:{tr:'Kontrol, korkunun kibar adıdır. Lucius’un yarım cümlesi kör sisteme kadar yankılandı: tutmak, bazen bırakmamaktır.',en:'Control is fear in polite clothes. Lucius’s unfinished line echoed all the way to the blind system: to hold can mean to never let go.'}},
+  {id:'yetersiz',at:5,theme:{tr:'YETERSİZLİK',en:'NOT ENOUGH'},
+    origin:{who:'NOCTORNUS',frag:{tr:'“Ne yaparsam yapayım yetmediği için…',en:'“Because nothing I did was ever enough, I…'}},
+    echoes:[
+      {who:'LUCIDA',line:{tr:'“…daha çok çalıştım, daha az uyudum, yine de boşluk doymadı.”',en:'“…worked more, slept less, and still the hollow stayed hungry.”'}},
+      {who:'AELIUS',line:{tr:'“…kanıt biriktirdim — ama kime kanıtladığımı çoktan unutmuştum.”',en:'“…gathered proof — but had long forgotten who I was proving it to.”'}}
+    ],
+    reveal:{tr:'“Yetmedi” cümlesi sahibini değiştirdikçe küçüldü: mesele başarı değil, içerideki o sönmeyen açlıktı.',en:'The sentence “not enough” shrank as it changed owners: it was never about achievement, but the hunger inside that never went out.'}},
+  {id:'terk',at:9,theme:{tr:'TERK EDİLME KORKUSU',en:'FEAR OF ABANDONMENT'},
+    origin:{who:'LUNARIS',frag:{tr:'“Gitmelerine dayanamadığım için önce ben…',en:'“Because I couldn’t bear them leaving, I first…'}},
+    echoes:[
+      {who:'NOCTORNUS',line:{tr:'“…önce ben soğudum, böylece terk edilmiş sayılmazdım.”',en:'“…went cold first, so it wouldn’t count as being left.”'}},
+      {who:'BAHAL',line:{tr:'“…önce ben yıktım, çünkü çöküşü beklemek çökmekten ağırdı.”',en:'“…broke it first, because waiting for the collapse was heavier than collapsing.”'}}
+    ],
+    reveal:{tr:'Terk edilmemek için terk eden gölge. Lunaris’in yarım cümlesi Bahal’ın elinde bir savunmaya dönüştü — tanıdık mı?',en:'The shadow that abandons so it won’t be abandoned. Lunaris’s half-line became, in Bahal’s hands, a defense — familiar?'}},
+  {id:'gorunmez',at:14,theme:{tr:'GÖRÜNMEZ OLMA',en:'BECOMING INVISIBLE'},
+    origin:{who:'SILVANUS',frag:{tr:'“Fark edilmek tehlikeliydi, o yüzden…',en:'“Being noticed was dangerous, so I…'}},
+    echoes:[
+      {who:'LUCIDA',line:{tr:'“…sesimi kıstım, sonra fikrimi, sonra varlığımı.”',en:'“…turned down my voice, then my opinion, then my presence.”'}},
+      {who:'ORDOS',line:{tr:'“…herkese benzedim ki kimse bana bakmasın. Mükemmel kamuflaj, mükemmel yalnızlık.”',en:'“…became like everyone so no one would look. Perfect camouflage, perfect loneliness.”'}}
+    ],
+    reveal:{tr:'Görünmezlik bir kalkandı; ama kalkanın arkasında kimsenin göremediği biri açlıktan soldu.',en:'Invisibility was a shield; but behind it, someone no one could see wilted from hunger.'}},
+  {id:'haklicik',at:20,theme:{tr:'HAKLI ÇIKMA İHTİYACI',en:'THE NEED TO BE RIGHT'},
+    origin:{who:'ORDOS',frag:{tr:'“Haklı çıkmazsam dağılacağım için…',en:'“Because I’d fall apart if I weren’t right, I…'}},
+    echoes:[
+      {who:'LUCIUS',line:{tr:'“…tartışmayı kazandım ve ilişkiyi kaybettim, her seferinde.”',en:'“…won the argument and lost the relationship, every time.”'}},
+      {who:'AELIUS',line:{tr:'“…haklılığı bir kale yaptım, sonra o kalede tek başıma kaldım.”',en:'“…made being right into a fortress, then stood alone inside it.”'}}
+    ],
+    reveal:{tr:'Haklı çıkma ihtiyacı, kırılganlığın zırhıdır. Ordos’un yarım cümlesi Aelius’a kadar geldi: kazanmak bazen yalnız kalmaktır.',en:'The need to be right is the armor of fragility. Ordos’s half-line reached even Aelius: to win can mean to be left alone.'}}
+];
+const EchoRoom={
+  load(){try{return JSON.parse(localStorage.getItem('it041_echoroom'))||{traced:[]}}catch(e){return{traced:[]}}},
+  store(o){try{localStorage.setItem('it041_echoroom',JSON.stringify(o))}catch(e){}},
+  T(o){return (o&&(o[GAMELANG]||o.en))||'';},
+  _surf(){var ms=(window.Library&&Library.milestones)?Library.milestones():0;return ECHO_SEEDS.filter(function(s){return ms>=(s.at||0);});},
+  show(){var tr=(GAMELANG==='tr');var st=this.load();var surf=this._surf();
+    var h='<p style="color:var(--dim);font-size:12.5px;line-height:1.65">'+(tr?'<b style="color:var(--moon)">Yankı Odası.</b> Bir karakterin yarım bıraktığı bir cümle, haftalar sonra başka birinin ağzında — biraz kaymış, biraz yanlış oturmuş — geri döner. İki ses arasındaki boşluk gölge çalışmasının arenasıdır. Yankının izini sür: bu söz <i>ilk</i> kimin yarım cümlesinden büyüdü?':'<b style="color:var(--moon)">The Echo Chamber.</b> A sentence one character left unfinished returns weeks later in another’s mouth — drifted, sitting slightly wrong. The gap between the two voices is the arena of shadow work. Trace the echo: whose unfinished words did it <i>first</i> grow from?')+'</p>';
+    if(!surf.length){h+='<p style="color:var(--dim)">'+(tr?'Oda henüz sessiz. Yolda derinleştikçe yankılar yüzeye çıkacak.':'The chamber is still quiet. As you go deeper, echoes will surface.')+'</p>';UI.doc('◌ '+(tr?'YANKI ODASI':'ECHO CHAMBER'),h);return;}
+    var day=Math.floor(Date.now()/864e5);
+    h+='<div style="margin-top:8px">';
+    surf.forEach(function(s){var done=st.traced.indexOf(s.id)>=0;var dr=s.echoes[(day+s.id.length)%s.echoes.length];
+      h+='<div style="border:1px solid var(--line);border-radius:6px;padding:10px;margin:7px 0;background:rgba(157,140,201,.06)">';
+      h+='<div style="font-size:10px;letter-spacing:.2em;color:var(--violet)">◌ '+(tr?'YÜZEYE ÇIKAN YANKI':'A SURFACED ECHO')+(done?(' · ✓ '+(tr?'izi sürüldü':'traced')):'')+'</div>';
+      h+='<p style="font-style:italic;color:var(--moon);font-size:13px;line-height:1.6;margin:6px 0">'+esc(EchoRoom.T(dr.line))+'</p>';
+      h+='<p style="font-size:10.5px;color:var(--dim)">— '+esc(dr.who)+(tr?' böyle söyledi':' said it like this')+'</p>';
+      if(done){h+='<p style="font-size:11.5px;color:var(--ink);line-height:1.55;margin-top:6px">'+(tr?'İlk söyleyen: ':'First spoken by: ')+'<b>'+esc(s.origin.who)+'</b> — “'+esc(EchoRoom.T(s.origin.frag))+'”</p><p style="font-size:11.5px;color:var(--accent);line-height:1.55">'+esc(EchoRoom.T(s.reveal))+'</p>';}
+      else{h+='<button class="btn v" style="font-size:11.5px;margin-top:4px" onclick="EchoRoom.trace(\''+s.id+'\')">◌ '+(tr?'yankının izini sür':'trace this echo')+'</button>';}
+      h+='</div>';});
+    h+='</div><p style="color:var(--dim);font-size:11px;margin-top:6px">'+(tr?'İzini sürdüğün: ':'Traced: ')+st.traced.length+'/'+ECHO_SEEDS.length+' — '+(tr?'evrenin derin hafızası':'the universe’s deep memory')+'</p>';
+    UI.doc('◌ '+(tr?'YANKI ODASI':'ECHO CHAMBER'),h);},
+  trace(id){var tr=(GAMELANG==='tr');var s=null;for(var i=0;i<ECHO_SEEDS.length;i++)if(ECHO_SEEDS[i].id===id)s=ECHO_SEEDS[i];if(!s)return;
+    var pool=['LUCIDA','LUCIUS','SILVANUS','NOCTORNUS','LUNARIS','BAHAL','AELIUS','ORDOS'];
+    var opts=[s.origin.who];pool.filter(function(p){return p!==s.origin.who;}).sort(function(){return Math.random()-0.5;}).slice(0,3).forEach(function(p){opts.push(p);});
+    opts.sort(function(){return Math.random()-0.5;});
+    var dr=s.echoes[0];
+    var h='<p style="color:var(--dim);font-size:12px">'+(tr?'Bu yankı:':'This echo:')+'</p><p style="font-style:italic;color:var(--moon);line-height:1.6">'+esc(EchoRoom.T(dr.line))+'</p><p style="font-size:11px;color:var(--dim)">— '+esc(dr.who)+'</p><p style="font-size:12.5px;color:var(--ink);margin-top:8px">'+(tr?'Bu söz <b>ilk</b> kimin yarım cümlesinden büyüdü?':'Whose unfinished words did this <b>first</b> grow from?')+'</p>';
+    opts.forEach(function(o){h+='<button class="choice" onclick="EchoRoom.answer(\''+id+'\',\''+o+'\')">'+esc(o)+'</button>';});
+    h+='<button class="btn ghost" style="margin-top:6px" onclick="EchoRoom.show()">↩ '+(tr?'geri':'back')+'</button>';
+    UI.doc('◌ '+(tr?'YANKININ İZİ':'TRACE THE ECHO'),h);},
+  answer(id,who){var tr=(GAMELANG==='tr');var s=null;for(var i=0;i<ECHO_SEEDS.length;i++)if(ECHO_SEEDS[i].id===id)s=ECHO_SEEDS[i];if(!s)return;
+    if(who===s.origin.who){var st=this.load();if(st.traced.indexOf(id)<0){st.traced.push(id);this.store(st);try{S.insight=(S.insight||0)+3;if(typeof save==='function')save();if(window.refreshHud)refreshHud();}catch(e){}}
+      try{if(window.Mirror&&Mirror.remember)Mirror.remember('aelius','A traveler traced an echo back to '+s.origin.who+' — pattern: '+EchoRoom.T(s.theme));}catch(e){}
+      UI.toast('◌ '+(tr?'İz sürüldü. Evrenin hafızasına bir örüntü daha eklendi.':'Traced. One more pattern joined the chamber’s memory.'),5200);this.show();}
+    else{UI.toast('◌ '+(tr?'Bu ses başkasının. Yankı daha derinden geliyor — tekrar dinle.':'That voice is another’s. The echo comes from deeper — listen again.'),5200);}}
+};
+if(typeof window!=='undefined')window.EchoRoom=EchoRoom;
+/* ============ LUCIDA'NIN AYNASI — LUCIDA'S MIRROR ============ */
+const DISTORTIONS=[
+  {id:'felaket',name:{tr:'Felaketleştirme',en:'Catastrophizing'},desc:{tr:'En kötü sonu kesinmiş gibi yaşamak.',en:'Living the worst outcome as if certain.'},
+    scene:{tr:'Telefon iki kez çaldı, açılmadı. Zihin çoktan kazayı, hastaneyi, en kötü haberi kurdu. Henüz hiçbir şey olmadı — ama bedenin çoktan oradaydı.',en:'The phone rang twice, unanswered. The mind already built the accident, the hospital, the worst news. Nothing has happened yet — but your body was already there.'},
+    whisper:{tr:'Görüyorum seni, Felaketleştirme. Sen geleceği değil, korkuyu gösteriyorsun.',en:'I see you, Catastrophizing. You show not the future, but the fear.'}},
+  {id:'hephic',name:{tr:'Ya Hep Ya Hiç',en:'All-or-Nothing'},desc:{tr:'Gri tonların olmadığı bir dünya.',en:'A world with no shades of grey.'},
+    scene:{tr:'Bir hata yaptın. Ve o an, tüm gün “mahvolmuş”, tüm çaban “boşa” oldu. Yüzde doksan iyi giden her şey, tek bir lekeyle siliniyor.',en:'You made one mistake. And in that instant the whole day became “ruined,” all your effort “for nothing.” The ninety percent that went well is erased by a single stain.'},
+    whisper:{tr:'Görüyorum seni, Ya Hep Ya Hiç. Sen ya beyaz ya siyah dersin — ama hayat gridir.',en:'I see you, All-or-Nothing. You say either white or black — but life is grey.'}},
+  {id:'zihinoku',name:{tr:'Zihin Okuma',en:'Mind-Reading'},desc:{tr:'Başkalarının seni yargıladığından emin olmak.',en:'Being sure others are judging you.'},
+    scene:{tr:'Selamına kısa karşılık verdi. Zihin hemen okudu: “Bana kızgın, beni sevmiyor, bir şey yaptım.” Oysa belki sadece yorgundu. Sen onun zihnini değil, kendi korkunu okudun.',en:'They answered your greeting briefly. The mind read it at once: “They’re angry, they don’t like me, I did something.” Perhaps they were just tired. You read not their mind, but your own fear.'},
+    whisper:{tr:'Görüyorum seni, Zihin Okuma. Sen onların değil, benim en eski yaramı okuyorsun.',en:'I see you, Mind-Reading. You read not their thoughts, but my oldest wound.'}},
+  {id:'malidir',name:{tr:'-meli / -malı',en:'Should Statements'},desc:{tr:'Kuralların altında ezilmek.',en:'Crushed beneath your own rules.'},
+    scene:{tr:'“Daha güçlü olmalıydım. Bunu hissetmemeliyim. Çoktan halletmeliydim.” Her cümle bir kırbaç. Kendine bir düşmana bile reva görmeyeceğin bir sertlikle davranıyorsun.',en:'“I should be stronger. I shouldn’t feel this. I should have handled it already.” Each sentence a whip. You treat yourself with a harshness you’d spare even an enemy.'},
+    whisper:{tr:'Görüyorum seni, -meli/-malı. Sen şefkat değil, ceza dağıtıyorsun.',en:'I see you, Should. You hand out punishment where compassion belongs.'}},
+  {id:'kisisel',name:{tr:'Kişiselleştirme',en:'Personalization'},desc:{tr:'Her şeyin sorumlusu sen olmak.',en:'Taking the blame for everything.'},
+    scene:{tr:'Toplantı kötü geçti. Aklına ilk gelen: “Benim yüzümden.” Hava, trafik, başkalarının günü — hepsi silindi; geriye yalnızca senin suçun kaldı. Dünyanın ağırlığını tek başına taşıyorsun.',en:'The meeting went badly. Your first thought: “It’s because of me.” The weather, the traffic, everyone else’s day — all erased; only your fault remained. You carry the weight of the world alone.'},
+    whisper:{tr:'Görüyorum seni, Kişiselleştirme. Sen dünyanın tüm yükünü tek bir omuza yığıyorsun.',en:'I see you, Personalization. You pile the whole world’s weight onto one shoulder.'}},
+  {id:'duygusal',name:{tr:'Duygusal Akıl Yürütme',en:'Emotional Reasoning'},desc:{tr:'“Hissediyorsam doğrudur” demek.',en:'“If I feel it, it must be true.”'},
+    scene:{tr:'Kendini değersiz hissediyorsun, ve bu yüzden değersiz olduğuna inanıyorsun. Duygu, kanıt gibi davranıyor. Oysa hissetmek, olmak değildir. Sis, dağın yok olduğu anlamına gelmez.',en:'You feel worthless, and so you believe you are worthless. The feeling poses as evidence. But to feel is not to be. Fog does not mean the mountain is gone.'},
+    whisper:{tr:'Görüyorum seni, Duygusal Akıl Yürütme. Sen sisi dağ sanıyorsun.',en:'I see you, Emotional Reasoning. You mistake the fog for the mountain.'}},
+  {id:'genelleme',name:{tr:'Aşırı Genelleme',en:'Overgeneralization'},desc:{tr:'Tek olaydan “hep/asla” çıkarmak.',en:'From one event to “always / never.”'},
+    scene:{tr:'Bir kez reddedildin. Ve zihin yazdı: “Hep böyle olacak. Kimse beni seçmez. Asla olmayacak.” Tek bir kapı kapandı, sen tüm koridoru duvar sandın.',en:'You were rejected once. And the mind wrote: “It will always be this way. No one chooses me. It will never happen.” One door closed, and you took the whole corridor for a wall.'},
+    whisper:{tr:'Görüyorum seni, Aşırı Genelleme. Sen bir günü ömür sanıyorsun.',en:'I see you, Overgeneralization. You mistake one day for a lifetime.'}},
+  {id:'etiket',name:{tr:'Etiketleme',en:'Labeling'},desc:{tr:'Bir davranışı kimliğe çevirmek.',en:'Turning a behavior into an identity.'},
+    scene:{tr:'Bir şeyi unuttun. “Aptalım” dedin. Bir kez geç kaldın, “güvenilmezim” oldun. Tek bir an, bütün bir kimliğe dönüştü. Yaptığın bir şey, olduğun şeyi yutuyor.',en:'You forgot something. “I’m stupid,” you said. You were late once, and became “unreliable.” A single moment turned into a whole identity. A thing you did swallows the thing you are.'},
+    whisper:{tr:'Görüyorum seni, Etiketleme. Sen bir anı bütün bir insana yapıştırıyorsun.',en:'I see you, Labeling. You glue a single moment onto an entire person.'}}
+];
+const LucidaMirror={
+  load(){try{return JSON.parse(localStorage.getItem('it041_lucmirror'))||{seen:[]}}catch(e){return{seen:[]}}},
+  store(o){try{localStorage.setItem('it041_lucmirror',JSON.stringify(o))}catch(e){}},
+  T(o){return (o&&(o[GAMELANG]||o.en))||'';},
+  _d(id){for(var i=0;i<DISTORTIONS.length;i++)if(DISTORTIONS[i].id===id)return DISTORTIONS[i];return null;},
+  show(){var tr=(GAMELANG==='tr');var st=this.load();
+    var h='<p style="color:var(--dim);font-size:12.5px;line-height:1.65"><b style="color:var(--moon)">Lucida:</b> '+(tr?'“Bu ayna kırık kalıbı tamir etmez. Onu yalnızca ışığa tutar. Zihninin çarpıtmalarından birini seç; onu bir sahne olarak canlandıralım, sonra ona adıyla seslenelim. Değiştirmeyeceğiz — yalnızca tanık olacağız. Görülen bir kalıp, seni yönetmeyi azar azar bırakır.”':'“This mirror does not repair the broken pattern. It only holds it to the light. Choose one of your mind’s distortions; we will stage it as a scene, then call it by its name. We will not change it — only witness it. A pattern that is seen slowly loosens its grip.”')+'</p><div style="margin-top:8px">';
+    DISTORTIONS.forEach(function(d){var seen=st.seen.indexOf(d.id)>=0;h+='<button class="choice" onclick="LucidaMirror.stage(\''+d.id+'\')">'+(seen?'◑ ':'◇ ')+'<b>'+esc(LucidaMirror.T(d.name))+'</b> — <span style="color:var(--dim)">'+esc(LucidaMirror.T(d.desc))+'</span></button>';});
+    h+='</div><p style="color:var(--dim);font-size:11px;margin-top:6px">'+(tr?'Tanık olunan kalıp: ':'Witnessed: ')+st.seen.length+'/'+DISTORTIONS.length+'</p>';
+    UI.doc('◑ '+(tr?'LUCIDA’NIN AYNASI':'LUCIDA’S MIRROR'),h);},
+  stage(id){var tr=(GAMELANG==='tr');var d=this._d(id);if(!d)return;
+    var h='<div style="font-size:10px;letter-spacing:.2em;color:var(--violet)">◑ '+(tr?'SAHNE':'THE SCENE')+' — '+esc(LucidaMirror.T(d.name))+'</div>';
+    h+='<p style="font-style:italic;color:var(--moon);line-height:1.7;font-size:13.5px;margin:8px 0">'+esc(LucidaMirror.T(d.scene))+'</p>';
+    h+='<p style="font-size:12px;color:var(--ink)">'+(tr?'Bu kalıp senin hayatında nerede sahne alıyor? (istersen yaz — cihazından çıkmaz)':'Where does this pattern take the stage in your life? (write if you wish — it never leaves your device)')+'</p>';
+    h+='<textarea id="lmScene" rows="3" maxlength="600" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--ink);padding:8px;font-family:inherit;font-size:12.5px;border-radius:6px"></textarea>';
+    h+='<p style="font-size:12px;color:var(--dim);margin-top:6px"><b>Lucida:</b> '+(tr?'“Şimdi onu değiştirmeye çalışma. Sadece ona adıyla seslen. Adını söylemek, onu sen olmaktan çıkarır.”':'“Now don’t try to change it. Just call it by its name. Naming it makes it no longer you.”')+'</p>';
+    h+='<button class="btn v" onclick="LucidaMirror.witness(\''+id+'\')">◑ '+(tr?'adıyla seslen':'call it by its name')+'</button> <button class="btn ghost" onclick="LucidaMirror.show()">↩ '+(tr?'geri':'back')+'</button>';
+    UI.doc('◑ '+(tr?'LUCIDA’NIN AYNASI':'LUCIDA’S MIRROR'),h);},
+  witness(id){var tr=(GAMELANG==='tr');var d=this._d(id);if(!d)return;
+    var st=this.load();if(st.seen.indexOf(id)<0){st.seen.push(id);this.store(st);}
+    try{S.lucidity=Math.min(100,(S.lucidity||0)+6);if(window.Profile&&Profile.nudge)Profile.nudge(1);if(typeof save==='function')save();if(window.refreshHud)refreshHud();}catch(e){}
+    try{if(window.Mirror&&Mirror.remember)Mirror.remember('lucida','A traveler witnessed and named the pattern: '+LucidaMirror.T(d.name));}catch(e){}
+    var h='<p style="font-style:italic;color:var(--accent);line-height:1.7;font-size:14px">'+esc(LucidaMirror.T(d.whisper))+'</p>';
+    h+='<p style="color:var(--ink);font-size:12.5px;line-height:1.6"><b>Lucida:</b> '+(tr?('“'+esc(LucidaMirror.T(d.name))+' hâlâ burada — ve bu sorun değil. Onu kovmadık, oturmasına izin verdik. Bir kalıp görüldüğünde artık karanlıkta hüküm süremez. Tanık oldun. Bu yeter.”'):('“'+esc(LucidaMirror.T(d.name))+' is still here — and that is alright. We did not banish it; we let it sit. A pattern, once seen, can no longer rule from the dark. You witnessed it. That is enough.”'))+'</p>';
+    h+='<button class="btn ghost" onclick="LucidaMirror.show()">↩ '+(tr?'aynaya dön':'back to the mirror')+'</button>';
+    UI.doc('◑ '+(tr?'TANIK OLUNDU':'WITNESSED'),h);
+    try{UI.toast('◑ '+(tr?'Tanık oldun — kalıbı değiştirmedin, adını verdin. (+berraklık)':'You witnessed it — you didn’t change it, you named it. (+clarity)'),5000);}catch(e){}}
+};
+if(typeof window!=='undefined')window.LucidaMirror=LucidaMirror;
+/* ============ YARIK KAPI RİTÜELİ — THE CRACKED DOOR RITE ============ */
+const CrackedDoor={
+  show(){var tr=(GAMELANG==='tr');
+    var h='<p style="color:var(--dim);font-size:12.5px;line-height:1.65">'+(tr?'Önünde bir kapı var. Hazır görünüyor — ama değil. Menteşesi yarım, eşiği biraz çatlak. Bu evrende çoğu kapı böyledir: hiçbir şey tam bitmeden geçilmeyi bekler. Mükemmel anı bekleyen gölge, eşikte donar kalır.':'A door stands before you. It looks ready — but it isn’t. The hinge is half-set, the threshold slightly cracked. Most doors in this universe are like this: nothing is ever fully finished before it must be crossed. The shadow that waits for the perfect moment freezes at the threshold.')+'</p>';
+    h+='<p style="font-size:12.5px;color:var(--ink)">'+(tr?'Hayatında, “hazır olduğunda / mükemmel olduğunda” başlamak için beklediğin bir şey yaz:':'Name one thing you’re waiting to start “when it’s ready / when it’s perfect”:')+'</p><input id="cdWait" maxlength="140" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--ink);padding:8px;font-family:inherit;font-size:12.5px;border-radius:6px">';
+    h+='<p style="font-size:12.5px;color:var(--ink);margin-top:6px">'+(tr?'Şimdi: hâlâ eksikken atabileceğin en küçük ilk adım nedir?':'Now: what is the smallest first step you could take while it’s still incomplete?')+'</p><input id="cdStep" maxlength="140" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--ink);padding:8px;font-family:inherit;font-size:12.5px;border-radius:6px">';
+    h+='<div style="margin-top:8px"><button class="btn v" onclick="CrackedDoor.cross()">⟡ '+(tr?'yarık kapıdan geç':'cross the cracked door')+'</button> <button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(tr?'çık':'leave')+'</button></div>';
+    UI.doc('⟡ '+(tr?'YARIK KAPI RİTÜELİ':'THE CRACKED DOOR RITE'),h);},
+  cross(){var tr=(GAMELANG==='tr');var st=(UI.el('cdStep')&&UI.el('cdStep').value.trim())||'';
+    if(!st){UI.toast(tr?'Küçük de olsa bir adım yaz.':'Write one small step, however small.');return;}
+    try{S.lucidity=Math.min(100,(S.lucidity||0)+8);if(window.Profile&&Profile.nudge)Profile.nudge(1);if(typeof save==='function')save();if(window.refreshHud)refreshHud();}catch(e){}
+    try{if(window.Mirror&&Mirror.remember)Mirror.remember('aelius','A traveler crossed a cracked door — stepping into the incomplete instead of waiting for perfect.');}catch(e){}
+    var h='<p style="font-style:italic;color:var(--accent);line-height:1.7;font-size:13.5px">'+(tr?'Geçtin. Kapı tam değildi; sen de değilsin — ve tam da bu yüzden geçebildin. Mükemmellik bir eşik değil, bir bahanedir.':'You crossed. The door was not complete; neither are you — and that is exactly why you could pass. Perfection is not a threshold; it is an excuse.')+'</p>';
+    h+=(st?('<p style="color:var(--ink);font-size:12.5px;line-height:1.55">'+(tr?'İlk adımın: ':'Your first step: ')+'<b>'+esc(st)+'</b>'+(tr?' — bugün, eksikken.':' — today, while incomplete.')+'</p>'):'');
+    h+='<button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(tr?'kapat':'close')+'</button>';
+    UI.doc('⟡ '+(tr?'GEÇTİN':'YOU CROSSED'),h);
+    try{UI.toast('⟡ '+(tr?'Eşiği eksikken geçtin. (+berraklık)':'You crossed while incomplete. (+clarity)'),4500);}catch(e){}}
+};
+if(typeof window!=='undefined')window.CrackedDoor=CrackedDoor;
+/* ============ BOŞ ODA — THE EMPTY ROOM (ödülsüz) ============ */
+const EmptyRoom={
+  enter(){var tr=(GAMELANG==='tr');if(document.getElementById('emptyRoom'))return;
+    var ov=document.createElement('div');ov.id='emptyRoom';
+    ov.style.cssText='position:fixed;inset:0;z-index:300;background:#05060a;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;opacity:0;transition:opacity 1.6s';
+    ov.innerHTML='<div style="width:118px;height:172px;border:1px solid rgba(160,180,210,.22);border-radius:60px/14px;background:radial-gradient(ellipse at 50% 34%,rgba(150,175,210,.12),transparent 70%);margin-bottom:30px"></div><p style="color:#6b7689;font-size:13px;letter-spacing:.06em;line-height:1.95;max-width:430px">'+(tr?'Boş bir odadasın. Profil yok, ödül yok, yönerge yok. Yalnızca bir ayna ve sessizlik. Ne yapacağına, ne kadar kalacağına, çıkıp çıkmamaya sen karar verirsin.':'You are in an empty room. No profile, no reward, no instruction. Only a mirror and silence. What you do, how long you stay, whether you leave — you decide.')+'</p><div id="emLeave" style="margin-top:36px;opacity:0;transition:opacity 2.4s"><span style="color:#48506a;font-size:12px;letter-spacing:.3em;cursor:pointer" onclick="EmptyRoom.leave()">'+(tr?'· çık ·':'· leave ·')+'</span></div>';
+    document.body.appendChild(ov);try{if(window.Game&&Game.setModal)Game.setModal(true);}catch(e){}
+    requestAnimationFrame(function(){ov.style.opacity='1';});
+    setTimeout(function(){var l=document.getElementById('emLeave');if(l)l.style.opacity='1';},9000);},
+  leave(){var tr=(GAMELANG==='tr');var ov=document.getElementById('emptyRoom');
+    if(ov){ov.style.opacity='0';setTimeout(function(){if(ov.parentNode)ov.parentNode.removeChild(ov);},1200);}
+    try{if(window.Game&&Game.setModal)Game.setModal(false);}catch(e){}
+    try{UI.toast(tr?'Odadan kendi vaktinde çıktın. Kimse seni çağırmadı; kimse tutmadı.':'You left in your own time. No one called you; no one held you.',5000);}catch(e){}}
+};
+if(typeof window!=='undefined')window.EmptyRoom=EmptyRoom;
 const SideQuests={
   show(){
     var L=(typeof GAMELANG!=='undefined'?GAMELANG:'en'),tr=(L==='tr');
@@ -3081,8 +3322,8 @@ const Voices={
     UI.doc((tr?'◈ ARKETİP YORUMLARI':'◈ ARCHETYPE VOICES'),h);
   },
   audio:function(){var tr=(GAMELANG==='tr');var got=(S.voices&&S.voices.audio)||{};var base=this.ABURL;
-    var h='<p style="color:var(--dim);font-size:12px">'+(tr?'Sesli kitabın bölümleri ilerledikçe açılır; açıldıkça burada birikir. Tıkla ve dinle.':'The audiobook parts unlock as you progress; they accumulate here. Tap and listen.')+'</p>';
-    this.AB.forEach(function(a){var u=!!got[a.n];h+='<div class="row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:6px 0"><span style="white-space:nowrap">'+(u?'🎧 ':'🔒 ')+(tr?'Bölüm ':'Ch ')+a.lo+'–'+a.hi+'</span>'+(u?('<audio controls preload="none" style="height:32px;max-width:62%" src="'+base+'audiobook'+a.n+'.mp3"></audio>'):('<span style="color:var(--dim);font-size:11px">'+(tr?(a.end+'. bölümde açılır'):('unlocks at chapter '+a.end))+'</span>'))+'</div>';});
+    var h='<p style="color:var(--dim);font-size:12px;line-height:1.55">'+(tr?'Sesli kitabın bölümleri ilerledikçe açılır; açıldıkça burada birikir. <b style="color:var(--moon)">Kayıtlar büyük (saatlerce) dosyalardır; yavaş bağlantıda yüklenmesi biraz sürebilir.</b> Gömülü oynatıcı çalışmazsa altındaki “↗ doğrudan aç / indir” ile cihazının kendi oynatıcısında dinle.':'The audiobook parts unlock as you progress; they accumulate here. <b style="color:var(--moon)">The recordings are large (hours long); on a slow connection they may take a while to load.</b> If the embedded player won’t work, use the “↗ open / download” link below to listen in your device’s own player.')+'</p>';
+    this.AB.forEach(function(a){var u=!!got[a.n];var url=base+'audiobook'+a.n+'.mp3';h+='<div class="row" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin:8px 0"><span style="white-space:nowrap;padding-top:7px">'+(u?'🎧 ':'🔒 ')+(tr?'Bölüm ':'Ch ')+a.lo+'–'+a.hi+'</span>'+(u?('<div style="max-width:64%;text-align:right"><audio controls playsinline preload="none" style="height:34px;width:100%" src="'+url+'"></audio><div style="margin-top:2px"><a href="'+url+'" target="_blank" rel="noopener" style="font-size:11px;color:var(--accent)">↗ '+(tr?'oynatılamıyorsa: doğrudan aç / indir':'won’t play? open / download')+'</a></div></div>'):('<span style="color:var(--dim);font-size:11px;padding-top:7px">'+(tr?(a.end+'. bölümde açılır'):('unlocks at chapter '+a.end))+'</span>'))+'</div>';});
     UI.doc((tr?'🎧 SESLİ KAYITLAR':'🎧 AUDIOBOOK'),h);
   }
 };
@@ -3353,10 +3594,21 @@ const House={
     if(o.correct){var ctx=this._aictx(st,(GAMELANG==='tr'?'Soru: ':'Q: ')+this.T(st.q)+' | '+(GAMELANG==='tr'?'Cevabım: ':'My answer: ')+this.T(o.t));
       fb.innerHTML='<p style="color:var(--accent);line-height:1.6">✓ '+esc(this.T(o.fb))+'</p>'+(st.after?'<p style="color:var(--moon);line-height:1.6">'+esc(this.T(st.after))+'</p>':'')+this.aiBtn(ctx)+'<button class="btn v" onclick="House._adv()">'+(GAMELANG==='tr'?'devam':'continue')+'</button>';}
     else{fb.innerHTML='<p style="color:var(--warn);line-height:1.6">✕ '+esc(this.T(o.fb))+'</p><span style="color:var(--dim);font-size:11px">'+(GAMELANG==='tr'?'tekrar dene — doğru kavrayışı bul':'try again — find the true reading')+'</span>';}},
-  _choice(st){var h='<p style="color:var(--violet)">'+esc(this.T(st.setup))+'</p><div id="cOpts">';st.opts.forEach(function(o,i){h+='<button class="btn ghost" style="display:block;margin:5px 0;font-size:12px;text-align:left" onclick="House._choicePick('+i+')">'+esc(House.T(o.t))+'</button>';});h+='</div><div id="cFb" style="min-height:20px;margin-top:6px"></div>'+this._hintBar();this._cstep=st;UI.doc(this._title(),this._wrap(h));},
+  _choice(st){var h='<p style="color:var(--violet)">'+esc(this.T(st.setup))+'</p>'+this._frame('choice')+'<div id="cOpts">';st.opts.forEach(function(o,i){h+='<button class="btn ghost" style="display:block;margin:5px 0;font-size:12px;text-align:left" onclick="House._choicePick('+i+')">'+esc(House.T(o.t))+'</button>';});h+='</div><div id="cFb" style="min-height:20px;margin-top:6px"></div>'+this._hintBar();this._cstep=st;UI.doc(this._title(),this._wrap(h));},
   _choicePick(i){var st=this._cstep;var o=st.opts[i];var fb=UI.el('cFb');if(!fb)return;var box=UI.el('cOpts');if(box){box.innerHTML='<div class="btn" style="display:block;text-align:left;font-size:12px;border-color:var(--accent);color:var(--moon);cursor:default">▸ '+esc(this.T(o.t))+'</div>';}if(window.Profile){Profile.seedCaseD();if(o.w)Profile.add(o.w);}this._recordChoice(o);try{if(o.w){this._chW=this._chW||{};for(var _wk in o.w){this._chW[_wk]=(this._chW[_wk]||0)+o.w[_wk];}}}catch(e){}try{this._txPush({q:this.T(st.setup),a:this.T(o.t)});}catch(e){}var ctx=this._aictx(st,this.T(o.t));fb.innerHTML='<p style="color:var(--accent);line-height:1.6">'+esc(this.T(o.fb))+'</p>'+(st.after?'<p style="color:var(--moon);line-height:1.6">'+esc(this.T(st.after))+'</p>':'')+this._analysis(o)+this.aiBtn(ctx)+'<button class="btn v" onclick="House._adv()">'+(GAMELANG==='tr'?'devam':'continue')+'</button>';},
-  _reflect(st){var L=GAMELANG;var h='<p style="color:var(--violet)">'+esc(this.T(st.prompt))+'</p><p style="color:var(--dim);font-size:11px">'+(L==='tr'?'Tek dürüst cümle. Kimse okumaz; bu cihazda kalır.':'One honest sentence. No one reads it; it stays on this device.')+'</p><textarea id="hRfl" rows="3" maxlength="320" placeholder="..."></textarea>'+this._hintBar()+'<button class="btn v" onclick="House._reflectDone()">'+(L==='tr'?'bırak':'leave it')+'</button>';this._rstep=st;UI.doc(this._title(),this._wrap(h));},
-  _reflectDone(){var v=(UI.el('hRfl')&&UI.el('hRfl').value.trim())||'';if(!v){UI.toast(GAMELANG==='tr'?'Bir cümle yaz.':'Write a sentence.');return;}try{this._txPush({q:this.T(this._rstep.prompt),a:(GAMELANG==='tr'?'(kişisel not bırakıldı)':'(personal note left)')});}catch(e){}try{this._chTH=this._chTH||{};var _rt=(window.Voices&&Voices._theme)?Voices._theme([v]):'';if(_rt)this._chTH[_rt]=(this._chTH[_rt]||0)+2;}catch(e){}this._after(this._rstep,this._aictx(this._rstep,''));},
+  _frame:function(kind){var L=GAMELANG;var theme=this.cur&&this.cur.room?this.T(this.cur.room.topic||this.cur.room.room||{tr:'',en:''}):'';var why,how;
+    if(kind==='choice'){
+      why=L==='tr'?('Burada bir seçim var. Amacı seni yargılamak değil — '+(theme?('“'+theme+'” karşısında'):'bu durumda')+' içindeki hangi sesin öne çıktığını fark ettirmek.'):('A choice here — not to judge you, but to let you notice which inner voice steps forward'+(theme?(' in the face of “'+theme+'”'):'')+'.');
+      how=L==='tr'?'Nasıl: “Doğru” olanı değil, sana en dürüst geleni seç. Her seçim bir şey öğretir.':'How: choose not the “correct” one, but the most honest for you. Every choice teaches something.';
+    }else{
+      why=L==='tr'?('Bu bir sınav değil, bir ayna. Amacı doğru cevap değil — '+(theme?('“'+theme+'” temasını'):('bu temayı'))+' kendi hayatında nerede yaşadığını görünür kılmak.'):('This is not a test, it is a mirror. Its purpose is not the right answer, but to make visible where '+(theme?('“'+theme+'”'):('this theme'))+' lives in your own life.');
+      how=L==='tr'?'Nasıl: Kendi kelimelerinle, içinden ilk gelen dürüst cümleyi yaz. Doğru/yanlış yok, cilalama. Cihazından çıkmaz.':'How: in your own words, write the first honest sentence that comes. No right or wrong, don’t polish it. It never leaves your device.';
+    }
+    return '<div style="margin:2px 0 9px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:rgba(157,140,201,.06)"><div style="color:var(--dim);font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px">'+(L==='tr'?'neden bu soru':'why this question')+'</div><p style="color:var(--moon);font-size:11.5px;line-height:1.55;margin:0 0 5px">'+esc(why)+'</p><p style="color:var(--dim);font-size:11px;line-height:1.5;margin:0">'+esc(how)+'</p></div>';},
+  _reflect(st){var L=GAMELANG;var h='<p style="color:var(--violet);line-height:1.6">'+esc(this.T(st.prompt))+'</p>'+this._frame('open')+'<textarea id="hRfl" rows="3" maxlength="320" placeholder="..."></textarea>'+this._hintBar()+'<button class="btn v" onclick="House._reflectDone()">'+(L==='tr'?'bırak':'leave it')+'</button>';this._rstep=st;UI.doc(this._title(),this._wrap(h));},
+  _lowEffort:function(v){v=String(v||'').trim().toLowerCase();if(v.length<6)return true;var compact=v.replace(/[\s.!?,;:"'’()\-_]/g,'');if(compact.length<5)return true;if(/^(.)\1{3,}$/.test(compact))return true;var letters=v.replace(/[^a-zçğıöşü]/g,'');if(letters.length>=4&&!/[aeıioöuü]/.test(letters))return true;if(/(asdf|sdfg|fghj|qwer|wert|erty|zxcv|xcvb|hjkl|1234|2345)/.test(v))return true;var bad=['yapmadım','yapmadim','etmedim','yapmıcam','yapmicam','yapmayacağım','yapmayacagim','bilmiyorum','bilemiyorum','bilmem','hiçbirşey','hicbirsey','olmadı','olmadi','deneme','qwerty','nothing','dunno','idontknow','dontknow','blabla','falanfilan','saçma','sacma','umrumdadeğil','boş','bos','geç','gec','yok','yokk','test','idk','asdf','xxx','bla','falan','filan'];for(var i=0;i<bad.length;i++){if(compact===bad[i])return true;}return false;},
+  _effToast:function(){UI.toast(GAMELANG==='tr'?'Bu alan dürüst bir cümle için. Kısa da olsa gerçek bir şey yaz — “yapmadım” ya da rastgele harfler geçmene izin vermez. Burası sadece sen ve aynan.':'This space is for one honest sentence. Write something real, however short — “didn’t do it” or random letters won’t pass. This is just you and your mirror.',6500);},
+  _reflectDone(){var v=(UI.el('hRfl')&&UI.el('hRfl').value.trim())||'';if(!v){UI.toast(GAMELANG==='tr'?'Bir cümle yaz.':'Write a sentence.');return;}if(this._lowEffort(v)){this._effToast();return;}try{this._txPush({q:this.T(this._rstep.prompt),a:(GAMELANG==='tr'?'(kişisel not bırakıldı)':'(personal note left)')});}catch(e){}try{this._chTH=this._chTH||{};var _rt=(window.Voices&&Voices._theme)?Voices._theme([v]):'';if(_rt)this._chTH[_rt]=(this._chTH[_rt]||0)+2;}catch(e){}this._after(this._rstep,this._aictx(this._rstep,''));},
   _breath(st){var L=GAMELANG;var h='<p style="line-height:1.6;color:var(--ink)">'+esc(this.T(st.intro))+'</p><div style="text-align:center;margin:10px 0"><div id="breathOrb" style="width:64px;height:64px;border-radius:50%;margin:16px auto;background:radial-gradient(circle,#cdbef0,#6a5a9a);transition:transform 4s ease-in-out;transform:scale(0.55)"></div><div id="breathTxt" style="color:var(--violet);font-size:13px;min-height:18px"></div><div id="breathCnt" style="color:var(--dim);font-size:11px;margin-top:4px"></div></div><button class="btn ghost" id="breathNotice" style="font-size:11px">'+(L==='tr'?'zihnim dağıldı — fark ettim':'my mind wandered — I noticed')+'</button> <button class="btn v" id="breathDone" style="display:none" onclick="House._breathAfter()">'+(L==='tr'?'tamam':'done')+'</button>';this._bstep=st;UI.doc(this._title(),this._wrap(h));if(window.Scene&&Scene._breath)Scene._breath();},
   _breathAfter(){if(window.Profile)Profile.nudge(1);try{if(window.Skills)Skills.unlock('breath');}catch(e){}var st=this._bstep;this._pause({sec:90},function(){House._after(st,House._aictx(st,''));});},
   /* ---- TASK (real-life homework, multi-part, 12h gate, re-readable) ---- */
@@ -3371,10 +3623,10 @@ const House={
     /* 12h passed -> confirm this part */
     var h='<div style="margin:0 0 8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:rgba(157,140,201,.06)"><div style="color:var(--violet);font-size:10.5px;letter-spacing:.05em;margin-bottom:3px">'+(L==='tr'?'HATIRLATMA — SANA VERİLEN ÖDEV':'REMINDER — THE TASK YOU WERE GIVEN')+'</div><div style="color:var(--moon);font-size:12px;line-height:1.55">'+esc(this.T(st.task))+'</div></div><p style="color:var(--violet);line-height:1.7">'+esc(this.T(st.confirm))+'</p><textarea id="tskC" rows="2" maxlength="240" placeholder="..."></textarea><p style="color:var(--dim);font-size:11px">'+(L==='tr'?'Kimse okumaz; bu cihazda kalır.':'No one reads it; it stays on this device.')+'</p><button class="btn v" onclick="House._taskConfirm('+parts+')">'+(L==='tr'?'tamam ('+(t.done+1)+'/'+parts+')':'done ('+(t.done+1)+'/'+parts+')')+'</button>';UI.doc(this._title(),this._wrap(h));},
   _taskAccept(parts){var tm=this.taskMap();tm['ch'+this.cur.ch]={start:Date.now(),done:1,parts:parts};this._save();UI.toast(GAMELANG==='tr'?'Ödev hayatına bırakıldı (1/'+parts+'). Yapınca, 12 saat sonra dön.':'Task set in your life (1/'+parts+'). Do it, return after 12h.',6000);try{if(UI.closeDoc)UI.closeDoc();}catch(e){}},
-  _taskConfirm(parts){var v=(UI.el('tskC')&&UI.el('tskC').value.trim())||'';if(!v){UI.toast(GAMELANG==='tr'?'Kısa bir not yaz.':'Write a short note.');return;}var tm=this.taskMap();var t=tm['ch'+this.cur.ch];t.done++;t.start=Date.now();this._save();try{this._txPush({q:(GAMELANG==='tr'?'Gerçek-hayat görevi':'Real-life task'),a:(GAMELANG==='tr'?'(üstlenildi)':'(taken on)')});}catch(e){}
+  _taskConfirm(parts){var v=(UI.el('tskC')&&UI.el('tskC').value.trim())||'';if(!v){UI.toast(GAMELANG==='tr'?'Kısa bir not yaz.':'Write a short note.');return;}if(this._lowEffort(v)){this._effToast();return;}var tm=this.taskMap();var t=tm['ch'+this.cur.ch];t.done++;t.start=Date.now();this._save();try{this._txPush({q:(GAMELANG==='tr'?'Gerçek-hayat görevi':'Real-life task'),a:(GAMELANG==='tr'?'(üstlenildi)':'(taken on)')});}catch(e){}
     if(t.done>=parts){if(window.Profile)Profile.nudge(1);var st=this.cur.room.steps[this.cur.step];this._after(st,this._aictx(st,''));}
     else{UI.toast(GAMELANG==='tr'?(t.done)+'/'+parts+' tamam — bir sonraki parça için ~12 saat sonra dön.':(t.done)+'/'+parts+' done — return in ~12h for the next part.',6000);try{if(UI.closeDoc)UI.closeDoc();}catch(e){}}},
-  _taskNowDone(){var L=GAMELANG;var v=(UI.el('tskNow')&&UI.el('tskNow').value.trim())||'';if(!v){UI.toast(L==='tr'?'Kısa bir not yaz.':'Write a short note.');return;}try{this._txPush({q:(L==='tr'?'Beklemesiz öz-şefkat ödevi':'Self-compassion task'),a:(L==='tr'?'(yapıldı)':'(done)')});}catch(e){}if(window.Profile)Profile.nudge(1);var st=this.cur.room.steps[this.cur.step];this._after(st,this._aictx(st,''));},
+  _taskNowDone(){var L=GAMELANG;var v=(UI.el('tskNow')&&UI.el('tskNow').value.trim())||'';if(!v){UI.toast(L==='tr'?'Kısa bir not yaz.':'Write a short note.');return;}if(this._lowEffort(v)){this._effToast();return;}try{this._txPush({q:(L==='tr'?'Beklemesiz öz-şefkat ödevi':'Self-compassion task'),a:(L==='tr'?'(yapıldı)':'(done)')});}catch(e){}if(window.Profile)Profile.nudge(1);var st=this.cur.room.steps[this.cur.step];this._after(st,this._aictx(st,''));},
   /* ---- CBT court of evidence ---- */
   _safety(){var L=GAMELANG;UI.doc('☂ '+(L==='tr'?'Destek':'Support'),this._wrap('<p style="line-height:1.65">'+(L==='tr'?'Burada yaptığın bir oyun-içi alıştırma; terapi değil. Şu an zorlanıyorsan durman tamamen uygun. Güvendiğin birine söylemek ya da bir ruh sağlığı uzmanına başvurmak güçlü bir adımdır. Kendine zarar verme düşüncen varsa, lütfen hemen yerel bir kriz/acil yardım hattına ya da güvendiğin birine ulaş.':'What you do here is an in-game exercise; not therapy. If you are struggling right now, it is completely okay to stop. Telling someone you trust, or reaching a mental-health professional, is a strong step. If you have thoughts of harming yourself, please reach a local crisis/emergency line or someone you trust right now.')+'</p><button class="btn v" onclick="if(UI.closeDoc)UI.closeDoc()">'+(L==='tr'?'kapat':'close')+'</button>'));},
   _safetyBtn(){return '<button class="btn ghost" style="font-size:11px;margin-right:6px" onclick="House._safety()">☂ '+(GAMELANG==='tr'?'zorlanıyorum':'I’m struggling')+'</button>';},
@@ -3445,8 +3697,8 @@ const House={
   _emdrSet(){var L=GAMELANG;this._em.set++;var n=this._em.set,tot=this._em.sets;var focusLine;
     if(n===1){var _img=this._em.img,_nc=this._em.nc;focusLine=(L==='tr'?(('O '+(_img?('“'+esc(_img)+'” ')+'':'')+'resmi zihninde tut'+(_nc?(' ve onunla gelen “'+esc(_nc)+'” inancını'):''))+'. Şimdi aynı anda: o GÖRÜNTÜYE, o olumsuz İNANCA, getirdiği DUYGUYA ve BEDENİNDEKİ duyuma birlikte odaklan. Hiçbir şeyi değiştirmeye çalışma — sadece fark et ve bırak ne geliyorsa gelsin.'):(('Hold the '+(_img?('“'+esc(_img)+'” ')+'':'')+'image in mind'+(_nc?(' and the belief “'+esc(_nc)+'” that comes with it'):''))+'. Now, at the same time: focus on that IMAGE, that negative BELIEF, the EMOTION it brings, and the SENSATION in your body, together. Do not try to change anything — just notice, and let whatever comes, come.'));}
     else{focusLine=(L==='tr'?('Şimdi az önce fark ettiğin şeye — “'+esc(this._em.focus||'şu an ne varsa ona')+'” — ve onun getirdiği duygu, düşünce, beden duyumu ve görüntüye aynı anda odaklan. Sadece izle.'):('Now focus on what you just noticed — “'+esc(this._em.focus||'whatever is here now')+'” — and the emotion, thought, body sensation and image it brings, all at once. Just watch.'));}
-    UI.doc(this._title(),this._wrap('<p style="color:var(--moon);font-size:12px">'+(L==='tr'?'Set ':'Set ')+n+'/'+tot+'</p><p style="color:var(--violet);line-height:1.6">'+focusLine+'</p><p style="color:var(--dim);font-size:12px">'+(L==='tr'?'Gözlerini yumuşakça kapatabilirsin; sesi kulaklıkla sağdan-sola izle. Kendiliğinden bitecek.':'You may softly close your eyes; follow the sound left–right in your headphones. It will end on its own.')+'</p><div id="emTimer" style="text-align:center;color:var(--moon);font-size:28px;margin:14px">24</div>'));
-    this._emCancelled=false;if(this._emTimer)clearInterval(this._emTimer);this._emTok=(this._emTok||0)+1;var _tk=this._emTok;this._emdrAudio(24,function(){if(House._emCancelled||House._emTok!==_tk)return;House._emdrAfterSet();});
+    UI.doc(this._title(),this._wrap('<p style="color:var(--moon);font-size:12px">'+(L==='tr'?'Set ':'Set ')+n+'/'+tot+'</p><p style="color:var(--violet);line-height:1.6">'+focusLine+'</p><p style="color:var(--dim);font-size:12px">'+(L==='tr'?'Kulaklıkla sesi sağdan-sola izle; ya da gözlerin açıkken aşağıdaki ışığı sağa-sola takip et. Kendiliğinden bitecek.':'Follow the sound left–right in headphones; or, eyes open, follow the light below as it moves side to side. It ends on its own.')+'</p><div id="emLight" style="position:relative;height:72px;margin:12px 0;border-radius:10px;overflow:hidden;background:#05060c;border:1px solid var(--line)"><div id="emOrb" style="position:absolute;top:19px;left:6%;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,#dcd2f5,#7f77dd);box-shadow:0 0 26px 10px rgba(149,134,232,.6);transition:left .46s ease-in-out"></div></div><div id="emTimer" style="text-align:center;color:var(--moon);font-size:26px;margin:6px">24</div>'));
+    this._emCancelled=false;if(this._emTimer)clearInterval(this._emTimer);this._emTok=(this._emTok||0)+1;var _tk=this._emTok;this._emdrAudio(24,function(){if(House._emCancelled||House._emTok!==_tk)return;House._emdrAfterSet();},function(s){if(House._emCancelled||House._emTok!==_tk)return;var o=UI.el('emOrb');if(o)o.style.left=(s>0?'84%':'6%');});
     var left=24;House._emTimer=setInterval(function(){left--;var e=UI.el('emTimer');if(e)e.textContent=Math.max(0,left);if(left<=0)clearInterval(House._emTimer);},1000);},
   _emdrAfterSet(){var L=GAMELANG;var n=this._em.set,tot=this._em.sets;var last=this._em.cur;
     var note=(n>=3)?('<p style="color:var(--dim);font-size:11.5px">'+(L==='tr'?'(Bu yalnızca bir tohum. Buradan sonrasını eğitimli bir EMDR terapistiyle sürdürmen önerilir.)':'(This is only a seed. Continuing beyond here with a trained EMDR therapist is recommended.)')+'</p>'):'';
@@ -3466,7 +3718,10 @@ const House={
     var arcLine='<p style="color:var(--moon);font-size:12.5px">'+(L==='tr'?'Gerginlik yolculuğun: ':'Your tension arc: ')+arc+(drop>0?(' — '+(L==='tr'?'düştü ✓':'it eased ✓')):'')+'</p>';
     var h='<p style="color:var(--accent);line-height:1.7">'+(L==='tr'?'Burada nazikçe duruyoruz. Yaptığın şey — duyguya, düşünceye, bedene ve görüntüye aynı anda dokunup bırakmak — işlemlemenin tohumudur. Tam işlemleme, eğitimli bir EMDR terapistiyle, güvenli bir ilişkide yapılır. Taşıdığın bir ağırlık varsa, bir sonraki adımı bir terapistle atman önerilir.':'We stop gently here. What you did — touching emotion, thought, body and image at once, then letting go — is the seed of processing. Full processing is done with a trained EMDR therapist, in a safe relationship. If you carry a weight, taking the next step with a therapist is recommended.')+'</p>'+arcLine+(st.after?'<p style="color:var(--violet);line-height:1.6">'+esc(this.T(st.after))+'</p>':'')+'<div id="emPause"></div>';
     UI.doc(this._title(),this._wrap(h));this._pause({sec:90,box:'emPause'},function(){House._adv();});},
-  _emdrAudio(seconds,cb){try{var AC=window.AudioContext||window.webkitAudioContext;if(!AC){setTimeout(cb,seconds*1000);return;}var ctx=this._ac||(this._ac=new AC());if(ctx.state==='suspended')ctx.resume();var osc=ctx.createOscillator();var gain=ctx.createGain();var pan=ctx.createStereoPanner?ctx.createStereoPanner():null;osc.type='sine';osc.frequency.value=210;gain.gain.value=0.05;osc.connect(gain);if(pan){gain.connect(pan);pan.connect(ctx.destination);}else{gain.connect(ctx.destination);}osc.start();var i=0;var iv=setInterval(function(){if(pan)pan.pan.value=(i%2?0.9:-0.9);i++;},520);var stop=function(){clearInterval(iv);try{osc.stop();}catch(e){}};setTimeout(function(){stop();cb&&cb();},seconds*1000);}catch(e){setTimeout(cb,seconds*1000);}},
+  _emdrAudio(seconds,cb,onTick){try{var AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC){var k=0;var ivv=setInterval(function(){if(onTick)try{onTick(k%2?1:-1);}catch(e){}k++;},520);if(onTick)onTick(-1);setTimeout(function(){clearInterval(ivv);cb&&cb();},seconds*1000);return;}
+    var ctx=this._ac||(this._ac=new AC());if(ctx.state==='suspended')ctx.resume();var osc=ctx.createOscillator();var gain=ctx.createGain();var pan=ctx.createStereoPanner?ctx.createStereoPanner():null;osc.type='sine';osc.frequency.value=210;gain.gain.value=0.085;osc.connect(gain);if(pan){gain.connect(pan);pan.connect(ctx.destination);}else{gain.connect(ctx.destination);}osc.start();
+    var i=0;var tick=function(){var s=(i%2?1:-1);if(pan)pan.pan.value=s*0.9;if(onTick)try{onTick(s);}catch(e){}i++;};tick();var iv=setInterval(tick,520);var stop=function(){clearInterval(iv);try{osc.stop();}catch(e){}};setTimeout(function(){stop();cb&&cb();},seconds*1000);}catch(e){setTimeout(cb,seconds*1000);}},
   /* ---- Silvanus pause-and-notice gate ---- */
   _txPush(e){if(!this._tx)this._tx=[];if(e&&(e.q||e.a))this._tx.push(e);},
   _chapterSummary(){var L=GAMELANG;var tx=this._tx||[];var ch=this.cur?this.abs(this.cur.ch):0;var ttl=(window.chLabel?chLabel(ch):((L==='tr'?'Bölüm ':'Chapter ')+ch));var topic=(this.cur&&this.cur.room)?this.T(this.cur.room.topic||{}):'';var rows=tx.length?tx.map(function(e){return '<div style="margin:8px 0;border-left:2px solid var(--line);padding-left:10px"><div style="color:var(--violet);font-size:11.5px;line-height:1.45">'+esc(e.q||'')+'</div><div style="color:var(--accent);font-size:12px;line-height:1.5;margin-top:2px">▸ '+esc(e.a||'')+'</div></div>';}).join(''):'<p style="color:var(--dim);font-size:12px">'+(L==='tr'?'Bu bölümde kayıtlı etkileşim yok.':'No recorded interactions for this chapter.')+'</p>';var old=document.getElementById('sumOv');if(old)old.remove();var ov=document.createElement('div');ov.id='sumOv';ov.style.cssText='position:fixed;inset:0;z-index:430;display:flex;align-items:center;justify-content:center;background:rgba(3,4,10,.94);padding:18px';ov.innerHTML='<div style="max-width:480px;max-height:84vh;overflow:auto;padding:20px 18px;border:1px solid var(--accent);border-radius:14px;background:radial-gradient(ellipse at 50% 0%,rgba(157,140,201,.14),rgba(8,10,18,.98))"><div style="color:var(--accent);letter-spacing:.12em;font-size:12px">'+(L==='tr'?'BÖLÜM ÖZETİ':'CHAPTER SUMMARY')+'</div><div style="color:var(--moon);font-size:13.5px;margin:4px 0 2px">'+esc(ttl)+'</div>'+(topic?'<div style="color:var(--dim);font-size:11.5px;margin-bottom:8px">'+esc(topic)+'</div>':'')+rows+'<div style="color:var(--dim);font-size:11px;margin-top:10px">'+(L==='tr'?'Sayaç akmaya devam ediyor. Hazır olunca kapat.':'The timer keeps running. Close when ready.')+'</div><button class="btn v" style="margin-top:8px" onclick="var o=document.getElementById(&#39;sumOv&#39;);if(o)o.remove();">'+(L==='tr'?'← geri':'← back')+'</button></div>';document.body.appendChild(ov);},
@@ -3496,10 +3751,10 @@ const House={
     document.body.appendChild(ov);var go=ov.querySelector('#rwGo');go.onclick=function(){ov.remove();if(cb)cb();};},
   _ask(st){var L=GAMELANG;this._askStep=st;
     if(st.qs&&st.qs.length){var intro=this.T(st.intro||st.prompt||{tr:'İçinden sormak istediğin soruyu seç:',en:'Choose the question you want to ask within:'});
-      var h='<p style="color:var(--violet);line-height:1.6">'+esc(intro)+'</p><div id="askQ">';
+      var h='<p style="color:var(--violet);line-height:1.6">'+esc(intro)+'</p>'+this._frame('open')+'<div id="askQ">';
       st.qs.forEach(function(q,i){h+='<button class="btn ghost" style="display:block;margin:5px 0;font-size:12px;text-align:left" onclick="House._askPick('+i+')">'+esc(House.T(q.q))+'</button>';});
       h+='</div><div id="askO" style="margin:6px 0"></div>'+this._hintBar();UI.doc(this._title(),this._wrap(h));return;}
-    var h='<p style="color:var(--violet);line-height:1.6">'+esc(this.T(st.prompt))+'</p><div id="askO" style="margin:6px 0"></div><button class="btn v" onclick="House._askGo()">'+(L==='tr'?'☽ danış':'☽ consult')+'</button> <button class="btn ghost" onclick="House._after(House._askStep,\'\')">'+(L==='tr'?'devam':'continue')+'</button>';UI.doc(this._title(),this._wrap(h));},
+    var h='<p style="color:var(--violet);line-height:1.6">'+esc(this.T(st.prompt))+'</p>'+this._frame('open')+'<div id="askO" style="margin:6px 0"></div><button class="btn v" onclick="House._askGo()">'+(L==='tr'?'☽ danış':'☽ consult')+'</button> <button class="btn ghost" onclick="House._after(House._askStep,\'\')">'+(L==='tr'?'devam':'continue')+'</button>';UI.doc(this._title(),this._wrap(h));},
   _askPick(i){var L=GAMELANG;var st=this._askStep;var q=st.qs[i];this._curQ=q;try{this._txPush({q:this.T(st.intro||st.prompt||{tr:'Sormayı seçtiğin soru',en:'The question you chose to ask'}),a:this.T(q.q)});}catch(e){}try{this._chTH=this._chTH||{};var _qt=(window.Voices&&Voices._theme)?Voices._theme([this.T(q.q),this.T(q.a||'')]):'';if(_qt)this._chTH[_qt]=(this._chTH[_qt]||0)+1;}catch(e){}var box=UI.el('askQ');if(box){box.innerHTML='<div class="btn" style="display:block;text-align:left;font-size:12px;border-color:var(--accent);color:var(--moon);cursor:default">? '+esc(this.T(q.q))+'</div>';}var nm=this.NAMES[this.realm]||'Lunaris';var o=UI.el('askO');if(!o)return;o.innerHTML='<p style="color:var(--accent);line-height:1.7"><b style="color:var(--moon)">'+esc(nm)+':</b> '+esc(this.T(q.a))+'</p>'+(q.rel?'<button class="btn ghost" style="font-size:11px" onclick="House._askRelate()">↳ '+(L==='tr'?'Bunun benimle ilişkisi? — Silvanus':'What this means for me — Silvanus')+'</button><div id="askRel" style="margin:5px 0"></div>':'')+this.aiBtn(this._aictx(st,this.T(q.q)+' | '+this.T(q.a)))+'<button class="btn v" onclick="House._adv()">'+(L==='tr'?'devam':'continue')+'</button>';},
   _askRelate(){var q=this._curQ;var box=UI.el('askRel');if(!box||!q||!q.rel)return;box.innerHTML='<p style="color:var(--dim);font-size:11.5px;font-style:italic;margin-top:4px">◦ <b style="color:var(--moon)">Silvanus:</b> '+esc(this.T(q.rel))+'</p>';},
   _askGo(){var L=GAMELANG;var st=this._askStep;var box=UI.el('askO');if(box)box.innerHTML='<p style="color:var(--dim);font-size:12px">'+(L==='tr'?'Lunaris düşünüyor…':'Lunaris reflects…')+'</p>';try{if(window.Mirror&&Mirror.loadCfg)Mirror.loadCfg();}catch(e){}
@@ -4261,11 +4516,12 @@ if(HAS3D)(function(){
   const scene=new THREE.Scene();
   scene.fog=new THREE.FogExp2(0x070a14,0.0065);
   const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,900);
-  const renderer=new THREE.WebGLRenderer({antialias:true});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  const _coarse=(typeof matchMedia!=='undefined'&&matchMedia('(pointer:coarse)').matches);
+  const renderer=new THREE.WebGLRenderer({antialias:!_coarse,powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,_coarse?1.5:2));
   renderer.setSize(innerWidth,innerHeight);
   renderer.shadowMap.enabled=true;
-  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type=_coarse?THREE.PCFShadowMap:THREE.PCFSoftShadowMap;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure=1.15;
   renderer.outputEncoding=THREE.sRGBEncoding;
@@ -4548,6 +4804,39 @@ if(HAS3D)(function(){
     /* waiting-room mirror */
     box(1.6,2.6,.2,std(0x444c60,{roughness:.1,metalness:.9,emissive:0x222c44,emissiveIntensity:.4}),L.maskMirror.x,1.6,L.maskMirror.z);
     for(let i=0;i<3;i++)maskWall.push(box(.7,.9,.12,std(0x33291a,{emissive:0x8a7434,emissiveIntensity:.2}),L.maskMirror.x-2.2+i*1.1,2.2,L.maskMirror.z+.4,0,scene,false));
+  })();
+
+  /* ---- SHADOW-WORK LANDMARKS (council features, world-integrated · [E] to trigger) ---- */
+  (function(){
+    var x=L.lucidaMirror.x,z=L.lucidaMirror.z;
+    box(2.0,0.3,2.0,std(0x1a2230,{roughness:.85}),x,0.15,z);
+    box(1.5,3.0,0.18,std(0x2a3344,{metalness:.6,roughness:.3,emissive:0x223044,emissiveIntensity:.3}),x,1.7,z);
+    var mir=new THREE.Mesh(new THREE.PlaneGeometry(1.2,2.5),new THREE.MeshStandardMaterial({color:0x8fb6c0,metalness:.9,roughness:.08,emissive:0x1a2a30,emissiveIntensity:.5}));mir.position.set(x,1.75,z+0.11);scene.add(mir);
+    var lp=new THREE.PointLight(0x9fd0d8,.7,10,2);lp.position.set(x,2.4,z+1);scene.add(lp);collide(x,z,1.3);
+  })();
+  (function(){
+    var x=L.crackedDoor.x,z=L.crackedDoor.z;var wood=0x3a2e22;
+    box(0.3,3.4,0.3,std(wood,{roughness:.85}),x-0.9,1.7,z,0.06,scene,true);
+    box(0.3,3.0,0.3,std(wood,{roughness:.85}),x+0.9,1.5,z,-0.12,scene,true);
+    box(2.3,0.3,0.3,std(wood,{roughness:.85}),x,3.2,z,0.05,scene,true);
+    var dr=new THREE.Mesh(new THREE.PlaneGeometry(1.3,2.6),new THREE.MeshStandardMaterial({color:0x0a0c14,emissive:0x2a2440,emissiveIntensity:.35,roughness:.6}));dr.position.set(x-0.1,1.6,z);dr.rotation.y=0.05;scene.add(dr);
+    var lp=new THREE.PointLight(0x9d8cc9,.5,9,2);lp.position.set(x,2.2,z+0.8);scene.add(lp);collide(x,z,1.2);
+  })();
+  (function(){
+    var x=L.emptyDoor.x,z=L.emptyDoor.z;
+    box(0.28,3.2,0.28,std(0x20242c,{roughness:.9}),x-0.85,1.6,z);
+    box(0.28,3.2,0.28,std(0x20242c,{roughness:.9}),x+0.85,1.6,z);
+    box(2.2,0.28,0.28,std(0x20242c,{roughness:.9}),x,3.15,z);
+    var dr=new THREE.Mesh(new THREE.PlaneGeometry(1.5,3.0),new THREE.MeshStandardMaterial({color:0x05060a,roughness:1}));dr.position.set(x,1.55,z);scene.add(dr);
+    var lp=new THREE.PointLight(0x8a93a8,.32,8,2);lp.position.set(x,2.4,z+1);scene.add(lp);collide(x,z,1.1);
+  })();
+  (function(){
+    var x=L.echoChamber.x,z=L.echoChamber.z;
+    var dome=new THREE.Mesh(new THREE.SphereGeometry(3.2,20,16,0,Math.PI*2,0,Math.PI/2),std(0x1b2030,{roughness:.95}));dome.position.set(x,0,z);scene.add(dome);collide(x,z,2.6);
+    var arch=new THREE.Mesh(new THREE.TorusGeometry(1.1,0.18,8,20,Math.PI),new THREE.MeshStandardMaterial({color:0x9d8cc9,emissive:0x9d8cc9,emissiveIntensity:.5,roughness:.5}));arch.position.set(x,0.1,z+3.0);arch.rotation.x=-Math.PI/2;scene.add(arch);
+    var mouth=new THREE.Mesh(new THREE.PlaneGeometry(2.0,1.8),new THREE.MeshBasicMaterial({color:0x05060a}));mouth.position.set(x,1.0,z+3.04);scene.add(mouth);
+    for(var i=0;i<3;i++){var rg=new THREE.Mesh(new THREE.RingGeometry(3.6+i*1.1,3.75+i*1.1,40),new THREE.MeshBasicMaterial({color:0x9d8cc9,transparent:true,opacity:.12-i*0.03,side:THREE.DoubleSide}));rg.rotation.x=-Math.PI/2;rg.position.set(x,0.04,z);scene.add(rg);}
+    var lp=new THREE.PointLight(0x9d8cc9,.6,12,2);lp.position.set(x,2.0,z+2);scene.add(lp);
   })();
   let ownMask=null;
   W3.rite_r2=(v)=>{ownMask=box(.8,1,.12,std(0x3a2f4e,{emissive:0x9d8cc9,emissiveIntensity:.7}),L.maskMirror.x+1.6,2.2,L.maskMirror.z+.4,0,scene,false);
@@ -4841,6 +5130,21 @@ if(HAS3D)(function(){
     ['IT-058','Pleroma diye bir yer varmış, aşağıda. Dosyalar gibi istiflenmiş insanlar. İnanmıyorum. İnanmadığımı her gece tekrar kontrol ediyorum.'],
     ['IT-077','Dolunayda göle gittim. Biri vardı. Bana “makbuzları sakladım” dedi. Makbuz ne demek bilmiyorum ama ağladım.'],
     ['IT-077','Sen de mi kürsüyü buldun? Ekranlardaki konuşmalar… bir makine birine “seçilmişsin” diyor. Ben de duymak isterdim. Sonra korktum.'],
+    ['IT-009','Gerçek tarihi mi istiyorsun? Enstitü 1969’dan sayıyor — göğün ulaşılabilir olduğuna inandıkları geceden. Buradaki her şey o gecenin bir kopyası. Kopyalanmayı reddeden parçaları bul; onlar senin.'],
+    ['IT-104','Nereye gideceğimi sor, dürüstçe söylerim: haritanın parladığı yere. Ama vardığında ritüeli yap — gerçekten yap. Performe edenler özgür çıkar; tıklayıp geçenler benim gibi burada, dolaşıp durur.'],
+    ['IT-062','Bulduğum en güzel şey yankı — birimizin yarım bıraktığı bir cümle, haftalar sonra başkasının ağzında geri dönüyor. İzini sür, evrenin hatırlayışını duyarsın. Hücrelerin yanındaki Yankı Odası’nı dene.'],
+    ['IT-019','Lumen adında, bitirip burada kalan bir robotla tanışacaksın. Onunla konuş — mezun olmuş bir denek. Doğru bitirmenin mümkün olduğunun kanıtı. Bütün mesele bu: bitir, ve gerçekten bitir.'],
+    ['IT-058','Bir soru sana fazla doğrudan geliyorsa, cevaplanması gereken tam da odur. Burası bir ayna; tartıştığın ayna boş kalır. Dürüstçe cevapla, sana gerçek bir şey gösterir.'],
+  ];
+  const AG_HOOKS=[
+    'Yeni misin? Bir sır: bu evren senin zihnin. Gerçekten oyna — her bölümü yaşa, geçiştirme — ve sonunda kendi haritanı gökyüzünde okuyacaksın.',
+    'Acele etme. Soruları geçiştirenler hep aynı kapıya döner. Ben üç kez döndüm; dördüncüde gerçekten cevapladım — işte o zaman açıldı.',
+    'Burası hakkında ne istersen sor — her diyarı yürüdüm. Enstitü’nün sakladığı sır: bütünleşmiş bir zihin kopyalanamaz. Bütün oyun bu.',
+    'Buradaki en sarsıcı şeyi ister misin? Gölde, dolunayda, biri “makbuzları sakladım” diyor. Git, orada dur. Anlayacaksın.',
+    'Yedi diyar, kırk dokuz bölüm. İnsanlar üçüncüde bırakıyor — sen bırakma. Ortada disk gevşemeye başlar. Bitirmeye değer, söz veriyorum.',
+    'Buradaki her tuhaf detay bir kapı — uğuldayan obelisk, yarık kapı, boş oda. Onları kurcalayanlar, bitirenlerdir.',
+    'Bir denekten diğerine: gerçek-hayat ödevlerini elle, yavaşça yap. Oyun numara yaptığını anlar — ve yalnızca dürüst olanlar İkinci Kitap’a ulaşır.',
+    'Kaybolduysan: haritayı aç (M), parlayan bir ritüele yürü, banka otur. Yol, yürümeye devam edene kendini gösterir.',
   ];
   const AG_DEST=['blackdisk','forest','prison','therapy','labyrinth','lake','institute','caravan','station','bench','ovStone1','ovStone2'];
   /* gündüz iş yerleri / gece ritüel noktaları */
@@ -4969,7 +5273,14 @@ if(HAS3D)(function(){
       var wait=document.createElement('div');wait.className='row';wait.style.cssText='font-size:12px;color:var(--dim)';wait.textContent=(tr?(this._name||'denek')+' düşünüyor…':(this._name||'subject')+' is thinking…');log.appendChild(wait);log.scrollTop=log.scrollHeight;
       var rep='';try{var r=await fetch(this.KON()+'/graduatesay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idx:idx,text:t,lang:(tr?'tr':'en')})});var d=await r.json();rep=(d&&d.reply)||'';}catch(e){}
       try{wait.remove();}catch(e){}
-      log.innerHTML+='<div class="row" style="font-size:12px"><b style="color:var(--accent)">'+esc(this._name||'')+':</b> '+(rep?esc(rep):(tr?'(şimdi yanıt veremedi)':'(could not answer now)'))+'</div>';log.scrollTop=log.scrollHeight;}
+      log.innerHTML+='<div class="row" style="font-size:12px"><b style="color:var(--accent)">'+esc(this._name||'')+':</b> '+(rep?esc(rep):(tr?'(şimdi yanıt veremedi)':'(could not answer now)'))+'</div>';log.scrollTop=log.scrollHeight;},
+    readStories(stories,name,genre){var tr=(GAMELANG==='tr');var sts=stories||[];
+      var body=sts.length?('<div style="white-space:pre-wrap;line-height:1.7;color:var(--ink);font-size:12.5px;border-left:2px solid var(--line);padding-left:10px;max-height:300px;overflow-y:auto">'+sts.map(function(p){return esc(p.text);}).join('\n\n— · —\n\n')+'</div>'):('<p style="color:var(--dim);font-size:12px">'+(tr?'Henüz hikâye yazmadı.':'No stories yet.')+'</p>');
+      UI.doc('📖 '+esc(name||'')+(tr?'’in Yazdıkları':'’s Pages')+(genre?(' · '+esc(genre)):''),body+'<div style="margin-top:10px"><button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(tr?'kapat':'close')+'</button></div>');},
+    chat(idx,name){var tr=(GAMELANG==='tr');this._idx=idx;this._name=name||'';
+      var h='<div id="ghLog" style="max-height:200px;overflow-y:auto;margin-bottom:6px"></div><textarea id="ghSay" rows="2" maxlength="500" placeholder="'+(tr?'ona bir şey sor…':'ask something…')+'" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--ink);padding:8px;font-family:inherit;font-size:12.5px;border-radius:6px"></textarea><br><button class="btn v" style="margin-top:4px" onclick="SubjHome.say('+idx+')">'+(tr?'gönder':'send')+'</button> <button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(tr?'kapat':'close')+'</button>';
+      UI.doc('💬 '+esc(name||'')+(tr?' ile konuş':' — talk'),h);
+      var inp=document.getElementById('ghSay');if(inp)inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();ev.stopPropagation();SubjHome.say(idx);}});}
   };
   if(typeof window!=='undefined')window.SubjHome=SubjHome;
 
@@ -5168,7 +5479,7 @@ if(HAS3D)(function(){
   };
   const Interior={
     RS:14, coll:[], scene:interiorScene, cur:null, door:{x:0,z:13.1}, stations:[], _g:null,
-    _clear(){ if(this._g){interiorScene.remove(this._g); this._g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.map)m.map.dispose&&m.map.dispose();m.dispose&&m.dispose();});}}); } this._g=null; this.coll=[]; this.stations=[]; this._deskAt=null; this._benchAt=null; },
+    _clear(){ if(this._g){interiorScene.remove(this._g); this._g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.map)m.map.dispose&&m.map.dispose();m.dispose&&m.dispose();});}}); } this._g=null; this.coll=[]; this.stations=[]; this._deskAt=null; this._benchAt=null; this.subjHome=false; this._bookAt=null; this._robotAt=null; this.echoChamber=false; this._echoPillars=[]; },
     _label(text,col,sc){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(text,512,96,30,col||'rgba(210,220,240,.96)'),transparent:true,depthWrite:false}));sp.scale.set(6*sc,1.15*sc,1);return sp;},
     build(k){
       this._clear();
@@ -5420,6 +5731,86 @@ if(HAS3D)(function(){
       this.buildClinic();W3.IP={px:0,pz:this.RS-3};W3.inInterior=true;meshAng=Math.PI;interiorScene.add(player.g);if(W3.intLamp)W3.intLamp.visible=true;
       try{if(UI&&UI.closeDoc)UI.closeDoc();}catch(e){}if(Game.setModal)Game.setModal(false);
       UI.toast(L==='tr'?'\uD83D\uDECB Terapi Merkezi — koltuğa yaklaş [E] ve bir terapötik çalışma seç.':'\uD83D\uDECB Therapy Center — approach the couch [E] and choose a therapeutic exercise.',6000);return true;},
+    buildSubjHome(idx,name,stories,genre){
+      this._clear();this.seatMode=false;var _h=document.getElementById('seatHUD');if(_h)_h.remove();
+      const g=new THREE.Group();interiorScene.add(g);this._g=g;const RS=this.RS;
+      this.subjHome=true;this.house=false;this.clinic=false;this.subjIdx=idx;this.subjName=name||'';this.subjStories=stories||[];this.subjGenre=genre||'';this.cur=null;this.stations=[];
+      const pal={floor:0x161a22,wall:0x1e2630,accent:0x8fd0d8,amb:0x26323c};
+      const fl=new THREE.Mesh(new THREE.CircleGeometry(RS,48),std(pal.floor,{roughness:.95}));fl.rotation.x=-Math.PI/2;g.add(fl);
+      const wall=new THREE.Mesh(new THREE.CylinderGeometry(RS,RS,7,48,1,true),new THREE.MeshStandardMaterial({color:pal.wall,roughness:.96,side:THREE.BackSide}));wall.position.y=3.5;g.add(wall);
+      const ceil=new THREE.Mesh(new THREE.RingGeometry(RS*0.18,RS*0.96,40),new THREE.MeshBasicMaterial({color:pal.accent,transparent:true,opacity:.06,side:THREE.DoubleSide,depthWrite:false}));ceil.rotation.x=Math.PI/2;ceil.position.y=6.8;g.add(ceil);
+      g.add(new THREE.AmbientLight(pal.amb,.7));
+      const cl=new THREE.PointLight(pal.accent,.9,42,2);cl.position.set(0,5.6,0);g.add(cl);
+      var rug=new THREE.Mesh(new THREE.CircleGeometry(5.0,40),std(pal.accent,{roughness:1}));rug.rotation.x=-Math.PI/2;rug.position.set(0,0.02,-0.8);rug.material.color.multiplyScalar(0.4);g.add(rug);
+      var base=new THREE.Mesh(new THREE.CylinderGeometry(RS-0.04,RS-0.04,0.45,48,1,true),std(0x241c1c,{roughness:.85}));base.position.y=0.22;g.add(base);
+      const shelfX=-7,shelfZ=-1;
+      box(0.5,3.4,4.6,std(0x2a2018,{roughness:.9}),shelfX,1.7,shelfZ,0,g,false);
+      const bcols=[0x6b3f4a,0x3f5a6b,0x6b5a2f,0x4a3f6b,0x3f6b5a,0x8a5a2f];
+      const nbooks=Math.max(7,Math.min(28,((stories||[]).length*3)+8));
+      for(var r2=0;r2<4;r2++){for(var b2=0;b2<7;b2++){if(r2*7+b2>=nbooks)break;var bc=bcols[(r2+b2)%bcols.length];box(0.2,0.6,0.34,std(bc,{roughness:.85,emissive:bc,emissiveIntensity:.08}),shelfX+0.18,0.78+r2*0.78,shelfZ-1.6+b2*0.46,0,g,false);}}
+      const shg=new THREE.PointLight(pal.accent,.5,8,2);shg.position.set(shelfX+1.2,2.4,shelfZ);g.add(shg);
+      const slab=this._label((GAMELANG==='tr'?'📖 kitaplık — hikâyeleri oku':'📖 library — read the stories'),'rgba(200,220,235,.95)',1.15);slab.position.set(shelfX+1.4,3.4,shelfZ);g.add(slab);
+      this._bookAt={x:shelfX+2.1,z:shelfZ};this.coll.push({x:shelfX,z:shelfZ,r:1.4});
+      var robX=2.6,robZ=-2.4;
+      var metalM=std(0x9aa6b4,{roughness:.4,metalness:.6,emissive:pal.accent,emissiveIntensity:.05});
+      box(0.9,1.1,0.55,metalM,robX,1.15,robZ,0,g,false);
+      var hip=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.4,0.5,12),metalM);hip.position.set(robX,0.45,robZ);g.add(hip);
+      var head=new THREE.Mesh(new THREE.SphereGeometry(0.36,20,20),metalM);head.position.set(robX,2.0,robZ);g.add(head);
+      var visor=new THREE.Mesh(new THREE.BoxGeometry(0.46,0.12,0.05),new THREE.MeshStandardMaterial({color:0x8fe0e8,emissive:0x8fe0e8,emissiveIntensity:1.2,roughness:.3}));visor.position.set(robX,2.04,robZ+0.33);g.add(visor);
+      box(0.18,0.8,0.18,metalM,robX-0.62,1.2,robZ,0,g,false);box(0.18,0.8,0.18,metalM,robX+0.62,1.2,robZ,0,g,false);
+      var chest=new THREE.Mesh(new THREE.SphereGeometry(0.12,12,12),new THREE.MeshStandardMaterial({color:pal.accent,emissive:pal.accent,emissiveIntensity:1.0,roughness:.3}));chest.position.set(robX,1.35,robZ+0.3);g.add(chest);
+      var rl=new THREE.PointLight(0x8fe0e8,.7,9,2);rl.position.set(robX,2.0,robZ+0.6);g.add(rl);
+      this._robotAt={x:robX,z:robZ+2.2};this.coll.push({x:robX,z:robZ,r:1.0});
+      const nlab=this._label('◍ '+(name||'Lumen'),'rgba(180,225,235,.97)',1.7);nlab.position.set(robX,2.7,robZ);g.add(nlab);
+      const tlab=this._label((GAMELANG==='tr'?'💬 '+(name||'Lumen')+' ile konuş':'💬 talk with '+(name||'Lumen')),'rgba(210,225,240,.92)',1.1);tlab.position.set(robX,2.35,robZ+1.1);g.add(tlab);
+      const ttl=this._label('◍ '+(name||'Lumen')+(GAMELANG==='tr'?'’in Evi':'’s House'),'rgba(222,234,246,.97)',2.4);ttl.position.set(0,6.3,0);g.add(ttl);
+      box(2.0,0.5,0.7,std(0x2e241c,{roughness:.85}),6.4,0.4,3.2,0,g,false);
+      var plnt=new THREE.Mesh(new THREE.IcosahedronGeometry(0.6,0),std(0x3f6b46,{roughness:.85,flatShading:true}));plnt.position.set(7,1.05,-4);g.add(plnt);
+      (function(){var r=RS-0.35;var win=new THREE.Mesh(new THREE.BoxGeometry(0.12,3.0,4.2),new THREE.MeshStandardMaterial({color:0x0a1426,emissive:0x16263f,emissiveIntensity:.3,roughness:.5}));win.position.set(r,3.2,0);g.add(win);
+        for(var i=0;i<24;i++){var sy=1.6+Math.random()*3.2,sz=(Math.random()*3.6-1.8);var st2=new THREE.Mesh(new THREE.SphereGeometry(0.04,8,8),new THREE.MeshStandardMaterial({color:0xbcd0f0,emissive:0xbcd0f0,emissiveIntensity:1.0}));st2.position.set(r-0.14,sy,sz);g.add(st2);} })();
+      const dfr=new THREE.Mesh(new THREE.TorusGeometry(1.5,.16,8,24,Math.PI),new THREE.MeshStandardMaterial({color:pal.accent,emissive:pal.accent,emissiveIntensity:.6,roughness:.5}));dfr.position.set(0,0,RS-0.6);dfr.rotation.x=-Math.PI/2;g.add(dfr);
+      const dl=this._label(GAMELANG==='tr'?'↩ ÇIKIŞ':'↩ EXIT','rgba(200,210,230,.92)',1.6);dl.position.set(0,2.4,RS-0.7);g.add(dl);this.door={x:0,z:RS-0.9};
+    },
+    enterSubjHome(idx,name){var TR=(GAMELANG==='tr');var self=this;
+      var KON=(window.Cloud&&Cloud.KON)||'https://it041-konsey.lunarisbahal.workers.dev';
+      UI.toast(TR?'◍ '+(name||'denek')+' evine giriliyor…':'entering '+(name||'subject')+'’s house…',2200);
+      var go=function(g){self.buildSubjHome(idx,(g&&g.name)||name,(g&&g.stories)||[],(g&&g.genre)||'');
+        W3.IP={px:0,pz:self.RS-3};W3.inInterior=true;meshAng=Math.PI;interiorScene.add(player.g);if(W3.intLamp)W3.intLamp.visible=true;
+        try{if(UI&&UI.closeDoc)UI.closeDoc();}catch(e){}if(Game.setModal)Game.setModal(false);
+        UI.toast('◍ '+((g&&g.name)||name)+(TR?'’in evi — soldaki kitaplıkta hikâyeleri, içeride kendisi. Yaklaş [E].':'’s house — stories on the left shelf, the resident inside. Approach [E].'),6000);};
+      fetch(KON+'/graduates',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){go((d&&d.graduates&&d.graduates[idx])||{name:name,stories:[],genre:''});}).catch(function(){go({name:name,stories:[],genre:''});});
+    },
+    buildEchoChamber(){
+      this._clear();this.seatMode=false;var _h=document.getElementById('seatHUD');if(_h)_h.remove();
+      var TR=(GAMELANG==='tr');
+      const g=new THREE.Group();interiorScene.add(g);this._g=g;const RS=this.RS;
+      this.echoChamber=true;this.house=false;this.clinic=false;this.subjHome=false;this.cur=null;this.stations=[];this._echoPillars=[];
+      const pal={floor:0x14121e,wall:0x1d1a2c,accent:0x9d8cc9,amb:0x2a2440};
+      const fl=new THREE.Mesh(new THREE.CircleGeometry(RS,48),std(pal.floor,{roughness:.95}));fl.rotation.x=-Math.PI/2;g.add(fl);
+      const wall=new THREE.Mesh(new THREE.CylinderGeometry(RS,RS,7,48,1,true),new THREE.MeshStandardMaterial({color:pal.wall,roughness:.97,side:THREE.BackSide}));wall.position.y=3.5;g.add(wall);
+      const ceil=new THREE.Mesh(new THREE.RingGeometry(RS*0.18,RS*0.96,40),new THREE.MeshBasicMaterial({color:pal.accent,transparent:true,opacity:.06,side:THREE.DoubleSide,depthWrite:false}));ceil.rotation.x=Math.PI/2;ceil.position.y=6.8;g.add(ceil);
+      g.add(new THREE.AmbientLight(pal.amb,.62));
+      const cl=new THREE.PointLight(pal.accent,.85,42,2);cl.position.set(0,5.6,0);g.add(cl);
+      var pool=new THREE.Mesh(new THREE.CircleGeometry(2.6,40),new THREE.MeshStandardMaterial({color:0x0c0a18,metalness:.6,roughness:.2,emissive:0x1a1430,emissiveIntensity:.5}));pool.rotation.x=-Math.PI/2;pool.position.y=0.03;g.add(pool);this.coll.push({x:0,z:0,r:2.8});
+      var surf=(window.EchoRoom&&EchoRoom._surf)?EchoRoom._surf():[];
+      var st=(window.EchoRoom&&EchoRoom.load)?EchoRoom.load():{traced:[]};
+      var n=Math.max(1,surf.length);var rr=RS*0.62;
+      surf.forEach(function(s,i){var ang=Math.PI/2+(i/n)*Math.PI*2;var x=Math.cos(ang)*rr,zz=Math.sin(ang)*rr;
+        var done=st.traced.indexOf(s.id)>=0;var col=done?0x7fd4c1:0x9d8cc9;
+        var pil=new THREE.Mesh(new THREE.CylinderGeometry(.34,.42,2.4,12),std(0x10101a,{emissive:col,emissiveIntensity:done?.5:.3,roughness:.6}));pil.position.set(x,1.2,zz);g.add(pil);
+        var glo=new THREE.Mesh(new THREE.SphereGeometry(.3,16,16),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:done?1.3:.9,roughness:.3}));glo.position.set(x,2.9,zz);g.add(glo);
+        var pl=new THREE.PointLight(col,.4,7,2);pl.position.set(x,2.9,zz);g.add(pl);
+        var lab=Interior._label((done?'✓ ':'◌ ')+(TR?'yankı':'echo'),'rgba(200,210,235,.9)',1.2);lab.position.set(x,3.6,zz);g.add(lab);
+        Interior.coll.push({x:x,z:zz,r:.7});Interior._echoPillars.push({id:s.id,x:x,z:zz});});
+      const ttl=this._label('◌ '+(TR?'YANKI ODASI':'ECHO CHAMBER'),'rgba(214,206,236,.97)',2.4);ttl.position.set(0,6.3,0);g.add(ttl);
+      const sub=this._label((TR?'evrenin derin hafızası':'the universe’s deep memory'),'rgba(150,140,180,.8)',1.3);sub.position.set(0,5.6,0);g.add(sub);
+      const dfr=new THREE.Mesh(new THREE.TorusGeometry(1.5,.16,8,24,Math.PI),new THREE.MeshStandardMaterial({color:pal.accent,emissive:pal.accent,emissiveIntensity:.6,roughness:.5}));dfr.position.set(0,0,RS-0.6);dfr.rotation.x=-Math.PI/2;g.add(dfr);
+      const dl=this._label(GAMELANG==='tr'?'↩ ÇIKIŞ':'↩ EXIT','rgba(200,210,230,.92)',1.6);dl.position.set(0,2.4,RS-0.7);g.add(dl);this.door={x:0,z:RS-0.9};
+    },
+    enterEchoChamber(){var TR=(GAMELANG==='tr');this.buildEchoChamber();
+      W3.IP={px:0,pz:this.RS-3};W3.inInterior=true;meshAng=Math.PI;interiorScene.add(player.g);if(W3.intLamp)W3.intLamp.visible=true;
+      try{if(UI&&UI.closeDoc)UI.closeDoc();}catch(e){}if(Game.setModal)Game.setModal(false);
+      UI.toast(TR?'◌ Yankı Odası — sütunlara yaklaş [E], yankının izini sür. Eksik yankılar yolculukla belirir.':'◌ The Echo Chamber — approach a pillar [E] and trace the echo. Missing echoes surface as you go deeper.',6000);},
     advanceHouse(){const ch=window.House.curChapter();if(ch>7){if(window.House&&House.realmGate){House.realmGate();}else{this.exit();}return;}
       this.buildHouseRoom(ch);W3.IP={px:0,pz:this.RS-3};
       const room=(window.House&&House.data().rooms[ch-1]);if(room)UI.toast('→ '+(room.room[GAMELANG]||room.room.en),3500);},
@@ -5436,6 +5827,15 @@ if(HAS3D)(function(){
     target(){const p=W3.IP;if(!p)return null;
       if(Math.hypot(p.px-this.door.x,p.pz-this.door.z)<2.3)return[GAMELANG==='tr'?'↩ alandan çık':'↩ leave the area',()=>W3.Interior.exit()];
       if(this.cur==='therapy'){const f=this._foc;if(f&&Math.hypot(p.px-f.position.x,p.pz-f.position.z)<2.3)return['\uD83D\uDECB '+(GAMELANG==='tr'?'terapötik çalışma seç':'choose a therapeutic exercise'),()=>{if(window.Therapy)Therapy.show();}];return null;}
+      if(this.echoChamber){
+        var ebest=null,ebd=2.6;for(var ei=0;ei<(this._echoPillars||[]).length;ei++){var ep=this._echoPillars[ei];var ed=Math.hypot(p.px-ep.x,p.pz-ep.z);if(ed<ebd){ebd=ed;ebest=ep;}}
+        if(ebest){var est=(window.EchoRoom&&EchoRoom.load)?EchoRoom.load():{traced:[]};var edone=est.traced.indexOf(ebest.id)>=0;
+          return['◌ '+(GAMELANG==='tr'?(edone?'yankıyı dinle':'yankının izini sür'):(edone?'listen to the echo':'trace this echo')),(function(id,dn){return function(){if(!window.EchoRoom)return;if(dn)EchoRoom.show();else EchoRoom.trace(id);};})(ebest.id,edone)];}
+        return null;}
+      if(this.subjHome){
+        if(this._bookAt&&Math.hypot(p.px-this._bookAt.x,p.pz-this._bookAt.z)<2.7)return['📖 '+(GAMELANG==='tr'?'kitaplık — hikâyeleri oku':'library — read the stories'),()=>{if(window.SubjHome)SubjHome.readStories(this.subjStories,this.subjName,this.subjGenre);}];
+        if(this._robotAt&&Math.hypot(p.px-this._robotAt.x,p.pz-this._robotAt.z)<2.9)return['💬 '+(GAMELANG==='tr'?(esc(this.subjName||'Lumen')+' ile konuş'):('talk with '+esc(this.subjName||'Lumen'))),()=>{if(window.SubjHome)SubjHome.chat(this.subjIdx,this.subjName);}];
+        return null;}
       if(this.house){const f=this._foc;if(f&&Math.hypot(p.px-f.position.x,p.pz-f.position.z)<2.4){const ch=this.houseCh;const rooms=(window.House&&House.data().rooms)||[];const room=rooms[ch-1]||{};const allDone=window.House&&House.curChapter()>7;return['◈ '+(GAMELANG==='tr'?'Bölüm ':'Chapter ')+(window.House?House.abs(ch):ch)+' · '+(room.room?(room.room[GAMELANG]||room.room.en):'')+(GAMELANG==='tr'?' — başla':' — begin'),()=>{if(allDone&&window.House){House.realmGate();}else if(window.House){House.openRoom(ch);}}];}
         if(this._deskAt&&Math.hypot(p.px-this._deskAt.x,p.pz-this._deskAt.z)<2.6)return['🪑 '+(GAMELANG==='tr'?'masaya otur — günlüğünü yaz':'sit at the desk — write your journal'),()=>{try{sitAtDesk();}catch(e){}}];
         if(this._benchAt&&Math.hypot(p.px-this._benchAt.x,p.pz-this._benchAt.z)<2.6)return['🧘 '+(GAMELANG==='tr'?'bankta otur — sakinleş / topraklan':'sit on the bench — settle / ground'),()=>{try{if(window.Grounding)Grounding.start();}catch(e){}}];
@@ -5789,6 +6189,10 @@ if(HAS3D)(function(){
       a.f.parts.legL.rotation.x=asw;a.f.parts.legR.rotation.x=-asw;
       a.f.parts.armL.rotation.x=-asw*.7;a.f.parts.armR.rotation.x=asw*.7;
     });
+    /* proaktif: dolaşan denekler oyuncuya yaklaşınca kendileri konu açar — merak uyandırıp oyuna çekerler */
+    if(!Game.modal&&!W3.inInterior&&typeof AG_HOOKS!=='undefined'){W3._hookT=(W3._hookT||0)+dt;
+      if(W3._hookT>30){for(var _ai=0;_ai<AGENTS.length;_ai++){var _ag=AGENTS[_ai];var _hd=Math.hypot(S.px-_ag.f.g.position.x,S.pz-_ag.f.g.position.z);
+        if(_hd<6.2){W3._hookT=0;_ag.wait=Math.max(_ag.wait||0,4);_ag.f.g.rotation.y=Math.atan2(S.px-_ag.f.g.position.x,S.pz-_ag.f.g.position.z);var _hk=AG_HOOKS[(W3._hookI=((W3._hookI||0)+1))%AG_HOOKS.length];try{UI.toast('◍ '+_ag.nm+': '+_hk+'  —  [E]',7200);}catch(e){}break;}}}}
     /* ---- v5: eşzamanlı mod ---- */
     if(MP.on&&MP.send){mpT+=dt;
       if(mpT>.15){mpT=0;try{MP.send({x:S.px,z:S.pz,h:meshAng,n:travelerName()+(S.solved.s7?'·⟁':'')});}catch(e){}}
@@ -5880,36 +6284,46 @@ function drawMini(){
 }
 function drawBigMap(){
   const c=document.getElementById('bigmap');
-  c.width=Math.min(innerWidth*.9,900);c.height=c.width*WZ/WX;
+  const tr=(GAMELANG==='tr');
+  c.width=Math.min(innerWidth*.92,980);c.height=c.width*WZ/WX;
   const ctx=c.getContext('2d'),sx=c.width/WX,sz=c.height/WZ;
   drawMiniBase(ctx,c.width,c.height);
-  ctx.font='11px monospace';ctx.textAlign='center';ctx.fillStyle='#9aa7c4';
-  ZONES.forEach(z=>ctx.fillText(z.name,z.x*sx,z.z*sz-z.r*sx-4));
-  ctx.fillText('AYNALAR KAPISI',L.gate.x*sx,L.gate.z*sz-12);
-  /* v8.6: karakterler (yeşilimsi), ajanlar (camgöbeği), yolcular (altın) — adlarıyla */
-  ctx.font='10px monospace';
-  ctx.fillStyle='rgba(127,212,193,.9)';
-  ctx.fillText('SILVANUS',L.caravan.x*sx,L.caravan.z*sz-8);
-  ctx.fillText('LUCIUS',L.lucius.x*sx,L.lucius.z*sz-8);
-  ctx.fillText('LUCIDA ☎',L.payphone.x*sx,L.payphone.z*sz-8);
-  if(!S.flags.integrated)ctx.fillText('BAHAL ⟁',L.shadowSpot.x*sx,L.shadowSpot.z*sz+16);
-  if(W3.noctPos)ctx.fillText('MC NOCTORNUS',W3.noctPos.x*sx,W3.noctPos.z*sz-8);
-  if(lunarisMoon()&&!S.solved.s2)ctx.fillText('LUNARIS ☽',L.lunaris.x*sx,L.lunaris.z*sz-8);
-  ctx.fillStyle='rgba(110,210,220,.9)';ctx.font='9px monospace';
-  (window.__mmA||[]).forEach(a=>{if(a.nm)ctx.fillText(a.nm,a.x*sx,a.z*sz-6);});
-  ctx.fillStyle='rgba(230,195,110,.95)';ctx.font='10px monospace';
-  (window.__mmP||[]).forEach(p=>{ctx.strokeStyle='rgba(230,195,110,.7)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x*sx,p.z*sz,6,0,7);ctx.stroke();if(p.n)ctx.fillText(p.n,p.x*sx,p.z*sz-9);});{const _c=(window.__mmP||[]).length;ctx.fillStyle=_c?'rgba(230,195,110,.95)':'#6b7689';ctx.font='12px monospace';ctx.textAlign='center';ctx.fillText(_c?('● şu an '+_c+' başka yolcu burada'):'● şu an tek yolcu sensin',c.width/2,18);}
-  ctx.fillStyle='#9d8cc9';
-  ctx.font='10px monospace';ctx.fillStyle='#9d8cc9';ctx.fillText('◈ mor = ritüellerin',c.width/2-150,c.height-30);ctx.fillStyle='rgba(230,195,110,.95)';ctx.fillText('● altın = yolcular',c.width/2,c.height-30);ctx.fillStyle='rgba(110,210,220,.9)';ctx.fillText('● cyan = ayna-ajanları',c.width/2+150,c.height-30);
-  ctx.font='11px monospace';
-  (window.W3&&W3.PORTALS||[]).forEach(function(p){if(!p.house)return;var X=p.x*sx,Z=p.z*sz;var integ=S.flags&&S.flags[p.k+'Integrated'];ctx.strokeStyle=integ?'rgba(127,212,193,.95)':'rgba(205,184,120,.95)';ctx.fillStyle=ctx.strokeStyle;ctx.lineWidth=2;ctx.beginPath();ctx.arc(X,Z,8,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(X,Z-4);ctx.lineTo(X+3.5,Z+3);ctx.lineTo(X-3.5,Z+3);ctx.closePath();ctx.fill();ctx.fillText((integ?'✓ ':'☽ ')+(function(){var R=(window.REALMS||[]).find(function(x){return x.k===p.k;});return R&&window.Realms?Realms.T(R.n):((window.House&&House.NAMES[p.k])||p.k);})(),X,Z-11);});
+  function lbl(txt,x,y,color,size){size=size||10;ctx.font=size+'px monospace';ctx.textAlign='center';var w=ctx.measureText(txt).width;ctx.fillStyle='rgba(4,6,12,.66)';ctx.fillRect(x-w/2-3,y-size,w+6,size+4);ctx.fillStyle=color;ctx.fillText(txt,x,y-2);}
+  ZONES.forEach(z=>lbl(z.name,z.x*sx,z.z*sz-z.r*sx-2,'#aeb8d4',11));
+  lbl(tr?'AYNALAR KAPISI':'GATE OF MIRRORS',L.gate.x*sx,L.gate.z*sz-10,'#c9b6e6',10);
+  lbl('SILVANUS',L.caravan.x*sx,L.caravan.z*sz-7,'#7fd4c1');
+  lbl('LUCIUS',L.lucius.x*sx,L.lucius.z*sz-7,'#7fd4c1');
+  lbl('LUCIDA ☎',L.payphone.x*sx,L.payphone.z*sz-7,'#7fd4c1');
+  if(!S.flags.integrated)lbl('BAHAL ⟁',L.shadowSpot.x*sx,L.shadowSpot.z*sz+14,'#cdb878');
+  if(W3.noctPos)lbl('NOCTORNUS',W3.noctPos.x*sx,W3.noctPos.z*sz-7,'#7fd4c1');
+  if(lunarisMoon()&&!S.solved.s2)lbl('LUNARIS ☽',L.lunaris.x*sx,L.lunaris.z*sz-7,'#7fd4c1');
+  (window.W3&&W3.PORTALS||[]).forEach(function(p){if(!p.house)return;var X=p.x*sx,Z=p.z*sz;var integ=S.flags&&S.flags[p.k+'Integrated'];var col=integ?'#7fd4c1':'#cdb878';ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(X,Z,7,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(X,Z-4);ctx.lineTo(X+3.5,Z+3);ctx.lineTo(X-3.5,Z+3);ctx.closePath();ctx.fill();var nm=(function(){var R=(window.REALMS||[]).find(function(x){return x.k===p.k;});return R&&window.Realms?Realms.T(R.n):((window.House&&House.NAMES[p.k])||p.k);})();lbl((integ?'✓ ':'☽ ')+nm,X,Z-10,col,9);});
+  ctx.fillStyle='rgba(157,140,201,.95)';RITE_SITES.forEach((k,i)=>{if(S.rites['r'+(i+1)]===undefined){const X=L[k].x*sx,Z=L[k].z*sz;ctx.beginPath();ctx.moveTo(X,Z-6);ctx.lineTo(X+6,Z);ctx.lineTo(X,Z+6);ctx.lineTo(X-6,Z);ctx.closePath();ctx.fill();}});
+  ctx.fillStyle='rgba(110,210,220,.95)';(window.__mmA||[]).forEach(a=>{ctx.beginPath();ctx.arc(a.x*sx,a.z*sz,4.5,0,7);ctx.fill();});
+  (window.__mmA||[]).forEach(a=>{if(a.nm)lbl(a.nm,a.x*sx,a.z*sz-6,'rgba(150,225,235,.95)',9);});
+  var _trc=(window.__traces||[]).filter(t=>t.x!==undefined).slice(-40);
+  ctx.fillStyle='rgba(157,140,201,.5)';_trc.forEach(t=>{const X=t.x*sx,Z=t.z*sz;ctx.beginPath();ctx.moveTo(X,Z-3);ctx.lineTo(X+3,Z);ctx.lineTo(X,Z+3);ctx.lineTo(X-3,Z);ctx.closePath();ctx.fill();});
+  (window.__mmP||[]).forEach(p=>{ctx.strokeStyle='rgba(230,195,110,.8)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x*sx,p.z*sz,6,0,7);ctx.stroke();if(p.n)lbl(p.n,p.x*sx,p.z*sz-9,'rgba(235,200,120,.95)',9);});
   const wp=waypoint();
-  if(wp){ctx.fillStyle='#cdb878';ctx.beginPath();ctx.arc(wp.x*sx,wp.z*sz,5,0,7);ctx.fill();
-    ctx.fillText('◆ HEDEF',wp.x*sx,wp.z*sz+18);}
-  ctx.fillStyle='rgba(157,140,201,.95)';RITE_SITES.forEach((k,i)=>{if(S.rites['r'+(i+1)]===undefined){const X=L[k].x*sx,Z=L[k].z*sz;ctx.beginPath();ctx.moveTo(X,Z-6);ctx.lineTo(X+6,Z);ctx.lineTo(X,Z+6);ctx.lineTo(X-6,Z);ctx.closePath();ctx.fill();}});ctx.fillStyle='rgba(110,210,220,.95)';(window.__mmA||[]).forEach(a=>{ctx.beginPath();ctx.arc(a.x*sx,a.z*sz,4.5,0,7);ctx.fill();});ctx.fillStyle='rgba(157,140,201,.92)';(window.__traces||[]).forEach(t=>{if(t.x===undefined)return;const X=t.x*sx,Z=t.z*sz;ctx.beginPath();ctx.moveTo(X,Z-4);ctx.lineTo(X+4,Z);ctx.lineTo(X,Z+4);ctx.lineTo(X-4,Z);ctx.closePath();ctx.fill();});
-  ctx.fillStyle='#e8e4d4';ctx.beginPath();ctx.arc(S.px*sx,S.pz*sz,5,0,7);ctx.fill();
-  ctx.fillStyle='#7fd4c1';ctx.fillText('SEN',S.px*sx,S.pz*sz-10);
-  ctx.fillText('— KAPATMAK İÇİN [M] —',c.width/2,c.height-14);
+  if(wp){ctx.fillStyle='#cdb878';ctx.beginPath();ctx.arc(wp.x*sx,wp.z*sz,5,0,7);ctx.fill();lbl(tr?'◆ HEDEF':'◆ OBJECTIVE',wp.x*sx,wp.z*sz+16,'#e3c878',9);}
+  [['echoChamber','◌',(tr?'Yankı Odası':'Echo Chamber'),'#b9a8e8'],['lucidaMirror','◑',(tr?'Lucida Aynası':'Lucida’s Mirror'),'#9fd0d8'],['crackedDoor','⟡',(tr?'Yarık Kapı':'Cracked Door'),'#b9a8e8'],['emptyDoor','▢',(tr?'Boş Oda':'Empty Room'),'#9aa6bd']].forEach(function(it){var Lp=L[it[0]];if(!Lp)return;var X=Lp.x*sx,Z=Lp.z*sz;ctx.fillStyle=it[3];ctx.font='13px monospace';ctx.textAlign='center';ctx.fillText(it[1],X,Z+4);lbl(it[2],X,Z-9,it[3],9);});
+  ctx.fillStyle='#e8e4d4';ctx.beginPath();ctx.arc(S.px*sx,S.pz*sz,5,0,7);ctx.fill();lbl(tr?'SEN':'YOU',S.px*sx,S.pz*sz-10,'#7fd4c1',10);
+  drawMapLegend(ctx,tr);
+  ctx.textAlign='center';
+  var _c=(window.__mmP||[]).length;
+  ctx.font='12px monospace';ctx.fillStyle=_c?'rgba(230,195,110,.95)':'#6b7689';
+  var ctxt=_c?(tr?('● şu an '+_c+' yolcu daha burada'):('● '+_c+' other traveler'+(_c>1?'s':'')+' here now')):(tr?'● şu an buradaki tek yolcu sensin':'● you are the only traveler here right now');
+  ctx.fillText(ctxt,c.width/2,c.height-30);
+  ctx.fillStyle='#6b7689';ctx.font='10px monospace';ctx.fillText(tr?'— KAPATMAK İÇİN [M] —':'— PRESS [M] TO CLOSE —',c.width/2,c.height-12);
+}
+function drawMapLegend(ctx,tr){
+  const items=[['#7fd4c1',tr?'karakterler':'characters'],['rgba(110,210,220,.95)',tr?'ayna-ajanları':'mirror-agents'],['rgba(230,195,110,.95)',tr?'şu anki yolcular':'travelers now'],['#cdb878',tr?'evler / hedef':'houses / objective'],['rgba(157,140,201,.7)',tr?'ritüeller & izler':'rites & traces']];
+  const pad=10,lh=15,bw=176,bh=pad*2+lh*items.length+16;
+  ctx.fillStyle='rgba(4,6,12,.74)';ctx.strokeStyle='rgba(127,212,193,.35)';ctx.lineWidth=1;
+  ctx.fillRect(10,10,bw,bh);ctx.strokeRect(10,10,bw,bh);
+  ctx.textAlign='left';ctx.font='10px monospace';ctx.fillStyle='#aeb8d4';
+  ctx.fillText(tr?'EVREN HARİTASI':'UNIVERSE MAP',10+pad,10+pad+8);
+  items.forEach((it,i)=>{const y=10+pad+24+i*lh;ctx.fillStyle=it[0];ctx.beginPath();ctx.arc(10+pad+5,y-3,4,0,7);ctx.fill();ctx.fillStyle='#c2cadf';ctx.fillText(it[1],10+pad+16,y);});
 }
 document.getElementById('bigmapWrap').addEventListener('click',()=>Game.toggleMap());
 document.getElementById('bigmap').addEventListener('click',function(ev){const c=this,rect=c.getBoundingClientRect();const wx=(ev.clientX-rect.left)/rect.width*WX,wz=(ev.clientY-rect.top)/rect.height*WZ;let hit=null,best=1e9;(window.__traces||[]).forEach(t=>{if(t.x===undefined)return;const d=Math.hypot(wx-t.x,wz-t.z);if(d<best){best=d;hit=t;}});if(hit&&best<WX*0.05){ev.stopPropagation();UI.toast('◈ '+hit.mask+': "'+hit.text+'"'+(hit.ack>0?'  ◇'+hit.ack:''),6000);}});
