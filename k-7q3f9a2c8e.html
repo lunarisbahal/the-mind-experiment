@@ -294,8 +294,11 @@ function setDot(c){$('liveDot').className='dot'+(c?(' '+c):'');}
 async function getState(){setDot('load');
   try{const r=await fetch(API+'/state',{cache:'no-store',headers:{'x-operator-key':(localStorage.getItem('it041_op_key')||'')}});S=await r.json();setDot(S.autoStopped?'off':'');renderAll();}
   catch(e){setDot('off');toast('Bağlanılamadı — Worker/internet?');}}
-async function health(){try{const r=await fetch(API+'/health',{cache:'no-store'});const h=await r.json();
-  $('hDot').className='dot'+(h.groq?'':' off');$('hTxt').textContent=h.groq?'beyin bağlı · '+h.model:'beyin BAĞLI DEĞİL — Groq anahtarını ekle';}catch(e){}}
+async function health(){try{const r=await fetch(API+'/health',{cache:'no-store',headers:{'x-operator-key':(localStorage.getItem('it041_op_key')||'')}});const h=await r.json();
+  const on=!!(h.groq||h.claude);
+  if(h.operator===undefined && h.ver===undefined){ $('hDot').className='dot off'; $('hTxt').textContent='beyin durumu için ⚙ ile operatör anahtarını gir'; return; }
+  $('hDot').className='dot'+(on?'':' off');
+  $('hTxt').textContent=on?('beyin bağlı · '+(h.model||(h.claude?'Claude':'Groq'))):'beyin BAĞLI DEĞİL — anahtar Cloudflare’de tanımlanır: Worker → Settings → Variables and Secrets → GROQ_KEY (ya da CLAUDE_KEY). Konsoldan eklenmez.';}catch(e){}}
 async function post(path,body){const key=opKey();if(!key){toast('Önce operatör anahtarını gir (⚙).');return null;}
   try{const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':key},body:JSON.stringify(body||{})});
     const d=await r.json();if(r.status===403){toast('Anahtar yanlış. ⚙ ile düzelt.');return null;}return d;}
