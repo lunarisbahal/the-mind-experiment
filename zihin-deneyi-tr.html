@@ -300,7 +300,7 @@
   <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026 · b39 · <span style="color:var(--accent)">sinematik geçiş 5: peyzaja yayılan alçak yer sisi ve gölle ormanın çevresinde süzülen sıcak ateşböceği-ruhları — yaşayan gökyüzüne eşlik eden, nefes alan bir zemin</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026 · b40 · <span style="color:var(--accent)">sinematik geçiş 6: figürlerin artık yumuşakça nabız gibi parlayan yaşayan gözleri var (varlık hissi) ve uzak ağaç-kaya siluetlerinden bir halka ufku atmosferik derinlikle dolduruyor</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -4716,6 +4716,24 @@ if(HAS3D)(function(){
     const fpts=new THREE.Points(fgeo,fmat);fpts.userData={base:fp.slice(),ph:fph};scene.add(fpts);W3._atmo.fireflies=fpts;
   }catch(e){}})();
 
+  /* ---- b40: uzak agac/kaya siluetleri — ufku doldurur, atmosferik derinlik verir (oynanis alani disinda, carpismasiz) ---- */
+  (function(){try{
+    var trunkM=new THREE.MeshStandardMaterial({color:0x0a0f12,roughness:1});
+    var coneM=new THREE.MeshStandardMaterial({color:0x0c1418,roughness:1});
+    var rockM=new THREE.MeshStandardMaterial({color:0x0d1016,roughness:1});
+    for(var i=0;i<46;i++){
+      var a=Math.random()*Math.PI*2, r=190+Math.random()*120;
+      var x=190+Math.cos(a)*r, z=145+Math.sin(a)*r*0.85;
+      if(Math.random()<0.7){
+        var h=6+Math.random()*9;
+        var tr=new THREE.Mesh(new THREE.CylinderGeometry(.3,.45,h*.32,5),trunkM);tr.position.set(x,h*.16,z);scene.add(tr);
+        var cn=new THREE.Mesh(new THREE.ConeGeometry(1.6+Math.random()*1.2,h,6),coneM);cn.position.set(x,h*.32+h*.5,z);scene.add(cn);
+      }else{
+        var rk=new THREE.Mesh(new THREE.DodecahedronGeometry(1.4+Math.random()*2.2,0),rockM);rk.position.set(x,.6,z);rk.rotation.set(Math.random(),Math.random(),Math.random());scene.add(rk);
+      }
+    }
+  }catch(e){}})();
+
   /* ---- ground ---- */
   let groundMat;
   (function(){
@@ -5116,6 +5134,10 @@ if(HAS3D)(function(){
     hood.scale.set(1,.9,1);hood.position.y=2.04;g.add(hood);
     const visor=new THREE.Mesh(new THREE.BoxGeometry(.3,.09,.06),std(0x080a10,{emissive:glow||0x223244,emissiveIntensity:1}));
     visor.position.set(0,2.02,.18);g.add(visor);
+    /* b40: yasayan gozler — basin onunde, vizorun altinda yumusakca nabiz gibi parlayan iki nokta (bilinc hissi) */
+    try{var _eyeC=glow||0x9fd0e0;parts.eyes=[];
+      [[.066,1.985,.186],[-.066,1.985,.186]].forEach(function(e){var ey=new THREE.Mesh(new THREE.SphereGeometry(.024,8,8),std(0x05070c,{emissive:_eyeC,emissiveIntensity:1.3}));ey.position.set(e[0],e[1],e[2]);g.add(ey);parts.eyes.push(ey);});
+    }catch(e){}
     /* b37: yumusatma — boyun, yuvarlatilmis omuzlar, eller, ayaklar (daha az bloklu, daha organik siluet) */
     try{
       var _neck=new THREE.Mesh(new THREE.CylinderGeometry(.1,.13,.2,8),sm);_neck.position.y=1.89;_neck.castShadow=true;g.add(_neck);
@@ -6663,6 +6685,7 @@ if(HAS3D)(function(){
     if(!Game.modal){for(var _fi=0;_fi<FIGS.length;_fi++){var _F=FIGS[_fi];if(!_F||!_F.g||!_F.g.visible)continue;var _p=_F.parts;if(!_p)continue;var _ph=_p.bphase||0;
       if(_p.head)_p.head.position.y=(_p.headY||2.0)+Math.sin(t*1.6+_ph)*0.014;
       if(_p.visor&&_p.visor.material)_p.visor.material.emissiveIntensity=0.8+0.3*(0.5+0.5*Math.sin(t*2.1+_ph));
+      if(_p.eyes){for(var _ei=0;_ei<_p.eyes.length;_ei++){if(_p.eyes[_ei].material)_p.eyes[_ei].material.emissiveIntensity=0.9+0.7*(0.5+0.5*Math.sin(t*2.1+_ph+0.4));}} /* b40: gozler nabiz gibi */
     }}
     /* 3B HİKÂYE ODASI — seçim sütunları nefes alsın (parlama + hafif süzülme) */
     try{if(W3.inInterior&&W3.Interior&&W3.Interior.storyMode&&W3.Interior._sgGlows){var _G=W3.Interior._sgGlows;for(var _gi=0;_gi<_G.length;_gi++){var _gg=_G[_gi];var _pu=0.5+0.5*Math.sin(t*2.3+_gi*2.1);if(_gg.m){_gg.m.position.y=_gg.by+Math.sin(t*1.4+_gi*3.0)*0.13;if(_gg.m.material)_gg.m.material.emissiveIntensity=0.9+0.8*_pu;}if(_gg.l)_gg.l.intensity=0.4+0.55*_pu;}}}catch(e){}

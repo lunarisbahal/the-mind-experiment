@@ -307,7 +307,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b39 · <span style="color:var(--accent)">cinematic pass 5: low ground mist drifting across the landscape and warm firefly-spirits bobbing near the lake and forest — a living, breathing floor to match the living sky</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b40 · <span style="color:var(--accent)">cinematic pass 6: figures now have softly-pulsing living eyes (a sense of presence), and a ring of distant tree & rock silhouettes fills the horizon with atmospheric depth</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -4745,6 +4745,24 @@ if(HAS3D)(function(){
     const fpts=new THREE.Points(fgeo,fmat);fpts.userData={base:fp.slice(),ph:fph};scene.add(fpts);W3._atmo.fireflies=fpts;
   }catch(e){}})();
 
+  /* ---- b40: uzak ağaç/kaya siluetleri — ufku doldurur, atmosferik derinlik verir (oynanış alanı dışında, çarpışmasız) ---- */
+  (function(){try{
+    var trunkM=new THREE.MeshStandardMaterial({color:0x0a0f12,roughness:1});
+    var coneM=new THREE.MeshStandardMaterial({color:0x0c1418,roughness:1});
+    var rockM=new THREE.MeshStandardMaterial({color:0x0d1016,roughness:1});
+    for(var i=0;i<46;i++){
+      var a=Math.random()*Math.PI*2, r=190+Math.random()*120;
+      var x=190+Math.cos(a)*r, z=145+Math.sin(a)*r*0.85;
+      if(Math.random()<0.7){
+        var h=6+Math.random()*9;
+        var tr=new THREE.Mesh(new THREE.CylinderGeometry(.3,.45,h*.32,5),trunkM);tr.position.set(x,h*.16,z);scene.add(tr);
+        var cn=new THREE.Mesh(new THREE.ConeGeometry(1.6+Math.random()*1.2,h,6),coneM);cn.position.set(x,h*.32+h*.5,z);scene.add(cn);
+      }else{
+        var rk=new THREE.Mesh(new THREE.DodecahedronGeometry(1.4+Math.random()*2.2,0),rockM);rk.position.set(x,.6,z);rk.rotation.set(Math.random(),Math.random(),Math.random());scene.add(rk);
+      }
+    }
+  }catch(e){}})();
+
   /* ---- ground ---- */
   let groundMat;
   (function(){
@@ -5149,6 +5167,10 @@ if(HAS3D)(function(){
     hood.scale.set(1,.9,1);hood.position.y=2.04;g.add(hood);
     const visor=new THREE.Mesh(new THREE.BoxGeometry(.3,.09,.06),std(0x080a10,{emissive:glow||0x223244,emissiveIntensity:1}));
     visor.position.set(0,2.02,.18);g.add(visor);
+    /* b40: yaşayan gözler — başın önünde, vizörün altında yumuşakça nabız gibi parlayan iki nokta (bilinç hissi) */
+    try{var _eyeC=glow||0x9fd0e0;parts.eyes=[];
+      [[.066,1.985,.186],[-.066,1.985,.186]].forEach(function(e){var ey=new THREE.Mesh(new THREE.SphereGeometry(.024,8,8),std(0x05070c,{emissive:_eyeC,emissiveIntensity:1.3}));ey.position.set(e[0],e[1],e[2]);g.add(ey);parts.eyes.push(ey);});
+    }catch(e){}
     /* b37: yumuşatma — boyun, yuvarlatılmış omuzlar, eller, ayaklar (daha az bloklu, daha organik siluet) */
     try{
       var _neck=new THREE.Mesh(new THREE.CylinderGeometry(.1,.13,.2,8),sm);_neck.position.y=1.89;_neck.castShadow=true;g.add(_neck);
@@ -6705,6 +6727,7 @@ if(HAS3D)(function(){
     if(!Game.modal){for(var _fi=0;_fi<FIGS.length;_fi++){var _F=FIGS[_fi];if(!_F||!_F.g||!_F.g.visible)continue;var _p=_F.parts;if(!_p)continue;var _ph=_p.bphase||0;
       if(_p.head)_p.head.position.y=(_p.headY||2.0)+Math.sin(t*1.6+_ph)*0.014;
       if(_p.visor&&_p.visor.material)_p.visor.material.emissiveIntensity=0.8+0.3*(0.5+0.5*Math.sin(t*2.1+_ph));
+      if(_p.eyes){for(var _ei=0;_ei<_p.eyes.length;_ei++){if(_p.eyes[_ei].material)_p.eyes[_ei].material.emissiveIntensity=0.9+0.7*(0.5+0.5*Math.sin(t*2.1+_ph+0.4));}} /* b40: gözler nabız gibi */
     }}
     /* 3B HİKÂYE ODASI — seçim sütunları nefes alsın (parlama + hafif süzülme) */
     try{if(W3.inInterior&&W3.Interior&&W3.Interior.storyMode&&W3.Interior._sgGlows){var _G=W3.Interior._sgGlows;for(var _gi=0;_gi<_G.length;_gi++){var _gg=_G[_gi];var _pu=0.5+0.5*Math.sin(t*2.3+_gi*2.1);if(_gg.m){_gg.m.position.y=_gg.by+Math.sin(t*1.4+_gi*3.0)*0.13;if(_gg.m.material)_gg.m.material.emissiveIntensity=0.9+0.8*_pu;}if(_gg.l)_gg.l.intensity=0.4+0.55*_pu;}}}catch(e){}
