@@ -305,7 +305,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b30 · <span style="color:var(--accent)">at the moment a realm integrates, Aelius now invites you to ✶ READ FROM YOUR WORDS — your own sentences, read back toward the next step of integration</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b31 · <span style="color:var(--accent)">Nexus now lights a realm's node the moment you pass ANY chapter in it and shows live per-realm progress (e.g. LUNARIS 6/7); plus a clear ✕ LEAVE THE MAP exit (capped map height)</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -2930,29 +2930,35 @@ const NEXUS={
     /* TANIŞILAN KADRO — karşılaştığın her yüz takımyıldıza eklenir; harita yolculukla giderek şekillenir */
     try{var TRc=(GAMELANG==='tr');var fl=(S&&S.flags)||{};var sv=(S&&S.solved)||{};
       var intg=function(rk){return !!((S.flags&&S.flags[rk+'Integrated'])||(S.council&&S.council.indexOf(rk)>=0));};
-      var lun=((typeof lunarisMoon==='function'&&lunarisMoon())||sv.s2||fl.uploadNight||intg('lunaris'));
+      /* o diyarda kac bolum gecildi — node ANINDA bir bolum gecince yansin, butunlesince tam parlasin */
+      var prog=function(rk){try{var z=S.zones&&S.zones[rk];if(!z||!z.done)return 0;var n=0;for(var c in z.done){if(z.done[c])n++;}return Math.min(n,7);}catch(e){return 0;}};
+      var lun=((typeof lunarisMoon==='function'&&lunarisMoon())||sv.s2||fl.uploadNight||intg('lunaris')||prog('lunaris')>0);
       var cast=[
-        {on:(fl.lucida||intg('lucida')),     n:'LUCIDA',    t:'CH_LUCIDA',   sub:(TRc?'rehber · yerçekimi':'guide · gravity')},
-        {on:(fl.lucius||intg('lucius')),     n:'LUCIUS',    t:'CH_LUCIUS',   sub:(TRc?'düzen · strateji':'order · strategy')},
-        {on:(fl.silvanus||intg('silvanus')), n:'SILVANUS',  t:'CH_SILVANUS', sub:(TRc?'inanç · bilge':'faith · sage')},
-        {on:(fl.noct||intg('noct')),         n:'NOCTORNUS', t:'CH_NOCT', dark:true, sub:(TRc?'kaçınma · bağlanma':'avoidance · attachment')},
+        {on:(fl.lucida||intg('lucida')||prog('lucida')>0),     n:'LUCIDA',    t:'CH_LUCIDA',   sub:(TRc?'rehber · yerçekimi':'guide · gravity')},
+        {on:(fl.lucius||intg('lucius')||prog('lucius')>0),     n:'LUCIUS',    t:'CH_LUCIUS',   sub:(TRc?'düzen · strateji':'order · strategy')},
+        {on:(fl.silvanus||intg('silvanus')||prog('silvanus')>0), n:'SILVANUS',  t:'CH_SILVANUS', sub:(TRc?'inanç · bilge':'faith · sage')},
+        {on:(fl.noct||intg('noct')||prog('noct')>0),         n:'NOCTORNUS', t:'CH_NOCT', dark:true, sub:(TRc?'kaçınma · bağlanma':'avoidance · attachment')},
         {on:lun,         n:'LUNARIS',   t:'CH_LUNARIS',  sub:(TRc?'ay · isimlendiren':'moon · the namer')},
-        {on:(fl.shadowFought||fl.integrated||intg('bahal')), n:'BAHAL', t:'CH_BAHAL', dark:true, sub:(TRc?'gölge · bütünleşme':'shadow · integration')},
-        {on:(fl.book2||fl.uploadNight||sv.s2||intg('aelius')), n:'AELIUS', t:'CH_AELIUS', sub:(TRc?'yorumcu · güneş':'interpreter · sun')}
+        {on:(fl.shadowFought||fl.integrated||intg('bahal')||prog('bahal')>0), n:'BAHAL', t:'CH_BAHAL', dark:true, sub:(TRc?'gölge · bütünleşme':'shadow · integration')},
+        {on:(fl.book2||fl.uploadNight||sv.s2||intg('aelius')||prog('aelius')>0), n:'AELIUS', t:'CH_AELIUS', sub:(TRc?'yorumcu · güneş':'interpreter · sun')}
       ];
       cast.forEach(function(c){ if(c.on) f.push({n:c.n,dark:!!c.dark,t:c.t,sub:c.sub,cast:true}); });
+      /* DİYAR İLERLEMESİ — her diyarın bölüm sayacı (henüz bütünleşmemiş ama başlanmış diyarlar) */
+      var RUP={lunaris:'LUNARIS',bahal:'BAHAL',lucida:'LUCIDA',lucius:'LUCIUS',noct:'NOCTORNUS',silvanus:'SILVANUS',aelius:'AELIUS'};
+      ['lunaris','bahal','lucida','lucius','noct','silvanus','aelius'].forEach(function(rk){var p=prog(rk);if(p>0&&!intg(rk)){f.push({n:RUP[rk]+' '+p+'/7',small:true,t:'RPROG'});}});
     }catch(e){}
     return f;},
   show(){
     UI.doc('⟁ NEXUS — THE INNER CONSTELLATION',
       '<p style="color:var(--dim);font-size:12.5px"><b style="color:var(--moon)">What is this?</b> NEXUS is a living map of <i>your</i> inner cast — the figures, drives and shadows your choices have revealed — drawn as one connected web. Bright nodes are integrated parts; <b style="color:var(--violet)">dark nodes are your shadow</b>. <b>Tap a node</b> to sit with it (you do not delete the dark — you give it a seat). The same pattern echoes in the characters you meet and the stars above: <i style="color:var(--moon)">as above, so below</i>. Use <b>name the unnamed</b> to give words to a wordless node, and <b>the eye of time</b> to see the loop you keep repeating.</p>'+
-      '<canvas id="nexC" width="740" height="760" style="width:100%;border:1px solid var(--line);border-radius:4px;background:#04050a;cursor:pointer"></canvas>'+
+      '<canvas id="nexC" width="740" height="760" style="width:100%;max-height:50vh;border:1px solid var(--line);border-radius:4px;background:#04050a;cursor:pointer"></canvas>'+
       '<div style="margin-top:10px">'+
+      '<button class="btn v" style="background:var(--accent);color:#0a0d14" onclick="if(window.UI&&UI.closeDoc)UI.closeDoc();">✕ '+(GAMELANG==='tr'?'HARİTADAN ÇIK':'LEAVE THE MAP')+'</button>'+
       '<button class="btn v" onclick="NEXUS.aelius()">✶ '+(GAMELANG==='tr'?'AELIUS’UN YORUMU':'AELIUS READS THIS')+'</button>'+
       '<button class="btn v" onclick="NEXUS.fromWords()">✶ '+(GAMELANG==='tr'?'SÖZLERİNDEN OKUMA':'READ FROM YOUR WORDS')+'</button>'+
       '<button class="btn v" onclick="NEXUS.eye()">▴ THE EYE OF TIME — see the loop</button>'+
       '<button class="btn" onclick="NEXUS.name()">name the unnamed</button>'+
-      '<button class="btn ghost" onclick="NEXUS.gate()">↩ return gate</button>'+
+      '<button class="btn ghost" onclick="try{if(window.UI&&UI.toast)UI.toast(GAMELANG===&#39;tr&#39;?&#39;↩ Yüzeye dön. Bir nefes al — bütün bunları izleyen sensin.&#39;:&#39;↩ Step back to the surface. Breathe — you are the one who watched all this.&#39;,4200);}catch(e){};if(window.UI&&UI.closeDoc)UI.closeDoc();">↩ '+(GAMELANG==='tr'?'yüzeye dön':'return gate')+'</button>'+
       '<button class="btn ghost" onclick="NEXUS.download()">PNG</button></div>'+
       '<div id="nexMsg" style="margin-top:10px;font-size:13px;color:var(--violet);line-height:1.6">Touch a node to reflect on it.</div>');
     setTimeout(()=>this.draw(),60);},
@@ -2974,7 +2980,7 @@ const NEXUS={
       x.fillStyle=n.dark?'#e2b0ab':'#c8d2e0';x.font=(n.small?'9px':'11px')+' monospace';x.textAlign='center';
       x.fillText(n.n,n.x,n.y+(n.center?32:19));});
     x.fillStyle='#6b7689';x.font='10px monospace';x.textAlign='center';x.fillText('AS ABOVE, SO BELOW',cx,H-12);
-    const TT={THE_CENTER:'the shadow you have not yet named',THE_CAP:'the captain who drives most days',THE_SHA:'the one who drives when you are tired',THE_FACE:'the face the mirror saw leading',THE_RITE:'a rite you completed',YOUSAID:(GAMELANG==='tr'?'bu evrene bıraktığın sözler — geri dönüp seni şekillendirirler':'the words you left in this world — they return to shape what comes'),JOURNEY:(GAMELANG==='tr'?'geçtiğin gerçek bölümler':'the real chapters you have passed')};
+    const TT={THE_CENTER:'the shadow you have not yet named',THE_CAP:'the captain who drives most days',THE_SHA:'the one who drives when you are tired',THE_FACE:'the face the mirror saw leading',THE_RITE:'a rite you completed',YOUSAID:(GAMELANG==='tr'?'bu evrene bıraktığın sözler — geri dönüp seni şekillendirirler':'the words you left in this world — they return to shape what comes'),JOURNEY:(GAMELANG==='tr'?'geçtiğin gerçek bölümler':'the real chapters you have passed'),RPROG:(GAMELANG==='tr'?'bu diyarda geçtiğin bölümler — 7/7 olup eşiği geçince düğüm tam parlar':'chapters passed in this realm — at 7/7 and crossing the threshold the node fully lights')};
     c.onclick=(e)=>{const r=c.getBoundingClientRect();const mx=(e.clientX-r.left)*(W/r.width),my=(e.clientY-r.top)*(H/r.height);
       let best=null,bd=34;f.forEach(n=>{const d=Math.hypot(mx-n.x,my-n.y);if(d<bd){bd=d;best=n;}});
       if(best)this.msg((best.dark?'◑ ':'◇ ')+best.n+' — '+(TT[best.t]||best.sub||'')+(best.dark?(GAMELANG==='tr'?'  Bunu senin taşımaman için kim taşıdı?':'  What did this one carry so you would not?'):''));};},
