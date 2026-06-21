@@ -305,7 +305,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b26 · <span style="color:var(--accent)">living mind: every passed chapter & answer now reshapes the mind map / Nexus / profile; your words persist & return in later realms (Echoes of You); realm nodes light when integrated</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b27 · <span style="color:var(--accent)">living mind + fixes: finish a realm → enter its house → salon writing computer with [E]; IT-019 [E] now continues the exact line it threw; tall rite spires fade after you reach them (declutter)</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -5238,8 +5238,10 @@ if(HAS3D)(function(){
   W3.agentTalk=()=>{const a=W3.agentNear();if(!a)return;
     a.wait=12;a.f.g.rotation.y=Math.atan2(S.px-a.f.g.position.x,S.pz-a.f.g.position.z);
     window.Daily3&&Daily3.mark('agent');
-    if(window.Mirror&&Mirror.ready()){Mirror.open('agent'+(AGENTS.indexOf(a)%7));return;}
-    const line=AG_LINES[a.li];a.li=(a.li+1)%AG_LINES.length;
+    /* continue from the exact line it just threw at you (top dialogue), not a different one */
+    var opener=(a._thrown&&(performance.now()-(a._thrownT||0)<120000))?a._thrown:null;a._thrown=null;
+    if(window.Mirror&&Mirror.ready()){if(opener){try{Dlg.open([[a.nm,opener]],()=>{Mirror.open('agent'+(AGENTS.indexOf(a)%7));});}catch(e){Mirror.open('agent'+(AGENTS.indexOf(a)%7));}}else{Mirror.open('agent'+(AGENTS.indexOf(a)%7));}return;}
+    var line=opener?[a.nm,opener]:AG_LINES[a.li];if(!opener)a.li=(a.li+1)%AG_LINES.length;
     Dlg.open([[line[0],line[1]]],()=>{
       UI.doc('WANT AN OPEN-ENDED CONVERSATION?',
         '<p>'+a.nm+' is speaking from a script right now. To hold a <b>free, real-time dialogue</b> with them (and every character) link the Mirrors — they will answer your questions personally, Detroit-style.</p>'+
@@ -5870,8 +5872,10 @@ if(HAS3D)(function(){
       const fcol=pal.accent;const foc=new THREE.Mesh(new THREE.IcosahedronGeometry(.8,1),new THREE.MeshStandardMaterial({color:fcol,emissive:fcol,emissiveIntensity:.75,roughness:.35,flatShading:true}));foc.position.set(0,1.7,-3.5);g.add(foc);this._foc=foc;
       const fl2=new THREE.PointLight(fcol,.75,11,2);fl2.position.set(0,2.4,-3.5);g.add(fl2);
       const flab=this._label((GAMELANG==='tr'?'◈ başla':'◈ begin'),'rgba(210,218,238,.95)',1.4);flab.position.set(0,2.9,-3.5);g.add(flab);
-      /* SALON: gerçek dünya-içi 'masaya otur' + 'topraklan/güvenli alan' etkileşimleri */
-      if(room.palette==='livingroom'||room.palette==='therapy'){
+      /* SALON: gerçek dünya-içi 'masaya otur' + 'topraklan/güvenli alan' etkileşimleri.
+         Diyar bütünlendiğinde (7/7) hangi arketibin evi olursa olsun salon + yazı bilgisayarı belirir. */
+      var _realmDone=!!(window.House&&House.curChapter&&House.curChapter()>7);
+      if(room.palette==='livingroom'||room.palette==='therapy'||_realmDone){
         this._deskAt={x:0,z:6.7};
         var _dlab=this._label((GAMELANG==='tr'?'🪑 masaya otur — yaz':'🪑 sit at the desk — write'),'rgba(222,210,160,.96)',1.15);_dlab.position.set(0,2.35,6.7);g.add(_dlab);
         var _dgl=new THREE.PointLight(0xe8d49a,.5,5,2);_dgl.position.set(0,1.9,6.7);g.add(_dgl);
@@ -6119,10 +6123,11 @@ if(HAS3D)(function(){
     enter(k){const z=RZONES[k];if(!z){return;}if(z.stub){UI.toast(GAMELANG==='tr'?'Bu alan henüz inşa edilmedi.':'This area is not built yet.');return;}
       const idx=(window.REALMS||[]).findIndex(r=>r.k===k);if(idx>0&&window.Realms&&!Realms.open(idx)){UI.toast(GAMELANG==='tr'?'Önce bir önceki arketibi bütünle.':'Integrate the previous archetype first.');return;}
       this.house=!!(window.HOUSES&&HOUSES[k]);
-      if(this.house){window.House.realm=k;let ch=window.House.curChapter();if(ch>7)ch=7;this.buildHouseRoom(ch);}else{this.build(k);}
-      W3.IP={px:0,pz:this.RS-3};W3.inInterior=true;meshAng=Math.PI;interiorScene.add(player.g);if(W3.intLamp)W3.intLamp.visible=true;
+      var _realmDone=false;
+      if(this.house){window.House.realm=k;let ch=window.House.curChapter();_realmDone=ch>7;if(ch>7)ch=7;this.buildHouseRoom(ch);}else{this.build(k);}
+      W3.IP={px:0,pz:(this.house&&_realmDone)?9.4:this.RS-3};W3.inInterior=true;meshAng=Math.PI;interiorScene.add(player.g);if(W3.intLamp)W3.intLamp.visible=true;
       try{if(UI&&UI.closeDoc)UI.closeDoc();}catch(e){}if(Game.setModal)Game.setModal(false);
-      if(this.house){UI.toast('☽ '+z.name+' — '+(GAMELANG==='tr'?'evine girdin · odadaki ışıyan odağa yaklaş [E]':'you entered his house · approach the glowing focus [E]'),6000);}
+      if(this.house){UI.toast(_realmDone?('☽ '+z.name+' — '+(GAMELANG==='tr'?'bu diyarı bütünledin · salondaki yazı bilgisayarına yaklaş [E] — günlüğünü/kitabını yaz':'you integrated this realm · approach the writing computer in the salon [E] — write your journal/book')):('☽ '+z.name+' — '+(GAMELANG==='tr'?'evine girdin · odadaki ışıyan odağa yaklaş [E]':'you entered his house · approach the glowing focus [E]')),_realmDone?7500:6000);}
       else{const cfg=INTERIORS[k];UI.toast('◈ '+z.name+' — '+(cfg&&cfg.wake?(cfg.wake[GAMELANG]||cfg.wake.en):(GAMELANG==='tr'?'alanına girdin':'you entered'))+(GAMELANG==='tr'?' · [WASD gez · sütuna yaklaş · E ile performe et]':' · [WASD move · approach a pillar · E to perform]'),6500);}
     },
     exit(){W3.inInterior=false;scene.add(player.g);if(W3.intLamp)W3.intLamp.visible=false;try{if(window.House){if(House._emCancel)House._emCancel();if(House._pz)clearInterval(House._pz);}}catch(e){}UI.toast(GAMELANG==='tr'?'Alandan çıktın.':'You left the area.');},
@@ -6416,7 +6421,11 @@ if(HAS3D)(function(){
         if(arr[i*3+1]>5)arr[i*3+1]=.2;}
       emberGeo.attributes.position.needsUpdate=true;}
     Object.values(riteMarks).forEach((m,i)=>{m.material.opacity=.1+.08*Math.abs(Math.sin(t*1.5+i));});
-    for(const k in riteMarks)if(S.rites[k]!==undefined)riteMarks[k].material.opacity=0;
+    /* declutter: a tall rite spire vanishes once it is done OR once you've walked up to it the first time (it stays on the minimap; the golden beacon still guides the active objective) */
+    S.riteSeen=S.riteSeen||{};
+    for(var _ri=0;_ri<RITE_SITES.length;_ri++){var _rk='r'+(_ri+1);var _m=riteMarks[_rk];if(!_m)continue;var _Lr=L[RITE_SITES[_ri]];
+      if(_Lr&&!S.riteSeen[_rk]&&Math.hypot(S.px-_Lr.x,S.pz-_Lr.z)<6){S.riteSeen[_rk]=1;if(!W3._riteSaveT||t-W3._riteSaveT>1){W3._riteSaveT=t;try{save();}catch(e){}}}
+      _m.visible=!(S.rites[_rk]!==undefined||S.riteSeen[_rk]);}
     shadowMark.material.opacity=(S.solved.s2&&S.rites.r7===undefined)?.12+.08*Math.abs(Math.sin(t*1.2)):0;
 
     /* Lunaris */
@@ -6518,7 +6527,7 @@ if(HAS3D)(function(){
     /* proaktif: dolaşan denekler oyuncuya yaklaşınca kendileri konu açar — merak uyandırıp oyuna çekerler */
     if(!Game.modal&&!W3.inInterior&&typeof AG_HOOKS!=='undefined'){W3._hookT=(W3._hookT||0)+dt;
       if(W3._hookT>42){for(var _ai=0;_ai<AGENTS.length;_ai++){var _ag=AGENTS[_ai];var _hd=Math.hypot(S.px-_ag.f.g.position.x,S.pz-_ag.f.g.position.z);
-        if(_hd<6.0){W3._hookT=0;_ag.wait=Math.max(_ag.wait||0,10);_ag.f.g.rotation.y=Math.atan2(S.px-_ag.f.g.position.x,S.pz-_ag.f.g.position.z);var _hk=AG_HOOKS[(W3._hookI=((W3._hookI||0)+1))%AG_HOOKS.length];try{Dlg.open([[_ag.nm,_hk]]);}catch(e){}break;}}}}
+        if(_hd<6.0){W3._hookT=0;_ag.wait=Math.max(_ag.wait||0,10);_ag.f.g.rotation.y=Math.atan2(S.px-_ag.f.g.position.x,S.pz-_ag.f.g.position.z);var _hk=AG_HOOKS[(W3._hookI=((W3._hookI||0)+1))%AG_HOOKS.length];_ag._thrown=_hk;_ag._thrownT=performance.now();try{Dlg.open([[_ag.nm,_hk]]);}catch(e){}break;}}}}
     /* ---- v5: eşzamanlı mod ---- */
     if(MP.on&&MP.send){mpT+=dt;
       if(mpT>.15){mpT=0;try{MP.send({x:S.px,z:S.pz,h:meshAng,n:travelerName()+(S.solved.s7?'·⟁':'')});}catch(e){}}
