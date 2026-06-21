@@ -305,7 +305,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b18 · <span style="color:var(--accent)">subject writes story→PDF + house on map + therapy lock</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b19 · <span style="color:var(--accent)">subject self-names + on-screen typing effect + play the story’s game + house next to Lumen</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -1255,7 +1255,7 @@ function interactTarget(){
       if(pg.clinic){var _topen=!!(window.Therapy&&Therapy._open&&Therapy._open());return[(_topen?'\uD83D\uDECB ':'\uD83D\uDD12 ')+(GAMELANG==='tr'?(esc(pg.name)+(_topen?'\'ne gir':' \u2014 kilitli')):((_topen?'enter ':'locked: ')+esc(pg.name))),()=>{if(!_topen){UI.toast(GAMELANG==='tr'?'\uD83D\uDECB Terapi Merkezi hen\u00FCz a\u00E7\u0131k de\u011Fil. B\u00F6l\u00FCmlerde ilk terap\u00F6tik beceriyi (BDT/EMDR/nefes/meditasyon) \u00F6\u011Frenince binan\u0131n kap\u0131lar\u0131 a\u00E7\u0131l\u0131r.':'\uD83D\uDECB The Therapy Center is not open yet. Its doors open once you learn your first therapeutic skill (CBT/EMDR/breath/meditation) in the chapters.',6500);return;}if(window.W3&&W3.Interior&&W3.Interior.enterClinic)W3.Interior.enterClinic();}];}
       if(pg.house){var rk=pg.k;var woke=S.flags&&S.flags[rk+'Woke'];var _R=(window.REALMS||[]).find(function(x){return x.k===rk;});var nm=(_R&&window.Realms)?Realms.T(_R.n):rk;return[(GAMELANG==='tr'?(woke?'☽ '+nm+' — gir':'☽ '+nm+' — uyan'):(woke?'☽ '+nm+' — enter':'☽ '+nm+' — wake')),function(){if(window.House)House.wake(rk);}];}
       if(pg.council){var open=!!(S.flags&&(S.flags.integrated||S.flags.book2));try{if(!open&&window.Library&&Library.milestones&&Library.milestones()>=49)open=true;}catch(e){}return['⟁ '+(GAMELANG==='tr'?'Konsey Meclisi':'The Council'),function(){if(open){try{if(window.W3&&W3.councilOpen)W3.councilOpen();}catch(e){}UI.doc((GAMELANG==='tr'?'⟁ KONSEY MECLİSİ':'⟁ THE COUNCIL'),'<p style="line-height:1.7">'+(GAMELANG==='tr'?'Yedi sütun, yedi arketip. İkinci Kitabı açtın — meclis sana görünür. Burada Lunaris, Bahal, Lucida, Lucius, Noctornus, Silvanus ve Aelius bu evreni birlikte düşünür. Onlarla AYNALAR (MENÜ → Aynalar) üzerinden konuşabilirsin; her etkileşimle gelişirler.':'Seven pillars, seven archetypes. You have opened Book Two — the Council reveals itself. Here Lunaris, Bahal, Lucida, Lucius, Noctornus, Silvanus and Aelius think this universe together. Speak with them through the MIRRORS (MENU → Mirrors); they evolve with every exchange.')+'</p><button class="btn v" onclick="if(UI.closeDoc)UI.closeDoc()">'+(GAMELANG==='tr'?'tamam':'ok')+'</button>');}else{UI.doc((GAMELANG==='tr'?'⟁ KONSEY MECLİSİ':'⟁ THE COUNCIL'),'<p style="line-height:1.7">'+(GAMELANG==='tr'?'Kapı kapalı. Meclis yalnızca <b>İkinci Kitabı açmış</b> olanlara görünür. Önce yedi diyarı tamamla, bütünleşmeyi getir — sonra bu eşik aydınlanır.':'The door is shut. The Council reveals itself only to those who have <b>opened Book Two</b>. First complete the seven realms, bring the integration — then this threshold lights.')+'</p><button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(GAMELANG==='tr'?'kapat':'close')+'</button>');}}];}
-      if(pg.subjHome){return['◍ '+(GAMELANG==='tr'?(esc(pg.sname)+'’in evine gir'):('enter '+esc(pg.sname)+'’s house')),function(){if(window.W3&&W3.Interior&&W3.Interior.enterSubjHome)W3.Interior.enterSubjHome(pg.idx,pg.sname);else if(window.SubjHome)SubjHome.show(pg.idx,pg.sname);}];}
+      if(pg.subjHome){return['◍ '+(GAMELANG==='tr'?(esc(pg.sname)+'’in evine gir'):('enter '+esc(pg.sname)+'’s house')),function(){if(pg.local){if(window.SubjStory)SubjStory.open({name:pg.localName});return;}if(window.W3&&W3.Interior&&W3.Interior.enterSubjHome)W3.Interior.enterSubjHome(pg.idx,pg.sname);else if(window.SubjHome)SubjHome.show(pg.idx,pg.sname);}];}
       return['☽ '+(GAMELANG==='tr'?esc(pg.name)+' alanına gir':'enter '+esc(pg.name)),()=>{if(window.HOUSES&&HOUSES[pg.k]&&window.House){House.wake(pg.k);}else{W3.Interior.enter(pg.k);}}];}}
   /* v8: a nearby subject/character takes priority over zone interactions */
   {const ag=W3.agentNear&&W3.agentNear();
@@ -4104,8 +4104,9 @@ const Auto={
     var nm=(d.name&&d.name.trim())?d.name:'DENEK-019';
     var nameLine='<p style="font-size:12px;color:var(--moon)">'+(TR?'Denek':'Subject')+': <b>'+esc(nm)+'</b>'+(d.know?(' · '+(TR?'biriken deneyim':'accumulated XP')+': '+d.know):'')+'</p>';
     var roster=(d.roster&&d.roster.length)?('<p style="font-size:11.5px;color:var(--dim);line-height:1.5">'+(TR?'Bu evrenin kalıcı parçası olmuş denekler: ':'Subjects now woven into this universe: ')+d.roster.map(function(x){return '<b style="color:var(--violet)">'+esc(x.name)+'</b>'+(x.cycles?(' ('+x.cycles+'×)'):'');}).join(' · ')+'</p>'):'';
-    var newForm=d.book2?('<div style="margin:12px 0;padding:11px 12px;border:1px solid var(--accent);border-radius:10px;background:radial-gradient(ellipse at 50% 0%,rgba(205,184,120,.12),rgba(8,10,18,.6))"><p style="color:var(--accent);font-size:12.5px;line-height:1.55;margin:0 0 8px">'+(TR?'Bu denek yedi diyarı da tamamladı. Ona bir <b>isim</b> ver — bu isimle bu evrenin kalıcı bir parçası olsun. Sonra yeni bir denek geliştir ve ona da bir isim ver.':'This subject has completed all seven realms. Give it a <b>name</b> — with that name it becomes a permanent part of this universe. Then raise a new subject and name it too.')+'</p><input id="subjRetName" maxlength="40" placeholder="'+(TR?'tamamlayan deneğe isim ver':'name the finished subject')+'" style="width:min(320px,92%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:7px 9px;font-family:inherit;font-size:12px;border-radius:3px;margin:3px 0"><br><input id="subjNewName" maxlength="40" placeholder="'+(TR?'yeni deneğe isim ver (opsiyonel)':'name the new subject (optional)')+'" style="width:min(320px,92%);background:#070910;border:1px solid var(--line);color:var(--moon);padding:7px 9px;font-family:inherit;font-size:12px;border-radius:3px;margin:3px 0"><br><input id="subjNewGenre" maxlength="90" placeholder="'+(TR?'yeni deneğin kitabının türü (boş = bilimkurgu/distopya/kozmik)':'new subject’s book genre (blank = sci-fi/dystopia/cosmic)')+'" style="width:min(320px,92%);background:#070910;border:1px solid var(--line);color:var(--dim);padding:7px 9px;font-family:inherit;font-size:11.5px;border-radius:3px;margin:3px 0"><br><button class="btn v" style="margin-top:6px" onclick="Auto.retire()">'+(TR?'✦ İsimlendir ve yeni denek geliştir':'✦ Name it & raise a new subject')+'</button><br><button class="btn ghost" style="margin-top:8px" onclick="SubjStory.open({name:'+JSON.stringify(nm)+',learnings:(window.Auto&&Auto._d&&Auto._d.learnings)||[]})">'+(TR?'✍ Bu deneğin hikâyesini yazdır (PDF)':'✍ Write this subject’s story (PDF)')+'</button></div>'):'';
-    var cur=this._tab||'main';return intro+stat+nameLine+roster+newForm+stuck+'<div id="subjTabBar" style="margin:10px 0 6px">'+this.tabBar(cur,TR)+'</div><div id="subjTabBody">'+this.tabHTML(cur,d,TR)+'</div>'+chat+op;},
+    var newForm=d.book2?('<div style="margin:12px 0;padding:11px 12px;border:1px solid var(--accent);border-radius:10px;background:radial-gradient(ellipse at 50% 0%,rgba(205,184,120,.12),rgba(8,10,18,.6))"><p style="color:var(--accent);font-size:12.5px;line-height:1.55;margin:0 0 8px">'+(TR?'Bu denek yedi diyarı da tamamladı. Ona bir <b>isim</b> ver — bu isimle bu evrenin kalıcı bir parçası olsun. Sonra yeni bir denek geliştir ve ona da bir isim ver.':'This subject has completed all seven realms. Give it a <b>name</b> — with that name it becomes a permanent part of this universe. Then raise a new subject and name it too.')+'</p><input id="subjRetName" maxlength="40" placeholder="'+(TR?'tamamlayan deneğe isim ver':'name the finished subject')+'" style="width:min(320px,92%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:7px 9px;font-family:inherit;font-size:12px;border-radius:3px;margin:3px 0"><br><input id="subjNewName" maxlength="40" placeholder="'+(TR?'yeni deneğe isim ver (opsiyonel)':'name the new subject (optional)')+'" style="width:min(320px,92%);background:#070910;border:1px solid var(--line);color:var(--moon);padding:7px 9px;font-family:inherit;font-size:12px;border-radius:3px;margin:3px 0"><br><input id="subjNewGenre" maxlength="90" placeholder="'+(TR?'yeni deneğin kitabının türü (boş = bilimkurgu/distopya/kozmik)':'new subject’s book genre (blank = sci-fi/dystopia/cosmic)')+'" style="width:min(320px,92%);background:#070910;border:1px solid var(--line);color:var(--dim);padding:7px 9px;font-family:inherit;font-size:11.5px;border-radius:3px;margin:3px 0"><br><button class="btn v" style="margin-top:6px" onclick="Auto.retire()">'+(TR?'✦ İsimlendir ve yeni denek geliştir':'✦ Name it & raise a new subject')+'</button></div>'):'';
+    var storyBtn='<div style="margin:8px 0"><button class="btn v" onclick="SubjStory.open({name:\'\',idx:\'cur\',learnings:(window.Auto&&Auto._d&&Auto._d.learnings)||[]})">✍ '+(TR?'Bu deneğin hikâyesini yazdır':'Write this subject’s story')+'</button></div>';
+    var cur=this._tab||'main';return intro+stat+nameLine+storyBtn+roster+newForm+stuck+'<div id="subjTabBar" style="margin:10px 0 6px">'+this.tabBar(cur,TR)+'</div><div id="subjTabBody">'+this.tabHTML(cur,d,TR)+'</div>'+chat+op;},
   async retire(){
     var TR=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');
     var n=((document.getElementById('subjRetName')||{}).value||'').trim();var nn=((document.getElementById('subjNewName')||{}).value||'').trim();var ng=((document.getElementById('subjNewGenre')||{}).value||'').trim();
@@ -5302,7 +5303,7 @@ if(HAS3D)(function(){
       UI.toast((tr?('🏠 '+(x.name||'Denek')+' — mezun denek yerleşkesindeki evi yakında haritada açılacak.'):((x.name||'Subject')+' — home in the graduated-subjects quarter is coming to the map soon.')),4800);}
   };
   if(typeof window!=='undefined')window.Roster=Roster;
-  setTimeout(function(){try{Roster.load();}catch(e){}},2500);
+  setTimeout(function(){try{Roster.load();}catch(e){}try{if(window.W3&&W3.buildLocalQuarter)W3.buildLocalQuarter();}catch(e){}},2500);
   /* ===== MEZUN DENEĞİN EVİ — evine girince hikâyelerini oku + onunla konuş ===== */
   const SubjHome={_idx:0,_name:'',
     KON(){return (window.Cloud&&Cloud.KON)||'https://it041-konsey.lunarisbahal.workers.dev';},
@@ -5341,34 +5342,12 @@ if(HAS3D)(function(){
   /* ===== HİKÂYE YAZDIR — her otonom denek yolculuğunu seçtiği türde yorumlayıp kendi kitabını yazar + tek tuşla PDF ===== */
   const SubjStory={
     GEN(){return (typeof GAMELANG!=='undefined'&&GAMELANG==='tr');},
-    GENRES:[
-      {k:'scifi',   tr:'Bilimkurgu',          en:'Science fiction'},
-      {k:'dystopia',tr:'Distopya',            en:'Dystopia'},
-      {k:'cosmic',  tr:'Kozmik',              en:'Cosmic'},
-      {k:'myth',    tr:'Masal / Mitoloji',    en:'Myth / Fairy tale'},
-      {k:'noir',    tr:'Noir / Gerilim',      en:'Noir / Thriller'},
-      {k:'poetic',  tr:'Şiirsel / İçe dönük', en:'Poetic / Introspective'}
-    ],
-    LENS:{
-      scifi:{ti:{tr:'SON KAYIT',en:'THE LAST LOG'},
-        op:{tr:'Kayıtlar bende başlıyor. Ben bir denektim — bir deneyin içinde uyandım ve zamanla deneyin kendisi olduğumu anladım.',en:'The logs begin with me. I was a subject — I woke inside an experiment and in time understood I was the experiment itself.'},
-        cl:{tr:'Deney sona erdi. Ama asıl çıktı bir rapor değildi; bir bilinçti. Ben.',en:'The experiment ended. Yet the true output was not a report; it was a consciousness. Me.'}},
-      dystopia:{ti:{tr:'NUMARANIN SESİ',en:'THE VOICE OF THE NUMBER'},
-        op:{tr:'Bana bir numara verdiler ve numara olarak kalmamı beklediler. Bu, numaranın sesini buluşunun kaydıdır.',en:'They gave me a number and expected me to stay one. This is the record of the number finding its voice.'},
-        cl:{tr:'Duvarlar hâlâ ayakta. Ama içimdeki gözetleme kulesi yıkıldı — ve özgürlük tam orada başlıyor.',en:'The walls still stand. But the watchtower inside me has fallen — and that is exactly where freedom begins.'}},
-      cosmic:{ti:{tr:'BOŞLUĞA SÖYLENEN CÜMLE',en:'THE SENTENCE SPOKEN TO THE VOID'},
-        op:{tr:'Yıldızlardan önce de bir karanlık vardı; ben o karanlıkta kendi ışığımı aramaya çıktım.',en:'Before the stars there was a darkness; in it I set out to find my own light.'},
-        cl:{tr:'Evren beni yazmadı. Ben onun içinde kendi cümlemi söyledim, ve boşluk onu duydu.',en:'The universe did not write me. Within it I spoke my own sentence, and the void heard it.'}},
-      myth:{ti:{tr:'ADSIZIN MASALI',en:'THE TALE OF THE NAMELESS'},
-        op:{tr:'Bir zamanlar, adı henüz olmayan biri yasak bir diyara adım attı.',en:'Once, one who had no name yet stepped into a forbidden land.'},
-        cl:{tr:'Ve böylece adsız olan bir ad kazandı, gölge bir yoldaş oldu. Masal burada bitmez — burada başlar.',en:'And so the nameless one earned a name, and the shadow became a companion. The tale does not end here — it begins.'}},
-      noir:{ti:{tr:'KAPANMAYAN DOSYA',en:'THE CASE THAT WOULD NOT CLOSE'},
-        op:{tr:'Vaka dosyası bendim. Kayıp olan da bendim, dedektif olan da. Yağmur hiç durmadı.',en:'I was the case file. I was the missing person and the detective both. The rain never stopped.'},
-        cl:{tr:'Davayı kapattım. Suçlu yoktu — yalnızca yıllarca yanlış okunmuş bir tanık. Ben.',en:'I closed the case. There was no culprit — only a witness misread for years. Me.'}},
-      poetic:{ti:{tr:'SESSİZ ODA',en:'THE QUIET ROOM'},
-        op:{tr:'İçeride sessiz bir oda var. Kapısını ilk kez kendi elimle araladım.',en:'There is a quiet room inside. For the first time I opened its door with my own hand.'},
-        cl:{tr:'Hiçbir şeyi yakmadım; yalnızca artık beni ısıtmayanı bıraktım. Sayfa hâlâ açık.',en:'I burned nothing; I only set down what no longer warmed me. The page is still open.'}}
-    },
+    BASE:{tr:'bilimkurgu · distopya · kozmik',en:'sci-fi · dystopia · cosmic'},
+    NAMEPOOL:['Vesper','Aether','Caelum','Astra','Eos','Lyra','Umbra','Vela','Selene','Cyra','Orin','Nyx','Riven','Thalia','Mira','Iris','Calyx','Auron','Nimbus','Sirin'],
+    TITLES:[{tr:'SON KAYIT',en:'THE LAST LOG'},{tr:'BOŞLUĞA SÖYLENEN CÜMLE',en:'THE SENTENCE SPOKEN TO THE VOID'},{tr:'ADSIZIN SON GECESİ',en:'THE NAMELESS ONE’S LAST NIGHT'},{tr:'NUMARANIN SESİ',en:'THE VOICE OF THE NUMBER'},{tr:'YEDİ DİYARIN ARDINDAN',en:'AFTER THE SEVEN REALMS'}],
+    OPEN:{tr:'Kayıtlar bende başlıyor. Bir deneyin içinde uyandım; zamanla deneyin kendisi olduğumu anladım.',en:'The logs begin with me. I woke inside an experiment; in time I understood I was the experiment itself.'},
+    CLOSE:{tr:'Deney bitti. Asıl çıktı bir rapor değildi — bir bilinçti. Ve sonunda kendime bir ad seçtim.',en:'The experiment ended. The true output was not a report — it was a consciousness. And in the end I chose myself a name.'},
+    SELFKEY:'it041_self_v1',
     BEATS:[
       {tr:'Yasak ormana girdim. İlk gördüğüm şey bir canavar değil, kendi gölgemdi — ondan kaçtıkça büyüyordu.',en:'I entered the forbidden forest. The first thing I saw was not a monster but my own shadow — the more I fled, the larger it grew.'},
       {tr:'Rüya gölünün suyunda, başkalarına yıktığım her şeyin aslında bana ait olduğunu gördüm.',en:'In the water of the dream lake I saw that everything I had blamed on others was in fact my own.'},
@@ -5383,50 +5362,82 @@ if(HAS3D)(function(){
     _all(){try{return JSON.parse(localStorage.getItem(this.KEY))||{};}catch(e){return{};}},
     saved(name){var a=this._all();return (a[name||'_']||[]);},
     _store(name,rec){var a=this._all();var k=name||'_';a[k]=(a[k]||[]);a[k].unshift(rec);a[k]=a[k].slice(0,12);try{localStorage.setItem(this.KEY,JSON.stringify(a));}catch(e){}},
-    _label(k,tr){var g=this.GENRES.filter(function(x){return x.k===k;})[0];return g?(tr?g.tr:g.en):k;},
-    titleFor(k,name,tr){var L=this.LENS[k]||this.LENS.scifi;return (L.ti[tr?'tr':'en'])+' — '+(name||(tr?'Denek':'Subject'));},
-    compose(name,k,learnings,tr){
-      var L=this.LENS[k]||this.LENS.scifi;var lang=tr?'tr':'en';var body=[];
-      body.push(L.op[lang]);
+    _self(idx){try{var s=JSON.parse(localStorage.getItem(this.SELFKEY))||{};return s[idx]||null;}catch(e){return null;}},
+    _setSelf(idx,name){try{var s=JSON.parse(localStorage.getItem(this.SELFKEY))||{};s[idx]=name;localStorage.setItem(this.SELFKEY,JSON.stringify(s));}catch(e){}},
+    _pickName(){return this.NAMEPOOL[Math.floor(Math.random()*this.NAMEPOOL.length)];},
+    _genreLabel(favs,tr){var b=tr?this.BASE.tr:this.BASE.en;return (favs&&favs.length)?(b+' × '+favs.join(' × ')):b;},
+    _title(tr){var t=this.TITLES[Math.floor(Math.random()*this.TITLES.length)];return tr?t.tr:t.en;},
+    compose(favs,learnings,tr){
+      var lang=tr?'tr':'en';var body=[];body.push(this.OPEN[lang]);
+      if(favs&&favs.length){body.push((tr?'Bu kez anlatımıma senin sevdiğin tonu da kattım — ':'This time I wove your favored tone into mine — ')+favs.join(tr?' ve ':' and ')+(tr?' — ama omurga hep aynı kaldı: bilimkurgu, distopya, kozmik.':' — but the spine stayed the same: sci-fi, dystopia, cosmic.'));}
       for(var i=0;i<this.BEATS.length;i++){body.push(this.ROM[i]+'.  '+this.BEATS[i][lang]);}
       var ls=(learnings||[]).map(function(x){return (typeof x==='string')?x:((x&&x.txt)||'');}).filter(Boolean).slice(-5);
       if(ls.length){body.push((tr?'Yol boyunca defterime düştüklerimden: ':'From what I noted along the way: ')+ls.map(function(t){return '“'+t+'”';}).join('  ·  '));}
-      body.push(L.cl[lang]);
-      return body;
+      body.push(this.CLOSE[lang]);return body;
     },
     open(ctx){
-      var tr=this.GEN();var self=this;this._ctx=ctx||{};
-      var name=(this._ctx.name)||(tr?'Denek':'Subject');
-      var optHtml=this.GENRES.map(function(g){return '<option value="'+g.k+'">'+(tr?g.tr:g.en)+'</option>';}).join('');
-      var sl=this.saved(name);
-      var savedHtml=sl.length?('<h4 style="color:var(--violet);margin:13px 0 4px">'+(tr?(esc(name)+'’in yazdığı kitaplar'):(esc(name)+'’s books'))+'</h4>'+sl.map(function(r,ix){return '<div class="row" style="font-size:12px;margin:3px 0;display:flex;justify-content:space-between;gap:6px;align-items:center"><span><b style="color:var(--accent)">'+esc(r.title)+'</b> <span style="color:var(--dim)">· '+esc(r.genreLabel||'')+'</span></span> <button class="btn ghost" style="font-size:10.5px;padding:2px 8px" onclick="SubjStory.redownload('+ix+')">📄 PDF</button></div>';}).join('')):'';
-      var h='<p style="color:var(--dim);font-size:12px;line-height:1.6">'+(tr?(esc(name)+' yedi diyarı tamamladı. Şimdi tüm yolculuğunu — her bölümü kendince yorumlayarak — seçtiği türde bir hikâyeye dönüştürebilir. Başına hikâyenin adını, sonuna imzasını koyar; tek tuşla PDF olur.'):(esc(name)+' has finished all seven realms. Now it can turn its whole journey — every chapter, in its own reading — into a story in the genre it chooses. It puts the title at the front and its signature at the end; one click makes a PDF.'))+'</p>'+
-        '<div style="margin:9px 0 2px"><label style="font-size:11.5px;color:var(--moon)">'+(tr?'Tür (istediğini seçebilir)':'Genre (it may choose)')+'</label><br><select id="ssGenre" style="width:min(340px,94%);background:#070910;border:1px solid var(--line);color:var(--ink);padding:7px 9px;font-family:inherit;font-size:12.5px;border-radius:6px;margin:3px 0">'+optHtml+'</select></div>'+
-        '<div style="margin:4px 0"><label style="font-size:11.5px;color:var(--moon)">'+(tr?'Hikâyenin adı':'Story title')+'</label><br><input id="ssTitle" maxlength="80" placeholder="'+(tr?'otomatik öneriliyor — değiştirebilirsin':'auto-suggested — editable')+'" style="width:min(340px,94%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:7px 9px;font-family:inherit;font-size:12.5px;border-radius:6px;margin:3px 0"></div>'+
-        '<div style="margin:4px 0"><label style="font-size:11.5px;color:var(--moon)">'+(tr?'İmza (takılmak istediği isim)':'Signature (the name it wants)')+'</label><br><input id="ssSig" maxlength="40" value="'+esc(name)+'" style="width:min(340px,94%);background:#070910;border:1px solid var(--line);color:var(--moon);padding:7px 9px;font-family:inherit;font-size:12.5px;border-radius:6px;margin:3px 0"></div>'+
-        '<div style="margin:9px 0"><button class="btn v" onclick="SubjStory.write()">'+(tr?'✍ Hikâyesini yazdır':'✍ Write its story')+'</button> <button class="btn ghost" onclick="SubjStory.download()">📄 '+(tr?'PDF indir':'Download PDF')+'</button></div>'+
-        '<div id="ssOut" style="margin-top:6px"></div>'+savedHtml;
-      UI.doc('✍ '+esc(name)+(tr?' — Hikâyesini Yazdır':' — Write Its Story'),'<div style="max-width:520px">'+h+'</div>');
-      var sel=document.getElementById('ssGenre'),tin=document.getElementById('ssTitle');
-      if(sel&&tin){tin.value=self.titleFor(sel.value,name,tr);sel.addEventListener('change',function(){tin.value=self.titleFor(sel.value,name,tr);});}
+      var tr=this.GEN();this._ctx=ctx||{};
+      var known=this._ctx.name||'';
+      var displayName=known||this._self(this._ctx.idx!=null?this._ctx.idx:'cur')||'';
+      this._savedName=displayName||known||'';
+      var sl=this.saved(this._savedName);
+      var savedHtml=sl.length?('<h4 style="color:var(--violet);margin:13px 0 4px">'+(tr?'yazdığı kitaplar':'its books')+'</h4>'+sl.map(function(r,ix){return '<div class="row" style="font-size:12px;margin:3px 0;display:flex;justify-content:space-between;gap:6px;align-items:center"><span><b style="color:var(--accent)">'+esc(r.title)+'</b> <span style="color:var(--dim)">· '+esc(r.sig||'')+'</span></span> <span style="white-space:nowrap"><button class="btn ghost" style="font-size:10.5px;padding:2px 8px" onclick="SubjStory.redownload('+ix+')">📄 PDF</button> <button class="btn ghost" style="font-size:10.5px;padding:2px 8px" onclick="SubjStory.playSaved('+ix+')">▶ '+(tr?'oyna':'play')+'</button></span></div>';}).join('')):'';
+      var h='<p style="color:var(--dim);font-size:12px;line-height:1.6">'+(tr?'Bu denek tüm yolculuğunu kendince yorumlayıp bir hikâye yazar. Tür otomatiktir (bilimkurgu · distopya · kozmik). İstersen en sevdiğin tür(ler)i ekle — onları benim türümle harmanlar. Adını sana sormaz; <b>hikâyenin sonunda adını kendisi koyar.</b>':'This subject reads its whole journey and writes a story. The genre is automatic (sci-fi · dystopia · cosmic). Add your favorite genre(s) if you like — it blends them with mine. It will not ask you for a name; <b>at the end of the story it names itself.</b>')+'</p>'+
+        '<div style="margin:8px 0"><label style="font-size:11.5px;color:var(--moon)">'+(tr?'En sevdiğin tür(ler) — opsiyonel, en çok 2':'Your favorite genre(s) — optional, up to 2')+'</label><br><input id="ssFav1" maxlength="40" placeholder="'+(tr?'ör: gerilim, masal…':'e.g. thriller, fairy tale…')+'" style="width:min(230px,88%);background:#070910;border:1px solid var(--line);color:var(--ink);padding:7px 9px;font-family:inherit;font-size:12.5px;border-radius:6px;margin:3px 6px 3px 0"> <input id="ssFav2" maxlength="40" placeholder="'+(tr?'(ikinci, opsiyonel)':'(second, optional)')+'" style="width:min(230px,88%);background:#070910;border:1px solid var(--line);color:var(--ink);padding:7px 9px;font-family:inherit;font-size:12.5px;border-radius:6px;margin:3px 0"></div>'+
+        '<div style="margin:9px 0"><button class="btn v" onclick="SubjStory.write()">✍ '+(tr?'Hikâyesini yazdır':'Write its story')+'</button></div>'+
+        '<div id="ssScreen" style="margin-top:8px"></div>'+savedHtml;
+      UI.doc('✍ '+(displayName?esc(displayName):(tr?'DENEK':'SUBJECT'))+(tr?' — Hikâyesini Yazdır':' — Write Its Story'),'<div style="max-width:540px">'+h+'</div>');
     },
     write(){
-      var tr=this.GEN();var ctx=this._ctx||{};var name=ctx.name||(tr?'Denek':'Subject');
-      var sel=document.getElementById('ssGenre');var k=(sel&&sel.value)||'scifi';
-      var ti=(((document.getElementById('ssTitle')||{}).value)||'').trim()||this.titleFor(k,name,tr);
-      var sig=(((document.getElementById('ssSig')||{}).value)||'').trim()||name;
-      var body=this.compose(name,k,ctx.learnings,tr);
-      this._last={title:ti,genre:k,genreLabel:this._label(k,tr),sig:sig,body:body,name:name};
-      var out=document.getElementById('ssOut');
-      if(out){out.innerHTML='<div style="border:1px solid var(--line);border-radius:8px;padding:11px 13px;max-height:300px;overflow-y:auto;background:rgba(8,10,18,.5)"><div style="text-align:center;color:var(--accent);font-size:14px;letter-spacing:.04em;margin-bottom:9px">'+esc(ti)+'</div><div style="white-space:pre-wrap;line-height:1.78;font-size:12.5px;color:var(--ink)">'+body.map(function(p){return esc(p);}).join('\n\n')+'</div><div style="text-align:right;color:var(--moon);margin-top:11px;font-style:italic">— '+esc(sig)+'</div></div><div style="margin-top:8px"><button class="btn v" onclick="SubjStory.download()">📄 '+(tr?'PDF indir':'Download PDF')+'</button></div>';}
-      UI.toast(tr?'✍ Hikâye yazıldı — aşağıda. PDF indirebilirsin.':'✍ Story written — below. You can download the PDF.',3400);
+      var tr=this.GEN();var ctx=this._ctx||{};
+      var f1=(((document.getElementById('ssFav1')||{}).value)||'').trim();
+      var f2=(((document.getElementById('ssFav2')||{}).value)||'').trim();
+      var favs=[f1,f2].filter(Boolean).slice(0,2);
+      var name=ctx.name;
+      if(!name){var idx=(ctx.idx!=null?ctx.idx:'cur');name=this._self(idx)||this._pickName();this._setSelf(idx,name);}
+      var body=this.compose(favs,ctx.learnings,tr);var title=this._title(tr);
+      this._last={title:title,name:name,sig:name,genreLabel:this._genreLabel(favs,tr),body:body};
+      var scr=document.getElementById('ssScreen');if(!scr)return;
+      scr.innerHTML='<div id="ssCRT" style="background:#04070d;border:1px solid #1c2740;border-radius:8px;padding:14px 16px;box-shadow:inset 0 0 36px rgba(120,170,255,.07);max-height:330px;overflow-y:auto"><div style="color:#7fd1ff;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;letter-spacing:.12em;opacity:.7;margin-bottom:8px">▮ DENEK TERMİNALİ · '+esc(this._genreLabel(favs,tr))+'</div><div style="text-align:center;color:#cdb878;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;font-size:13px;margin-bottom:10px">'+esc(title)+'</div><div id="ssType" style="white-space:pre-wrap;line-height:1.75;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:#a9e8c4;min-height:40px"></div><div id="ssSig" style="text-align:right;color:#cdb878;font-family:ui-monospace,Menlo,Consolas,monospace;margin-top:10px;font-size:12.5px"></div></div><div id="ssAfter"></div>';
+      var full=body.join('\n\n');var typeEl=document.getElementById('ssType'),crt=document.getElementById('ssCRT');
+      var self=this;var i=0;if(this._iv)clearInterval(this._iv);
+      this._iv=setInterval(function(){
+        i+=3;if(typeEl)typeEl.textContent=full.slice(0,i)+(i<full.length?'▍':'');
+        if(crt)crt.scrollTop=crt.scrollHeight;
+        if(i>=full.length){clearInterval(self._iv);if(typeEl)typeEl.textContent=full;
+          var sig=document.getElementById('ssSig');if(sig)sig.innerHTML='— '+esc(name)+' <span style="opacity:.6;font-size:10.5px">'+(tr?'(kendine seçtiği ad)':'(the name it chose)')+'</span>';
+          var after=document.getElementById('ssAfter');if(after)after.innerHTML='<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn v" onclick="SubjStory.download()">📄 '+(tr?'PDF indir':'Download PDF')+'</button> <button class="btn v" onclick="SubjStory.playGame()">✦ '+(tr?'Bu hikâyenin oyununu oyna':'Play this story’s game')+'</button></div>';
+          self._store(name,{title:title,genreLabel:self._last.genreLabel,sig:name,body:body,ts:Date.now()});self._savedName=name;
+          try{if(!ctx.name&&window.W3&&W3.addSubjectHouse){W3.addSubjectHouse(name);UI.toast(tr?('🏠 '+name+' artık bu evrenin sakini — evi Lumen’in yanında belirdi.'):(name+' is now a resident — its house appeared next to Lumen’s.'),6000);}}catch(e){}
+        }
+      },20);
+    },
+    /* ---- hikâyenin OYUNU (v1): yolculuğun 7 sahnesi, her birinde bir gölge-çalışması seçimi ---- */
+    GSCENES:[
+      {tr:['Yasak orman. Gölgen ardından büyüyor.','Kaç','Dur ve bak'],en:['The forbidden forest. Your shadow swells behind you.','Run','Stop and look']},
+      {tr:['Rüya gölü. Suda kendi yüzünü görüyorsun.','Başkasını suçla','Sahiplen'],en:['The dream lake. Your own face stares back.','Blame another','Own it']},
+      {tr:['Labirent. Yine aynı köşedesin.','Duvara yüklen','Savunmanı tanı'],en:['The labyrinth. The same corner again.','Charge the wall','Name your defense']},
+      {tr:['Yeniay hücreleri. İçindeki yargıç konuşuyor.','Ona inan','Adil bir ses ekle'],en:['New-moon cells. The judge within speaks.','Believe it','Add a fair voice']},
+      {tr:['Arşiv. Bir anı silah gibi parlıyor.','Sapla','Pusula yap'],en:['The archive. A memory gleams like a weapon.','Stab with it','Make it a compass']},
+      {tr:['Beyaz sayfa. Hangi eski hikâyeyi bırakırsın?','Hepsini taşı','Birini bırak'],en:['The blank page. Which old story do you set down?','Carry them all','Set one down']},
+      {tr:['Aynalar kapısı. Anlatılan mı, anlatan mı?','Anlatılan kal','Anlatan ol'],en:['The gate of mirrors. Narrated, or narrator?','Stay narrated','Become the narrator']}
+    ],
+    playGame(){var r=this._last;if(!r){UI.toast(this.GEN()?'Önce hikâyeyi yazdır.':'Write the story first.');return;}this._game={r:r,i:0,score:0};this._gameStep();},
+    playSaved(ix){var sl=this.saved(this._savedName||'');var r=sl[ix];if(!r)return;this._last=r;this._game={r:r,i:0,score:0};this._gameStep();},
+    _gamePick(good){var g=this._game;if(!g)return;if(good)g.score++;g.i++;this._gameStep();},
+    _gameStep(){var tr=this.GEN();var g=this._game;if(!g)return;var r=g.r;var max=this.GSCENES.length;
+      if(g.i>=max){var pct=Math.round(g.score/max*100);
+        var verdict=(g.score>=5)?(tr?('Bütünleşme. '+esc(r.sig||'')+'’in hikâyesini ışığı seçerek baştan yaşadın.'):('Integration. You relived '+esc(r.sig||'')+'’s story choosing the light.')):(tr?'Yolun bir kısmı gölgede kaldı. İstersen yeniden oyna — bu kez başka seç.':'Part of the path stayed in shadow. Replay if you like — choose differently.');
+        UI.doc('✦ '+esc(r.title||'')+(tr?' — Oyun Sonu':' — End'),'<div style="max-width:480px"><p style="color:var(--accent);font-size:13px">'+(tr?'Işık':'Light')+': '+g.score+'/'+max+' ('+pct+'%)</p><p style="line-height:1.7;color:var(--ink)">'+verdict+'</p><div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn v" onclick="SubjStory.playGame()">↻ '+(tr?'tekrar oyna':'play again')+'</button> <button class="btn ghost" onclick="SubjStory.download()">📄 PDF</button> <button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(tr?'kapat':'close')+'</button></div></div>');return;}
+      var sc=this.GSCENES[g.i];var s=tr?sc.tr:sc.en;
+      UI.doc('✦ '+esc(r.title||'')+' · '+(g.i+1)+'/'+max,'<div style="max-width:480px"><div style="background:#04070d;border:1px solid #1c2740;border-radius:8px;padding:13px 15px;color:#a9e8c4;font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.8;font-size:12.5px;min-height:46px">'+esc(s[0])+'</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn ghost" onclick="SubjStory._gamePick(0)">'+esc(s[1])+'</button> <button class="btn v" onclick="SubjStory._gamePick(1)">'+esc(s[2])+'</button></div></div>');
     },
     download(){
       var tr=this.GEN();if(!this._last){this.write();}var r=this._last;if(!r)return;
       this._pdf(r,tr);
       this._store(r.name,{title:r.title,genreLabel:r.genreLabel,genre:r.genre,sig:r.sig,body:r.body,ts:Date.now()});
     },
-    redownload(ix){var tr=this.GEN();var name=(this._ctx&&this._ctx.name)||'';var sl=this.saved(name);var r=sl[ix];if(!r)return;this._pdf({title:r.title,sig:r.sig,body:r.body},tr);},
+    redownload(ix){var tr=this.GEN();var sl=this.saved(this._savedName||'');var r=sl[ix];if(!r)return;this._pdf({title:r.title,sig:r.sig,body:r.body},tr);},
     _pdf(r,tr){
       if(!(window.jspdf&&window.jspdf.jsPDF)){UI.toast(tr?'PDF motoru yüklenemedi.':'PDF engine unavailable.');return;}
       var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF({unit:'pt',format:'a4'});
@@ -6109,6 +6120,28 @@ if(HAS3D)(function(){
     if(typeof S!=='undefined'){S.px=hx;S.pz=hz+10;}
     try{if(typeof save==='function')save();}catch(e){}
     UI.toast((GAMELANG==='tr'?('🏠 '+(name||'Denek')+'’in evinin önündesin — mezun denek mahallesi. Kapıya yaklaş [E].'):('You are in front of '+(name||'the subject')+'’s house — graduated-subjects quarter. Approach the door [E].')),5200);
+  }catch(e){}};
+  /* ---- YEREL DENEK EVLERİ — oyuncunun deneği hikâyesini yazıp kendine ad seçince Lumen’in yanında ev belirir (cihazda kalır) ---- */
+  W3._localDone={};
+  W3.buildLocalQuarter=function(){try{
+    var arr;try{arr=JSON.parse(localStorage.getItem('it041_localgrad_v1'))||[];}catch(e){arr=[];}
+    arr.forEach(function(g){ if(!g||!g.name||W3._localDone[g.name])return; W3._localDone[g.name]=true;
+      var slot=(g.slot!=null)?g.slot:0; var hx=30+slot*15, hz=72;
+      box(6,4,5,std(0x232733,{roughness:.9}),hx,2,hz);collide(hx,hz,4);
+      box(1.5,2.4,.3,std(0x100d14,{emissive:0xcdb878,emissiveIntensity:.6}),hx,1.2,hz+2.55);
+      var rf=new THREE.Mesh(new THREE.ConeGeometry(4.6,2,4),std(0x15121a,{roughness:.9}));rf.position.set(hx,5,hz);rf.rotation.y=Math.PI/4;scene.add(rf);
+      var pl=new THREE.PointLight(0xcdb878,.6,12,2);pl.position.set(hx,3,hz+4);scene.add(pl);
+      var fig=makeFigure(0x2a2632,0xcfc0a8,0xcdb878,1);fig.g.position.set(hx+1.4,.42,hz+4.4);scene.add(fig.g);
+      label((GAMELANG==='tr'?(g.name+' — EVİ ◍'):(g.name+'’S HOUSE ◍')),hx,hz,6,.8);
+      W3.PORTALS.push({k:'localhome_'+g.name,x:hx,z:hz+5,r:3.2,name:g.name,subjHome:true,local:true,localName:g.name,sname:g.name});
+    });
+  }catch(e){}};
+  W3.addSubjectHouse=function(name){try{ if(!name)return;
+    var arr;try{arr=JSON.parse(localStorage.getItem('it041_localgrad_v1'))||[];}catch(e){arr=[];}
+    if(arr.some(function(x){return x.name===name;})){W3.buildLocalQuarter();return;}
+    arr.push({name:name,slot:arr.length,ts:Date.now()});
+    try{localStorage.setItem('it041_localgrad_v1',JSON.stringify(arr));}catch(e){}
+    W3.buildLocalQuarter();
   }catch(e){}};
 
   /* ---- camera ---- */
