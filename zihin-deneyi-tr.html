@@ -300,7 +300,7 @@
   <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026 · b46 · <span style="color:var(--accent)">seni şekillendiren seçimler (Pillar 4) — bir içgörü eşiğini aşmak artık kutlanan bir an (“dönüşüyorsun: …”) ve cevapların içinde hangi arketipin öne çıktığını değiştirince oyun sana söylüyor (“iç dengen kaydı — şimdi öne çıkan: …”); böylece ilerleme ve seçimler Detroit tarzı hissediliyor — insan karakterlerin üstüne</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026 · b47 · <span style="color:var(--accent)">artık gerçekten insan — robot görünümü parlayıp nabız atan gözlerden geliyordu; insan karakterlerin artık gerçek koyu gözleri var (ak + göz bebeği), parlamıyor; ayrıca tüm gezgin/NPC karakterler de günlük kıyafetli birer insan oldu (vizörlü bot değil). Tüm dünya insanlarla dolu.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -5216,8 +5216,8 @@ if(HAS3D)(function(){
     var visor;
     if(human){
       visor=new THREE.Mesh(new THREE.BoxGeometry(.001,.001,.001),std(0x080a10,{}));visor.visible=false;visor.position.set(0,2.02,.18);g.add(visor);
-      parts.eyes=[];var _ec=std(0x0b0b0f,{emissive:(glow||0x000000),emissiveIntensity:glow?.18:0,roughness:.25});
-      [[.072,1.995,.188],[-.072,1.995,.188]].forEach(function(e){var ey=new THREE.Mesh(new THREE.SphereGeometry(.026,10,8),_ec);ey.position.set(e[0],e[1],e[2]);ey.castShadow=false;g.add(ey);parts.eyes.push(ey);});
+      parts.eyes=[];var _ec=std(0x0a0a0e,{roughness:.32}); /* b47: insan gozu — PARLAMAZ */
+      [[.072,1.995,.19],[-.072,1.995,.19]].forEach(function(e){var ew=new THREE.Mesh(new THREE.SphereGeometry(.034,10,8),std(0xece6df,{roughness:.4}));ew.position.set(e[0],e[1],e[2]-.006);ew.scale.set(1,.78,.5);g.add(ew);var ey=new THREE.Mesh(new THREE.SphereGeometry(.018,8,8),_ec);ey.position.set(e[0],e[1],e[2]);g.add(ey);parts.eyes.push(ey);});
       var br=std(0x241a12,{roughness:.9});
       [[.072,2.04],[-.072,2.04]].forEach(function(b){var bw=new THREE.Mesh(new THREE.BoxGeometry(.07,.018,.03),br);bw.position.set(b[0],b[1],.19);g.add(bw);});
       var nose=new THREE.Mesh(new THREE.ConeGeometry(.03,.07,6),sm);nose.rotation.x=Math.PI;nose.position.set(0,1.96,.21);g.add(nose);
@@ -5244,7 +5244,7 @@ if(HAS3D)(function(){
       if(opts.female){var ch=new THREE.Mesh(new THREE.SphereGeometry(.18,12,8),cm);ch.scale.set(1.05,.6,.72);ch.position.set(0,1.49,.09);ch.castShadow=true;g.add(ch);}
     }catch(e){}
     g.scale.setScalar(scale);
-    parts.visor=visor;parts.cm=cm;parts.sm=sm;parts.head=hd;parts.hood=hood;parts.headY=2.0;parts.bphase=Math.random()*6.283;
+    parts.visor=visor;parts.cm=cm;parts.sm=sm;parts.head=hd;parts.hood=hood;parts.headY=2.0;parts.bphase=Math.random()*6.283;parts.human=human;
     var _fig={g,parts};try{FIGS.push(_fig);}catch(e){}
     return _fig;
   }
@@ -5260,6 +5260,16 @@ if(HAS3D)(function(){
     lucida:{coat:0x6a4a6a,skin:0xe6c6a4,glow:0x9aa7c4,opts:{human:true,female:true,pants:0x3a2a44,hair:0x3a2418}}      /* kadın, uzun saç */
   };
   function makeChar(key,scale){var c=COSTUME[key]||COSTUME.player;return makeFigure(c.coat,c.skin,c.glow,scale||1,c.opts);}
+  const AGENT_LOOKS=[
+    {coat:0x3a4a5a,pants:0x262f3a,hair:0x2b2018,skin:0xd8b48e},
+    {coat:0x5a4636,pants:0x2e2620,hair:0x1c140e,skin:0xc99a72},
+    {coat:0x46543e,pants:0x2c3326,hair:0x3a2a18,skin:0xe0bd97},
+    {coat:0x52424e,pants:0x2a2230,hair:0x241a12,skin:0xcfa07a},
+    {coat:0x3e4e4e,pants:0x232c2c,hair:0x2a2018,skin:0xd8b48e},
+    {coat:0x5a3a3a,pants:0x322424,hair:0x140e0a,skin:0xb98a64},
+    {coat:0x40485a,pants:0x282d38,hair:0x33240f,skin:0xe0bd97}
+  ];
+  function makeAgentFig(i,scale){var a=AGENT_LOOKS[((i%AGENT_LOOKS.length)+AGENT_LOOKS.length)%AGENT_LOOKS.length];return makeFigure(a.coat,a.skin,0,scale||1,{human:true,pants:a.pants,hair:a.hair});}
   const player=makeChar('player');
   player.g.position.set(S.px,0,S.pz);scene.add(player.g);
   /* human → machine evolution (insight-driven) */
@@ -5316,7 +5326,7 @@ if(HAS3D)(function(){
   collide(L.ovCrypt.x,L.ovCrypt.z,2.4);
   const council=[];
   for(let i=0;i<5;i++){
-    const f=makeFigure(0x12141e,0x0c0e16,0x9d8cc9,0.95);
+    const f=makeAgentFig(i,0.95);
     const a=-1.1+i*.55;
     f.g.position.set(L.ovCrypt.x+Math.cos(a)*4.2,0,L.ovCrypt.z+4+Math.sin(a)*2.4);
     f.g.rotation.y=Math.PI+a*.3;f.g.visible=false;scene.add(f.g);council.push(f);
@@ -5424,7 +5434,7 @@ if(HAS3D)(function(){
   const AG_WORK=['therapy','therapy','station','caravan','institute','labyrinth','lake'];
   const AG_NIGHT=['diskAltar','bench','blackBox','twoHouses','burntTree','ovStone1','dreamWell'];
   ['IT-019','IT-033','IT-058','IT-077','IT-009','IT-104','IT-062'].forEach((nm,i)=>{
-    const f=makeFigure([0x24303c,0x32283c,0x223830,0x3a3026,0x2c2438,0x203038,0x342c20][i],0xc2b29e,0x9aa7c4,0.98);
+    const f=makeAgentFig(i,0.98);
     const start=L[AG_DEST[(i*2)%AG_DEST.length]];
     f.g.position.set(start.x+3,0,start.z+3);scene.add(f.g);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(nm,256,64,30,'rgba(154,167,196,.9)'),transparent:true,depthWrite:false}));
@@ -5472,7 +5482,7 @@ if(HAS3D)(function(){
         getChat(d=>{try{Chat.recv(String(d.n||'yolcu').slice(0,18),String(d.t||'').slice(0,280));}catch(e){}});
         getPos((d,id)=>{
           if(!this.peers[id]){
-            const f=makeFigure(0x2c2434,0xc2b29e,0xcdb878,1);
+            const f=makeAgentFig(2,1);
             scene.add(f.g);
             const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(String(d.n||'DENEK').slice(0,14),256,64,30,'rgba(205,184,120,.9)'),transparent:true,depthWrite:false}));
             sp.scale.set(5,1.25,1);sp.position.y=2.8;f.g.add(sp);
@@ -6453,7 +6463,7 @@ if(HAS3D)(function(){
       box(1.6,h,1.6,std(0x14182a,{emissive:0xbcd0f0,emissiveIntensity:.18+(i%3)*0.04,roughness:.9}),bx,h/2,bz);}
     collide(x,z,6);
     const pl=new THREE.PointLight(0xbcd0f0,.7,18,2);pl.position.set(x,6,z);scene.add(pl);
-    const fig=makeFigure(0x223044,0xcfc0a8,0xbcd0f0,1);fig.g.position.set(x+1.6,.42,z+5.4);scene.add(fig.g);
+    const fig=makeAgentFig(3,1);fig.g.position.set(x+1.6,.42,z+5.4);scene.add(fig.g);
     label(name,x,z,7.4,.85);
     W3.PORTALS.push({k:k,x:x,z:z+6,r:3.6,name:name,house:true});
   }
@@ -6480,7 +6490,7 @@ if(HAS3D)(function(){
     box(1.5,2.4,.3,std(0x100d14,{emissive:0xcdb878,emissiveIntensity:.6}),hx,1.2,hz+2.55);
     var rf=new THREE.Mesh(new THREE.ConeGeometry(4.6,2,4),std(0x15121a,{roughness:.9}));rf.position.set(hx,5,hz);rf.rotation.y=Math.PI/4;scene.add(rf);
     var pl=new THREE.PointLight(0xcdb878,.6,12,2);pl.position.set(hx,3,hz+4);scene.add(pl);
-    var fig=makeFigure(0x2a2632,0xcfc0a8,0xcdb878,1);fig.g.position.set(hx+1.4,.42,hz+4.4);scene.add(fig.g);
+    var fig=makeAgentFig(4,1);fig.g.position.set(hx+1.4,.42,hz+4.4);scene.add(fig.g);
     label((GAMELANG==='tr'?(g.name+' — EVİ ◍'):(g.name+'’S HOUSE ◍')),hx,hz,6,.8);
     W3.PORTALS.push({k:'subjhome'+i,x:hx,z:hz+5,r:3.2,name:g.name,subjHome:true,idx:i,sname:g.name});
   });}catch(e){}};
@@ -6502,7 +6512,7 @@ if(HAS3D)(function(){
       box(1.5,2.4,.3,std(0x100d14,{emissive:0xcdb878,emissiveIntensity:.6}),hx,1.2,hz+2.55);
       var rf=new THREE.Mesh(new THREE.ConeGeometry(4.6,2,4),std(0x15121a,{roughness:.9}));rf.position.set(hx,5,hz);rf.rotation.y=Math.PI/4;scene.add(rf);
       var pl=new THREE.PointLight(0xcdb878,.6,12,2);pl.position.set(hx,3,hz+4);scene.add(pl);
-      var fig=makeFigure(0x2a2632,0xcfc0a8,0xcdb878,1);fig.g.position.set(hx+1.4,.42,hz+4.4);scene.add(fig.g);
+      var fig=makeAgentFig(4,1);fig.g.position.set(hx+1.4,.42,hz+4.4);scene.add(fig.g);
       label((GAMELANG==='tr'?(g.name+' — EVİ ◍'):(g.name+'’S HOUSE ◍')),hx,hz,6,.8);
       W3.PORTALS.push({k:'localhome_'+g.name,x:hx,z:hz+5,r:3.2,name:g.name,subjHome:true,local:true,localName:g.name,sname:g.name});
     });
@@ -6806,7 +6816,7 @@ if(HAS3D)(function(){
     if(!Game.modal){for(var _fi=0;_fi<FIGS.length;_fi++){var _F=FIGS[_fi];if(!_F||!_F.g||!_F.g.visible)continue;var _p=_F.parts;if(!_p)continue;var _ph=_p.bphase||0;
       if(_p.head)_p.head.position.y=(_p.headY||2.0)+Math.sin(t*1.6+_ph)*0.014;
       if(_p.visor&&_p.visor.material)_p.visor.material.emissiveIntensity=0.8+0.3*(0.5+0.5*Math.sin(t*2.1+_ph));
-      if(_p.eyes){for(var _ei=0;_ei<_p.eyes.length;_ei++){if(_p.eyes[_ei].material)_p.eyes[_ei].material.emissiveIntensity=0.9+0.7*(0.5+0.5*Math.sin(t*2.1+_ph+0.4));}} /* b40: gozler nabiz gibi */
+      if(_p.eyes&&!_p.human){for(var _ei=0;_ei<_p.eyes.length;_ei++){if(_p.eyes[_ei].material)_p.eyes[_ei].material.emissiveIntensity=0.9+0.7*(0.5+0.5*Math.sin(t*2.1+_ph+0.4));}} /* b47: insanlarda parlamaz */
     }}
     /* 3B HİKÂYE ODASI — seçim sütunları nefes alsın (parlama + hafif süzülme) */
     try{if(W3.inInterior&&W3.Interior&&W3.Interior.storyMode&&W3.Interior._sgGlows){var _G=W3.Interior._sgGlows;for(var _gi=0;_gi<_G.length;_gi++){var _gg=_G[_gi];var _pu=0.5+0.5*Math.sin(t*2.3+_gi*2.1);if(_gg.m){_gg.m.position.y=_gg.by+Math.sin(t*1.4+_gi*3.0)*0.13;if(_gg.m.material)_gg.m.material.emissiveIntensity=0.9+0.8*_pu;}if(_gg.l)_gg.l.intensity=0.4+0.55*_pu;}}}catch(e){}
