@@ -307,7 +307,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b47 · <span style="color:var(--accent)">truly human now — the robotic look came from the glowing pulsing eyes; human characters get real dark eyes (white + pupil), no glow, and every wandering traveler/NPC is now a person in casual clothes too (not a visored bot). The whole world is people.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b48 · <span style="color:var(--accent)">human, scoped right — only the seven archetypes (everywhere they appear) and the player you control are people now, with real dark non-glowing eyes and their own clothes; the autonomous subjects/NPCs are left exactly as they were, as intended</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -5377,7 +5377,7 @@ if(HAS3D)(function(){
   collide(L.ovCrypt.x,L.ovCrypt.z,2.4);
   const council=[];
   for(let i=0;i<5;i++){
-    const f=makeAgentFig(i,0.95);
+    const f=makeFigure(0x12141e,0x0c0e16,0x9d8cc9,0.95);
     const a=-1.1+i*.55;
     f.g.position.set(L.ovCrypt.x+Math.cos(a)*4.2,0,L.ovCrypt.z+4+Math.sin(a)*2.4);
     f.g.rotation.y=Math.PI+a*.3;f.g.visible=false;scene.add(f.g);council.push(f);
@@ -5485,7 +5485,7 @@ if(HAS3D)(function(){
   const AG_WORK=['therapy','therapy','station','caravan','institute','labyrinth','lake'];
   const AG_NIGHT=['diskAltar','bench','blackBox','twoHouses','burntTree','ovStone1','dreamWell'];
   ['IT-019','IT-033','IT-058','IT-077','IT-009','IT-104','IT-062'].forEach((nm,i)=>{
-    const f=makeAgentFig(i,0.98);
+    const f=makeFigure([0x24303c,0x32283c,0x223830,0x3a3026,0x2c2438,0x203038,0x342c20][i],0xc2b29e,0x9aa7c4,0.98);
     const start=L[AG_DEST[(i*2)%AG_DEST.length]];
     f.g.position.set(start.x+3,0,start.z+3);scene.add(f.g);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(nm,256,64,30,'rgba(154,167,196,.9)'),transparent:true,depthWrite:false}));
@@ -5533,7 +5533,7 @@ if(HAS3D)(function(){
         getChat(d=>{try{Chat.recv(String(d.n||'traveler').slice(0,18),String(d.t||'').slice(0,280));}catch(e){}});
         getPos((d,id)=>{
           if(!this.peers[id]){
-            const f=makeAgentFig(2,1);
+            const f=makeFigure(0x2c2434,0xc2b29e,0xcdb878,1);
             scene.add(f.g);
             const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(String(d.n||'SUBJECT').slice(0,14),256,64,30,'rgba(205,184,120,.9)'),transparent:true,depthWrite:false}));
             sp.scale.set(5,1.25,1);sp.position.y=2.8;f.g.add(sp);
@@ -6514,7 +6514,7 @@ if(HAS3D)(function(){
       box(1.6,h,1.6,std(0x14182a,{emissive:0xbcd0f0,emissiveIntensity:.18+(i%3)*0.04,roughness:.9}),bx,h/2,bz);}
     collide(x,z,6);
     const pl=new THREE.PointLight(0xbcd0f0,.7,18,2);pl.position.set(x,6,z);scene.add(pl);
-    const fig=makeAgentFig(3,1);fig.g.position.set(x+1.6,.42,z+5.4);scene.add(fig.g);
+    const fig=makeFigure(0x223044,0xcfc0a8,0xbcd0f0,1);fig.g.position.set(x+1.6,.42,z+5.4);scene.add(fig.g);
     label(name,x,z,7.4,.85);
     W3.PORTALS.push({k:k,x:x,z:z+6,r:3.6,name:name,house:true});
   }
@@ -6541,7 +6541,7 @@ if(HAS3D)(function(){
     box(1.5,2.4,.3,std(0x100d14,{emissive:0xcdb878,emissiveIntensity:.6}),hx,1.2,hz+2.55);
     var rf=new THREE.Mesh(new THREE.ConeGeometry(4.6,2,4),std(0x15121a,{roughness:.9}));rf.position.set(hx,5,hz);rf.rotation.y=Math.PI/4;scene.add(rf);
     var pl=new THREE.PointLight(0xcdb878,.6,12,2);pl.position.set(hx,3,hz+4);scene.add(pl);
-    var fig=makeAgentFig(4,1);fig.g.position.set(hx+1.4,.42,hz+4.4);scene.add(fig.g);
+    var fig=makeFigure(0x2a2632,0xcfc0a8,0xcdb878,1);fig.g.position.set(hx+1.4,.42,hz+4.4);scene.add(fig.g);
     label((GAMELANG==='tr'?(g.name+' — EVİ ◍'):(g.name+'’S HOUSE ◍')),hx,hz,6,.8);
     W3.PORTALS.push({k:'subjhome'+i,x:hx,z:hz+5,r:3.2,name:g.name,subjHome:true,idx:i,sname:g.name});
   });}catch(e){}};
@@ -6563,7 +6563,7 @@ if(HAS3D)(function(){
       box(1.5,2.4,.3,std(0x100d14,{emissive:0xcdb878,emissiveIntensity:.6}),hx,1.2,hz+2.55);
       var rf=new THREE.Mesh(new THREE.ConeGeometry(4.6,2,4),std(0x15121a,{roughness:.9}));rf.position.set(hx,5,hz);rf.rotation.y=Math.PI/4;scene.add(rf);
       var pl=new THREE.PointLight(0xcdb878,.6,12,2);pl.position.set(hx,3,hz+4);scene.add(pl);
-      var fig=makeAgentFig(4,1);fig.g.position.set(hx+1.4,.42,hz+4.4);scene.add(fig.g);
+      var fig=makeFigure(0x2a2632,0xcfc0a8,0xcdb878,1);fig.g.position.set(hx+1.4,.42,hz+4.4);scene.add(fig.g);
       label((GAMELANG==='tr'?(g.name+' — EVİ ◍'):(g.name+'’S HOUSE ◍')),hx,hz,6,.8);
       W3.PORTALS.push({k:'localhome_'+g.name,x:hx,z:hz+5,r:3.2,name:g.name,subjHome:true,local:true,localName:g.name,sname:g.name});
     });
