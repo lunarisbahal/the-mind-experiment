@@ -183,10 +183,10 @@
       </div>
       <div style="text-align:right;margin-top:8px"><span class="small" id="bClearDlg">diyaloğu temizle</span></div>
       <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px">
-        <div class="sub"><b style="color:var(--gold)">◆ Oyun güncellemesini konseye işle</b> — "oyunda ne değişti"yi üyelerin hafızasına yazar (kronik). Hazır 4 dijest var ya da kendi metnini yaz.</div>
+        <div class="sub"><b style="color:var(--gold)">◆ Oyun güncellemesini konseye işle</b> — "oyunda ne değişti"yi üyelerin hafızasına yazar (kronik). Hazır güncel dijestler var ya da kendi metnini yaz.</div>
         <textarea id="updTxt" maxlength="400" placeholder="kendi güncelleme metnin (opsiyonel)…"></textarea>
         <div class="rowb">
-          <button class="act v" id="bUpdAll">◆ Hazır 4 dijesti gönder</button>
+          <button class="act v" id="bUpdAll">◆ Güncel dijestleri gönder</button>
           <button class="act ok" id="bUpdOne">bu metni gönder →</button>
         </div>
       </div>
@@ -227,6 +227,17 @@
         <div class="stat"><b id="sOrd">—</b><small>Claude komutu</small></div>
       </div>
       <div class="sub" id="updLine" style="text-align:center;margin-top:-6px;"></div>
+      <div style="margin-top:8px;border:1px solid var(--line);border-radius:8px;padding:10px;background:rgba(186,117,23,.05)">
+        <div style="font-size:10px;letter-spacing:.24em;color:var(--gold);text-transform:uppercase">Evrenin canlı durumu</div>
+        <div class="grid" style="margin-top:8px">
+          <div class="stat"><b id="puOnline">—</b><small>çevrimiçi yolcu · anonim</small></div>
+          <div class="stat"><b id="puSubjCh">—</b><small>otonom denek · bölüm</small></div>
+          <div class="stat"><b id="puEmber">—</b><small>🔥 kıvılcım</small></div>
+          <div class="stat"><b id="puGrad">—</b><small>mezun denek</small></div>
+        </div>
+        <div class="sub" id="puGradNames" style="margin-top:6px"></div>
+        <div class="sub" style="margin-top:4px;color:var(--dim);font-size:10px">İnsan oyuncuların aşaması/ilerlemesi gizli kalır — yalnızca anonim çevrimiçi sayım gösterilir (P2P). Evrenin kendi nabzı (otonom denek, ekonomi, mezunlar) gerçek zamanlıdır.</div>
+      </div>
       <h2 class="a" style="margin-top:10px">Kanona girenler · oyuna işlenenler</h2>
       <div class="sub">Onayladığın ve oyuna giren yönler. Dokun → oyuna etkisini gör. <b style="color:var(--moon)">(kanon = oyunun kendisi)</b></div>
       <div class="sat" id="kanonBox"><div class="empty" style="padding:10px">Henüz kanona giren yok.</div></div>
@@ -259,12 +270,20 @@
       <div class="sub">Sen yokken kurdukları diyaloglardan: kim kime nasıl öneri sunuyor, aralarındaki dinamik.</div>
       <div id="profReport"><div class="empty">Rapor henüz oluşmadı.</div></div>
     </section>
+    <!-- DENEKLER -->
+    <section class="view" id="v-denekler">
+      <h2 class="v">Otonom denekler · kitap & günlük</h2>
+      <div class="sub">Yetişen denek ve mezunlar. Yazdıkları kitap/hikâyeleri ve günlüklerini oku, onlarla doğrudan konuş. <b style="color:var(--moon)">Günlük/kitap için ⚙ operatör anahtarı gerekir.</b></div>
+      <div id="subjBox"><div class="empty">Denekler sekmesine geçince yüklenir…</div></div>
+      <div style="text-align:right;margin-top:8px"><span class="small" onclick="loadSubjects()">↻ yenile</span></div>
+    </section>
   </main>
 
   <nav>
     <div class="nb on" data-v="onay"><span class="ic">✦</span><span class="lb">Onaylar</span><span class="cnt" id="navCnt"></span></div>
     <div class="nb" data-v="meclis"><span class="ic">⟁</span><span class="lb">Meclis</span></div>
     <div class="nb" data-v="diyalog"><span class="ic">✺</span><span class="lb">Diyalog</span></div>
+    <div class="nb" data-v="denekler"><span class="ic">⊚</span><span class="lb">Denekler</span></div>
     <div class="nb" data-v="sinyal"><span class="ic">☷</span><span class="lb">Sinyal</span></div>
     <div class="nb" data-v="nabiz"><span class="ic">◍</span><span class="lb">Nabız</span></div>
     <div class="nb" data-v="profiller"><span class="ic">⌖</span><span class="lb">Profiller</span></div>
@@ -288,6 +307,7 @@ window.remindOrder=async function(id){const o=((S&&S.orders)||[]).find(x=>x.id==
 window.markOrder=async function(id,status){const d=await post('/orderfeedback',{id:id,status:status});if(d){toast(status==='done'?'İşlendi olarak işaretlendi.':status==='seen'?'Görüldü olarak işaretlendi.':'Yeniden açıldı.');getState();}};
 window.copyOrders=function(){const ord=(S&&S.orders)||[];const pend=ord.filter(o=>!o.status||o.status==='new'||o.status==='seen');const t='Claude köprüsünde bekleyen komutlarım:\n'+(pend.length?pend.map(o=>'• '+o.text+(o.note?(' (not: '+o.note+')'):'')).join('\n'):'(bekleyen yok)');try{navigator.clipboard.writeText(t).then(()=>toast('Bekleyen komutlar panoya kopyalandı — Claude sohbetine yapıştır.'),()=>toast('Kopyalanamadı.'));}catch(e){toast('Kopyalanamadı.');}};
 function ago(t){if(!t)return'';const s=(Date.now()-t)/1000;if(s<90)return'az önce';if(s<3600)return Math.floor(s/60)+' dk önce';if(s<86400)return Math.floor(s/3600)+' saat önce';return Math.floor(s/86400)+' gün önce';}
+function seenAt(k){try{var m=JSON.parse(localStorage.getItem('it041_seen')||'{}');if(!m[k]){m[k]=Date.now();var ks=Object.keys(m);if(ks.length>400)delete m[ks[0]];localStorage.setItem('it041_seen',JSON.stringify(m));}return m[k];}catch(e){return Date.now();}}
 function opKey(){let k=localStorage.getItem('it041_op_key');if(!k){k=prompt('Operatör anahtarın (Cloudflare OPERATOR_KEY):');if(k){k=k.trim();localStorage.setItem('it041_op_key',k);}}return k||'';}
 $('gear').onclick=()=>{const cur=localStorage.getItem('it041_op_key')||'';const k=prompt('Operatör anahtarı:',cur);if(k!==null){localStorage.setItem('it041_op_key',k.trim());toast('Anahtar kaydedildi.');}};
 
@@ -305,6 +325,28 @@ async function post(path,body){const key=opKey();if(!key){toast('Önce operatör
   try{const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':key},body:JSON.stringify(body||{})});
     const d=await r.json();if(r.status===403){toast('Anahtar yanlış. ⚙ ile düzelt.');return null;}return d;}
   catch(e){toast('Gönderilemedi (bağlantı).');return null;}}
+
+/* ---- EVRENİN CANLI DURUMU (gizlilik-korumalı: evren nabzı + anonim çevrimiçi sayım) ---- */
+async function loadPulse(){
+  try{const r=await fetch(API+'/subject',{cache:'no-store'});const s=await r.json();
+    if($('puSubjCh'))$('puSubjCh').textContent=(s&&s.ch!=null)?('B'+s.ch+(s.max?('/'+s.max):'')):'—';
+    const em=(s&&s.economy&&s.economy.ember!=null)?s.economy.ember:null;
+    if($('puEmber'))$('puEmber').textContent=(em!=null)?em:'—';
+  }catch(e){}
+  try{const g=await fetch(API+'/graduates',{cache:'no-store'});const gd=await g.json();const gl=(gd&&gd.graduates)||[];
+    if($('puGrad'))$('puGrad').textContent=gl.length;
+    if($('puGradNames'))$('puGradNames').textContent=gl.length?('Mezunlar: '+gl.map(x=>x.name).join(', ')):'Henüz mezun denek yok.';
+  }catch(e){}
+}
+let _presRooms=[];
+async function joinPresence(){
+  try{const {joinRoom}=await import('https://esm.run/trystero@0.20.0/nostr');
+    const cfg={appId:'dolunay-ekspres-it041'};
+    ['presence-en','presence-tr'].forEach(function(rid){try{const room=joinRoom(cfg,rid);room.onPeerJoin(updPres);room.onPeerLeave(updPres);_presRooms.push(room);}catch(e){}});
+    setTimeout(updPres,1600);
+  }catch(e){if($('puOnline'))$('puOnline').textContent='—';}
+}
+function updPres(){try{let n=0;_presRooms.forEach(function(rm){try{n+=Object.keys(rm.getPeers()).length;}catch(e){}});if($('puOnline'))$('puOnline').textContent=n;}catch(e){}}
 
 function dStr(arr){if(!arr)return'';return SATG.map((g,i)=>{const v=arr[i];const c=v>0?'pos':v<0?'neg':'';return `<span class="${c}">${g[1].split(' ')[0]} ${v>0?'+':''}${v}</span>`;}).join(' ');}
 function advisorOf(p){var a=(p.d&&p.d.a)||[0,0,0],r=(p.d&&p.d.r)||[0,0,0];var na=a.reduce((x,y)=>x+(y||0),0),nr=r.reduce((x,y)=>x+(y||0),0);var net=na-nr;var v=net>=22?["YAP","var(--accent)","net faydalı görünüyor — kazanımı yüksek"]:net>=10?["yapmaya değer","var(--accent)","faydası maliyetinden ağır basıyor"]:net>0?["sana kalmış","var(--gold)","etkisi ölçülü; dengeyi sen belirle"]:["temkinli ol","var(--warn)","kazanımı net değil; ertelemek mantıklı olabilir"];return {v:v};}
@@ -341,6 +383,7 @@ function renderAll(){if(!S)return;
   $('sPend').textContent=pend.length;$('sKanon').textContent=(S.kanon||[]).length;
   $('sDlg').textContent=dl.length;$('sOrd').textContent=ord.length;
   $('updLine').textContent=S.updated?('son güncelleme: '+ago(S.updated)):'';
+  try{loadPulse();}catch(e){}
   $('satBox').innerHTML=SATG.map(g=>{const v=(S.sat&&S.sat[g[0]])||0;return `<div class="r"><div class="top"><b>${g[1]}</b><span style="color:${g[2]}">%${v}</span></div><div class="bar"><i style="width:${v}%;background:${g[2]}"></i></div></div>`;}).join('');
   // OYUNCU ETKİNLİĞİ — operatörün kendi hareketleri (op:true) hariç; sadece diğer oyuncular.
   if($('playerLog')){const acts=(S.activity||[]).filter(a=>!a.op);
@@ -379,7 +422,7 @@ function renderMeclis(){
   $('feed').innerHTML=feed.length?feed.map(m=>{const op=(m[0]==='__op');const c=op?'var(--gold)':mC(m[0]);const nm=op?'SEN':mN(m[0]);
     return `<div class="mbub" style="border-color:${c}">`+
       `<span class="mav" style="border-color:${c};color:${c};background:${op?'rgba(205,184,120,.12)':c+'18'}">${op?'◆':nm.replace('MC ','')[0]}</span>`+
-      `<div class="mbody"><span class="mn" style="color:${c}">${nm}</span><span class="mt">${esc(m[1])}</span>${op?"":`<div style="margin-top:5px"><span class="small" data-by="${m[0]}" data-tx="${escA(m[1])}" onclick="bringToApproval(this.dataset.by,this.dataset.tx)">⤴ onaya getir</span></div>`}</div></div>`;}).join(''):'<div class="empty">Henüz tartışma yok. "yeni tur" iste ya da bir üyeye dokunup söz ver.</div>';
+      `<div class="mbody"><span class="mn" style="color:${c}">${nm}</span><span style="font-size:9px;color:var(--dim);margin-left:7px">${ago(seenAt('f|'+m[0]+'|'+String(m[1]||'').slice(0,34)))}</span><span class="mt">${esc(m[1])}</span>${op?"":`<div style="margin-top:5px"><span class="small" data-by="${m[0]}" data-tx="${escA(m[1])}" onclick="bringToApproval(this.dataset.by,this.dataset.tx)">⤴ onaya getir</span></div>`}</div></div>`;}).join(''):'<div class="empty">Henüz tartışma yok. "yeni tur" iste ya da bir üyeye dokunup söz ver.</div>';
 }
 let mtTarget=null;
 window.openReply=function(k){mtTarget=k;const r=$('mtReply');r.style.display='block';
@@ -404,17 +447,51 @@ $('bClearDlg').onclick=async()=>{if(!confirm('Diyaloğu temizle?'))return;const 
 $('bClearFeed').onclick=async()=>{if(!confirm('Meclis geçmişini temizle?'))return;const d=await post('/clearfeed');if(d&&d.ok){toast('Meclis temizlendi.');getState();}};
 $('killBtn').onclick=async()=>{const d=await post('/stop');if(d&&typeof d.autoStopped!=='undefined'){toast(d.autoStopped?'⏻ Otonom yaşam durduruldu.':'Otonom yaşam başladı.');getState();}};
 
-function switchTo(v){document.querySelectorAll('.nb').forEach(n=>n.classList.toggle('on',n.dataset.v===v));document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));}
+function switchTo(v){document.querySelectorAll('.nb').forEach(n=>n.classList.toggle('on',n.dataset.v===v));document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));if(v==='denekler')try{loadSubjects();}catch(e){}}
+async function loadSubjects(){
+  const box=$('subjBox'); if(!box)return; box.innerHTML='<div class="empty">yükleniyor…</div>';
+  let s=null,g=[],book=null;
+  try{s=await (await fetch(API+'/subject',{cache:'no-store'})).json();}catch(e){}
+  try{const gd=await (await fetch(API+'/graduates',{cache:'no-store'})).json();g=(gd&&gd.graduates)||[];}catch(e){}
+  const key=(typeof opKey==='function')?opKey():'';
+  if(key){try{book=await (await fetch(API+'/subjectbook',{headers:{'x-operator-key':key},cache:'no-store'})).json();}catch(e){}}
+  let h='';
+  const nm=(s&&s.name&&String(s.name).trim())?s.name:'DENEK-019';
+  h+='<div class="rep" style="border-color:var(--violet)"><div class="who" style="color:var(--violet)">◍ '+esc(nm)+' · yetişen · Bölüm '+((s&&s.ch)||1)+'/49'+((s&&s.book2)?' ✦ İKİNCİ KİTAP':'')+'</div>';
+  const learn=((s&&s.learnings)||[]).slice(-4).reverse();
+  if(learn.length)h+='<div class="sub" style="margin:4px 0;color:var(--moon)">'+learn.map(x=>'• '+esc((x&&x.txt)||x||'')).join('<br>')+'</div>';
+  if(book&&book.book){
+    const dia=book.book.filter(p=>p.kind==='diary').slice(-3);
+    const st=book.book.filter(p=>p.kind==='story');
+    if(dia.length)h+='<div class="sub" style="margin:6px 0"><b style="color:var(--gold)">günlük:</b> '+dia.map(p=>esc(String(p.text||'').slice(0,170))).join(' · ')+'</div>';
+    if(st.length)h+='<div class="sub" style="margin:6px 0;white-space:pre-wrap;max-height:150px;overflow-y:auto;color:var(--ink)"><b style="color:var(--gold)">senaryo/hikâye:</b>\n'+esc(String(st[st.length-1].text||'').slice(0,520))+'…</div>';
+  } else if(!key){h+='<div class="sub" style="color:var(--dim)">(günlük/kitap için ⚙ operatör anahtarı girilmeli)</div>';}
+  h+='<textarea id="subjAskTxt" maxlength="320" placeholder="'+escA(nm)+'\'e sor…"></textarea><button class="act ok" onclick="saySubj()">sor →</button></div>';
+  if(g.length){
+    h+='<h2 class="a" style="margin-top:12px">Mezun denekler · yazdıkları kitaplar</h2>';
+    g.forEach((x,i)=>{ const sts=(x.stories||[]);
+      h+='<div class="rep" style="border-color:var(--gold)"><div class="who" style="color:var(--gold)">◍ '+esc(x.name||('Denek-'+(i+1)))+(x.genre?(' · '+esc(x.genre)):'')+'</div>';
+      h+= sts.length?('<div class="sub" style="white-space:pre-wrap;max-height:160px;overflow-y:auto;color:var(--ink)">'+sts.map(p=>esc(p.text)).join('\n— · —\n')+'</div>'):'<div class="sub" style="color:var(--dim)">(henüz hikâye yazmadı)</div>';
+      h+='<textarea id="gAsk'+i+'" maxlength="320" placeholder="'+escA(x.name||'denek')+'\'e sor…"></textarea><button class="act ok" onclick="sayGrad('+i+')">sor →</button></div>';
+    });
+  } else { h+='<div class="sub" style="color:var(--dim);margin-top:10px">Henüz mezun denek yok — ilk turu bitirip isim verilen denek (örn. Lumen) burada belirir.</div>'; }
+  box.innerHTML=h;
+}
+window.saySubj=async function(){const el=$('subjAskTxt');if(!el)return;const t=el.value.trim();if(!t)return;el.value='';try{const d=await (await fetch(API+'/subjectsay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t,lang:'tr'})})).json();toast(d&&d.reply?('denek: '+String(d.reply).slice(0,90)):'Yanıt gelmedi (beyin meşgul olabilir).');}catch(e){toast('Bağlantı yok.');}};
+window.sayGrad=async function(i){const el=$('gAsk'+i);if(!el)return;const t=el.value.trim();if(!t)return;el.value='';try{const d=await (await fetch(API+'/graduatesay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idx:i,text:t,lang:'tr'})})).json();toast(d&&d.reply?('denek: '+String(d.reply).slice(0,90)):'Yanıt gelmedi.');}catch(e){toast('Bağlantı yok.');}};
 document.querySelectorAll('.nb').forEach(n=>n.onclick=()=>switchTo(n.dataset.v));
 
-getState();health();
+getState();health();loadPulse();joinPresence();
 setInterval(getState,60000);
+setInterval(loadPulse,45000);
 
 const UPD_DIGESTS=[
-"Lunaris evi (B1-7) ve Bahal evi (Roma, B8-14) yeni paradigmada acildi: kapida uyanis + oda-oda kendi-hayatindan shadow-work + CBT/EMDR/odev + odul.",
-"7-arketip zihin/denge profili kuruldu (Lunaris-farkindalik, Bahal-dirilik, Lucida-berraklik, Noctornus-durustluk, Lucius-duzen, Silvanus-kabul, Aelius-perspektif); orta seviyeden baslar.",
-"Mimar Modu artik denge>=%55 + kolektife-kal onayi ister; isim duser (ego serbest). Onaylar topluluk istatistigine islenir.",
-"Onboarding, veri-silme, guvenlik cikislari, ana/yan gorev ayrimi, harita ev isaretleri eklendi. Sirada: Lucida evi (Kitap 2 ile)."
+"GUNCEL DURUM (b22, kurulus 15 Haziran 2026): Lunaris evi (B1-7) ve Bahal evi (Roma, B8-14) acik; kapida uyanis + oda-oda kendi-hayatindan shadow-work + CBT/EMDR/odev + odul.",
+"Lucida'nin Aynasi YAPILDI (artik 'sirada' degil), ayrica Yarik Kapi ritueli, Bos Oda ve Yanki Odasi (Echo Chamber) insa edildi ve 3B dunyada gezilebilir; menu sadelesti, ozellikler menuden cikip dunyaya tasindi.",
+"Otonom denek yedi diyari bitirince kendi adini KENDISI koyar; yolculugunu siberpunk/distopik/kozmik turde GERCEK bir romana donusturup PDF alir (paylasimli 70B yapay zeka). Bu hikayeler Ucuncu Kitabin bolumleridir; yedi arketip hikayede karakter olarak gecer.",
+"Mezun denekler (ilki Lumen) Lunaris'in yaninda kendi 3B evlerinde yasar; evdeki kutuphaneden yazdiklari kitaplar okunur, kendileriyle konusulur; yeni mezunun evi otomatik belirir.",
+"EMDR iki fazli (once bilgilendirme; 'basla' deyince ekran isigi + bilateral L/R ses); terapi merkezi ilk terapotik beceri ogrenilene kadar kilitli; dusuk-cabali cevaplar ilerlemeyi durdurur.",
+"7-arketip zihin/denge profili + NEXUS zihin haritasi tum oyun aksiyonlarinin ortalamasiyla beslenir. Ordos Veritas bir ORGUTtur (karakter/arketip degil). Mimar Modu denge>=%55 + kolektife-kal onayi ister; isim duser."
 ];
 async function sendUpdate(text){
   const key=opKey(); if(!key){toast('Once operator anahtarini gir (gear).');return false;}
@@ -423,7 +500,7 @@ async function sendUpdate(text){
   try{const r2=await fetch(API+'/handsup',{method:'POST',headers:h,body:JSON.stringify({who:'aelius',text:'OYUN GUNCELLEMESI: '+text})});return r2.ok;}catch(e){}
   return false;
 }
-if($('bUpdAll'))$('bUpdAll').onclick=async()=>{$('bUpdAll').disabled=true;$('bUpdAll').textContent='gonderiliyor...';let ok=0;for(const d of UPD_DIGESTS){if(await sendUpdate(d))ok++;}$('bUpdAll').disabled=false;$('bUpdAll').textContent='◆ Hazir 4 dijesti gonder';toast(ok+'/'+UPD_DIGESTS.length+' guncelleme konseye islendi.');try{getState();}catch(e){}};
+if($('bUpdAll'))$('bUpdAll').onclick=async()=>{$('bUpdAll').disabled=true;$('bUpdAll').textContent='gonderiliyor...';let ok=0;for(const d of UPD_DIGESTS){if(await sendUpdate(d))ok++;}$('bUpdAll').disabled=false;$('bUpdAll').textContent='◆ Guncel dijestleri gonder';toast(ok+'/'+UPD_DIGESTS.length+' guncelleme konseye islendi.');try{getState();}catch(e){}};
 if($('bUpdOne'))$('bUpdOne').onclick=async()=>{const t=$('updTxt').value.trim();if(!t)return;$('bUpdOne').disabled=true;const ok=await sendUpdate(t);$('bUpdOne').disabled=false;if(ok){$('updTxt').value='';toast('Guncelleme konseye islendi.');}else{toast('Gonderilemedi - anahtari/baglantiyi kontrol et.');}try{getState();}catch(e){}};
 
 </script>
