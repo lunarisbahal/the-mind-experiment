@@ -4623,7 +4623,7 @@ if(HAS3D)(function(){
     if(typeof THREE.EffectComposer==='function'&&typeof THREE.UnrealBloomPass==='function'&&typeof THREE.RenderPass==='function'&&typeof THREE.ShaderPass==='function'){
       composer=new THREE.EffectComposer(renderer);
       renderPass=new THREE.RenderPass(scene,camera);composer.addPass(renderPass);
-      bloomPass=new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),0.62,0.5,0.62);composer.addPass(bloomPass);
+      bloomPass=new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),0.7,0.6,0.82);composer.addPass(bloomPass); /* yüksek eşik = sadece parlak ışıklar parlasın, sis yapmasın */
       if(THREE.GammaCorrectionShader){var _gp=new THREE.ShaderPass(THREE.GammaCorrectionShader);composer.addPass(_gp);}
       composer.setSize(innerWidth,innerHeight);
       bloomOn=!_coarse;
