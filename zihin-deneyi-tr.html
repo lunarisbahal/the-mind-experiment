@@ -300,7 +300,7 @@
   <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026 · b55 · <span style="color:var(--accent)">zihnin labirenti — yedi arketip ve sen artık gerçek insanlar gibi görünüyorsunuz (robot zırhı yok); ufkun çok uzağında bir bilinç ışığı, kayan savunma-mekanizması kalkanlarının ardında parlıyor. Birinci kişi görünümü için C'ye bas; kamera artık daha alçak ve daha yakın</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026 · b56 · <span style="color:var(--accent)">bilinçdışı şekil alıyor — kamera artık neredeyse göz hizasında (tam birinci kişi için C). Noctornus artık bir şehir değil; sokak lambaları ve uzaktan ulumalarla dolu tekinsiz bir ormanda bir MAĞARA. Bahal'ın yakınında geceleri uzak sirenler ve trafikle uğuldayan bir MAHALLE; ufukta labirent duvarları. Sesler cihazda sentezleniyor</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -1890,6 +1890,32 @@ const Snd={
     src.connect(hp);hp.connect(bp);bp.connect(g);g.connect(this.master);src.start();
     this._hissG=g;this._hissSrc=src;
   }catch(e){} },
+  /* b56: BOLGESEL ORTAM SESLERI — sentezlenmis (cihazdan cikmaz). Orman gecesi (ruzgar+uzak ulumalar) Noctornus magarasinda; sehir gecesi (trafik+siren+kalabalik) Bahal mahallesinde. Yakinliga gore capraz gecis. */
+  _ensureZoneAmb(){ if(this._zoneAmb||!this.ac)return; try{
+    var ac=this.ac;
+    var nb=ac.createBuffer(1,ac.sampleRate*4,ac.sampleRate);var nd=nb.getChannelData(0);for(var i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+    /* FOREST NIGHT */
+    var fG=ac.createGain();fG.gain.value=0;fG.connect(this.master);
+    var w=ac.createBufferSource();w.buffer=nb;w.loop=true;var wlp=ac.createBiquadFilter();wlp.type='lowpass';wlp.frequency.value=300;var wg=ac.createGain();wg.gain.value=.11;w.connect(wlp);wlp.connect(wg);wg.connect(fG);w.start();
+    var wlfo=ac.createOscillator();wlfo.frequency.value=.07;var wlg=ac.createGain();wlg.gain.value=.05;wlfo.connect(wlg);wlg.connect(wg.gain);wlfo.start();
+    var hOsc=ac.createOscillator();hOsc.type='sawtooth';hOsc.frequency.value=200;var hbp=ac.createBiquadFilter();hbp.type='bandpass';hbp.frequency.value=560;hbp.Q.value=4.5;var hG=ac.createGain();hG.gain.value=0;hOsc.connect(hbp);hbp.connect(hG);hG.connect(fG);hOsc.start();
+    var owl=ac.createOscillator();owl.type='sine';owl.frequency.value=420;var owG=ac.createGain();owG.gain.value=0;owl.connect(owG);owG.connect(fG);owl.start();
+    /* CITY NIGHT */
+    var cG=ac.createGain();cG.gain.value=0;cG.connect(this.master);
+    var tr=ac.createBufferSource();tr.buffer=nb;tr.loop=true;var tlp=ac.createBiquadFilter();tlp.type='lowpass';tlp.frequency.value=130;var tg=ac.createGain();tg.gain.value=.17;tr.connect(tlp);tlp.connect(tg);tg.connect(cG);tr.start();
+    var cr=ac.createBufferSource();cr.buffer=nb;cr.loop=true;var cbp=ac.createBiquadFilter();cbp.type='bandpass';cbp.frequency.value=520;cbp.Q.value=.5;var cg=ac.createGain();cg.gain.value=.05;cr.connect(cbp);cbp.connect(cg);cg.connect(cG);cr.start();
+    var crlfo=ac.createOscillator();crlfo.frequency.value=.12;var crlg=ac.createGain();crlg.gain.value=.03;crlfo.connect(crlg);crlg.connect(cg.gain);crlfo.start();
+    var sOsc=ac.createOscillator();sOsc.type='sine';sOsc.frequency.value=740;var sbp=ac.createBiquadFilter();sbp.type='bandpass';sbp.frequency.value=900;sbp.Q.value=2;var sG=ac.createGain();sG.gain.value=0;sOsc.connect(sbp);sbp.connect(sG);sG.connect(cG);sOsc.start();
+    this._zoneAmb={fG:fG,cG:cG,hOsc:hOsc,hG:hG,owl:owl,owG:owG,sOsc:sOsc,sG:sG};
+    var self=this;
+    this._howlT=setInterval(function(){try{if(!self._zoneAmb||fG.gain.value<0.012)return;var n=ac.currentTime;var f0=170+Math.random()*70;hOsc.frequency.cancelScheduledValues(n);hOsc.frequency.setValueAtTime(f0,n);hOsc.frequency.linearRampToValueAtTime(f0*1.7,n+0.9);hOsc.frequency.linearRampToValueAtTime(f0*1.15,n+2.6);hG.gain.cancelScheduledValues(n);hG.gain.setValueAtTime(0,n);hG.gain.linearRampToValueAtTime(.13,n+0.55);hG.gain.linearRampToValueAtTime(.10,n+1.9);hG.gain.linearRampToValueAtTime(0,n+3.0);}catch(e){}},8500);
+    this._owlT=setInterval(function(){try{if(!self._zoneAmb||fG.gain.value<0.012)return;var n=ac.currentTime;owl.frequency.setValueAtTime(430,n);owG.gain.cancelScheduledValues(n);owG.gain.setValueAtTime(0,n);owG.gain.linearRampToValueAtTime(.05,n+0.08);owG.gain.linearRampToValueAtTime(0,n+0.5);owG.gain.linearRampToValueAtTime(.04,n+0.9);owG.gain.linearRampToValueAtTime(0,n+1.4);}catch(e){}},13000);
+    this._sirenT=setInterval(function(){try{if(!self._zoneAmb||cG.gain.value<0.012)return;var n=ac.currentTime;sG.gain.cancelScheduledValues(n);sG.gain.setValueAtTime(0,n);sG.gain.linearRampToValueAtTime(.05,n+0.4);var t=n;for(var k=0;k<5;k++){sOsc.frequency.setValueAtTime(760,t);sOsc.frequency.setValueAtTime(600,t+0.5);t+=1.0;}sG.gain.setValueAtTime(.05,t-0.4);sG.gain.linearRampToValueAtTime(0,t+0.5);}catch(e){}},15000);
+  }catch(e){} },
+  setZoneAmb(f,c){ if(!this.on)return; this._ensureZoneAmb(); if(!this._zoneAmb)return; var z=this._zoneAmb;
+    var ft=Math.max(0,Math.min(1,f))*0.5, ct=Math.max(0,Math.min(1,c))*0.5;
+    z.fG.gain.value+=(ft-z.fG.gain.value)*.05; z.cG.gain.value+=(ct-z.cG.gain.value)*.05; },
+
   toggleTapes(){this.tapesOn=!this.tapesOn;this.init();
     {const _b=document.getElementById('tapBtn');if(_b)_b.textContent='KAYITLAR: '+(this.tapesOn?'AÇIK':'KAPALI');}
     const w=this._zoneWant;this.tapeIdx=-2;this.zoneTape(w);},
@@ -6565,11 +6591,66 @@ if(HAS3D)(function(){
     label(name,x,z,7.4,.85);
     W3.PORTALS.push({k:k,x:x,z:z+6,r:3.6,name:name,house:true});
   }
+
+  /* b56: NOCTORNUS MAGARASI — sehir yerine tekinsiz bir magara agzi, karanlik orman ve sokak lambalari. */
+  function buildNoctCave(x,z,name){
+    var amb=new THREE.PointLight(0x6a4a55,.45,32,2);amb.position.set(x,5,z);scene.add(amb);
+    var mound=new THREE.Mesh(new THREE.SphereGeometry(6.4,18,12,0,6.283,0,1.45),std(0x131119,{roughness:1}));
+    mound.scale.set(1.55,1.05,1.25);mound.position.set(x,0,z-1.4);scene.add(mound);collide(x,z-1.4,5.6);
+    var mouth=new THREE.Mesh(new THREE.CircleGeometry(2.5,26,0,Math.PI),new THREE.MeshBasicMaterial({color:0x000000}));
+    mouth.position.set(x,2.0,z+3.0);scene.add(mouth);
+    var inner=new THREE.PointLight(0x4a6a8a,.85,11,2);inner.position.set(x,1.9,z+2.0);scene.add(inner);
+    box(3,.4,3,std(0x0c0a10,{emissive:0x4a6a8a,emissiveIntensity:.14}),x,.2,z+5);
+    var ring=new THREE.Mesh(new THREE.TorusGeometry(1.6,.16,10,26),std(0x14101a,{emissive:0x6a7e9a,emissiveIntensity:.6,metalness:.4,roughness:.5}));ring.position.set(x,2.0,z+5);scene.add(ring);W3._portals.push(ring);
+    try{var fig=makeChar('noct',1);fig.g.position.set(x+2.4,.42,z+4.4);fig.g.rotation.y=-.5;scene.add(fig.g);}catch(e){}
+    for(var i=0;i<11;i++){var a=(i/11)*6.283+0.3;var tr=9+(i%3)*2.4;var tx=x+Math.cos(a)*tr,tz=z+Math.sin(a)*tr;
+      cyl(.18,.26,2.2,std(0x120f0c,{roughness:.95}),tx,1.1,tz);
+      var cone=new THREE.Mesh(new THREE.ConeGeometry(1.5,3.6,7),std(0x0f1d17,{roughness:.95,emissive:0x0a160f,emissiveIntensity:.1}));cone.position.set(tx,3.3,tz);scene.add(cone);}
+    [[x-7.5,z+7],[x+7.5,z+6],[x-10,z-3]].forEach(function(p){
+      cyl(.1,.12,4.2,std(0x1a1a1e,{roughness:.6}),p[0],2.1,p[1]);
+      var hd=new THREE.Mesh(new THREE.SphereGeometry(.28,10,8),std(0x1a140a,{emissive:0xffb060,emissiveIntensity:.9}));hd.position.set(p[0],4.2,p[1]);scene.add(hd);
+      var lp=new THREE.PointLight(0xffb060,.5,13,2);lp.position.set(p[0],4.0,p[1]);scene.add(lp);});
+    label(name,x,z,7.2,.8);
+    W3.PORTALS.push({k:'noct',x:x,z:z+5,r:3.4,name:name,house:true});
+  }
+  /* b56: BAHAL MAHALLESI — Amerikan/ghetto sokak: yol, iki yanda evler, sokak lambalari (sehir gecesi sesi bolgesi). */
+  function buildHood(x,z){
+    var road=new THREE.Mesh(new THREE.PlaneGeometry(8,42),std(0x15161a,{roughness:.96}));road.rotation.x=-Math.PI/2;road.position.set(x,.05,z);scene.add(road);
+    for(var d=-17;d<=17;d+=6){box(.25,.02,1.7,std(0x3a3a30,{emissive:0x4a4636,emissiveIntensity:.2}),x,.07,z+d);}
+    var cols=[0x2a2622,0x262a2e,0x2e2622,0x222a26];
+    for(var s=0;s<2;s++){var hx=x+(s?6.4:-6.4);
+      for(var h=0;h<4;h++){var hz=z-14+h*9;var col=cols[(s*4+h)%cols.length];
+        box(4.2,3.4,4,std(col,{roughness:.95}),hx,1.7,hz);collide(hx,hz,3);
+        var roof=new THREE.Mesh(new THREE.BoxGeometry(4.6,.5,4.4),std(0x16140f,{roughness:.95}));roof.position.set(hx,3.6,hz);scene.add(roof);
+        box(.9,.7,.12,std(0x0c0a08,{emissive:0xffce7a,emissiveIntensity:((h+s)%2)?.7:.3}),hx+(s?-2.16:2.16),2.0,hz,Math.PI/2,scene,false);}}
+    for(var lz=-12;lz<=12;lz+=12){[x-7,x+7].forEach(function(lx){
+      cyl(.1,.12,4.4,std(0x1a1a1e,{roughness:.6}),lx,2.2,z+lz);
+      var hd=new THREE.Mesh(new THREE.SphereGeometry(.26,10,8),std(0x1a140a,{emissive:0xffd080,emissiveIntensity:.9}));hd.position.set(lx,4.4,z+lz);scene.add(hd);
+      var lp=new THREE.PointLight(0xffd080,.42,13,2);lp.position.set(lx,4.2,z+lz);scene.add(lp);});}
+    label((GAMELANG==='tr'?'MAHALLE — GECE':'THE BLOCK — NIGHT'),x,z+19,3,.7);
+  }
   buildCity('lucida',176,235,(GAMELANG==='tr'?"LUCIDA'NIN ŞEHRİ ✦":"LUCIDA'S CITY ✦"));
   buildCity('lucius',210,175,(GAMELANG==='tr'?"LUCIUS'UN PLAZASI ✦":"LUCIUS'S PLAZA ✦"));
-  buildCity('noct',300,190,(GAMELANG==='tr'?'NOCTORNUS GECESİ ✦':'NOCTORNUS NIGHT ✦'));
+  buildNoctCave(300,190,(GAMELANG==='tr'?'NOCTORNUS GECESİ — MAĞARA ☾':"NOCTORNUS'S NIGHT — THE CAVE ☾"));
   W3.PORTALS.push({k:'silvanus',x:L.caravan.x,z:L.caravan.z+4,r:3.6,name:(GAMELANG==='tr'?"SILVANUS'UN KARAVANI ☽":"SILVANUS'S CARAVAN ☽"),house:true});
   buildCity('aelius',310,90,(GAMELANG==='tr'?'AELIUS SEANSI ✦':'THE AELIUS SESSION ✦'));
+
+  buildHood(120,150);
+  /* b56: uzak LABIRENT DUVARLARI — bilincdisi labirenti hissi, sisli ufukta. Carpismasiz, oyun alaninin cok otesinde. */
+  (function(){try{
+    var MZ=new THREE.Group();MZ.name='labyrinth-walls';var cx=210,cz=120;
+    for(var i=0;i<20;i++){
+      var ang=(i/20)*6.283+0.13, rad=255+((i*37)%150);
+      var wx=cx+Math.cos(ang)*rad, wz=cz+Math.sin(ang)*rad;
+      var len=20+((i*53)%34), hh=10+((i*29)%10);
+      var mat=new THREE.MeshStandardMaterial({color:0x0d111a,roughness:.97,emissive:0x16324a,emissiveIntensity:.12});
+      var wall=new THREE.Mesh(new THREE.BoxGeometry(len,hh,3),mat);
+      wall.position.set(wx,hh/2,wz);wall.rotation.y=ang+((i%2)?1.2:0.2);MZ.add(wall);
+      if(i%3===0){var st=new THREE.Mesh(new THREE.BoxGeometry(3,hh,12+((i*7)%10)),mat);st.position.set(wx+Math.cos(ang)*len*0.4,hh/2,wz+Math.sin(ang)*len*0.4);st.rotation.y=wall.rotation.y;MZ.add(st);}
+    }
+    scene.add(MZ);W3._maze=MZ;
+  }catch(e){}})();
+
 
   /* ---- KONSEY MECLİSİ (3B) — yedi sütunlu meclis; girmek için İkinci Kitabı açmış olmak gerekir ---- */
   (function(){var cx=58,cz=250;
@@ -6624,7 +6705,7 @@ if(HAS3D)(function(){
   }catch(e){}};
 
   /* ---- camera ---- */
-  const Cam={yaw:Math.PI,pitch:.16,dist:4.6,fp:false};window.Cam=Cam;
+  const Cam={yaw:Math.PI,pitch:.07,dist:2.5,fp:false};window.Cam=Cam;
   renderer.domElement.addEventListener('click',()=>{
     if(!Game.modal&&Game.running&&matchMedia('(pointer:fine)').matches)
       renderer.domElement.requestPointerLock&&renderer.domElement.requestPointerLock();});
@@ -6945,6 +7026,7 @@ if(HAS3D)(function(){
     }
     /* radyo yakınlık sesi */
     Snd.setProx&&Snd.setProx(Math.hypot(S.px-L.radio.x,S.pz-L.radio.z));
+    try{var _dnc=Math.hypot(S.px-300,S.pz-190),_dbh=Math.hypot(S.px-120,S.pz-150);Snd.setZoneAmb&&Snd.setZoneAmb(Math.max(0,1-_dnc/46),Math.max(0,1-_dbh/46));}catch(e){}
     /* sesli kitap kasetleri: bölgeye göre, fade ile */
     tapeChk+=dt;
     if(tapeChk>.5){tapeChk=0;
