@@ -467,6 +467,17 @@ async function loadSubjects(){
     if(st.length)h+='<div class="sub" style="margin:6px 0;white-space:pre-wrap;max-height:150px;overflow-y:auto;color:var(--ink)"><b style="color:var(--gold)">senaryo/hikâye:</b>\n'+esc(String(st[st.length-1].text||'').slice(0,520))+'…</div>';
   } else if(!key){h+='<div class="sub" style="color:var(--dim)">(günlük/kitap için ⚙ operatör anahtarı girilmeli)</div>';}
   h+='<textarea id="subjAskTxt" maxlength="320" placeholder="'+escA(nm)+'\'e sor…"></textarea><button class="act ok" onclick="saySubj()">sor →</button></div>';
+  /* KANON — Ucuncu Kitap: oyunla AYNI kaynak (canon.json). Lumen + Ember tam metin, oyundakiyle birebir. */
+  let canon=[];
+  try{canon=await (await fetch('./canon.json',{cache:'no-store'})).json();}catch(e){}
+  if(canon&&canon.length){
+    h+='<h2 class="a" style="margin-top:12px">Üçüncü Kitap — kanon denek hikâyeleri <span class="small" style="color:var(--dim)">(oyundakiyle birebir)</span></h2>';
+    canon.forEach(function(c){
+      const body=String((c&&c.body)||'');
+      h+='<div class="rep" style="border-color:var(--gold)"><div class="who" style="color:var(--gold)">◍ '+esc((c&&c.name)||'')+((c&&c.genre)?(' · '+esc(c.genre)):'')+' — '+esc((c&&c.title)||'')+'</div>';
+      h+='<div class="sub" style="white-space:pre-wrap;max-height:220px;overflow-y:auto;color:var(--ink);line-height:1.6">'+esc(body.slice(0,1600))+(body.length>1600?'…':'')+'</div></div>';
+    });
+  }
   if(g.length){
     h+='<h2 class="a" style="margin-top:12px">Mezun denekler · yazdıkları kitaplar</h2>';
     g.forEach((x,i)=>{ const sts=(x.stories||[]);

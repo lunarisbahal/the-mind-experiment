@@ -305,7 +305,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b31 · <span style="color:var(--accent)">Nexus now lights a realm's node the moment you pass ANY chapter in it and shows live per-realm progress (e.g. LUNARIS 6/7); plus a clear ✕ LEAVE THE MAP exit (capped map height)</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b32 · <span style="color:var(--accent)">story games are now 3D: each scene is a room you walk into and choose between two pillars (◀ shadow · light ▶) with [E]; Nexus reacts to ANY chapter + LEAVE THE MAP exit; console shows canon stories</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -5512,8 +5512,9 @@ if(HAS3D)(function(){
       {tr:['Beyaz sayfa. Hangi eski hikâyeyi bırakırsın?','Hepsini taşı','Birini bırak'],en:['The blank page. Which old story do you set down?','Carry them all','Set one down']},
       {tr:['Aynalar kapısı. Anlatılan mı, anlatan mı?','Anlatılan kal','Anlatan ol'],en:['The gate of mirrors. Narrated, or narrator?','Stay narrated','Become the narrator']}
     ],
-    playGame(){var r=this._last;if(!r){UI.toast(this.GEN()?'Önce hikâyeyi yazdır.':'Write the story first.');return;}this._game={r:r,i:0,score:0,scenes:(r&&r.game&&r.game.length)?r.game:this.GSCENES};this._gameStep();},
-    playSaved(ix){var sl=this.saved(this._savedName||'');var r=sl[ix];if(!r)return;this._last=r;this._game={r:r,i:0,score:0,scenes:(r&&r.game&&r.game.length)?r.game:this.GSCENES};this._gameStep();},
+    _launch:function(scenes,r){this._last=r;if(window.W3&&W3.Interior&&W3.Interior.storyGame){try{W3.Interior.storyGame(scenes,{title:r.title||'',sig:r.sig||r.name||''});return;}catch(e){}}this._game={r:r,i:0,score:0,scenes:scenes};this._gameStep();},
+    playGame(){var r=this._last;if(!r){UI.toast(this.GEN()?'Önce hikâyeyi yazdır.':'Write the story first.');return;}this._launch((r&&r.game&&r.game.length)?r.game:this.GSCENES,r);},
+    playSaved(ix){var sl=this.saved(this._savedName||'');var r=sl[ix];if(!r)return;this._launch((r&&r.game&&r.game.length)?r.game:this.GSCENES,r);},
     _gamePick(good){var g=this._game;if(!g)return;if(good)g.score++;g.i++;this._gameStep();},
     _gameStep(){var tr=this.GEN();var g=this._game;if(!g)return;var r=g.r;var SC=g.scenes||this.GSCENES;var max=SC.length;
       if(g.i>=max){var pct=Math.round(g.score/max*100);
@@ -5819,7 +5820,7 @@ if(HAS3D)(function(){
   };
   const Interior={
     RS:14, coll:[], scene:interiorScene, cur:null, door:{x:0,z:13.1}, stations:[], _g:null,
-    _clear(){ if(this._g){interiorScene.remove(this._g); this._g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.map)m.map.dispose&&m.map.dispose();m.dispose&&m.dispose();});}}); } this._g=null; this.coll=[]; this.stations=[]; this._deskAt=null; this._benchAt=null; this.subjHome=false; this._bookAt=null; this._robotAt=null; this.echoChamber=false; this._echoPillars=[]; },
+    _clear(){ if(this._g){interiorScene.remove(this._g); this._g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.map)m.map.dispose&&m.map.dispose();m.dispose&&m.dispose();});}}); } this._g=null; this.coll=[]; this.stations=[]; this._deskAt=null; this._benchAt=null; this.subjHome=false; this._bookAt=null; this._robotAt=null; this.echoChamber=false; this._echoPillars=[]; this._sgL=null; this._sgR=null; try{var __sh=document.getElementById('sgHUD');if(__sh)__sh.remove();}catch(e){} },
     _label(text,col,sc){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(text,512,96,30,col||'rgba(210,220,240,.96)'),transparent:true,depthWrite:false}));sp.scale.set(6*sc,1.15*sc,1);return sp;},
     build(k){
       this._clear();
@@ -6167,8 +6168,41 @@ if(HAS3D)(function(){
       if(this.house){UI.toast(_realmDone?('☽ '+z.name+' — '+(GAMELANG==='tr'?'bu diyarı bütünledin · salondaki yazı bilgisayarına yaklaş [E] — günlüğünü/kitabını yaz':'you integrated this realm · approach the writing computer in the salon [E] — write your journal/book')):('☽ '+z.name+' — '+(GAMELANG==='tr'?'evine girdin · odadaki ışıyan odağa yaklaş [E]':'you entered his house · approach the glowing focus [E]')),_realmDone?7500:6000);}
       else{const cfg=INTERIORS[k];UI.toast('◈ '+z.name+' — '+(cfg&&cfg.wake?(cfg.wake[GAMELANG]||cfg.wake.en):(GAMELANG==='tr'?'alanına girdin':'you entered'))+(GAMELANG==='tr'?' · [WASD gez · sütuna yaklaş · E ile performe et]':' · [WASD move · approach a pillar · E to perform]'),6500);}
     },
-    exit(){W3.inInterior=false;scene.add(player.g);if(W3.intLamp)W3.intLamp.visible=false;try{if(window.House){if(House._emCancel)House._emCancel();if(House._pz)clearInterval(House._pz);}}catch(e){}UI.toast(GAMELANG==='tr'?'Alandan çıktın.':'You left the area.');},
+    exit(){W3.inInterior=false;this.storyMode=false;try{var __sh=document.getElementById('sgHUD');if(__sh)__sh.remove();}catch(e){}scene.add(player.g);if(W3.intLamp)W3.intLamp.visible=false;try{if(window.House){if(House._emCancel)House._emCancel();if(House._pz)clearInterval(House._pz);}}catch(e){}UI.toast(GAMELANG==='tr'?'Alandan çıktın.':'You left the area.');},
+    /* ===== 3B HİKÂYE OYUNU — her sahne bir oda; iki sütundan (gölge/ışık) birine yürü, [E] ile seç ===== */
+    storyGame:function(scenes,meta){if(!scenes||!scenes.length)return;this._sg={scenes:scenes,meta:meta||{},i:0,score:0};this._sgLast={scenes:scenes,meta:meta||{}};
+      try{if(window.UI&&UI.closeDoc)UI.closeDoc();}catch(e){}
+      this.buildStoryRoom();
+      W3.IP={px:0,pz:this.RS-3};W3.inInterior=true;meshAng=Math.PI;interiorScene.add(player.g);if(W3.intLamp)W3.intLamp.visible=true;
+      try{if(window.Game&&Game.setModal)Game.setModal(false);}catch(e){}},
+    _sgHUD:function(txt){try{var old=document.getElementById('sgHUD');if(old)old.remove();var d=document.createElement('div');d.id='sgHUD';d.style.cssText='position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:60;max-width:90vw;width:520px;background:rgba(8,10,18,.93);border:1px solid var(--accent);border-radius:10px;padding:11px 15px;color:var(--ink);font-size:13.5px;line-height:1.55;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.5)';d.innerHTML='✦ '+esc(txt);document.body.appendChild(d);}catch(e){}},
+    buildStoryRoom:function(){this._clear();this.storyMode=true;this.house=false;this.subjHome=false;this.cur=null;
+      var sg=this._sg;var sc=sg.scenes[sg.i];var tr=(GAMELANG==='tr');var s=(tr?sc.tr:sc.en)||sc.en||sc.tr||[];
+      var prompt=s[0]||'',aTxt=s[1]||'',bTxt=s[2]||'';
+      var g=new THREE.Group();interiorScene.add(g);this._g=g;var RS=this.RS;var self=this;
+      var fl=new THREE.Mesh(new THREE.CircleGeometry(RS,48),std(0x0d1018,{roughness:.95}));fl.rotation.x=-Math.PI/2;g.add(fl);
+      var wall=new THREE.Mesh(new THREE.CylinderGeometry(RS,RS,7,48,1,true),new THREE.MeshStandardMaterial({color:0x171d2b,roughness:.97,side:THREE.BackSide}));wall.position.y=3.5;g.add(wall);
+      g.add(new THREE.AmbientLight(0x2a3350,.7));var cl=new THREE.PointLight(0x9d8cc9,.9,46,2);cl.position.set(0,5.6,0);g.add(cl);
+      var head=this._label((sg.meta.title?(sg.meta.title+' · '):'')+(sg.i+1)+'/'+sg.scenes.length,'rgba(205,184,120,.95)',1.7);head.position.set(0,6.2,0);g.add(head);
+      var mk=function(x,col,txt,side){var pil=new THREE.Mesh(new THREE.CylinderGeometry(.4,.5,2.4,12),std(0x10131f,{emissive:col,emissiveIntensity:.45,roughness:.6}));pil.position.set(x,1.2,-1);g.add(pil);var glo=new THREE.Mesh(new THREE.SphereGeometry(.3,16,16),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:1.2,roughness:.3}));glo.position.set(x,2.9,-1);g.add(glo);var lp=new THREE.PointLight(col,.55,9,2);lp.position.set(x,2.9,-1);g.add(lp);var lab=self._label((side<0?'◀ ':'')+(txt.length>22?txt.slice(0,22)+'…':txt)+(side>0?' ▶':''),'rgba(214,222,240,.96)',1.35);lab.position.set(x,3.7,-1);g.add(lab);};
+      mk(-5.6,0x7a6ba0,aTxt,-1); mk(5.6,0x7fd4c1,bTxt,1);
+      this._sgL={x:-5.6,z:-1,t:aTxt}; this._sgR={x:5.6,z:-1,t:bTxt};
+      this.coll=[{x:-5.6,z:-1,r:.7},{x:5.6,z:-1,r:.7}];
+      var dl=this._label(tr?'↩ ÇIKIŞ':'↩ EXIT','rgba(200,210,230,.9)',1.6);dl.position.set(0,2.4,RS-0.7);g.add(dl);this.door={x:0,z:RS-0.9};
+      this._sgHUD(prompt+'  —  '+(tr?'◀ sol: gölge · sağ: ışık ▶ · birine yürü, [E] ile seç':'◀ left: shadow · right: light ▶ · walk to one, choose with [E]'));},
+    _storyPick:function(good){var sg=this._sg;if(!sg)return;if(good)sg.score++;try{if(window.Profile)Profile.nudge(1);}catch(e){}sg.i++;if(sg.i>=sg.scenes.length)return this._storyEnd();this.buildStoryRoom();W3.IP={px:0,pz:this.RS-3};},
+    _storyReplay:function(){if(this._sgLast)this.storyGame(this._sgLast.scenes,this._sgLast.meta);},
+    _storyAbort:function(){this.storyMode=false;this.exit();},
+    _storyEnd:function(){var sg=this._sg;var tr=(GAMELANG==='tr');var max=sg.scenes.length;var sign=(sg.meta&&sg.meta.sig)||'';this.storyMode=false;this.exit();
+      var win=sg.score>=Math.ceil(max*0.7);
+      var verdict=win?(tr?('Bütünleşme. '+esc(sign)+'’in hikâyesini ışığı seçerek baştan yaşadın.'):('Integration. You relived '+esc(sign)+'’s story choosing the light.')):(tr?'Yolun bir kısmı gölgede kaldı. İstersen yeniden oyna — bu kez başka seç.':'Part of the path stayed in shadow. Replay if you like — choose differently.');
+      try{UI.doc('✦ '+esc((sg.meta&&sg.meta.title)||'')+(tr?' — Oyun Sonu':' — End'),'<div style="max-width:480px"><p style="color:var(--accent);font-size:13px">'+(tr?'Işık':'Light')+': '+sg.score+'/'+max+'</p><p style="line-height:1.7;color:var(--ink)">'+verdict+'</p><div style="margin-top:10px"><button class="btn v" onclick="if(window.UI&&UI.closeDoc)UI.closeDoc();if(window.W3&&W3.Interior)W3.Interior._storyReplay();">↻ '+(tr?'tekrar oyna':'play again')+'</button> <button class="btn ghost" onclick="if(window.UI&&UI.closeDoc)UI.closeDoc()">'+(tr?'kapat':'close')+'</button></div></div>');}catch(e){}},
     target(){const p=W3.IP;if(!p)return null;
+      if(this.storyMode){
+        if(this._sgL&&Math.hypot(p.px-this._sgL.x,p.pz-this._sgL.z)<2.6)return['◀ '+this._sgL.t,()=>W3.Interior._storyPick(0)];
+        if(this._sgR&&Math.hypot(p.px-this._sgR.x,p.pz-this._sgR.z)<2.6)return[this._sgR.t+' ▶',()=>W3.Interior._storyPick(1)];
+        if(Math.hypot(p.px-this.door.x,p.pz-this.door.z)<2.3)return[GAMELANG==='tr'?'↩ oyundan çık':'↩ leave the game',()=>W3.Interior._storyAbort()];
+        return null;}
       if(Math.hypot(p.px-this.door.x,p.pz-this.door.z)<2.3)return[GAMELANG==='tr'?'↩ alandan çık':'↩ leave the area',()=>W3.Interior.exit()];
       if(this.cur==='therapy'){const f=this._foc;if(f&&Math.hypot(p.px-f.position.x,p.pz-f.position.z)<2.3)return['\uD83D\uDECB '+(GAMELANG==='tr'?'terapötik çalışma seç':'choose a therapeutic exercise'),()=>{if(window.Therapy)Therapy.show();}];return null;}
       if(this.echoChamber){
