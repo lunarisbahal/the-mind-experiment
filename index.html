@@ -307,7 +307,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b35 · <span style="color:var(--accent)">cinematic pass 1: teal/orange colour-grade, handheld camera sway, drifting dust motes, and a soft lantern glow-halo — a moodier, more filmic world (more graphics phases to come)</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b36 · <span style="color:var(--accent)">cinematic pass 2: real bloom (post-processing glow on lights & emissive) on top of the colour-grade — lights now bleed and shimmer; auto-off on mobile, graceful fallback if it can't load</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -387,6 +387,14 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- post-processing (gerçek bloom) — yüklenmezse oyun düz render'a düşer -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/GammaCorrectionShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 "use strict";
@@ -4609,7 +4617,20 @@ if(HAS3D)(function(){
   renderer.toneMappingExposure=1.15;
   renderer.outputEncoding=THREE.sRGBEncoding;
   document.getElementById('gl').appendChild(renderer.domElement);
-  addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+  /* ---- GERÇEK BLOOM (post-processing) — script yüklendiyse; mobilde varsayılan kapalı; hata olursa düz render'a düşer ---- */
+  let composer=null,renderPass=null,bloomPass=null,bloomOn=false;
+  try{
+    if(typeof THREE.EffectComposer==='function'&&typeof THREE.UnrealBloomPass==='function'&&typeof THREE.RenderPass==='function'&&typeof THREE.ShaderPass==='function'){
+      composer=new THREE.EffectComposer(renderer);
+      renderPass=new THREE.RenderPass(scene,camera);composer.addPass(renderPass);
+      bloomPass=new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),0.62,0.5,0.62);composer.addPass(bloomPass);
+      if(THREE.GammaCorrectionShader){var _gp=new THREE.ShaderPass(THREE.GammaCorrectionShader);composer.addPass(_gp);}
+      composer.setSize(innerWidth,innerHeight);
+      bloomOn=!_coarse;
+    }
+  }catch(e){composer=null;bloomOn=false;}
+  window.toggleBloom=function(){if(!composer)return false;bloomOn=!bloomOn;try{if(window.UI&&UI.toast)UI.toast((GAMELANG==='tr'?'✶ Bloom: ':'✶ Bloom: ')+(bloomOn?'açık':'off'));}catch(e){}return bloomOn;};
+  addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);if(composer)composer.setSize(innerWidth,innerHeight);});
 
   /* ---- sky dome ---- */
   const skyU={top:{value:new THREE.Color(0x03040c)},mid:{value:new THREE.Color(0x0a1326)},bot:{value:new THREE.Color(0x141f38)}};
@@ -6680,7 +6701,9 @@ if(HAS3D)(function(){
       saveT+=dt;if(saveT>5){saveT=0;save();}
     }
     if(W3._portals)for(const pr of W3._portals)pr.rotation.z+=dt*.35;
-    renderer.render(W3.inInterior&&W3.Interior?W3.Interior.scene:scene,camera);
+    var _acs=(W3.inInterior&&W3.Interior)?W3.Interior.scene:scene;
+    if(composer&&bloomOn){try{renderPass.scene=_acs;renderPass.camera=camera;composer.render();}catch(e){bloomOn=false;renderer.render(_acs,camera);}}
+    else{renderer.render(_acs,camera);}
   }
   requestAnimationFrame(animate);
 })();
