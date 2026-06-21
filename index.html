@@ -307,7 +307,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b42 · <span style="color:var(--accent)">studio polish — your journal now autosaves as you type (no more lost writing), and every spark (◇) you earn shows a live “+N spark” popup so you always see what each action gives you</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b43 · <span style="color:var(--accent)">studio polish II — open the journal mid-chapter and closing it now returns you to the exact question (no restart); plus richer animation: people turn smoothly, sway while idle instead of freezing, and lean as they walk</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -799,7 +799,10 @@ const UI={
     clearTimeout(this._tt);this._tt=setTimeout(()=>t.style.display='none',ms);},
   doc(title,html){try{if(window.FX&&/✶|🏆|🜂|açıld|kilid|unlock|ödül|reward|integrat|bütünle/i.test(String(title||'')))FX.reward();}catch(e){}this.el('docTitle').textContent=title;this.el('docBody').innerHTML=html;
     this.show('docModal');Game.setModal(true);},
-  closeDoc(){if(window.House&&House._inPause){House._pauseClose();return;}this.hide('docModal');Game.setModal(false);},
+  closeDoc(){if(window.House&&House._inPause){House._pauseClose();return;}this.hide('docModal');Game.setModal(false);
+    /* b42 düzeltme: günlük/yazı masası bir bölümün ortasında açıldıysa, kapatınca tam kaldığın soruya geri dön (bölüm baştan sorulmaz) */
+    try{var J=window.Journal;if(J&&J._resumeCh!=null){var _c=J._resumeCh;J._resumeCh=null;if(window.House&&House.openRoom){setTimeout(function(){try{House.openRoom(_c);}catch(e){}},50);}}}catch(e){}
+  },
   toggleQuests(){const q=this.el('quests');q.style.display=q.style.display==='block'?'none':'block';this.renderQuests();},
   renderQuests(){
     const M=[['Read the case file',S.stage>=1],
@@ -2849,7 +2852,7 @@ const Journal={
   data(){S.journal=S.journal||{entries:{},started:false};if(!S.journal.entries)S.journal.entries={};return S.journal;},
   reached(){try{if(window.Library&&Library.milestones&&Library.milestones()>=5)return true;}catch(e){}try{if(S.flags&&S.flags.lunarisIntegrated)return true;}catch(e){}return false;},
   curCh(){try{if(window.House&&House.cur&&House.cur.ch)return House.abs(House.cur.ch);}catch(e){}try{if(window.Library&&Library.milestones)return Math.max(1,Library.milestones());}catch(e){}return 1;},
-  desk(){var TR=(GAMELANG==='tr');try{if(window.Music&&Music._on&&localStorage.getItem('it041_music_off')!=='1'&&!Music.on)Music._on();}catch(e){}
+  desk(){var TR=(GAMELANG==='tr');this._armResume();try{if(window.Music&&Music._on&&localStorage.getItem('it041_music_off')!=='1'&&!Music.on)Music._on();}catch(e){}
     var icon=function(glyph,label,href,onclick){return '<a '+(href?('href="'+href+'" target="_blank" rel="noopener"'):('onclick="'+onclick+'" style="cursor:pointer"'))+' style="text-decoration:none;text-align:center;width:62px;display:inline-block;margin:2px 4px"><div style="font-size:28px;line-height:1.1">'+glyph+'</div><div style="font-size:10px;color:var(--dim)">'+label+'</div></a>';};
     var desktop='<div style="max-width:430px;margin:8px auto;background:linear-gradient(180deg,#0b1020,#070910);border:1px solid var(--line);border-radius:12px;padding:14px 12px 16px"><div style="font-size:9px;letter-spacing:.2em;color:var(--violet);opacity:.6;margin-bottom:8px">'+(TR?'MASAÜSTÜ':'DESKTOP')+'</div><div style="display:flex;justify-content:center;flex-wrap:wrap">'
       +icon('📄',(TR?'Günlük':'Journal'),'','UI.closeDoc&&UI.closeDoc();Journal.write()')
@@ -2858,7 +2861,8 @@ const Journal={
       +icon('👽','Reddit','https://www.reddit.com/user/lunarisbahal','')
       +'</div></div>';
     UI.doc(TR?'✍ Yazı Masası':'✍ The Writing Desk','<div style="text-align:center"><p style="color:var(--ink);line-height:1.7">'+(TR?'Masaya oturuyorsun; dizüstünün ekranı usulca aydınlanıyor. Tıpkı Lunaris gibi — ekranda hep aynı simgeler: yazdığı günlük (Word) ve sürekli uğradığı yerler. Sen de bu yolculukta öğrendiklerini, sana dokunanı kendi sözlerinle yazmaya başla; bu sayfalar zamanla senin kitabın olacak.':'You sit at the desk; the laptop glows softly. Just like Lunaris — the same icons on screen: the journal he wrote (Word) and the places he kept returning to. Begin writing what you learned, what touched you, in your own words; these pages will become your book.')+'</p>'+desktop+'<p style="color:var(--dim);font-size:11.5px">'+(TR?'(Sol altta müzik listesi açıldı — dilersen kapat. Yazdıkların yalnızca bu cihazda kalır.)':'(The playlist opened bottom-left — close it if you like. Your writing stays only on this device.)')+'</p><button class="btn v" onclick="Journal.write()">'+(TR?'💻 Yazmaya başla':'💻 Begin writing')+'</button> <button class="btn ghost" onclick="Journal.menu()">'+(TR?'📖 tüm sayfalarım':'📖 all my pages')+'</button></div>');},
-  write(ch){var TR=(GAMELANG==='tr');ch=ch||this.curCh();var d=this.data();var cur=d.entries[ch]||'';
+  _armResume(){try{if(window.W3&&W3.inInterior&&window.House&&House.cur&&House.cur.room&&House.cur.room.steps&&House.doneMap&&!House.doneMap()['ch'+House.abs(House.cur.ch)]){this._resumeCh=House.cur.ch;}}catch(e){}},
+  write(ch){var TR=(GAMELANG==='tr');this._armResume();ch=ch||this.curCh();var d=this.data();var cur=d.entries[ch]||'';
     UI.doc((TR?'📓 Kendi Kitabın — Bölüm ':'📓 Your Book — Chapter ')+ch,
       '<p style="color:var(--dim);font-size:12px">'+(TR?'Bu bölümde ne öğrendin, ne hissettin, hayatında ne değişti? Kendi sözlerinle yaz. Bölüm bölüm biriken bu sayfalar sonunda kitabını oluşturacak.':'What did you learn, feel, change in this chapter? Write in your own words. These pages, gathering chapter by chapter, become your book.')+'</p>'
       +'<textarea id="jrlIn" rows="11" oninput="Journal._auto('+ch+')" onblur="Journal._auto('+ch+',1)" style="width:100%;background:#0a0c14;border:1px solid var(--line);color:var(--ink);padding:10px;font-family:inherit;font-size:13.5px;line-height:1.6;border-radius:6px" placeholder="'+(TR?'Bugün şunu fark ettim…':'Today I noticed…')+'">'+esc(cur)+'</textarea>'
@@ -6574,9 +6578,15 @@ if(HAS3D)(function(){
     player.g.position.set(P.px,jy+Math.abs(Math.sin(walkT))*.05,P.pz);
     player.g.rotation.y=meshAng;
     const moving=Math.abs(mx)+Math.abs(mz)>0.0001;
-    const sw=Math.sin(walkT)*(moving?(running?.85:.55):.04);
-    player.parts.legL.rotation.x=sw;player.parts.legR.rotation.x=-sw;
-    player.parts.armL.rotation.x=-sw*.8;player.parts.armR.rotation.x=sw*.8;
+    if(moving){var sw=Math.sin(walkT)*(running?.85:.55);
+      player.parts.legL.rotation.x=sw;player.parts.legR.rotation.x=-sw;
+      player.parts.armL.rotation.x=-sw*.8;player.parts.armR.rotation.x=sw*.8;
+      player.g.rotation.z=Math.sin(walkT*2)*0.022; /* b43: yürürken hafif gövde salınımı */
+    }else{var _is=Math.sin(t*1.15)*0.055; /* b43: boşta yumuşak nefes/ağırlık aktarımı — donmuş durmaz */
+      player.parts.legL.rotation.x=0;player.parts.legR.rotation.x=0;
+      player.parts.armL.rotation.x=_is;player.parts.armR.rotation.x=-_is;
+      player.g.rotation.z=Math.sin(t*0.9)*0.013;
+    }
     lantern.position.set(P.px+Math.sin(meshAng)*.5,1.5,P.pz+Math.cos(meshAng)*.5);
     lantern.intensity=.82+Math.sin(t*9.0)*.05+Math.sin(t*23.0+1.3)*.03; /* fener titreşimi */
     lanternHalo.position.set(lantern.position.x,lantern.position.y,lantern.position.z);lanternHalo.material.opacity=.5+.18*(0.5+0.5*Math.sin(t*9.0));
@@ -6734,7 +6744,9 @@ if(HAS3D)(function(){
     }
     /* ---- v5: ajan denekler ---- */
     if(!Game.modal)AGENTS.forEach(a=>{
-      if(a.wait>0){a.wait-=dt;return;}
+      if(a.wait>0){a.wait-=dt; /* b43: boştaki denekler donmasın — yumuşak nefes/salınım */
+        try{var _iw=Math.sin(t*1.0+(a.walk||0))*0.05;a.f.parts.armL.rotation.x=_iw;a.f.parts.armR.rotation.x=-_iw;a.f.parts.legL.rotation.x=0;a.f.parts.legR.rotation.x=0;a.f.g.rotation.z=Math.sin(t*0.8+(a.walk||0))*0.011;}catch(e){}
+        return;}
       const dx=a.tx-a.f.g.position.x,dz=a.tz-a.f.g.position.z,m3=Math.hypot(dx,dz);
       if(m3<2){
         const pool=(W3.sun>.45)?AG_WORK:AG_NIGHT;
@@ -6742,11 +6754,12 @@ if(HAS3D)(function(){
         a.tx=d2.x+(Math.random()-.5)*6;a.tz=d2.z+(Math.random()-.5)*6;
         a.wait=(W3.sun>.45?14:8)+Math.random()*10;return;}
       a.f.g.position.x+=dx/m3*2.1*dt;a.f.g.position.z+=dz/m3*2.1*dt;
-      a.f.g.rotation.y=Math.atan2(dx,dz);
+      a.f.g.rotation.y=lerpAng(a.f.g.rotation.y,Math.atan2(dx,dz),.12); /* b43: yumuşak dönüş */
       a.walk+=dt*6;const asw=Math.sin(a.walk)*.5;
       a.f.g.position.y=Math.abs(Math.sin(a.walk))*.045; /* adım sekmesi */
       a.f.parts.legL.rotation.x=asw;a.f.parts.legR.rotation.x=-asw;
       a.f.parts.armL.rotation.x=-asw*.7;a.f.parts.armR.rotation.x=asw*.7;
+      a.f.g.rotation.z=Math.sin(a.walk*2)*0.02; /* b43: yürürken hafif gövde salınımı */
     });
     /* HER FİGÜR — hafif nefes + bakış parıltısı; cansız/donmuş durmasınlar (ucuz, sadece baş + vizör) */
     if(!Game.modal){for(var _fi=0;_fi<FIGS.length;_fi++){var _F=FIGS[_fi];if(!_F||!_F.g||!_F.g.visible)continue;var _p=_F.parts;if(!_p)continue;var _ph=_p.bphase||0;
