@@ -307,7 +307,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b43 · <span style="color:var(--accent)">studio polish II — open the journal mid-chapter and closing it now returns you to the exact question (no restart); plus richer animation: people turn smoothly, sway while idle instead of freezing, and lean as they walk</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b44 · <span style="color:var(--accent)">studio polish III — a real Graphics settings panel (MENU → ⚙ Graphics): Low / Medium / High presets that tune particles, bloom, shadows and resolution, so low-end devices run smooth and strong ones look cinematic (remembered on your device)</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -379,6 +379,7 @@
 <button class="mini" onclick="Cloud.ui()">☁ PROGRESS CODE</button>
 <div style="grid-column:1/-1;font-size:8.5px;letter-spacing:.25em;color:var(--violet);opacity:.62;margin:9px 2px 2px;text-transform:uppercase">✦ SETTINGS</div>
 <button class="mini" onclick="SoundUI.show()">🔊 SOUND</button>
+<button class="mini" onclick="if(window.GfxUI)GfxUI.show()">⚙ GRAPHICS</button>
 <button class="mini" onclick="Onboard.show(false)">❖ HOW IT WORKS</button>
 <button class="mini" onclick="Legal.show()">⚖ LEGAL & SAFETY</button>
 <div style="grid-column:1/-1;display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;margin-top:11px;border-top:1px solid var(--line);padding-top:9px"><button class="mini" onclick="Game.exitFlow()">⏏ EXIT</button><button class="mini" onclick="Data.wipe()" style="color:var(--warn);border-color:var(--warn);opacity:.85">⌮ DELETE DATA</button></div>
@@ -3314,6 +3315,19 @@ const FX={
 if(typeof window!=='undefined'){window.FX=FX;
   try{document.addEventListener('click',function(e){var t=e.target;if(!t||!t.closest)return;if(t.closest('.choice'))FX.sfx('select');else if(t.closest('button,.btn'))FX.sfx('click');},true);}catch(e){}
 }
+/* b44: GÖRÜNTÜ AYARLARI paneli — kalite seçimi (düşük/orta/yüksek) */
+const GfxUI={
+  show(){var TR=(GAMELANG==='tr');var cur=(window.GFX&&GFX.preset)||'high';
+    var btn=function(k,lab,desc){var on=(cur===k);return '<button class="btn '+(on?'v':'ghost')+'" style="display:block;width:100%;text-align:left;margin:5px 0" onclick="GfxUI.set(\''+k+'\')">'+(on?'● ':'○ ')+lab+' <span style="color:var(--dim);font-size:11px">— '+desc+'</span></button>';};
+    UI.doc(TR?'⚙ Görüntü Ayarları':'⚙ Graphics Settings',
+      '<p style="color:var(--dim);font-size:12px">'+(TR?'Cihazına göre seç. Düşük = en akıcı (efektler kapalı), Yüksek = en görkemli. Seçimin bu cihazda hatırlanır.':'Pick for your device. Low = smoothest (effects off), High = richest. Remembered on this device.')+'</p>'
+      +btn('low',(TR?'Düşük':'Low'),(TR?'parçacık & bloom kapalı, gölgesiz — en akıcı':'particles & bloom off, no shadows — smoothest'))
+      +btn('med',(TR?'Orta':'Medium'),(TR?'dengeli — çoğu efekt açık':'balanced — most effects on'))
+      +btn('high',(TR?'Yüksek':'High'),(TR?'tüm sinematik efektler — en görkemli':'all cinematic effects — richest'))
+      +'<hr style="border-color:var(--line);margin:10px 0"><p style="color:var(--dim);font-size:11.5px">'+(TR?'İpucu: oyun takılıyorsa Düşük’e al. Mobil cihazlarda otomatik Orta gelir.':'Tip: if the game stutters, switch to Low. Mobile defaults to Medium.')+'</p>');},
+  set(k){try{if(window.GFX)GFX.apply(k);}catch(e){}try{if(window.FX)FX.sfx('select');}catch(e){}try{if(window.UI)UI.toast((GAMELANG==='tr'?'⚙ Görüntü: ':'⚙ Graphics: ')+k.toUpperCase());}catch(e){}this.show();}
+};
+if(typeof window!=='undefined')window.GfxUI=GfxUI;
 const Voices={
   ORDER:['silv','lunaris','bahal','lucida','lucius','noct','aelius'],
   REALM:{lunaris:[1,7],bahal:[8,14],lucida:[15,21],lucius:[22,28],noct:[29,35],silv:[36,42],aelius:[43,49]},
@@ -4786,6 +4800,24 @@ if(HAS3D)(function(){
     var am=new THREE.PointsMaterial({color:0xffb070,size:.07,transparent:true,opacity:.42,blending:THREE.AdditiveBlending,depthWrite:false});
     var apts=new THREE.Points(ag,am);apts.userData={spd:asp};scene.add(apts);W3._ash=apts;
   }catch(e){}})();
+
+  /* ---- b44: GÖRÜNTÜ AYARLARI — düşük/orta/yüksek kalite (parçacık, bloom, gölge, piksel oranı). Düşük uç cihazlar akıcı, güçlü cihazlar görkemli ---- */
+  window.GFX={
+    preset:'high',
+    _load(){try{var p=localStorage.getItem('it041_gfx');if(p)this.preset=p;else this.preset=_coarse?'med':'high';}catch(e){this.preset=_coarse?'med':'high';}return this.preset;},
+    apply(p){p=p||this.preset;this.preset=p;try{localStorage.setItem('it041_gfx',p);}catch(e){}
+      var low=(p==='low'),med=(p==='med');
+      try{renderer.setPixelRatio(Math.min(devicePixelRatio,low?1.0:med?1.25:(_coarse?1.25:1.5)));renderer.setSize(innerWidth,innerHeight);if(composer)composer.setSize(innerWidth,innerHeight);}catch(e){}
+      try{bloomOn=(!_coarse||med)&&!low&&!!composer;}catch(e){}
+      try{renderer.shadowMap.enabled=!low;}catch(e){}
+      try{if(typeof motes!=='undefined'&&motes)motes.visible=!low;}catch(e){}
+      try{if(W3._ash)W3._ash.visible=!low;}catch(e){}
+      try{if(W3._atmo&&W3._atmo.fireflies)W3._atmo.fireflies.visible=!low;}catch(e){}
+      try{if(W3._atmo&&W3._atmo.fog)W3._atmo.fog.forEach(function(f){f.visible=!low;});}catch(e){}
+      try{if(W3._sky&&W3._sky.clouds)W3._sky.clouds.forEach(function(c,i){c.visible=low?false:(med?(i<3):true);});}catch(e){}
+      return p;}
+  };
+  try{window.GFX._load();window.GFX.apply();}catch(e){}
 
   /* ---- ground ---- */
   let groundMat;

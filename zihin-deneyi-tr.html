@@ -300,7 +300,7 @@
   <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026 · b43 · <span style="color:var(--accent)">stüdyo cilası II — bölümün ortasında günlüğü açıp kapatınca artık tam kaldığın soruya dönüyorsun (baştan başlamaz); ayrıca daha zengin animasyon: karakterler yumuşakça döner, boştayken donmaz hafifçe salınır, yürürken gövdeleri hafif eğilir</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026 · b44 · <span style="color:var(--accent)">stüdyo cilası III — gerçek bir Görüntü ayarları paneli (MENÜ → ⚙ GÖRÜNTÜ): Düşük / Orta / Yüksek ön ayarları parçacıkları, bloom’u, gölgeleri ve çözünürlüğü ayarlar; uç cihazlar akıcı, güçlü cihazlar sinematik görünür (cihazında hatırlanır)</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -371,6 +371,7 @@
 <button class="mini" onclick="Cloud.ui()">☁ İLERLEME KODU</button>
 <div style="grid-column:1/-1;font-size:8.5px;letter-spacing:.25em;color:var(--violet);opacity:.62;margin:9px 2px 2px;text-transform:uppercase">✦ AYARLAR</div>
 <button class="mini" onclick="SoundUI.show()">🔊 SES</button>
+<button class="mini" onclick="if(window.GfxUI)GfxUI.show()">⚙ GÖRÜNTÜ</button>
 <button class="mini" onclick="Onboard.show(false)">❖ NASIL OYNANIR</button>
 <button class="mini" onclick="Legal.show()">⚖ YASAL & GÜVENLİK</button>
 <div style="grid-column:1/-1;display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;margin-top:11px;border-top:1px solid var(--line);padding-top:9px"><button class="mini" onclick="Game.exitFlow()">⏏ ÇIKIŞ</button><button class="mini" onclick="Data.wipe()" style="color:var(--warn);border-color:var(--warn);opacity:.85">⌮ VERİLERİ SİL</button></div>
@@ -3285,6 +3286,19 @@ const FX={
 if(typeof window!=='undefined'){window.FX=FX;
   try{document.addEventListener('click',function(e){var t=e.target;if(!t||!t.closest)return;if(t.closest('.choice'))FX.sfx('select');else if(t.closest('button,.btn'))FX.sfx('click');},true);}catch(e){}
 }
+/* b44: GORUNTU AYARLARI paneli */
+const GfxUI={
+  show(){var TR=(GAMELANG==='tr');var cur=(window.GFX&&GFX.preset)||'high';
+    var btn=function(k,lab,desc){var on=(cur===k);return '<button class="btn '+(on?'v':'ghost')+'" style="display:block;width:100%;text-align:left;margin:5px 0" onclick="GfxUI.set(\''+k+'\')">'+(on?'\u25cf ':'\u25cb ')+lab+' <span style="color:var(--dim);font-size:11px">\u2014 '+desc+'</span></button>';};
+    UI.doc(TR?'\u2699 G\u00f6r\u00fcnt\u00fc Ayarlar\u0131':'\u2699 Graphics Settings',
+      '<p style="color:var(--dim);font-size:12px">'+(TR?'Cihaz\u0131na g\u00f6re se\u00e7. D\u00fc\u015f\u00fck = en ak\u0131c\u0131 (efektler kapal\u0131), Y\u00fcksek = en g\u00f6rkemli. Se\u00e7imin bu cihazda hat\u0131rlan\u0131r.':'Pick for your device. Low = smoothest (effects off), High = richest. Remembered on this device.')+'</p>'
+      +btn('low',(TR?'D\u00fc\u015f\u00fck':'Low'),(TR?'par\u00e7ac\u0131k & bloom kapal\u0131, g\u00f6lgesiz \u2014 en ak\u0131c\u0131':'particles & bloom off, no shadows \u2014 smoothest'))
+      +btn('med',(TR?'Orta':'Medium'),(TR?'dengeli \u2014 \u00e7o\u011fu efekt a\u00e7\u0131k':'balanced \u2014 most effects on'))
+      +btn('high',(TR?'Y\u00fcksek':'High'),(TR?'t\u00fcm sinematik efektler \u2014 en g\u00f6rkemli':'all cinematic effects \u2014 richest'))
+      +'<hr style="border-color:var(--line);margin:10px 0"><p style="color:var(--dim);font-size:11.5px">'+(TR?'\u0130pucu: oyun tak\u0131l\u0131yorsa D\u00fc\u015f\u00fck\u2019e al. Mobil cihazlarda otomatik Orta gelir.':'Tip: if the game stutters, switch to Low. Mobile defaults to Medium.')+'</p>');},
+  set(k){try{if(window.GFX)GFX.apply(k);}catch(e){}try{if(window.FX)FX.sfx('select');}catch(e){}try{if(window.UI)UI.toast((GAMELANG==='tr'?'\u2699 G\u00f6r\u00fcnt\u00fc: ':'\u2699 Graphics: ')+k.toUpperCase());}catch(e){}this.show();}
+};
+if(typeof window!=='undefined')window.GfxUI=GfxUI;
 const Voices={
   ORDER:['silv','lunaris','bahal','lucida','lucius','noct','aelius'],
   REALM:{lunaris:[1,7],bahal:[8,14],lucida:[15,21],lucius:[22,28],noct:[29,35],silv:[36,42],aelius:[43,49]},
@@ -4756,6 +4770,24 @@ if(HAS3D)(function(){
     var am=new THREE.PointsMaterial({color:0xffb070,size:.07,transparent:true,opacity:.42,blending:THREE.AdditiveBlending,depthWrite:false});
     var apts=new THREE.Points(ag,am);apts.userData={spd:asp};scene.add(apts);W3._ash=apts;
   }catch(e){}})();
+
+  /* ---- b44: GORUNTU AYARLARI ---- */
+  window.GFX={
+    preset:'high',
+    _load(){try{var p=localStorage.getItem('it041_gfx');if(p)this.preset=p;else this.preset=_coarse?'med':'high';}catch(e){this.preset=_coarse?'med':'high';}return this.preset;},
+    apply(p){p=p||this.preset;this.preset=p;try{localStorage.setItem('it041_gfx',p);}catch(e){}
+      var low=(p==='low'),med=(p==='med');
+      try{renderer.setPixelRatio(Math.min(devicePixelRatio,low?1.0:med?1.25:(_coarse?1.25:1.5)));renderer.setSize(innerWidth,innerHeight);if(composer)composer.setSize(innerWidth,innerHeight);}catch(e){}
+      try{bloomOn=(!_coarse||med)&&!low&&!!composer;}catch(e){}
+      try{renderer.shadowMap.enabled=!low;}catch(e){}
+      try{if(typeof motes!=='undefined'&&motes)motes.visible=!low;}catch(e){}
+      try{if(W3._ash)W3._ash.visible=!low;}catch(e){}
+      try{if(W3._atmo&&W3._atmo.fireflies)W3._atmo.fireflies.visible=!low;}catch(e){}
+      try{if(W3._atmo&&W3._atmo.fog)W3._atmo.fog.forEach(function(f){f.visible=!low;});}catch(e){}
+      try{if(W3._sky&&W3._sky.clouds)W3._sky.clouds.forEach(function(c,i){c.visible=low?false:(med?(i<3):true);});}catch(e){}
+      return p;}
+  };
+  try{window.GFX._load();window.GFX.apply();}catch(e){}
 
   /* ---- ground ---- */
   let groundMat;
