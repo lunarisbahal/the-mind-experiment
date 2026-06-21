@@ -5298,14 +5298,13 @@ if(HAS3D)(function(){
   let evoLv=-1;
   W3.evolve=lv=>{
     if(lv===evoLv)return;evoLv=lv;
+    /* b45: oyuncu HER ZAMAN İNSAN kalır. Eski "insan→makine" dönüşümü teni/kıyafeti metale çeviriyordu — kaldırıldı.
+       Yüksek içgörüde yalnızca göğüste yumuşak bir "uyanan iç ışık" (dikiş) belirir; metalik omuz/anten yok. */
     evo.seam.visible=lv>=1;
-    evo.shL.visible=evo.shR.visible=lv>=2;
-    evo.ant.visible=lv>=3;
-    player.parts.visor.material.emissiveIntensity=1+lv*.8;
-    if(lv>=2){player.parts.cm.color.set(0x39414f);player.parts.cm.metalness=.7;player.parts.cm.roughness=.3;}
-    else{player.parts.cm.color.set(0x1e2734);player.parts.cm.metalness=.05;player.parts.cm.roughness=.8;}
-    if(lv>=3){player.parts.sm.color.set(0xb8c2d4);player.parts.sm.metalness=.9;player.parts.sm.roughness=.15;}
-    else{player.parts.sm.color.set(0xc9b8a6);player.parts.sm.metalness=.05;player.parts.sm.roughness=.6;}
+    evo.shL.visible=evo.shR.visible=false;
+    evo.ant.visible=false;
+    try{if(player.parts.visor&&player.parts.visor.material)player.parts.visor.material.emissiveIntensity=1+lv*.8;}catch(e){}
+    try{if(evo.seam&&evo.seam.material)evo.seam.material.emissiveIntensity=0.7+lv*0.5;}catch(e){}
   };
   const lun=makeChar('lunaris');
   lun.g.position.set(L.lunaris.x,0,L.lunaris.z);lun.g.visible=false;scene.add(lun.g);
