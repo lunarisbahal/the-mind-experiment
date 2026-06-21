@@ -307,7 +307,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b50 · <span style="color:var(--accent)">real clothes — the seven archetypes & player now have actual garment details: a collar / open V-neck, a belt at the waist, a jacket front seam, a shirt hem and sleeve cuffs, so the body reads as a dressed person instead of a smooth painted shell</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b51 · <span style="color:var(--accent)">milestones (gameplay depth) — a new MENU → 🏆 Milestones gallery tracks 12 achievements (first chapter, integrate a realm, gather echoes, reach insight tiers, write a page…) and pops a live “🏆 Achievement unlocked” the moment you earn one</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -380,6 +380,7 @@
 <div style="grid-column:1/-1;font-size:8.5px;letter-spacing:.25em;color:var(--violet);opacity:.62;margin:9px 2px 2px;text-transform:uppercase">✦ SETTINGS</div>
 <button class="mini" onclick="SoundUI.show()">🔊 SOUND</button>
 <button class="mini" onclick="if(window.GfxUI)GfxUI.show()">⚙ GRAPHICS</button>
+<button class="mini" onclick="if(window.Achv)Achv.show()">🏆 MILESTONES</button>
 <button class="mini" onclick="Onboard.show(false)">❖ HOW IT WORKS</button>
 <button class="mini" onclick="Legal.show()">⚖ LEGAL & SAFETY</button>
 <div style="grid-column:1/-1;display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;margin-top:11px;border-top:1px solid var(--line);padding-top:9px"><button class="mini" onclick="Game.exitFlow()">⏏ EXIT</button><button class="mini" onclick="Data.wipe()" style="color:var(--warn);border-color:var(--warn);opacity:.85">⌮ DELETE DATA</button></div>
@@ -1663,6 +1664,8 @@ function refreshHud(){try{if(window.Library)Library.poll();}catch(e){}try{if(win
           try{UI.toast((_TRm?'⚖ İç dengen kaydı — şimdi içinde öne çıkan: ':'⚖ Your inner balance shifts — now leading inside you: ')+String(_nm).toUpperCase(),5200);}catch(e){}
           try{if(window.FX)FX.sfx('soft');}catch(e){}}}}}
   }catch(e){}
+  /* b51: başarım taraması (4 sn’de bir). İlk tarama SESSİZ — mevcut ilerleme toast bombardımanı yapmasın; sonra yeni açılanlar bildirilir. */
+  try{var _an=Date.now();if(!window._achvT||_an-window._achvT>4000){window._achvT=_an;if(window.Achv){if(!window._achvInit){window._achvInit=1;Achv.scan(true);}else{Achv.scan(false);}}}}catch(e){}
   UI.el('locksRow').textContent=['◇','◇','◇','◇'].map((c,i)=>i<S.locks?'◆':'◇').join(' ');
   UI.el('ritesRow').textContent=identityName()+' · RITES '+riteCount()+'/7 · ◇'+echoCount()+'/16'+' · 📖'+((window.Library&&Library.bookOpen)?Library.bookOpen():0)+'/49'+(S.flags.integrated?' · INTEGRATED':'')+(S.flags.initiate?' · ✶':S.solved.s7?' · ⟁':'');
   W3.evolve&&W3.evolve(S.insight>=90?3:S.insight>=55?2:S.insight>=25?1:0);
@@ -3342,6 +3345,42 @@ const GfxUI={
   set(k){try{if(window.GFX)GFX.apply(k);}catch(e){}try{if(window.FX)FX.sfx('select');}catch(e){}try{if(window.UI)UI.toast((GAMELANG==='tr'?'⚙ Görüntü: ':'⚙ Graphics: ')+k.toUpperCase());}catch(e){}this.show();}
 };
 if(typeof window!=='undefined')window.GfxUI=GfxUI;
+/* b51: KİLOMETRE TAŞLARI / BAŞARIMLAR — oynanış derinliği. Mevcut durumdan hesaplanır; açıldıkça bildirim verir. */
+const Achv={
+  KEY:'it041_achv',
+  _got(){try{return JSON.parse(localStorage.getItem(this.KEY))||{};}catch(e){return{};}},
+  _save(o){try{localStorage.setItem(this.KEY,JSON.stringify(o));}catch(e){}},
+  list(){var TR=(GAMELANG==='tr');
+    var dm={};try{dm=(window.House&&House.doneMap)?House.doneMap():{};}catch(e){}var nch=0;for(var k in dm){if(dm[k])nch++;}
+    var rin=0;try{['lunaris','bahal','lucida','lucius','noct','silvanus','aelius'].forEach(function(r){if((S.flags&&S.flags[r+'Integrated'])||(S.council&&S.council.indexOf(r)>=0))rin++;});}catch(e){}
+    var ec=0;try{ec=(typeof echoCount==='function')?echoCount():0;}catch(e){}
+    var rc=0;try{rc=(typeof riteCount==='function')?riteCount():0;}catch(e){}
+    var ins=S.insight||0;
+    var jp=0;try{var je=(S.journal&&S.journal.entries)||{};for(var jk in je){if((je[jk]||'').trim())jp++;}}catch(e){}
+    var ex=0;try{if(S.skills)ex=Object.keys(S.skills).length;}catch(e){}
+    return [
+      {id:'firstch',t:TR?'İlk Adım':'First Step',d:TR?'İlk bölümü tamamla':'Complete your first chapter',ok:nch>=1},
+      {id:'ch10',t:TR?'Yola Koyuldun':'On the Road',d:TR?'10 bölüm tamamla':'Complete 10 chapters',ok:nch>=10,prog:nch+'/10'},
+      {id:'allch',t:TR?'Tüm Yolculuk':'The Whole Journey',d:TR?'49 bölümün hepsini tamamla':'Complete all 49 chapters',ok:nch>=49,prog:nch+'/49'},
+      {id:'firstrealm',t:TR?'İlk Bütünleşme':'First Integration',d:TR?'Bir diyarı bütünle':'Integrate one realm',ok:rin>=1,prog:rin+'/7'},
+      {id:'allrealm',t:TR?'Yedi Ses, Tek Sen':'Seven Voices, One You',d:TR?'7 diyarın hepsini bütünle':'Integrate all 7 realms',ok:rin>=7,prog:rin+'/7'},
+      {id:'echo5',t:TR?'Yankı Avcısı':'Echo Hunter',d:TR?'5 yankı topla':'Gather 5 echoes',ok:ec>=5,prog:ec+'/16'},
+      {id:'echoall',t:TR?'Bütün Yankılar':'All Echoes',d:TR?'16 yankının hepsini topla':'Gather all 16 echoes',ok:ec>=16,prog:ec+'/16'},
+      {id:'rite7',t:TR?'Yedi Ritüel':'Seven Rites',d:TR?'7 ritüeli tamamla':'Complete all 7 rites',ok:rc>=7,prog:rc+'/7'},
+      {id:'ins25',t:TR?'Lunaris Olmak':'Becoming Lunaris',d:TR?'İçgörü 25’e ulaş':'Reach insight 25',ok:ins>=25},
+      {id:'ins90',t:TR?'Aelius Olmak':'Becoming Aelius',d:TR?'İçgörü 90’a ulaş — bütünleşme':'Reach insight 90 — integration',ok:ins>=90},
+      {id:'journal',t:TR?'Kendi Kitabın':'Your Own Book',d:TR?'Bir günlük sayfası yaz':'Write a journal page',ok:jp>=1},
+      {id:'innerwork',t:TR?'İç Çalışma':'Inner Work',d:TR?'Bir terapötik egzersiz yap':'Do one therapeutic exercise',ok:ex>=1}
+    ];
+  },
+  scan(silent){try{var L=this.list();var got=this._got();var any=false;
+    L.forEach(function(a){if(a.ok&&!got[a.id]){got[a.id]=Date.now();any=true;if(!silent){try{UI.toast((GAMELANG==='tr'?'🏆 Başarım açıldı: ':'🏆 Achievement: ')+a.t,5200);}catch(e){}try{if(window.FX&&FX.reward)FX.reward();}catch(e){}}}});
+    if(any)this._save(got);}catch(e){}},
+  show(){this.scan(true);var TR=(GAMELANG==='tr');var L=this.list();var done=L.filter(function(a){return a.ok;}).length;
+    var rows=L.map(function(a){var on=!!a.ok;return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)"><span style="font-size:16px">'+(on?'🏆':'🔒')+'</span><div style="flex:1"><div style="color:'+(on?'var(--accent)':'var(--dim)')+';font-size:13px">'+esc(a.t)+(a.prog?(' <span style=\"color:var(--dim);font-size:11px\">('+a.prog+')</span>'):'')+'</div><div style="color:var(--dim);font-size:11px">'+esc(a.d)+'</div></div></div>';}).join('');
+    UI.doc((TR?'🏆 KİLOMETRE TAŞLARI':'🏆 MILESTONES')+' · '+done+'/'+L.length,'<p style="color:var(--dim);font-size:12px">'+(TR?'Yolculuğunda açtığın başarımlar — içgörü kazandıkça, diyarları bütünledikçe, yankıları topladıkça açılır.':'Milestones you unlock on your journey — they open as you gain insight, integrate realms, and gather echoes.')+'</p>'+rows);}
+};
+if(typeof window!=='undefined')window.Achv=Achv;
 const Voices={
   ORDER:['silv','lunaris','bahal','lucida','lucius','noct','aelius'],
   REALM:{lunaris:[1,7],bahal:[8,14],lucida:[15,21],lucius:[22,28],noct:[29,35],silv:[36,42],aelius:[43,49]},
