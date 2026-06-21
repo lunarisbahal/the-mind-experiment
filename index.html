@@ -307,7 +307,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b52 · <span style="color:var(--accent)">audio & atmosphere — soft synthesized footsteps now play in time with your stride (faster when you run), giving real presence to walking; gated by your sound settings, no asset files</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b53 · <span style="color:var(--accent)">audio & atmosphere II — a gentle confirm sound when you interact ([E]) and a soft transition tone when you enter or leave an area, on top of the footsteps, so the world responds to you in sound</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -1344,7 +1344,7 @@ function interactTarget(){
 }
 function interact(){
   if(Game.modal){if(UI.el('dlg').style.display==='block')Dlg.advance();return;}
-  const t=interactTarget();if(t)t[1]();
+  const t=interactTarget();if(t){try{if(window.FX)FX.sfx('soft');}catch(e){}t[1]();} /* b53: etkileşim onay sesi */
 }
 function doCasefile(){
   if(S.stage===0){S.stage=1;save();}
@@ -6447,6 +6447,7 @@ if(HAS3D)(function(){
       this.buildHouseRoom(ch);W3.IP={px:0,pz:this.RS-3};
       const room=(window.House&&House.data().rooms[ch-1]);if(room)UI.toast('→ '+(room.room[GAMELANG]||room.room.en),3500);},
     enter(k){const z=RZONES[k];if(!z){return;}if(z.stub){UI.toast(GAMELANG==='tr'?'Bu alan henüz inşa edilmedi.':'This area is not built yet.');return;}
+      try{if(window.FX)FX.sfx('portal');}catch(e){} /* b53: içeri geçiş sesi */
       const idx=(window.REALMS||[]).findIndex(r=>r.k===k);if(idx>0&&window.Realms&&!Realms.open(idx)){UI.toast(GAMELANG==='tr'?'Önce bir önceki arketibi bütünle.':'Integrate the previous archetype first.');return;}
       this.house=!!(window.HOUSES&&HOUSES[k]);
       var _realmDone=false;
@@ -6456,7 +6457,7 @@ if(HAS3D)(function(){
       if(this.house){UI.toast(_realmDone?('☽ '+z.name+' — '+(GAMELANG==='tr'?'bu diyarı bütünledin · salondaki yazı bilgisayarına yaklaş [E] — günlüğünü/kitabını yaz':'you integrated this realm · approach the writing computer in the salon [E] — write your journal/book')):('☽ '+z.name+' — '+(GAMELANG==='tr'?'evine girdin · odadaki ışıyan odağa yaklaş [E]':'you entered his house · approach the glowing focus [E]')),_realmDone?7500:6000);}
       else{const cfg=INTERIORS[k];UI.toast('◈ '+z.name+' — '+(cfg&&cfg.wake?(cfg.wake[GAMELANG]||cfg.wake.en):(GAMELANG==='tr'?'alanına girdin':'you entered'))+(GAMELANG==='tr'?' · [WASD gez · sütuna yaklaş · E ile performe et]':' · [WASD move · approach a pillar · E to perform]'),6500);}
     },
-    exit(){W3.inInterior=false;this.storyMode=false;try{var __sh=document.getElementById('sgHUD');if(__sh)__sh.remove();}catch(e){}scene.add(player.g);if(W3.intLamp)W3.intLamp.visible=false;try{if(window.House){if(House._emCancel)House._emCancel();if(House._pz)clearInterval(House._pz);}}catch(e){}UI.toast(GAMELANG==='tr'?'Alandan çıktın.':'You left the area.');},
+    exit(){W3.inInterior=false;this.storyMode=false;try{if(window.FX)FX.sfx('portal');}catch(e){}try{var __sh=document.getElementById('sgHUD');if(__sh)__sh.remove();}catch(e){}scene.add(player.g);if(W3.intLamp)W3.intLamp.visible=false;try{if(window.House){if(House._emCancel)House._emCancel();if(House._pz)clearInterval(House._pz);}}catch(e){}UI.toast(GAMELANG==='tr'?'Alandan çıktın.':'You left the area.');},
     /* ===== 3B HİKÂYE OYUNU — her sahne bir oda; iki sütundan (gölge/ışık) birine yürü, [E] ile seç ===== */
     storyGame:function(scenes,meta){if(!scenes||!scenes.length)return;this._sg={scenes:scenes,meta:meta||{},i:0,score:0};this._sgLast={scenes:scenes,meta:meta||{}};
       try{if(window.UI&&UI.closeDoc)UI.closeDoc();}catch(e){}
