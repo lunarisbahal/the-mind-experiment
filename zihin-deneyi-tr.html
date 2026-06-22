@@ -304,7 +304,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b86--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b87--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -5034,7 +5034,7 @@ if(HAS3D)(function(){
     sp.scale.set(24*sc,4.5*sc,1);sp.position.set(x,y,z);scene.add(sp);return sp;}
   ZONES.forEach(z=>label(z.name,z.x,z.z,11));
   label('AYNALAR KAPISI',L.gate.x,L.gate.z,10,.8);
-  try{var _vmat=new THREE.MeshBasicMaterial({color:0x223046,transparent:true,opacity:0.16,side:THREE.DoubleSide,depthWrite:false,fog:false});var _vg=new THREE.PlaneGeometry(360,10);var _v1=new THREE.Mesh(_vg,_vmat);_v1.position.set(190,5,108);_v1.renderOrder=2;scene.add(_v1);var _v2=new THREE.Mesh(_vg,_vmat);_v2.position.set(190,5,116);_v2.renderOrder=2;scene.add(_v2);W3._defenseVeils=[_v1,_v2];label((GAMELANG==='tr'?'SAVUNMA MEKAN\u0130ZMALARI PERDELER\u0130':'DEFENSE-MECHANISM VEILS'),190,112,4,.7);}catch(e){}
+  try{var _vmat=new THREE.MeshBasicMaterial({color:0x223046,transparent:true,opacity:0.16,side:THREE.DoubleSide,depthWrite:false,fog:false});var _vg=new THREE.PlaneGeometry(360,10);var _v1=new THREE.Mesh(_vg,_vmat);_v1.position.set(190,5,104);_v1.renderOrder=2;scene.add(_v1);var _v2=new THREE.Mesh(_vg,_vmat);_v2.position.set(190,5,112);_v2.renderOrder=2;scene.add(_v2);W3._defenseVeils=[_v1,_v2];label((GAMELANG==='tr'?'SAVUNMA MEKAN\u0130ZMALARI PERDELER\u0130':'DEFENSE-MECHANISM VEILS'),190,112,4,.7);}catch(e){}
   const COLL=[];function collide(x,z,r){COLL.push({x,z,r});}
 
   /* ---- rite markers (violet pillars) ---- */
@@ -6719,6 +6719,74 @@ if(HAS3D)(function(){
   buildNoctCave(310,262,(GAMELANG==='tr'?'NOCTORNUS GECESİ — MAĞARA ☾':"NOCTORNUS'S NIGHT — THE CAVE ☾"));
   W3.PORTALS.push({k:'silvanus',x:L.caravan.x,z:L.caravan.z+4,r:3.6,name:(GAMELANG==='tr'?"SILVANUS'UN KARAVANI ☽":"SILVANUS'S CARAVAN ☽"),house:true});
   buildAeliusHill(215,165,(GAMELANG==='tr'?'AELIUS SEANSI ✦':'THE AELIUS SESSION ✦'));
+  function buildConsciousnessCity(){try{
+    var COARSE=false;try{COARSE=window.matchMedia&&window.matchMedia('(pointer:coarse)').matches;}catch(e){}
+    var pal=[std(0xd9d2c4),std(0xe6dcc8),std(0xcfd4d8),std(0xe8e2d2),std(0xc9bfa8)];
+    var rmat=std(0x2a2c30,{roughness:.95});
+    var dmat=std(0xc8c8b0,{roughness:.9});
+    var glassM=std(0xa9c4d6,{roughness:.4,metalness:.2});
+    var bodyM=std(0x3a3d42,{roughness:.55,metalness:.4});
+    var headM=std(0xe8c9a8,{roughness:.8});
+    function mk(w,h,d,mat,x,y,z){var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=false;m.receiveShadow=false;scene.add(m);return m;}
+    var clears=[[150,34,12],[165,92,12],[326,33,12],[274,66,12],[200,40,12],[101,7,12]];
+    function blocked(x,z){for(var i=0;i<clears.length;i++){var c=clears[i];if(Math.hypot(x-c[0],z-c[1])<c[2])return true;}return false;}
+    /* roads: across x at a few z, plus a couple along z */
+    var roadZ=[26,46,66,86];
+    for(var ri=0;ri<roadZ.length;ri++){mk(356,0.1,4,rmat,188,0.05,roadZ[ri]);}
+    var roadX=[60,300];
+    for(var rj=0;rj<roadX.length;rj++){mk(4,0.1,90,rmat,roadX[rj],0.05,54);}
+    if(!COARSE){for(var dz=0;dz<roadZ.length;dz++){for(var dx=20;dx<360;dx+=14){mk(2,0.06,0.5,dmat,dx,0.11,roadZ[dz]);}}}
+    /* buildings: rows between roads */
+    var rowZ=[16,36,56,76,90];
+    var nB=COARSE?22:44, placed=0, seed=8731;
+    function rnd(){seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;}
+    for(var pass=0;pass<6&&placed<nB;pass++){
+      for(var z0=0;z0<rowZ.length&&placed<nB;z0++){
+        var zz=rowZ[z0]+(rnd()*6-3);
+        for(var xx=16;xx<362&&placed<nB;xx+=(7+rnd()*7)){
+          if(blocked(xx,zz))continue;
+          var bw=3+rnd()*4, bd=3+rnd()*4, bh=4+rnd()*14;
+          var m=mk(bw,bh,bd,pal[(placed)%pal.length],xx,bh/2,zz);
+          if(rnd()>0.5){var gw=bw*0.7;mk(gw,bh*0.5,0.15,glassM,xx,bh*0.6,zz+bd/2+0.05);}
+          placed++;
+        }
+      }
+    }
+    /* houses near lower edge z~94 */
+    var nH=COARSE?3:6;
+    for(var h=0;h<nH;h++){var hx=40+h*55;if(blocked(hx,94))continue;mk(6,4,6,pal[h%pal.length],hx,2,94);var rf=new THREE.Mesh(new THREE.ConeGeometry(4.6,2.6,4),dmat);rf.position.set(hx,5.3,94);rf.rotation.y=Math.PI/4;rf.castShadow=false;rf.receiveShadow=false;scene.add(rf);}
+    /* cars */
+    W3._cityCars=[];
+    var carColors=[0xc0392b,0x2980b9,0xf1c40f,0x27ae60,0xecf0f1,0x8e44ad];
+    var nCars=COARSE?3:9;
+    for(var c=0;c<nCars;c++){var lane=roadZ[c%roadZ.length];var cx=20+rnd()*330;var car=mk(1.8,0.8,0.9,std(carColors[c%carColors.length]),cx,0.5,lane+(c%2?1.1:-1.1));car.userData={spd:(c%2?-1:1)*(3+rnd()*4),lane:lane};W3._cityCars.push(car);}
+    /* people */
+    W3._cityPeople=[];
+    var nP=COARSE?0:11;
+    for(var p=0;p<nP;p++){var px=24+rnd()*330,pz=rowZ[p%rowZ.length]+(p%2?5:-5);if(blocked(px,pz))continue;var grp=new THREE.Group();var bdy=new THREE.Mesh(new THREE.BoxGeometry(0.4,1.1,0.3),bodyM);bdy.position.y=0.55;bdy.castShadow=false;bdy.receiveShadow=false;grp.add(bdy);var hd=new THREE.Mesh(new THREE.SphereGeometry(0.28,6,6),headM);hd.position.y=1.3;hd.castShadow=false;hd.receiveShadow=false;grp.add(hd);grp.position.set(px,0,pz);grp.userData={ph:rnd()*6.28};scene.add(grp);W3._cityPeople.push(grp);}
+    label((GAMELANG==='tr'?'BILINÇ ŞEHRİ ☀':'CITY OF CONSCIOUSNESS ☀'),188,52,13,1);
+  }catch(e){}}
+  function buildMindExpressTrain(){try{
+    var railM=std(0x3a3a3a,{roughness:.7});
+    var locoM=std(0x232830,{roughness:.4,metalness:.6});
+    var wagM=std(0x2c333d,{roughness:.45,metalness:.5});
+    var winM=std(0xffe9a8,{roughness:.3,emissive:0xffcf6a,emissiveIntensity:0.9});
+    function mk2(w,h,d,mat,x,y,z){var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=false;m.receiveShadow=false;scene.add(m);return m;}
+    var tz=106;
+    mk2(356,0.12,0.5,railM,188,0.3,tz-1.2);
+    mk2(356,0.12,0.5,railM,188,0.3,tz+1.2);
+    var startX=24, seg=14, gap=1.2, n=7;
+    for(var i=0;i<n;i++){
+      var cx=startX+i*(seg+gap)+seg/2;
+      var isLoco=(i===0);
+      mk2(seg,4,4,isLoco?locoM:wagM,cx,2.4,tz);
+      if(isLoco){mk2(3,1.6,4.2,locoM,cx-seg/2+1.5,4.0,tz);}
+      for(var w=0;w<4;w++){mk2(1.6,1.0,0.12,winM,cx-seg/2+2.5+w*3,2.8,tz+2.05);}
+    }
+    label((GAMELANG==='tr'?'DO·LOON·AI EXPRESS':'DO·LOON·AI EXPRESS'),190,102,6,0.8);
+  }catch(e){}}
+  buildConsciousnessCity();
+  buildMindExpressTrain();
 
   buildHood(268,255);
   buildHood(372,150);
@@ -6911,7 +6979,7 @@ if(HAS3D)(function(){
       moonLight.color.setHSL(.6-.07*sun,.45,.75+.06*sun);
       hemi.intensity=ph.hemi*(1-sun)+.85*sun;
       scene.fog.density=ph.fog*(1-sun)+.0035*sun;
-      var _p=(window.W3&&W3._clear)||0;var _front=110+_p*230;var _df=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:150)-_front)/110));moonLight.intensity*=(1-0.97*_df);hemi.intensity*=(1-0.95*_df);scene.fog.density*=(1+14*_df);moonLight.intensity+=0.45*_p;hemi.intensity+=0.40*_p;scene.fog.density*=(1-0.5*_p);rimLight.intensity=0.12+0.85*_p;try{var _nf=Math.max(0,Math.min(1,(110-((typeof S!=='undefined'&&S.pz!=null)?S.pz:120))/110));if(_nf===_nf){hemi.intensity+=0.9*_nf;moonLight.intensity+=0.6*_nf;}}catch(e){}
+      var _p=(window.W3&&W3._clear)||0;var _front=110+_p*230;var _df=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:150)-_front)/110));moonLight.intensity*=(1-0.97*_df);hemi.intensity*=(1-0.95*_df);scene.fog.density*=(1+14*_df);moonLight.intensity+=0.45*_p;hemi.intensity+=0.40*_p;scene.fog.density*=(1-0.5*_p);rimLight.intensity=0.12+0.85*_p;try{var _nf=Math.max(0,Math.min(1,(110-((typeof S!=='undefined'&&S.pz!=null)?S.pz:120))/110));if(_nf===_nf){hemi.intensity+=1.1*_nf;moonLight.intensity+=0.6*_nf;}}catch(e){}
       skyU.top.value.setRGB(.012+.18*sun,.016+.34*sun,.047+.55*sun);
       skyU.mid.value.setRGB(.039+.42*sun,.075+.55*sun,.149+.62*sun);
       skyU.bot.value.setRGB(.078+.72*sun,.122+.62*sun,.22+.45*sun);
@@ -7284,6 +7352,7 @@ if(HAS3D)(function(){
       saveT+=dt;if(saveT>5){saveT=0;save();}
     }
     if(W3._portals)for(const pr of W3._portals)pr.rotation.z+=dt*.35;
+    try{if(W3._cityCars&&dt>0){for(var ci=0;ci<W3._cityCars.length;ci++){var car=W3._cityCars[ci];car.position.x+=car.userData.spd*dt;if(car.position.x>372)car.position.x=18;else if(car.position.x<18)car.position.x=372;}}if(W3._cityPeople&&dt>0){for(var pi=0;pi<W3._cityPeople.length;pi++){var pe=W3._cityPeople[pi];pe.userData.ph+=dt*1.3;pe.position.y=Math.abs(Math.sin(pe.userData.ph))*0.12;}}}catch(e){}
     var _acs=(W3.inInterior&&W3.Interior)?W3.Interior.scene:scene;
     if(composer&&bloomOn){try{renderPass.scene=_acs;renderPass.camera=camera;composer.render();}catch(e){bloomOn=false;renderer.render(_acs,camera);}}
     else{renderer.render(_acs,camera);}
