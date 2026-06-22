@@ -311,7 +311,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b93--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b94--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -515,8 +515,8 @@ const L={
   mural:{x:279,z:165,r:4.5,name:'MURAL'},
   graffiti:{x:48,z:170,r:4.5,name:'CELL WALL'},
   caravan:{x:338,z:196,r:13,name:"SILVANUS'S CARAVAN"},
-  medbench:{x:338,z:184,r:4,name:(GAMELANG==='tr'?'MEDİTASYON BANKI':'MEDITATION BENCH')},
-  medpark:{x:92,z:56,r:4,name:(GAMELANG==='tr'?'HUZUR GÖLETİ':'CALM POND')},
+  medbench:{x:338,z:184,r:4,get name(){return GAMELANG==='tr'?'MEDİTASYON BANKI':'MEDITATION BENCH';}},
+  medpark:{x:92,z:56,r:4,get name(){return GAMELANG==='tr'?'HUZUR GÖLETİ':'CALM POND';}},
   bridge:{x:319,z:196,r:6,name:'ROPE BRIDGE'},
   station:{x:300,z:108,r:18,name:'THE STATION'},
   ovStone1:{x:130,z:190,r:4.5,name:'ORDOS VERITAS OBELISK'},
