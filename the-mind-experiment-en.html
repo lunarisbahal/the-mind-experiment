@@ -310,7 +310,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b73 · <span style="color:var(--accent)">the deep south is now near-black, foggy and lantern-lit; denser labyrinth walls, scattered mirrors and thicker Noctornus woods; many more childhood-trauma sounds packed into the south, plus a rare horror vignette.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b74 · <span style="color:var(--accent)">the deep south is now nearly pitch-black: the consciousness glow and sky fade to almost nothing going south, fog thickens to hide the northern light pillar — the lantern is your only real light.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -6941,11 +6941,11 @@ if(HAS3D)(function(){
       moonLight.color.setHSL(.6-.07*sun,.45,.75+.06*sun);
       hemi.intensity=ph.hemi*(1-sun)+.85*sun;
       scene.fog.density=ph.fog*(1-sun)+.0035*sun;
-      var _lat=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:150)-40)/260));var _sl=_lat*_lat;moonLight.intensity*=(1-0.92*_sl);hemi.intensity*=(1-0.90*_sl);scene.fog.density*=(1+5.0*_sl);rimLight.intensity=0.10+0.55*(1-_lat);
+      var _lat=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:150)-40)/260));var _sl=_lat*_lat;var _slc=_sl*_lat;moonLight.intensity*=(1-0.992*_slc);hemi.intensity*=(1-0.985*_slc);scene.fog.density*=(1+12.0*_slc);rimLight.intensity=0.55*Math.pow(1-_lat,2.4);
       skyU.top.value.setRGB(.012+.18*sun,.016+.34*sun,.047+.55*sun);
       skyU.mid.value.setRGB(.039+.42*sun,.075+.55*sun,.149+.62*sun);
       skyU.bot.value.setRGB(.078+.72*sun,.122+.62*sun,.22+.45*sun);
-      try{var _sd=1-0.85*(_lat*_lat);skyU.top.value.multiplyScalar(_sd);skyU.mid.value.multiplyScalar(_sd);skyU.bot.value.multiplyScalar(_sd);}catch(e){} /* b73: deep-south horizon goes near-black */
+      try{var _sd=1-0.97*(_lat*_lat*_lat);skyU.top.value.multiplyScalar(_sd);skyU.mid.value.multiplyScalar(_sd);skyU.bot.value.multiplyScalar(_sd);}catch(e){} /* b73: deep-south horizon goes near-black */
       W3.starsM.opacity=.85*(1-sun);
       moonMesh.material.opacity=((W3._moonOp||.95)*(1-sun*.92))+.03;
       moonGlow.material.opacity=(W3._glowOp||.5)*(1-sun);
