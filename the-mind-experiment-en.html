@@ -310,7 +310,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b72 · <span style="color:var(--accent)">test entry fixed (?aeltest now teleports correctly); open it to reach the Aelius hill and try the climb action.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b73 · <span style="color:var(--accent)">the deep south is now near-black, foggy and lantern-lit; denser labyrinth walls, scattered mirrors and thicker Noctornus woods; many more childhood-trauma sounds packed into the south, plus a rare horror vignette.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -1973,6 +1973,8 @@ const Snd={
   childLaugh(){ if(!this.on||!this.ac)return; try{var ac=this.ac,n=ac.currentTime;var o=ac.createOscillator();o.type='triangle';var g=ac.createGain();g.gain.value=0;o.connect(g);g.connect(this.master);var t=n;for(var k=0;k<5;k++){var f=700+Math.random()*500;o.frequency.setValueAtTime(f,t);o.frequency.linearRampToValueAtTime(f*1.25,t+0.05);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.07,t+0.03);g.gain.linearRampToValueAtTime(0,t+0.1);t+=0.16;}o.start(n);o.stop(t+0.1);}catch(e){} },
   coupleArgue(){ if(!this.on||!this.ac)return; try{var ac=this.ac,n=ac.currentTime;var nb=this._traumaNoise();if(!nb)return;var t=n;for(var k=0;k<5;k++){var src=ac.createBufferSource();src.buffer=nb;var bp=ac.createBiquadFilter();bp.type='bandpass';bp.frequency.value=(k%2?320:190);bp.Q.value=6;var g=ac.createGain();g.gain.value=0;src.connect(bp);bp.connect(g);g.connect(this.master);var d=0.22+Math.random()*0.12;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.08,t+0.04);g.gain.linearRampToValueAtTime(0,t+d);src.start(t);src.stop(t+d+0.05);t+=d+0.12+Math.random()*0.1;}}catch(e){} },
   dishSmash(){ if(!this.on||!this.ac)return; try{var ac=this.ac,n=ac.currentTime;var nb=this._traumaNoise();if(!nb)return;var src=ac.createBufferSource();src.buffer=nb;var hp=ac.createBiquadFilter();hp.type='highpass';hp.frequency.value=2200;var g=ac.createGain();g.gain.value=0;src.connect(hp);hp.connect(g);g.connect(this.master);g.gain.setValueAtTime(.11,n);g.gain.exponentialRampToValueAtTime(.001,n+0.22);src.start(n);src.stop(n+0.28);for(var k=0;k<2;k++){var o=ac.createOscillator();o.type='sine';var og=ac.createGain();og.gain.value=0;o.connect(og);og.connect(this.master);var tt=n+0.04+k*0.07;o.frequency.setValueAtTime(3200+Math.random()*1600,tt);og.gain.setValueAtTime(.06,tt);og.gain.exponentialRampToValueAtTime(.001,tt+0.12);o.start(tt);o.stop(tt+0.14);}}catch(e){} },
+  scream(){ if(!this.on||!this.ac)return; try{var ac=this.ac,n=ac.currentTime;var nb=this._traumaNoise();var o=ac.createOscillator();o.type='sawtooth';var bp=ac.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1400;bp.Q.value=4;var g=ac.createGain();g.gain.value=0;o.connect(bp);bp.connect(g);g.connect(this.master);o.frequency.setValueAtTime(420,n);o.frequency.linearRampToValueAtTime(1700,n+0.22);o.frequency.linearRampToValueAtTime(360,n+0.9);g.gain.setValueAtTime(0,n);g.gain.linearRampToValueAtTime(.10,n+0.08);g.gain.linearRampToValueAtTime(.07,n+0.5);g.gain.exponentialRampToValueAtTime(.001,n+1.0);o.start(n);o.stop(n+1.05);if(nb){var src=ac.createBufferSource();src.buffer=nb;var hp=ac.createBiquadFilter();hp.type='bandpass';hp.frequency.value=2000;hp.Q.value=2;var ng=ac.createGain();ng.gain.value=0;src.connect(hp);hp.connect(ng);ng.connect(this.master);ng.gain.setValueAtTime(.05,n);ng.gain.exponentialRampToValueAtTime(.001,n+0.7);src.start(n);src.stop(n+0.75);}}catch(e){} },
+  childCry(){ if(!this.on||!this.ac)return; try{var ac=this.ac,n=ac.currentTime;var o=ac.createOscillator();o.type='triangle';var g=ac.createGain();g.gain.value=0;o.connect(g);g.connect(this.master);var lfo=ac.createOscillator();lfo.type='sine';lfo.frequency.value=3.2;var lg=ac.createGain();lg.gain.value=40;lfo.connect(lg);lg.connect(o.frequency);var t=n;for(var k=0;k<4;k++){var f=520+Math.random()*120;o.frequency.setValueAtTime(f,t);o.frequency.linearRampToValueAtTime(f*1.18,t+0.18);o.frequency.linearRampToValueAtTime(f*0.92,t+0.42);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.07,t+0.1);g.gain.linearRampToValueAtTime(.03,t+0.4);g.gain.linearRampToValueAtTime(0,t+0.55);t+=0.62;}o.start(n);lfo.start(n);o.stop(t+0.1);lfo.stop(t+0.1);}catch(e){} },
   setZoneAmb(f,c,b){ if(!this.on)return; this._ensureZoneAmb(); if(!this._zoneAmb)return; var z=this._zoneAmb;
     var ft=Math.max(0,Math.min(1,f))*0.5, ct=Math.max(0,Math.min(1,c))*0.5, bt=Math.max(0,Math.min(1,b||0))*0.42;
     z.fG.gain.value+=(ft-z.fG.gain.value)*.05; z.cG.gain.value+=(ct-z.cG.gain.value)*.05; if(z.bG)z.bG.gain.value+=(bt-z.bG.gain.value)*.05;
@@ -4813,6 +4815,8 @@ if(HAS3D)(function(){
   moonLight.target=mlTarget;scene.add(moonLight);
   const rimLight=new THREE.DirectionalLight(0x9fb6e8,.38);rimLight.position.set(40,120,-60);scene.add(rimLight); /* b37: soğuk arka kenar ışığı — figürleri arka plandan ayırır (sinematik rim aydınlatma) */
   const lantern=new THREE.PointLight(0xffd9a8,.85,11,2);scene.add(lantern);
+  /* b73: directional flashlight beam that follows player look-dir; faint in north, strong in deep south */
+  const southBeam=new THREE.SpotLight(0xffe8c4,.15,26,0.55,0.6,1.5);southBeam.position.set(0,2,0);scene.add(southBeam);scene.add(southBeam.target);
   /* ATMOSFER: toz zerreleri (oyuncunun çevresinde süzülen) + fener parıltı halkası (yumuşak bloom hissi) */
   const moteGeo=new THREE.BufferGeometry();const _MN=150;const _mp=new Float32Array(_MN*3);
   for(let i=0;i<_MN;i++){_mp[i*3]=(Math.random()-.5)*46;_mp[i*3+1]=Math.random()*9+.4;_mp[i*3+2]=(Math.random()-.5)*46;}
@@ -6780,6 +6784,22 @@ if(HAS3D)(function(){
   buildDarkForest(50,128,(GAMELANG==='tr'?'FISILTI ORMANI':'WHISPER WOOD'));
   buildDarkForest(340,60,(GAMELANG==='tr'?'KIYI AĞAÇLARI':'THE SHORE PINES'));
   buildDarkForest(200,40,(GAMELANG==='tr'?'EŞİK KORUSU':'THE THRESHOLD COPSE'));
+  /* b73: standing mirror — subconscious symbol. VISUAL ONLY (no collision). Cheap glassy material, dark frame. */
+  function buildMirror(x,z,ry){
+    var glass=new THREE.Mesh(new THREE.PlaneGeometry(1.7,3.4),new THREE.MeshStandardMaterial({color:0x10141c,metalness:.9,roughness:.18,emissive:0x223044,emissiveIntensity:.18,transparent:true,opacity:.85,side:THREE.DoubleSide}));
+    glass.position.set(x,2.0,z);glass.rotation.y=ry;scene.add(glass);
+    box(2.0,0.18,0.18,std(0x161015,{roughness:.7}),x,3.75,z,ry);
+    box(2.0,0.18,0.18,std(0x161015,{roughness:.7}),x,0.28,z,ry);
+    box(0.18,3.7,0.18,std(0x161015,{roughness:.7}),x-Math.cos(ry)*0.95,2.0,z+Math.sin(ry)*0.95,ry);
+    box(0.18,3.7,0.18,std(0x161015,{roughness:.7}),x+Math.cos(ry)*0.95,2.0,z-Math.sin(ry)*0.95,ry);
+  }
+  buildMirror(70,70,0.4);buildMirror(150,150,1.1);buildMirror(120,180,2.3);buildMirror(250,120,0.7);buildMirror(330,110,1.9);
+  buildMirror(95,250,0.5);buildMirror(160,270,1.6);buildMirror(230,255,2.7);buildMirror(285,270,0.9);buildMirror(335,235,1.3);buildMirror(265,290,2.0);buildMirror(120,235,0.2);
+  /* b73: thicker Noctornus woods, all in-bounds, >=16u from portals/houses */
+  buildDarkForest(270,285,(GAMELANG==='tr'?'KARANLIK ÇALILIK':'THE DARK THICKET'));
+  buildDarkForest(330,283,(GAMELANG==='tr'?'GECE KÖKLERİ':'THE NIGHT ROOTS'));
+  buildDarkForest(240,262,(GAMELANG==='tr'?'KAYIP PATİKA':'THE LOST PATH'));
+  buildDarkForest(300,238,(GAMELANG==='tr'?'GÖLGE AĞAÇLARI ☾':'THE SHADE PINES ☾'));
   function buildHedge(x,z,len,ry){ /* b67: decorative low foliage hedge — VISUAL ONLY, no collision */
     box(len,1.6,1.4,std(0x1c2a1e,{roughness:.98}),x,0.9,z,ry);
     var seg=Math.max(2,Math.round(len/3));for(var hi=0;hi<seg;hi++){var fx=x+Math.cos(ry)*((hi/(seg-1))-0.5)*len,fz=z-Math.sin(ry)*((hi/(seg-1))-0.5)*len;var b=new THREE.Mesh(new THREE.SphereGeometry(1.1+((hi%2)*0.25),7,6),std(0x1a2a1c,{roughness:1,emissive:0x0a140d,emissiveIntensity:.06}));b.position.set(fx,1.8,fz);scene.add(b);} }
@@ -6791,6 +6811,11 @@ if(HAS3D)(function(){
   buildHedge(200,28,16,0);
   buildHedge(40,140,14,Math.PI/2);
   buildHedge(360,240,16,0);
+  /* b73: more labyrinth walls, denser south, all VISUAL-ONLY & off travel lanes */
+  buildHedge(70,60,16,0);buildHedge(110,75,14,Math.PI/2);buildHedge(160,95,16,0);buildHedge(300,100,16,Math.PI/2);
+  buildHedge(20,110,14,0);buildHedge(360,160,16,0);buildHedge(150,210,18,0);buildHedge(70,265,18,0);
+  buildHedge(115,255,16,Math.PI/2);buildHedge(200,275,18,0);buildHedge(260,235,16,Math.PI/2);buildHedge(330,260,16,0);
+  buildHedge(290,295,18,0);buildHedge(240,290,16,0);buildHedge(160,250,14,Math.PI/2);buildHedge(20,270,16,0);
   (function(){try{var gx=L.caravan.x-10,gz=L.caravan.z+2;
     var wl=new THREE.PointLight(0xcfe0b0,.5,16,2);wl.position.set(gx,3,gz);scene.add(wl);
     var pts=[];for(var a=0;a<6.2832;a+=6.2832/16){pts.push([gx+Math.cos(a)*5.5,gz+Math.sin(a)*5.5]);}
@@ -6916,10 +6941,11 @@ if(HAS3D)(function(){
       moonLight.color.setHSL(.6-.07*sun,.45,.75+.06*sun);
       hemi.intensity=ph.hemi*(1-sun)+.85*sun;
       scene.fog.density=ph.fog*(1-sun)+.0035*sun;
-      var _lat=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:150)-40)/260));moonLight.intensity*=(1-0.50*_lat);hemi.intensity*=(1-0.45*_lat);scene.fog.density*=(1+1.5*_lat);rimLight.intensity=0.10+0.55*(1-_lat);
+      var _lat=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:150)-40)/260));var _sl=_lat*_lat;moonLight.intensity*=(1-0.92*_sl);hemi.intensity*=(1-0.90*_sl);scene.fog.density*=(1+5.0*_sl);rimLight.intensity=0.10+0.55*(1-_lat);
       skyU.top.value.setRGB(.012+.18*sun,.016+.34*sun,.047+.55*sun);
       skyU.mid.value.setRGB(.039+.42*sun,.075+.55*sun,.149+.62*sun);
       skyU.bot.value.setRGB(.078+.72*sun,.122+.62*sun,.22+.45*sun);
+      try{var _sd=1-0.85*(_lat*_lat);skyU.top.value.multiplyScalar(_sd);skyU.mid.value.multiplyScalar(_sd);skyU.bot.value.multiplyScalar(_sd);}catch(e){} /* b73: deep-south horizon goes near-black */
       W3.starsM.opacity=.85*(1-sun);
       moonMesh.material.opacity=((W3._moonOp||.95)*(1-sun*.92))+.03;
       moonGlow.material.opacity=(W3._glowOp||.5)*(1-sun);
@@ -7027,9 +7053,13 @@ if(HAS3D)(function(){
       player.g.rotation.z=Math.sin(t*0.9)*0.013;
     }
     lantern.position.set(P.px+Math.sin(meshAng)*.5,1.5,P.pz+Math.cos(meshAng)*.5);
-    lantern.intensity=.82+Math.sin(t*9.0)*.05+Math.sin(t*23.0+1.3)*.03; /* fener titreşimi */
+    var _slL=(function(){var _l=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:150)-40)/260));return _l*_l;})();
+    lantern.intensity=(0.85+1.7*_slL)*(1.0+Math.sin(t*9.0)*.06+Math.sin(t*23.0+1.3)*.035);lantern.distance=11+9*_slL; /* b73: lantern dominates the deep south */
+    if(southBeam){southBeam.position.set(P.px,2.0,P.pz);southBeam.target.position.set(P.px-Math.sin(meshAng)*8,0.6,P.pz-Math.cos(meshAng)*8);southBeam.target.updateMatrixWorld();southBeam.intensity=0.15+2.2*_slL;} /* b73: directional beam where you look, stronger south */
     lanternHalo.position.set(lantern.position.x,lantern.position.y,lantern.position.z);lanternHalo.material.opacity=.5+.18*(0.5+0.5*Math.sin(t*9.0));
     motes.position.set(P.px,Math.sin(t*.5)*.2,P.pz);motes.rotation.y=t*.03; /* süzülen toz */
+    /* b73: rare brief dark-red horror vignette pulse in the deep south */
+    try{if(typeof S!=='undefined'&&S.pz>250){if(!window._vigEl){var _v=document.createElement('div');_v.id='_vig';_v.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:0;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,0) 38%,rgba(40,0,0,.55) 78%,rgba(20,0,0,.9) 100%);transition:opacity .15s ease-out;';document.body.appendChild(_v);window._vigEl=_v;window._vigNext=t+12+Math.random()*8;}if(t>window._vigNext){var _ve=window._vigEl;var _rm=(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches);_ve.style.transition='opacity .15s ease-out';_ve.style.opacity=_rm?'0.45':'0.85';try{if(Snd.on)Snd.scream();}catch(e){}setTimeout(function(){if(_ve){_ve.style.transition='opacity .6s ease-in';_ve.style.opacity='0';}},170);window._vigNext=t+12+Math.random()*8;}}}catch(e){}
     if(W3._sky){for(var _ci=0;_ci<W3._sky.clouds.length;_ci++){var _cl=W3._sky.clouds[_ci];_cl.position.x+=_cl.userData.spd*0.02;if(_cl.position.x>430)_cl.position.x=10;} } /* b38: bulutların yavaş sürüklenmesi */
     if(W3._atmo){ /* b39: yer sisi sürüklenmesi + ateşböceği titremesi */
       for(var _fi=0;_fi<W3._atmo.fog.length;_fi++){var _fs=W3._atmo.fog[_fi];_fs.position.x=_fs.userData.bx+Math.sin(t*_fs.userData.spd*.3+_fs.userData.ph)*4;_fs.material.opacity=.32+.16*(0.5+0.5*Math.sin(t*.4+_fs.userData.ph));}
@@ -7235,7 +7265,7 @@ if(HAS3D)(function(){
     /* radyo yakınlık sesi */
     Snd.setProx&&Snd.setProx(Math.hypot(S.px-L.radio.x,S.pz-L.radio.z));
     try{var _FP=[[310,262],[154,56],[300,300],[95,288],[330,250],[280,285]],_CP=[[268,255],[372,150]],_fa=0,_ca=0,_k;for(_k=0;_k<_FP.length;_k++)_fa=Math.max(_fa,1-Math.hypot(S.px-_FP[_k][0],S.pz-_FP[_k][1])/46);for(_k=0;_k<_CP.length;_k++)_ca=Math.max(_ca,1-Math.hypot(S.px-_CP[_k][0],S.pz-_CP[_k][1])/46);var _ba=1-Math.hypot(S.px-338,S.pz-196)/40;Snd.setZoneAmb&&Snd.setZoneAmb(_fa,_ca,_ba);}catch(e){}
-    try{if(Snd.on){if(!Snd._traumaPts){Snd._traumaPts=[{x:300,z:270,type:'cry',_t:0},{x:330,z:255,type:'cry',_t:0},{x:285,z:285,type:'cry',_t:0},{x:120,z:280,type:'cry',_t:0},{x:60,z:210,type:'cry',_t:0},{x:200,z:160,type:'cry',_t:0},{x:90,z:80,type:'laugh',_t:0},{x:160,z:120,type:'laugh',_t:0},{x:250,z:90,type:'laugh',_t:0},{x:320,z:130,type:'laugh',_t:0},{x:40,z:150,type:'laugh',_t:0},{x:210,z:230,type:'laugh',_t:0},{x:310,z:240,type:'argue',_t:0},{x:280,z:280,type:'argue',_t:0},{x:340,z:200,type:'argue',_t:0},{x:150,z:250,type:'argue',_t:0},{x:80,z:240,type:'argue',_t:0},{x:230,z:200,type:'argue',_t:0},{x:300,z:290,type:'dish',_t:0},{x:260,z:260,type:'dish',_t:0},{x:120,z:200,type:'dish',_t:0},{x:55,z:175,type:'dish',_t:0},{x:340,z:170,type:'dish',_t:0},{x:190,z:185,type:'dish',_t:0}];Snd._traumaLast=0;}var _now=(typeof performance!=='undefined'?performance.now():Date.now())/1000;if(_now-Snd._traumaLast>6){var _bp=null,_bd=1e9;for(var _ti=0;_ti<Snd._traumaPts.length;_ti++){var _pp=Snd._traumaPts[_ti];var _dd=Math.hypot(S.px-_pp.x,S.pz-_pp.z);if(_dd<13&&_dd<_bd&&_now-_pp._t>30){_bd=_dd;_bp=_pp;}}if(_bp){var _fn={cry:'babyCry',laugh:'childLaugh',argue:'coupleArgue',dish:'dishSmash'}[_bp.type];if(_fn&&Snd[_fn]){Snd[_fn]();_bp._t=_now;Snd._traumaLast=_now;}}}}}catch(e){}
+    try{if(Snd.on){if(!Snd._traumaPts){Snd._traumaPts=[{x:300,z:270,type:'cry',_t:0},{x:330,z:255,type:'cry',_t:0},{x:285,z:285,type:'cry',_t:0},{x:310,z:262,type:'cry',_t:0},{x:265,z:250,type:'childcry',_t:0},{x:340,z:278,type:'childcry',_t:0},{x:295,z:248,type:'childcry',_t:0},{x:250,z:285,type:'childcry',_t:0},{x:315,z:290,type:'childcry',_t:0},{x:120,z:280,type:'cry',_t:0},{x:60,z:210,type:'cry',_t:0},{x:200,z:245,type:'cry',_t:0},{x:155,z:275,type:'cry',_t:0},{x:90,z:255,type:'childcry',_t:0},{x:175,z:260,type:'childcry',_t:0},{x:310,z:240,type:'argue',_t:0},{x:280,z:280,type:'argue',_t:0},{x:340,z:245,type:'argue',_t:0},{x:255,z:270,type:'argue',_t:0},{x:300,z:295,type:'argue',_t:0},{x:225,z:255,type:'argue',_t:0},{x:150,z:250,type:'argue',_t:0},{x:80,z:240,type:'argue',_t:0},{x:115,z:235,type:'argue',_t:0},{x:300,z:290,type:'dish',_t:0},{x:260,z:260,type:'dish',_t:0},{x:330,z:268,type:'dish',_t:0},{x:285,z:245,type:'dish',_t:0},{x:245,z:280,type:'dish',_t:0},{x:120,z:265,type:'dish',_t:0},{x:190,z:250,type:'dish',_t:0},{x:55,z:225,type:'dish',_t:0},{x:305,z:265,type:'scream',_t:0},{x:320,z:282,type:'scream',_t:0},{x:270,z:255,type:'scream',_t:0},{x:295,z:290,type:'scream',_t:0},{x:250,z:240,type:'scream',_t:0},{x:340,z:255,type:'scream',_t:0},{x:160,z:270,type:'scream',_t:0},{x:95,z:235,type:'scream',_t:0},{x:90,z:80,type:'laugh',_t:0},{x:160,z:120,type:'laugh',_t:0},{x:250,z:90,type:'laugh',_t:0},{x:320,z:130,type:'laugh',_t:0},{x:40,z:150,type:'laugh',_t:0},{x:130,z:60,type:'laugh',_t:0}];Snd._traumaLast=0;}var _now=(typeof performance!=='undefined'?performance.now():Date.now())/1000;var _ds=(typeof S!=='undefined'&&S.pz>240);var _gap=_ds?3.5:6;var _cd=_ds?18:30;var _rad=_ds?16:13;if(_now-Snd._traumaLast>_gap){var _bp=null,_bd=1e9;for(var _ti=0;_ti<Snd._traumaPts.length;_ti++){var _pp=Snd._traumaPts[_ti];var _dd=Math.hypot(S.px-_pp.x,S.pz-_pp.z);if(_dd<_rad&&_dd<_bd&&_now-_pp._t>_cd){_bd=_dd;_bp=_pp;}}if(_bp){var _fn={cry:'babyCry',childcry:'childCry',laugh:'childLaugh',argue:'coupleArgue',dish:'dishSmash',scream:'scream'}[_bp.type];if(_fn&&Snd[_fn]){Snd[_fn]();_bp._t=_now;Snd._traumaLast=_now;}}}}}catch(e){}
     /* audiobook tapes: zone-based, with fades */
     tapeChk+=dt;
     if(tapeChk>.5){tapeChk=0;
