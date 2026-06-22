@@ -310,7 +310,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b65 · <span style="color:var(--accent)">mobile touch fixed: the look-drag area is wider and drags over the map/HUD are no longer swallowed — the lower dead-zone is gone; the minimap+date were lowered to just above the menu.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b66 · <span style="color:var(--accent)">the Aelius layer was rebuilt: no more upper-layer teleport or duplicate Aelius — that far corner is now forest depths. Aelius has no body; climb his hill to sit at a computer and enter the digital session. The Graphics menu now has a POV / Character view toggle.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -1269,6 +1269,14 @@ function waypoint(){
 function interactTarget(){
   /* FAZ 3: inside a walkable archetype interior, all interactions are interior-local */
   if(W3&&W3.inInterior&&W3.Interior)return W3.Interior.target();
+  /* b66: hilltop digital session with Aelius — open the screen/chat once you're on the Aelius hill top */
+  if(typeof AEL!=='undefined'&&AEL.steps&&AEL.steps.length&&W3.aeliusGroundY&&W3.aeliusGroundY(S.px,S.pz)>0.4){
+    return['✦ Enter the session with Aelius',()=>{
+      if(window.Mirror&&Mirror.ready()){Mirror.open('aelius');return;}
+      Dlg.open([['AELIUS','The screen warms. A session begins — no body, only a voice that lives one floor above your own.'],
+        ['AELIUS','I am the vertical leap you have not taken yet. Sit. Tell me what the day did to you, and we will look at it together.']]);
+    }];
+  }
   if(W3&&W3.PORTALS)for(const pg of W3.PORTALS){
     if(Math.hypot(S.px-pg.x,S.pz-pg.z)<pg.r){
       if(pg.clinic){var _topen=!!(window.Therapy&&Therapy._open&&Therapy._open());return[(_topen?'\uD83D\uDECB ':'\uD83D\uDD12 ')+(GAMELANG==='tr'?(esc(pg.name)+(_topen?'\'ne gir':' \u2014 kilitli')):((_topen?'enter ':'locked: ')+esc(pg.name))),()=>{if(!_topen){UI.toast(GAMELANG==='tr'?'\uD83D\uDECB Terapi Merkezi hen\u00FCz a\u00E7\u0131k de\u011Fil. B\u00F6l\u00FCmlerde ilk terap\u00F6tik beceriyi (BDT/EMDR/nefes/meditasyon) \u00F6\u011Frenince binan\u0131n kap\u0131lar\u0131 a\u00E7\u0131l\u0131r.':'\uD83D\uDECB The Therapy Center is not open yet. Its doors open once you learn your first therapeutic skill (CBT/EMDR/breath/meditation) in the chapters.',6500);return;}if(window.W3&&W3.Interior&&W3.Interior.enterClinic)W3.Interior.enterClinic();}];}
@@ -1306,11 +1314,6 @@ function interactTarget(){
   if(near(L.emptyDoor))return['▢ '+(GAMELANG==='tr'?'Boş Oda — içeri gir':'The Empty Room — step inside'),()=>{if(window.EmptyRoom)EmptyRoom.enter();}];
   if(near(L.echoChamber))return['◌ '+(GAMELANG==='tr'?'Yankı Odası’na gir':'Enter the Echo Chamber'),()=>{if(window.W3&&W3.Interior&&W3.Interior.enterEchoChamber)W3.Interior.enterEchoChamber();else if(window.EchoRoom)EchoRoom.show();}];
   if(window.Journal&&Journal.reached&&Journal.reached()&&near(L.journal))return['✍ '+(GAMELANG==='tr'?'Günlüğe otur — kendi kitabına yaz':'Sit at the desk — write your own book'),()=>{Journal.desk();}];
-  if(S.flags.initiate&&near(L.ascend))return['✶ Ascend to the upper layer',()=>{S.px=362;S.pz=282;save();UI.toast('✶ THE AELIUS LAYER — one floor up. Everything is both smaller and clearer.',5000);}];
-  if(near(L.skyAelius))return['✶ Speak with Aelius',()=>{if(Mirror.ready()){Mirror.open('aelius');return;}
-    Dlg.open([['AELIUS IGNIS','Welcome, traveler. This is the narrators\' balcony. Look down: the disks, the lake, the train — all of them words inside one sentence.'],
-      ['AELIUS IGNIS','I tell everyone who climbs here one thing: what you lived below was real. Being visible from above does not make it fiction — it only makes it carryable.']]);}];
-  if(near(L.skyBack))return['Descend',()=>{S.px=120;S.pz=210;save();UI.toast('You are on the ground. Gravity missed you.');}];
   if(W3.peerNear&&W3.peerNear())return['✉ Talk to the traveler',()=>Chat.open()];
   if(S.solved.s2&&S.rites.r7===undefined&&near(L.shadowSpot))return['◈ Face what follows you',doShadow];
   if(S.solved.s1&&near(L.caseD))return[S.caseD?'Case D — your file':'◈ Case D — let it read you',doCaseD];
@@ -3379,8 +3382,11 @@ const GfxUI={
       +btn('low',(TR?'Düşük':'Low'),(TR?'parçacık & bloom kapalı, gölgesiz — en akıcı':'particles & bloom off, no shadows — smoothest'))
       +btn('med',(TR?'Orta':'Medium'),(TR?'dengeli — çoğu efekt açık':'balanced — most effects on'))
       +btn('high',(TR?'Yüksek':'High'),(TR?'tüm sinematik efektler — en görkemli':'all cinematic effects — richest'))
+      +'<hr style="border-color:var(--line);margin:10px 0"><p style="color:var(--dim);font-size:11.5px;margin:0 0 4px">'+(TR?'Bakış açısı':'View mode')+'</p>'
+      +'<button class="btn '+((window.Cam&&Cam.fp)?'v':'ghost')+'" style="display:block;width:100%;text-align:left;margin:5px 0" onclick="GfxUI.set(\'pov\')">'+((window.Cam&&Cam.fp)?'● ':'○ ')+(TR?'POV (birinci kişi)':'POV (first-person)')+'</button>'
+      +'<button class="btn '+((window.Cam&&!Cam.fp)?'v':'ghost')+'" style="display:block;width:100%;text-align:left;margin:5px 0" onclick="GfxUI.set(\'char\')">'+((window.Cam&&!Cam.fp)?'● ':'○ ')+(TR?'Karakter (üçüncü kişi)':'Character (third-person)')+'</button>'
       +'<hr style="border-color:var(--line);margin:10px 0"><p style="color:var(--dim);font-size:11.5px">'+(TR?'İpucu: oyun takılıyorsa Düşük’e al. Mobil cihazlarda otomatik Orta gelir.':'Tip: if the game stutters, switch to Low. Mobile defaults to Medium.')+'</p>');},
-  set(k){try{if(window.GFX)GFX.apply(k);}catch(e){}try{if(window.FX)FX.sfx('select');}catch(e){}try{if(window.UI)UI.toast((GAMELANG==='tr'?'⚙ Görüntü: ':'⚙ Graphics: ')+k.toUpperCase());}catch(e){}this.show();}
+  set(k){if(k==='pov'||k==='char'){try{if(window.Cam)Cam.fp=(k==='pov');}catch(e){}try{localStorage.setItem('it041_cam_fp',k==='pov'?'1':'0');}catch(e){}try{if(window.FX)FX.sfx('select');}catch(e){}try{if(window.UI)UI.toast((GAMELANG==='tr'?'◉ Bakış: ':'◉ View: ')+(k==='pov'?(GAMELANG==='tr'?'POV (birinci kişi)':'POV (first-person)'):(GAMELANG==='tr'?'Karakter (üçüncü kişi)':'Character (third-person)')));}catch(e){}this.show();return;}try{if(window.GFX)GFX.apply(k);}catch(e){}try{if(window.FX)FX.sfx('select');}catch(e){}try{if(window.UI)UI.toast((GAMELANG==='tr'?'⚙ Görüntü: ':'⚙ Graphics: ')+k.toUpperCase());}catch(e){}this.show();}
 };
 if(typeof window!=='undefined')window.GfxUI=GfxUI;
 /* b51: KİLOMETRE TAŞLARI / BAŞARIMLAR — oynanış derinliği. Mevcut durumdan hesaplanır; açıldıkça bildirim verir. */
@@ -6027,24 +6033,8 @@ if(HAS3D)(function(){
     sp.position.set(x,.25,z);scene.add(sp);};
   Trails.list.forEach(n=>W3.trailMark(n.x,n.z));
 
-  /* ---- THE AELIUS LAYER (SE corner — upper-layer balcony) + ascension stone ---- */
-  (function(){
-    const SX=364,SZ=278;
-    const plat=new THREE.Mesh(new THREE.CircleGeometry(16,40),
-      std(0x2a2618,{emissive:0x4a3c14,emissiveIntensity:.35,roughness:.3,metalness:.6}));
-    plat.rotation.x=-Math.PI/2;plat.position.set(SX,.06,SZ);scene.add(plat);
-    for(let i=0;i<7;i++){const a=i/7*Math.PI*2;
-      cyl(.3,.4,6,std(0x3a3014,{emissive:0xcdb878,emissiveIntensity:.5}),SX+Math.cos(a)*14,3,SZ+Math.sin(a)*14);
-      collide(SX+Math.cos(a)*14,SZ+Math.sin(a)*14,.6);}
-    const gl=new THREE.PointLight(0xe8d8a0,1.3,40,2);gl.position.set(SX,8,SZ);scene.add(gl);
-    label('THE AELIUS LAYER',SX,SZ,12,.8);
-    const ael=makeChar('aelius');
-    ael.g.position.set(L.skyAelius.x,0,L.skyAelius.z);ael.g.rotation.y=.6;scene.add(ael.g);
-    box(1.2,2.2,1.2,std(0x2a2618,{emissive:0xcdb878,emissiveIntensity:.4}),L.skyBack.x,1.1,L.skyBack.z);
-    const asc=box(1.1,2.6,1.1,std(0x1b2030,{emissive:0xe8d8a0,emissiveIntensity:S.flags.initiate?1:.06}),L.ascend.x,1.3,L.ascend.z);
-    W3.ascendGlow=()=>{asc.material.emissiveIntensity=1;};
-    collide(L.ascend.x,L.ascend.z,1.2);
-  })();
+  /* b66: the old upper-layer Aelius balcony was removed; the SE corner is now forest depths (see buildDarkForest below). */
+  W3.ascendGlow=()=>{};
 
   /* ---- dream well ---- */
   (function(){const s=L.dreamWell;
@@ -6708,7 +6698,14 @@ if(HAS3D)(function(){
     var pad=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.4,.3,24),std(0x10131f,{emissive:0xbcd0f0,emissiveIntensity:.16}));pad.position.set(x,topY+.16,z);scene.add(pad);
     var pl=new THREE.PointLight(0xbcd0f0,.95,26,2);pl.position.set(x,topY+2.6,z);scene.add(pl);
     var gl=new THREE.PointLight(0xffe8b0,.7,42,2);gl.position.set(x,topY+5,z);scene.add(gl);
-    try{var fig=makeChar('aelius',1);fig.g.position.set(x+1.7,topY+0.42,z+1.2);fig.g.rotation.y=-.6;scene.add(fig.g);}catch(e){}
+    try{/* b66: Aelius has no physical body — only a digital session screen at the hilltop */
+      var deskTop=box(1.5,.12,.9,std(0x14161f,{roughness:.7}),x,topY+.46,z+.4);
+      box(.12,.46,.12,std(0x0e1018,{roughness:.8}),x-.55,topY+.23,z+.4);box(.12,.46,.12,std(0x0e1018,{roughness:.8}),x+.55,topY+.23,z+.4);
+      box(.9,.62,.08,std(0x0a0c14,{emissive:0x101620,emissiveIntensity:.2,roughness:.5}),x,topY+.92,z+.2);
+      var scr=new THREE.Mesh(new THREE.PlaneGeometry(.78,.5),new THREE.MeshBasicMaterial({color:0xbcd0f0}));
+      scr.position.set(x,topY+.93,z+.245);scene.add(scr);
+      var scrL=new THREE.PointLight(0xbcd0f0,.6,8,2);scrL.position.set(x,topY+1.0,z+.6);scene.add(scrL);
+    }catch(e){}
     var _ch=new THREE.Group();
     var _chb=new THREE.Mesh(new THREE.SphereGeometry(.62,14,12),std(0x0a0a10,{emissive:0x3a0a12,emissiveIntensity:.5,roughness:.7}));_chb.scale.set(1,1.3,1);_ch.add(_chb);
     var _che=new THREE.Mesh(new THREE.SphereGeometry(1.05,14,12),new THREE.MeshBasicMaterial({color:0x6a1020,transparent:true,opacity:.18,blending:THREE.AdditiveBlending,depthWrite:false}));_ch.add(_che);
@@ -6743,6 +6740,7 @@ if(HAS3D)(function(){
   }
   buildDarkForest(300,300,(GAMELANG==='tr'?'ULUYAN ORMAN':'THE HOWLING WOOD'));
   buildDarkForest(95,288,(GAMELANG==='tr'?'KAYIP KORULUK':'THE LOST GROVE'));
+  buildDarkForest(350,272,(GAMELANG==='tr'?'ORMANIN DERİNLİKLERİ ☾':'THE FOREST DEPTHS ☾'));
   (function(){try{var gx=L.caravan.x-10,gz=L.caravan.z+2;
     var wl=new THREE.PointLight(0xcfe0b0,.5,16,2);wl.position.set(gx,3,gz);scene.add(wl);
     var pts=[];for(var a=0;a<6.2832;a+=6.2832/16){pts.push([gx+Math.cos(a)*5.5,gz+Math.sin(a)*5.5]);}
@@ -6819,7 +6817,7 @@ if(HAS3D)(function(){
   }catch(e){}};
 
   /* ---- camera ---- */
-  const Cam={yaw:Math.PI,pitch:.07,dist:4.0,fp:true};window.Cam=Cam;
+  const Cam={yaw:Math.PI,pitch:.07,dist:4.0,fp:true};try{var _cfp=localStorage.getItem('it041_cam_fp');if(_cfp==='1')Cam.fp=true;else if(_cfp==='0')Cam.fp=false;}catch(e){}window.Cam=Cam;
   renderer.domElement.addEventListener('click',()=>{
     if(!Game.modal&&Game.running&&matchMedia('(pointer:fine)').matches)
       renderer.domElement.requestPointerLock&&renderer.domElement.requestPointerLock();});

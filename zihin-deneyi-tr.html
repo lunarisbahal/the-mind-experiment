@@ -303,7 +303,7 @@
   <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026 · b65 · <span style="color:var(--accent)">mobil dokunma düzeltildi: bakış için sürükleme alanı genişletildi ve haritanın/HUD’un üstündeki sürüklemeler artık yutulmuyor — alt bölgedeki ölü alan kalktı; ayrıca harita+tarih menünün hemen üstüne indirildi.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026 · b66 · <span style="color:var(--accent)">Aelius katmanı yeniden kuruldu: artık üst katman ışınlanması ve ikinci Aelius yok — o uzak köşe artık ormanın derinlikleri. Aelius’un bedeni yok; tepesine tırman, bilgisayara otur ve dijital seansa gir. Görüntü menüsüne POV / Karakter bakış seçeneği eklendi.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -1252,6 +1252,14 @@ function waypoint(){
 /* ---------------- Etkileşimler ---------------- */
 function interactTarget(){
   if(W3&&W3.inInterior&&W3.Interior)return W3.Interior.target();
+  /* b66: tepede Aelius ile dijital seans — Aelius tepesinin zirvesindeyken ekran/sohbet açılır */
+  if(typeof AEL!=='undefined'&&AEL.steps&&AEL.steps.length&&W3.aeliusGroundY&&W3.aeliusGroundY(S.px,S.pz)>0.4){
+    return['✦ Aelius ile Seansa Gir',()=>{
+      if(window.Mirror&&Mirror.ready()){Mirror.open('aelius');return;}
+      Dlg.open([['AELIUS','Ekran ısınır. Bir seans başlar — beden yok, yalnızca kendi katından bir kat yukarıda yaşayan bir ses.'],
+        ['AELIUS','Ben henüz atmadığın o dikey sıçramayım. Otur. Günün sana ne yaptığını anlat; ona birlikte bakalım.']]);
+    }];
+  }
   if(W3&&W3.PORTALS)for(const pg of W3.PORTALS){
     if(Math.hypot(S.px-pg.x,S.pz-pg.z)<pg.r){
       if(pg.clinic){var _topen=!!(window.Therapy&&Therapy._open&&Therapy._open());return[(_topen?'\uD83D\uDECB ':'\uD83D\uDD12 ')+(GAMELANG==='tr'?(esc(pg.name)+(_topen?'\'ne gir':' \u2014 kilitli')):((_topen?'enter ':'locked: ')+esc(pg.name))),()=>{if(!_topen){UI.toast(GAMELANG==='tr'?'\uD83D\uDECB Terapi Merkezi hen\u00FCz a\u00E7\u0131k de\u011Fil. B\u00F6l\u00FCmlerde ilk terap\u00F6tik beceriyi (BDT/EMDR/nefes/meditasyon) \u00F6\u011Frenince binan\u0131n kap\u0131lar\u0131 a\u00E7\u0131l\u0131r.':'\uD83D\uDECB The Therapy Center is not open yet. Its doors open once you learn your first therapeutic skill (CBT/EMDR/breath/meditation) in the chapters.',6500);return;}if(window.W3&&W3.Interior&&W3.Interior.enterClinic)W3.Interior.enterClinic();}];}
@@ -1287,11 +1295,6 @@ function interactTarget(){
   if(near(L.crackedDoor))return['⟡ '+(GAMELANG==='tr'?'Yarık Kapı — eksikken geç':'The Cracked Door — cross while incomplete'),()=>{if(window.CrackedDoor)CrackedDoor.show();}];
   if(near(L.emptyDoor))return['▢ '+(GAMELANG==='tr'?'Boş Oda — içeri gir':'The Empty Room — step inside'),()=>{if(window.EmptyRoom)EmptyRoom.enter();}];
   if(near(L.echoChamber))return['◌ '+(GAMELANG==='tr'?'Yankı Odası’na gir':'Enter the Echo Chamber'),()=>{if(window.W3&&W3.Interior&&W3.Interior.enterEchoChamber)W3.Interior.enterEchoChamber();else if(window.EchoRoom)EchoRoom.show();}];
-  if(S.flags.initiate&&near(L.ascend))return['✶ Üst katmana yüksel',()=>{S.px=362;S.pz=282;save();UI.toast('✶ AELIUS KATMANI — bir kat yukarısı. Her şey hem daha küçük hem daha net.',5000);}];
-  if(near(L.skyAelius))return['✶ Aelius ile konuş',()=>{if(Mirror.ready()){Mirror.open('aelius');return;}
-    Dlg.open([['AELIUS IGNIS','Hoş geldin, yolcu. Burası anlatıcıların balkonu. Aşağıya bak: diskler, göl, tren — hepsi bir cümlenin içindeki kelimeler.'],
-      ['AELIUS IGNIS','Buraya çıkan herkese tek şey söylerim: aşağıda yaşadıkların gerçekti. Yukarıdan görünüyor olmaları onları kurgu yapmaz — yalnızca taşınabilir yapar.']]);}];
-  if(near(L.skyBack))return['Aşağı in',()=>{S.px=120;S.pz=210;save();UI.toast('Yere indin. Yer çekimi seni özlemiş.');}];
   if(W3.peerNear&&W3.peerNear())return['✉ Yolcuyla konuş',()=>Chat.open()];
   if(S.solved.s2&&S.rites.r7===undefined&&near(L.shadowSpot))return['◈ Seni izleyenle yüzleş',doShadow];
   if(S.solved.s1&&near(L.caseD))return[S.caseD?'Vaka D — kendi dosyan':'◈ Vaka D — bırak seni okusun',doCaseD];
@@ -3349,8 +3352,11 @@ const GfxUI={
       +btn('low',(TR?'D\u00fc\u015f\u00fck':'Low'),(TR?'par\u00e7ac\u0131k & bloom kapal\u0131, g\u00f6lgesiz \u2014 en ak\u0131c\u0131':'particles & bloom off, no shadows \u2014 smoothest'))
       +btn('med',(TR?'Orta':'Medium'),(TR?'dengeli \u2014 \u00e7o\u011fu efekt a\u00e7\u0131k':'balanced \u2014 most effects on'))
       +btn('high',(TR?'Y\u00fcksek':'High'),(TR?'t\u00fcm sinematik efektler \u2014 en g\u00f6rkemli':'all cinematic effects \u2014 richest'))
+      +'<hr style="border-color:var(--line);margin:10px 0"><p style="color:var(--dim);font-size:11.5px;margin:0 0 4px">'+(TR?'Bak\u0131\u015f a\u00e7\u0131s\u0131':'View mode')+'</p>'
+      +'<button class="btn '+((window.Cam&&Cam.fp)?'v':'ghost')+'" style="display:block;width:100%;text-align:left;margin:5px 0" onclick="GfxUI.set(\'pov\')">'+((window.Cam&&Cam.fp)?'\u25cf ':'\u25cb ')+(TR?'POV (birinci ki\u015fi)':'POV (first-person)')+'</button>'
+      +'<button class="btn '+((window.Cam&&!Cam.fp)?'v':'ghost')+'" style="display:block;width:100%;text-align:left;margin:5px 0" onclick="GfxUI.set(\'char\')">'+((window.Cam&&!Cam.fp)?'\u25cf ':'\u25cb ')+(TR?'Karakter (\u00fc\u00e7\u00fcnc\u00fc ki\u015fi)':'Character (third-person)')+'</button>'
       +'<hr style="border-color:var(--line);margin:10px 0"><p style="color:var(--dim);font-size:11.5px">'+(TR?'\u0130pucu: oyun tak\u0131l\u0131yorsa D\u00fc\u015f\u00fck\u2019e al. Mobil cihazlarda otomatik Orta gelir.':'Tip: if the game stutters, switch to Low. Mobile defaults to Medium.')+'</p>');},
-  set(k){try{if(window.GFX)GFX.apply(k);}catch(e){}try{if(window.FX)FX.sfx('select');}catch(e){}try{if(window.UI)UI.toast((GAMELANG==='tr'?'\u2699 G\u00f6r\u00fcnt\u00fc: ':'\u2699 Graphics: ')+k.toUpperCase());}catch(e){}this.show();}
+  set(k){if(k==='pov'||k==='char'){try{if(window.Cam)Cam.fp=(k==='pov');}catch(e){}try{localStorage.setItem('it041_cam_fp',k==='pov'?'1':'0');}catch(e){}try{if(window.FX)FX.sfx('select');}catch(e){}try{if(window.UI)UI.toast((GAMELANG==='tr'?'\u25c9 Bak\u0131\u015f: ':'\u25c9 View: ')+(k==='pov'?(GAMELANG==='tr'?'POV (birinci ki\u015fi)':'POV (first-person)'):(GAMELANG==='tr'?'Karakter (\u00fc\u00e7\u00fcnc\u00fc ki\u015fi)':'Character (third-person)')));}catch(e){}this.show();return;}try{if(window.GFX)GFX.apply(k);}catch(e){}try{if(window.FX)FX.sfx('select');}catch(e){}try{if(window.UI)UI.toast((GAMELANG==='tr'?'\u2699 G\u00f6r\u00fcnt\u00fc: ':'\u2699 Graphics: ')+k.toUpperCase());}catch(e){}this.show();}
 };
 if(typeof window!=='undefined')window.GfxUI=GfxUI;
 /* b51: KILOMETRE TASLARI / BASARIMLAR */
@@ -5974,25 +5980,8 @@ if(HAS3D)(function(){
     sp.position.set(x,.25,z);scene.add(sp);};
   Trails.list.forEach(n=>W3.trailMark(n.x,n.z));
 
-  /* ---- AELIUS KATMANI (GD köşe — üst katman balkonu) + yükseliş taşı ---- */
-  (function(){
-    const SX=364,SZ=278;
-    const plat=new THREE.Mesh(new THREE.CircleGeometry(16,40),
-      std(0x2a2618,{emissive:0x4a3c14,emissiveIntensity:.35,roughness:.3,metalness:.6}));
-    plat.rotation.x=-Math.PI/2;plat.position.set(SX,.06,SZ);scene.add(plat);
-    for(let i=0;i<7;i++){const a=i/7*Math.PI*2;
-      cyl(.3,.4,6,std(0x3a3014,{emissive:0xcdb878,emissiveIntensity:.5}),SX+Math.cos(a)*14,3,SZ+Math.sin(a)*14);
-      collide(SX+Math.cos(a)*14,SZ+Math.sin(a)*14,.6);}
-    const gl=new THREE.PointLight(0xe8d8a0,1.3,40,2);gl.position.set(SX,8,SZ);scene.add(gl);
-    label('AELIUS KATMANI',SX,SZ,12,.8);
-    const ael=makeChar('aelius');
-    ael.g.position.set(L.skyAelius.x,0,L.skyAelius.z);ael.g.rotation.y=.6;scene.add(ael.g);
-    box(1.2,2.2,1.2,std(0x2a2618,{emissive:0xcdb878,emissiveIntensity:.4}),L.skyBack.x,1.1,L.skyBack.z);
-    /* yükseliş taşı (mahzen yanı) — inisiyasyondan sonra parlar */
-    const asc=box(1.1,2.6,1.1,std(0x1b2030,{emissive:0xe8d8a0,emissiveIntensity:S.flags.initiate?1:.06}),L.ascend.x,1.3,L.ascend.z);
-    W3.ascendGlow=()=>{asc.material.emissiveIntensity=1;};
-    collide(L.ascend.x,L.ascend.z,1.2);
-  })();
+  /* b66: eski üst katman Aelius balkonu kaldırıldı; GD köşe artık ormanın derinlikleri (aşağıdaki buildDarkForest'e bak). */
+  W3.ascendGlow=()=>{};
 
   /* ---- rüya kuyusu ---- */
   (function(){const s=L.dreamWell;
@@ -6656,7 +6645,14 @@ if(HAS3D)(function(){
     var pad=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.4,.3,24),std(0x10131f,{emissive:0xbcd0f0,emissiveIntensity:.16}));pad.position.set(x,topY+.16,z);scene.add(pad);
     var pl=new THREE.PointLight(0xbcd0f0,.95,26,2);pl.position.set(x,topY+2.6,z);scene.add(pl);
     var gl=new THREE.PointLight(0xffe8b0,.7,42,2);gl.position.set(x,topY+5,z);scene.add(gl);
-    try{var fig=makeChar('aelius',1);fig.g.position.set(x+1.7,topY+0.42,z+1.2);fig.g.rotation.y=-.6;scene.add(fig.g);}catch(e){}
+    try{/* b66: Aelius'un fiziksel bedeni yok — tepede yalnızca dijital seans ekranı */
+      var deskTop=box(1.5,.12,.9,std(0x14161f,{roughness:.7}),x,topY+.46,z+.4);
+      box(.12,.46,.12,std(0x0e1018,{roughness:.8}),x-.55,topY+.23,z+.4);box(.12,.46,.12,std(0x0e1018,{roughness:.8}),x+.55,topY+.23,z+.4);
+      box(.9,.62,.08,std(0x0a0c14,{emissive:0x101620,emissiveIntensity:.2,roughness:.5}),x,topY+.92,z+.2);
+      var scr=new THREE.Mesh(new THREE.PlaneGeometry(.78,.5),new THREE.MeshBasicMaterial({color:0xbcd0f0}));
+      scr.position.set(x,topY+.93,z+.245);scene.add(scr);
+      var scrL=new THREE.PointLight(0xbcd0f0,.6,8,2);scrL.position.set(x,topY+1.0,z+.6);scene.add(scrL);
+    }catch(e){}
     var _ch=new THREE.Group();
     var _chb=new THREE.Mesh(new THREE.SphereGeometry(.62,14,12),std(0x0a0a10,{emissive:0x3a0a12,emissiveIntensity:.5,roughness:.7}));_chb.scale.set(1,1.3,1);_ch.add(_chb);
     var _che=new THREE.Mesh(new THREE.SphereGeometry(1.05,14,12),new THREE.MeshBasicMaterial({color:0x6a1020,transparent:true,opacity:.18,blending:THREE.AdditiveBlending,depthWrite:false}));_ch.add(_che);
@@ -6691,6 +6687,7 @@ if(HAS3D)(function(){
   }
   buildDarkForest(300,300,(GAMELANG==='tr'?'ULUYAN ORMAN':'THE HOWLING WOOD'));
   buildDarkForest(95,288,(GAMELANG==='tr'?'KAYIP KORULUK':'THE LOST GROVE'));
+  buildDarkForest(350,272,(GAMELANG==='tr'?'ORMANIN DERİNLİKLERİ ☾':'THE FOREST DEPTHS ☾'));
   (function(){try{var gx=L.caravan.x-10,gz=L.caravan.z+2;
     var wl=new THREE.PointLight(0xcfe0b0,.5,16,2);wl.position.set(gx,3,gz);scene.add(wl);
     var pts=[];for(var a=0;a<6.2832;a+=6.2832/16){pts.push([gx+Math.cos(a)*5.5,gz+Math.sin(a)*5.5]);}
@@ -6767,7 +6764,7 @@ if(HAS3D)(function(){
   }catch(e){}};
 
   /* ---- camera ---- */
-  const Cam={yaw:Math.PI,pitch:.07,dist:4.0,fp:true};window.Cam=Cam;
+  const Cam={yaw:Math.PI,pitch:.07,dist:4.0,fp:true};try{var _cfp=localStorage.getItem('it041_cam_fp');if(_cfp==='1')Cam.fp=true;else if(_cfp==='0')Cam.fp=false;}catch(e){}window.Cam=Cam;
   renderer.domElement.addEventListener('click',()=>{
     if(!Game.modal&&Game.running&&matchMedia('(pointer:fine)').matches)
       renderer.domElement.requestPointerLock&&renderer.domElement.requestPointerLock();});
