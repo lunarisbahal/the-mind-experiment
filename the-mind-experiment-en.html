@@ -310,7 +310,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b68 · <span style="color:var(--accent)">when an autonomous subject finishes a story you now choose: save it as that subject’s own page or discard it — saved stories stay under the subject’s self-chosen name everywhere (its house and chat), instead of being auto-saved or scattered under random names.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b69 · <span style="color:var(--accent)">the main objective is now chapter-aware: which house, which chapter (house ch. x/7), station + task progress, and where you left off — synced with your save.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -1206,6 +1206,27 @@ document.getElementById('cipherInput').addEventListener('keydown',e=>{if(e.key==
 
 /* ---------------- Objectives & waypoint ---------------- */
 function mainObjective(){var L=GAMELANG;
+  /* b69: detailed, save-synced main objective — which house, which chapter, station/task progress, where you left off */
+  try{
+    if(typeof REALMS!=='undefined'&&typeof Realms!=='undefined'&&Realms&&Realms.open){
+      var _tr=null;for(var _i=0;_i<REALMS.length;_i++){if(Realms.open(_i)&&!Realms.done(REALMS[_i])){_tr=REALMS[_i];break;}}
+      if(!_tr)return L==='tr'?'ANA SENARYO — Yedi diyar tamamlandı. ✦ Konsey / Mimar Modu açık.':'MAIN STORY — All seven realms complete. ✦ Council / Architect Mode is open.';
+      var _nm=Realms.T(_tr.n),_loc=Realms.T(_tr.loc);
+      var _base=(window.House&&House.CHBASE&&House.CHBASE[_tr.k]!=null)?House.CHBASE[_tr.k]:(_tr.ch[0]-1);
+      var _dm=(S.zones&&S.zones[_tr.k]&&S.zones[_tr.k].done)||{};
+      var _hc=0,_firstLocal=7,_foundOpen=false;
+      for(var _n=1;_n<=7;_n++){if(_dm['ch'+(_base+_n)])_hc++;else if(!_foundOpen){_firstLocal=_n;_foundOpen=true;}}
+      if(!_foundOpen)_firstLocal=7;
+      var _absCh=_base+_firstLocal;
+      var _sp=(window.Scene&&window.RZONES&&RZONES[_tr.k]&&!RZONES[_tr.k].stub&&Scene.prog)?Scene.prog(_tr.k):null;
+      var _stp=_sp?(' · '+(L==='tr'?'istasyon ':'stations ')+_sp.d+'/'+_sp.n):'';
+      var _tp='';try{if(window.House&&House.realm===_tr.k&&House.cur){var _tk=(S.zones[_tr.k]&&S.zones[_tr.k].task)||{};var _t=_tk['ch'+House.cur.ch];if(_t&&_t.parts)_tp=' · '+(L==='tr'?'soru/ödev ':'questions/task ')+(_t.done||0)+'/'+_t.parts;}}catch(_e){}
+      var _verb=(_hc===0&&_sp&&_sp.d===0)?(L==='tr'?'git ve içeri gir — ':'go in — '):'';
+      return (L==='tr'
+        ?('ANA SENARYO — '+_nm+': '+_verb+'Bölüm '+_absCh+' ('+_firstLocal+'/7 ev bölümü)'+_stp+_tp+(_loc?(' — '+_loc):''))
+        :('MAIN STORY — '+_nm+': '+_verb+'Chapter '+_absCh+' ('+_firstLocal+'/7 house ch.)'+_stp+_tp+(_loc?(' — '+_loc):'')));
+    }
+  }catch(_e){}
   if(!(S.flags&&S.flags.lunarisIntegrated))return L==='tr'?'ANA SENARYO — Göl kıyısındaki Lunaris\'in evine git: uyandır, içeri gir, kendi gölge çalışmanı yaşa.':'MAIN STORY — Go to Lunaris\'s house by the lake: wake him, step inside, live your own shadow-work.';
   if(!(S.flags&&S.flags.bahalIntegrated))return L==='tr'?'ANA SENARYO — Bahal\'ın evine gir (Siyah Disk yakını): Roma\'da uyan, gölgenle yüzleş.':'MAIN STORY — Enter Bahal\'s house (near the Black Disk): wake in Rome, face your shadow.';
   return L==='tr'?'ANA SENARYO — Sıradaki arketip evi yakında. ⚖ Zihin Profilinde dengeyi büyüt.':'MAIN STORY — The next archetype house opens soon. Grow your balance in ⚖ Mind Profile.';
