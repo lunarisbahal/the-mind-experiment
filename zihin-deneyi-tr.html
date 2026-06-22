@@ -303,7 +303,7 @@
   <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026 · b69 · <span style="color:var(--accent)">ana görev artık bölüm bölüm: hangi ev, kaçıncı bölüm (ev bölümü x/7), istasyon ve ödev ilerlemesi, nerede kaldığın — kayıtla senkron.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026 · b70 · <span style="color:var(--accent)">Aelius'un son tırmanışına kademe kademe zorlaşan bir aksiyon katmanı eklendi: önce parlayan ışık zerrelerini topla (sakin kademeler), sonra sürüklenen gölge-arkonları E / dokunuş ile dağıt (orta kademeler), zirvede ise dağıtış kovalayanı geri iten bir ışık-kalkanı yayar — arkonlar seni yere düşürür, zirve yine seansı açar.</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -1274,6 +1274,11 @@ function waypoint(){
 function interactTarget(){
   if(W3&&W3.inInterior&&W3.Interior)return W3.Interior.target();
   /* b66: tepede Aelius ile dijital seans — Aelius tepesinin zirvesindeyken ekran/sohbet açılır */
+  /* b70: while climbing the Aelius hill, E / tap dispels a nearby shadow-archon with light — only if one is in range; otherwise falls through to the session */
+  if(typeof AEL!=='undefined'&&AEL.steps&&AEL.steps.length&&W3.aeliusGroundY&&W3.aeliusGroundY(S.px,S.pz)>0.4&&W3._aelGame&&W3._aelGame.armed&&W3._aelGame.pool&&!W3._aelEscaped){
+    var _arn=false;for(var _ai=0;_ai<W3._aelGame.pool.archons.length;_ai++){var _aa=W3._aelGame.pool.archons[_ai];if(_aa.active&&Math.hypot(S.px-_aa.g.position.x,S.pz-_aa.g.position.z)<3.5){_arn=true;break;}}
+    if(_arn)return['\u26A1 '+(GAMELANG==='tr'?'Arkonu \u0131\u015F\u0131kla da\u011F\u0131t':'Dispel the archon with light'),function(){if(W3._aelDispel)W3._aelDispel();}];
+  }
   if(typeof AEL!=='undefined'&&AEL.steps&&AEL.steps.length&&W3.aeliusGroundY&&W3.aeliusGroundY(S.px,S.pz)>0.4){
     return['✦ Aelius ile Seansa Gir',()=>{
       if(window.Mirror&&Mirror.ready()){Mirror.open('aelius');return;}
@@ -6907,6 +6912,7 @@ if(HAS3D)(function(){
     /* zıplama */
     var _gy=(W3.aeliusGroundY?W3.aeliusGroundY(P.px,P.pz):0);
     if(keys['space']&&jy<=_gy+0.06&&Game.running&&!Game.modal){vy=6.2;}
+    if(W3._aelKnock){W3._aelKnock=false;vy=-3.0;try{var _kf=document.getElementById('dmg');if(_kf){_kf.style.opacity=.5;setTimeout(function(){_kf.style.opacity=0;},180);}if(window.FX&&FX.sfx)FX.sfx('error');}catch(e){}} /* b70: archon reach knockdown */
     if(vy!==0||jy>_gy+0.001||_gy>0){jy+=vy*dt;vy-=16*dt;if(jy<_gy){jy=_gy;vy=0;}}
     if(_gy>jy&&_gy-jy<0.34){jy=_gy;if(vy<0)vy=0;}
     S.heading=Math.PI-meshAng; /* v8: minimap oku gidiş yönüyle aynı (ayna düzeltmesi) */
@@ -6931,6 +6937,33 @@ if(HAS3D)(function(){
           if(!_onHill&&jy<0.3){_ch.active=false;_ch.g.visible=false;}
         }
       }
+      /* b70: Aelius climb ACTION layer — motes (calm) + shadow-archons (mid) + light-shield dispel (top), escalates by tier */
+      if(!W3._aelGameTick){W3._aelGameTick=function(dt,t){var G=W3._aelGame;if(!G)return;try{
+        if(!G.pool){var mk=function(){
+          var mo=[];for(var i=0;i<5;i++){var g=new THREE.Group();var c=new THREE.Mesh(new THREE.IcosahedronGeometry(0.26,0),std(0x1a1408,{emissive:0xffe8b0,emissiveIntensity:1.4,roughness:.4}));g.add(c);var s=new THREE.Mesh(new THREE.SphereGeometry(0.5,10,8),new THREE.MeshBasicMaterial({color:0xffe8b0,transparent:true,opacity:.22,blending:THREE.AdditiveBlending,depthWrite:false}));g.add(s);var lp=new THREE.PointLight(0xffe8b0,0,6,2);g.add(lp);g.visible=false;scene.add(g);mo.push({g:g,light:lp,active:false,t:0});}
+          var ar=[];for(var j=0;j<5;j++){var ag=new THREE.Group();var ab=new THREE.Mesh(new THREE.SphereGeometry(0.46,12,10),std(0x0a0a10,{emissive:0x3a0a12,emissiveIntensity:.5,roughness:.7}));ag.add(ab);var ae=new THREE.Mesh(new THREE.SphereGeometry(0.78,12,10),new THREE.MeshBasicMaterial({color:0x6a1020,transparent:true,opacity:.2,blending:THREE.AdditiveBlending,depthWrite:false}));ag.add(ae);var al=new THREE.PointLight(0xff3030,0,8,2);ag.add(al);ag.visible=false;scene.add(ag);ar.push({g:ag,light:al,active:false});}
+          var fb=new THREE.Mesh(new THREE.SphereGeometry(0.9,12,10),new THREE.MeshBasicMaterial({color:0xfff0c0,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));fb.visible=false;scene.add(fb);
+          return{motes:mo,archons:ar,flash:fb};};G.pool=mk();}
+        var P2=(W3.inInterior&&W3.IP)?W3.IP:S;var _g2=W3.aeliusGroundY(P2.px,P2.pz);var tier=Math.max(0,Math.round(_g2/0.92)-1);G.tier=tier;
+        /* chaser escalation */ if(W3._aelChaser&&!G.slowUntil){W3._aelChaser.speed=5.4+Math.max(0,tier-3)*0.35;}
+        if(G.slowUntil&&t>G.slowUntil){G.slowUntil=0;}
+        /* light-burst flash mesh fade */ var fb=G.pool.flash;if(fb.visible){fb.material.opacity*=0.86;fb.scale.multiplyScalar(1.06);if(fb.material.opacity<0.03){fb.visible=false;}}
+        /* MOTES */ var mts=G.pool.motes;var alive=0;for(var i=0;i<mts.length;i++)if(mts[i].active)alive++;
+        if(alive<3&&(G.spawnT===undefined||t-G.spawnT>1.1)){for(var i=0;i<mts.length;i++){if(!mts[i].active){var st=AEL.steps[Math.max(0,Math.min(AEL.steps.length-1,tier+((Math.random()<.5)?0:1)))];var a=Math.random()*6.283,rr=Math.random()*Math.max(1,st.r-1.5);mts[i].g.position.set(AEL.x+Math.cos(a)*rr,st.y+0.4,AEL.z+Math.sin(a)*rr);mts[i].g.visible=true;mts[i].active=true;mts[i].t=t;G.spawnT=t;break;}}}
+        for(var i=0;i<mts.length;i++){var m=mts[i];if(!m.active)continue;m.g.rotation.y+=dt*1.6;m.light.intensity=1.0+Math.sin(t*4+i)*0.4;m.g.position.y+=Math.sin(t*2+i)*0.002;
+          if(Math.hypot(P2.px-m.g.position.x,P2.pz-m.g.position.z)<1.2&&Math.abs((jy)-m.g.position.y+0.4)<1.6){m.active=false;m.g.visible=false;G.light=(G.light||0)+1;try{if(window.FX&&FX.sfx)FX.sfx('soft');if(window.FX&&FX.flash)FX.flash();}catch(e){}}}
+        /* ARCHONS (mid+ tiers) */ var ars=G.pool.archons;var cap=(tier>=7)?5:(tier>=4?2:0);var aalive=0;for(var j=0;j<ars.length;j++)if(ars[j].active)aalive++;
+        if(cap>0&&aalive<cap&&(G.aspawnT===undefined||t-G.aspawnT>1.6)){for(var j=0;j<ars.length;j++){if(!ars[j].active){var a=Math.random()*6.283,rr=2+Math.random()*4;ars[j].g.position.set(P2.px+Math.cos(a)*rr,_g2+0.8,P2.pz+Math.sin(a)*rr);ars[j].g.visible=true;ars[j].active=true;ars[j].light.intensity=0.8;G.aspawnT=t;break;}}}
+        var adr=(tier>=7)?2.1:1.3;for(var j=0;j<ars.length;j++){var ar=ars[j];if(!ar.active)continue;var dx=P2.px-ar.g.position.x,dz=P2.pz-ar.g.position.z,dl=Math.hypot(dx,dz)||1;ar.g.position.x+=dx/dl*adr*dt;ar.g.position.z+=dz/dl*adr*dt;var agy=W3.aeliusGroundY(ar.g.position.x,ar.g.position.z);ar.g.position.y=agy+0.8+Math.sin(t*4+j)*0.08;ar.light.intensity=0.7+Math.sin(t*7+j)*0.25;
+          if(Math.hypot(P2.px-ar.g.position.x,P2.pz-ar.g.position.z)<1.1){ar.active=false;ar.g.visible=false;W3._aelKnock=true;}}
+      }catch(e){}};}
+      if(!W3._aelDispel){W3._aelDispel=function(){var G=W3._aelGame;if(!G||!G.pool)return;try{var P2=(W3.inInterior&&W3.IP)?W3.IP:S;var best=-1,bd=3.5;for(var j=0;j<G.pool.archons.length;j++){var ar=G.pool.archons[j];if(!ar.active)continue;var d=Math.hypot(P2.px-ar.g.position.x,P2.pz-ar.g.position.z);if(d<bd){bd=d;best=j;}}if(best<0)return;var tar=G.pool.archons[best];var fb=G.pool.flash;fb.position.copy(tar.g.position);fb.scale.set(1,1,1);fb.material.opacity=0.6;fb.visible=true;tar.active=false;tar.g.visible=false;G.dispelled=(G.dispelled||0)+1;try{if(window.FX&&FX.sfx)FX.sfx('select');}catch(e){}
+        if(W3._aelChaser){W3._aelChaser.speed=Math.max(3.2,W3._aelChaser.speed-2);G.slowUntil=gameT+1.5;}
+        if((G.tier||0)>=7&&W3._aelChaser){var cg=W3._aelChaser.g.position;var px=cg.x-P2.px,pz=cg.z-P2.pz,pl=Math.hypot(px,pz)||1;cg.x+=px/pl*4;cg.z+=pz/pl*4;}
+      }catch(e){}};}
+      if(_onHill&&W3._aelOpen){ if(!W3._aelGame){W3._aelGame={armed:true,light:0,dispelled:0};} else if(!W3._aelGame.armed){W3._aelGame.armed=true;}
+        if(W3._aelGameTick)W3._aelGameTick(dt,t);
+      } else if((!_onHill&&jy<0.3)||W3._aelEscaped){ if(W3._aelGame&&W3._aelGame.armed){var GG=W3._aelGame;GG.armed=false;try{if(GG.pool){GG.pool.motes.forEach(function(m){m.active=false;m.g.visible=false;});GG.pool.archons.forEach(function(a){a.active=false;a.g.visible=false;});GG.pool.flash.visible=false;}}catch(e){}if(W3._aelChaser)W3._aelChaser.speed=5.4;}}
     }}catch(e){}
     player.g.rotation.y=meshAng;
     const moving=Math.abs(mx)+Math.abs(mz)>0.0001;
