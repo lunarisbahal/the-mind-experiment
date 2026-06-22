@@ -310,7 +310,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b59 · <span style="color:var(--accent)">the Aelius summit is now an earned ascent — only those who have integrated the previous archetype (Silvanus) can begin the ten-tier climb, and as you leap up tier by tier a shadow gives chase across the heights. Outrun it to the top and Aelius awaits; the whole mindscape opens out beneath you</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b60 · <span style="color:var(--accent)">the map is now read like Freud's iceberg — CONSCIOUSNESS and the far light up top, THE SUBCONSCIOUS sinking into the dark below, with the line of defence mechanisms drawn across the threshold; the legend moved out of the way. On phones the menu now has a clear ✕ CLOSE. Noctornus is named Noctornus, never 'trickster'</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -354,6 +354,7 @@
 <style>@media (pointer:coarse){#jbtn{display:flex !important;}}</style>
 <div id="menuBtns">
   <div id="menuPanel" style="display:none;">
+<button class="mini" onclick="document.getElementById('menuPanel').style.display='none'" style="grid-column:1/-1;background:rgba(48,16,16,.92);border-color:var(--warn);color:#ffb4b4;font-size:12px;padding:11px;position:sticky;top:0;z-index:3">✕ KAPAT · CLOSE</button>
 <div style="grid-column:1/-1;font-size:8.5px;letter-spacing:.25em;color:var(--violet);opacity:.62;margin:9px 2px 2px;text-transform:uppercase">✦ JOURNEY</div>
 <button class="mini" onclick="Library.show()">📖 THE MIND EXPERIMENT</button>
 <button class="mini" onclick="Quest.show()">◇ INNER WORK</button>
@@ -3716,7 +3717,7 @@ const REALMS=[
  {k:'bahal',n:{tr:"BAHAL-ROMA DENEYİ",en:"THE BAHAL-ROME EXPERIMENT"},arch:{tr:'Gölge',en:'The Shadow'},ch:[8,14],loc:{tr:'Seni takip eden gölge',en:'The shadow that follows you'}},
  {k:'lucida',n:{tr:"LUCIDA'NIN ŞEHRİ",en:"LUCIDA'S CITY"},arch:{tr:'Aydınlık / Anima',en:'Clarity / Anima'},ch:[15,21],loc:{tr:'Çalan ankesör',en:'The ringing payphone'}},
  {k:'lucius',n:{tr:"LUCIUS'UN PLAZASI",en:"LUCIUS'S PLAZA"},arch:{tr:'Persona / Manipülatör',en:'Persona / The Manipulator'},ch:[22,28],loc:{tr:'Takım elbiseli adam',en:'The man in the pressed suit'}},
- {k:'noct',n:{tr:"NOCTORNUS GECESİ",en:"NOCTORNUS NIGHT"},arch:{tr:'Trickster / İsyancı',en:'Trickster / Rebel'},ch:[29,35],loc:{tr:'Gecenin sesi',en:'The voice of the night'}},
+ {k:'noct',n:{tr:"NOCTORNUS GECESİ",en:"NOCTORNUS NIGHT"},arch:{tr:'Noctornus / İsyancı',en:'Noctornus / Rebel'},ch:[29,35],loc:{tr:'Gecenin sesi',en:'The voice of the night'}},
  {k:'silvanus',n:{tr:"SILVANUS'UN KARAVANI",en:"SILVANUS'S CARAVAN"},arch:{tr:'Bilge / Münzevi',en:'Sage / Hermit'},ch:[36,42],loc:{tr:'Karavan',en:'The caravan'}},
  {k:'aelius',n:{tr:"AELIUS SEANSI",en:"THE AELIUS SESSION"},arch:{tr:'Üst-Benlik / Anlatıcı',en:'Self / The Narrator'},ch:[43,49],loc:{tr:'Üst katman (Yükseliş Taşı)',en:'The upper layer (Ascension Stone)'}}
 ];
@@ -7242,6 +7243,18 @@ function drawBigMap(){
   c.width=Math.min(innerWidth*.92,980);c.height=c.width*WZ/WX;if(c.height>innerHeight*.9){c.height=innerHeight*.9;c.width=c.height*WX/WZ;}
   const ctx=c.getContext('2d'),sx=c.width/WX,sz=c.height/WZ;
   drawMiniBase(ctx,c.width,c.height);
+  (function(){var g=ctx.createLinearGradient(0,0,0,c.height);
+    g.addColorStop(0,'rgba(150,200,255,.17)');g.addColorStop(.30,'rgba(120,170,235,.05)');g.addColorStop(.55,'rgba(10,14,26,0)');g.addColorStop(1,'rgba(6,8,16,.36)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,c.width,c.height);
+    var wy=c.height*0.30;ctx.save();ctx.strokeStyle='rgba(127,212,193,.45)';ctx.lineWidth=1.4;ctx.setLineDash([7,6]);ctx.beginPath();ctx.moveTo(8,wy);ctx.lineTo(c.width-8,wy);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+    ctx.textAlign='left';ctx.font='9px monospace';ctx.fillStyle='rgba(127,212,193,.7)';ctx.fillText(tr?'— SAVUNMA MEKANİZMALARI HATTI —':'— THE LINE OF DEFENCE MECHANISMS —',12,wy-5);
+    ctx.fillStyle='rgba(180,205,240,.05)';ctx.beginPath();ctx.moveTo(c.width/2,wy-c.height*0.16);ctx.lineTo(c.width/2+c.width*0.33,c.height);ctx.lineTo(c.width/2-c.width*0.33,c.height);ctx.closePath();ctx.fill();
+    ctx.textAlign='center';
+    ctx.font='bold 15px monospace';ctx.fillStyle='rgba(210,232,255,.92)';ctx.fillText(tr?'◇ BİLİNÇ':'◇ CONSCIOUSNESS',c.width/2,24);
+    ctx.font='9px monospace';ctx.fillStyle='rgba(170,200,235,.6)';ctx.fillText(tr?'uzak ışık · arınma · anlatıcı':'the far light · clarity · the narrator',c.width/2,38);
+    ctx.font='bold 14px monospace';ctx.fillStyle='rgba(150,140,180,.85)';ctx.fillText(tr?'BİLİNÇALTI':'THE SUBCONSCIOUS',c.width/2,c.height*0.66);
+    ctx.font='9px monospace';ctx.fillStyle='rgba(140,130,170,.55)';ctx.fillText(tr?'gölge · mağara · en dipler':'the shadow · the cave · the depths',c.width/2,c.height*0.66+14);
+    ctx.textAlign='left';})();
   function lbl(txt,x,y,color,size){size=size||10;ctx.font=size+'px monospace';ctx.textAlign='center';var w=ctx.measureText(txt).width;ctx.fillStyle='rgba(4,6,12,.66)';ctx.fillRect(x-w/2-3,y-size,w+6,size+4);ctx.fillStyle=color;ctx.fillText(txt,x,y-2);}
   ZONES.forEach(z=>lbl(z.name,z.x*sx,z.z*sz-z.r*sx-2,'#aeb8d4',11));
   lbl(tr?'AYNALAR KAPISI':'GATE OF MIRRORS',L.gate.x*sx,L.gate.z*sz-10,'#c9b6e6',10);
@@ -7262,7 +7275,7 @@ function drawBigMap(){
   if(wp){ctx.fillStyle='#cdb878';ctx.beginPath();ctx.arc(wp.x*sx,wp.z*sz,5,0,7);ctx.fill();lbl(tr?'◆ HEDEF':'◆ OBJECTIVE',wp.x*sx,wp.z*sz+16,'#e3c878',9);}
   [['echoChamber','◌',(tr?'Yankı Odası':'Echo Chamber'),'#b9a8e8'],['lucidaMirror','◑',(tr?'Lucida Aynası':'Lucida’s Mirror'),'#9fd0d8'],['crackedDoor','⟡',(tr?'Yarık Kapı':'Cracked Door'),'#b9a8e8'],['emptyDoor','▢',(tr?'Boş Oda':'Empty Room'),'#9aa6bd']].forEach(function(it){var Lp=L[it[0]];if(!Lp)return;var X=Lp.x*sx,Z=Lp.z*sz;ctx.fillStyle=it[3];ctx.font='13px monospace';ctx.textAlign='center';ctx.fillText(it[1],X,Z+4);lbl(it[2],X,Z-9,it[3],9);});
   ctx.fillStyle='#e8e4d4';ctx.beginPath();ctx.arc(S.px*sx,S.pz*sz,5,0,7);ctx.fill();lbl(tr?'SEN':'YOU',S.px*sx,S.pz*sz-10,'#7fd4c1',10);
-  drawMapLegend(ctx,tr);
+  drawMapLegend(ctx,tr,c.height);
   ctx.textAlign='center';
   var _c=(window.__mmP||[]).length;
   ctx.font='12px monospace';ctx.fillStyle=_c?'rgba(230,195,110,.95)':'#6b7689';
@@ -7270,14 +7283,15 @@ function drawBigMap(){
   ctx.fillText(ctxt,c.width/2,c.height-30);
   ctx.fillStyle='#6b7689';ctx.font='10px monospace';ctx.fillText(tr?'— KAPATMAK İÇİN [M] —':'— PRESS [M] TO CLOSE —',c.width/2,c.height-12);
 }
-function drawMapLegend(ctx,tr){
+function drawMapLegend(ctx,tr,H){
   const items=[['#7fd4c1',tr?'karakterler':'characters'],['rgba(110,210,220,.95)',tr?'ayna-ajanları':'mirror-agents'],['rgba(230,195,110,.95)',tr?'şu anki yolcular':'travelers now'],['#cdb878',tr?'evler / hedef':'houses / objective'],['rgba(157,140,201,.7)',tr?'ritüeller & izler':'rites & traces']];
   const pad=10,lh=15,bw=176,bh=pad*2+lh*items.length+16;
-  ctx.fillStyle='rgba(4,6,12,.74)';ctx.strokeStyle='rgba(127,212,193,.35)';ctx.lineWidth=1;
-  ctx.fillRect(10,10,bw,bh);ctx.strokeRect(10,10,bw,bh);
+  var lx=10, ly=(H?H-bh-46:10);
+  ctx.fillStyle='rgba(4,6,12,.82)';ctx.strokeStyle='rgba(127,212,193,.35)';ctx.lineWidth=1;
+  ctx.fillRect(lx,ly,bw,bh);ctx.strokeRect(lx,ly,bw,bh);
   ctx.textAlign='left';ctx.font='10px monospace';ctx.fillStyle='#aeb8d4';
-  ctx.fillText(tr?'EVREN HARİTASI':'UNIVERSE MAP',10+pad,10+pad+8);
-  items.forEach((it,i)=>{const y=10+pad+24+i*lh;ctx.fillStyle=it[0];ctx.beginPath();ctx.arc(10+pad+5,y-3,4,0,7);ctx.fill();ctx.fillStyle='#c2cadf';ctx.fillText(it[1],10+pad+16,y);});
+  ctx.fillText(tr?'EVREN HARİTASI':'UNIVERSE MAP',lx+pad,ly+pad+8);
+  items.forEach((it,i)=>{const y=ly+pad+24+i*lh;ctx.fillStyle=it[0];ctx.beginPath();ctx.arc(lx+pad+5,y-3,4,0,7);ctx.fill();ctx.fillStyle='#c2cadf';ctx.fillText(it[1],lx+pad+16,y);});
 }
 document.getElementById('bigmapWrap').addEventListener('click',()=>Game.toggleMap());
 document.getElementById('bigmap').addEventListener('click',function(ev){const c=this,rect=c.getBoundingClientRect();const wx=(ev.clientX-rect.left)/rect.width*WX,wz=(ev.clientY-rect.top)/rect.height*WZ;let hit=null,best=1e9;(window.__traces||[]).forEach(t=>{if(t.x===undefined)return;const d=Math.hypot(wx-t.x,wz-t.z);if(d<best){best=d;hit=t;}});if(hit&&best<WX*0.05){ev.stopPropagation();UI.toast('◈ '+hit.mask+': "'+hit.text+'"'+(hit.ack>0?'  ◇'+hit.ack:''),6000);}});
