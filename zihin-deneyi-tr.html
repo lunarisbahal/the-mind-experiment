@@ -304,7 +304,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b87--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b89--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -4744,7 +4744,7 @@ const W3={};try{W3.lanternOff=(localStorage.getItem('it041_lantern')==='1');}cat
 if(HAS3D)(function(){
   const scene=new THREE.Scene();
   scene.fog=new THREE.FogExp2(0x070a14,0.0065);
-  const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,900);
+  const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,((typeof matchMedia!=='undefined'&&matchMedia('(pointer:coarse)').matches)?260:900));
   const _coarse=(typeof matchMedia!=='undefined'&&matchMedia('(pointer:coarse)').matches);
   const renderer=new THREE.WebGLRenderer({antialias:!_coarse,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio,_coarse?1.0:1.25));
@@ -4867,7 +4867,7 @@ if(HAS3D)(function(){
     const fg=fx.createRadialGradient(64,64,0,64,64,64);fg.addColorStop(0,'rgba(150,170,200,.22)');fg.addColorStop(1,'rgba(150,170,200,0)');
     fx.fillStyle=fg;fx.beginPath();fx.arc(64,64,64,0,7);fx.fill();
     const ftex=new THREE.CanvasTexture(fc);
-    const spots=[[190,145],[274,76],[150,210],[300,120],[120,90],[230,30],[60,160]];
+    var spots=[[190,145],[274,76],[150,210],[300,120],[120,90],[230,30],[60,160]];try{if(_coarse)spots=spots.slice(0,3);}catch(e){}
     for(let i=0;i<spots.length;i++){
       const fs=new THREE.Sprite(new THREE.SpriteMaterial({map:ftex,transparent:true,depthWrite:false,opacity:.5,fog:false}));
       const sc=30+Math.random()*26;fs.scale.set(sc,sc*.4,1);
@@ -4875,7 +4875,7 @@ if(HAS3D)(function(){
       fs.userData={spd:.3+Math.random()*.5,ph:Math.random()*6.28,bx:0};fs.userData.bx=fs.position.x;
       scene.add(fs);W3._atmo.fog.push(fs);
     }
-    const N=60,fp=new Float32Array(N*3),fph=[];
+    var N=60;try{if(_coarse)N=24;}catch(e){}const fp=new Float32Array(N*3),fph=[];
     const seeds=[[274,76],[150,210],[300,120]];
     for(let i=0;i<N;i++){const s=seeds[i%seeds.length];
       fp[i*3]=s[0]+(Math.random()-.5)*34;fp[i*3+1]=1+Math.random()*3.4;fp[i*3+2]=s[1]+(Math.random()-.5)*34;fph.push(Math.random()*6.28);}
@@ -6787,6 +6787,8 @@ if(HAS3D)(function(){
   }catch(e){}}
   buildConsciousnessCity();
   buildMindExpressTrain();
+  /* b89: decorative PointLight registry for mobile culling (built once after world setup) */
+  try{W3._cullN=6;setTimeout(function(){try{if(W3._cullPL)return;var pl=[];var essential=['lantern','rimLight','southBeam'];scene.traverse(function(o){try{if(o&&o.isPointLight){var nm=(o.name||'');var ess=false;for(var _e=0;_e<essential.length;_e++){if(nm.indexOf(essential[_e])>=0){ess=true;break;}}if(!ess)pl.push({l:o,base:o.intensity});}}catch(e){}});W3._cullPL=pl;if(!_coarse){for(var _i=0;_i<pl.length;_i++){pl[_i].l.intensity=pl[_i].base;}}}catch(e){}},0);}catch(e){}
 
   buildHood(268,255);
   buildHood(372,150);
@@ -6957,7 +6959,7 @@ if(HAS3D)(function(){
   },{passive:true});
 
   /* ---- loop ---- */
-  let walkT=0,meshAng=0,last=performance.now(),saveT=0,noctWarn=0,fovKick=0,gameT=0,tapeChk=0,_sfxChk=0,_clrChk=0,jy=0,vy=0;
+  let walkT=0,meshAng=0,last=performance.now(),saveT=0,noctWarn=0,fovKick=0,gameT=0,tapeChk=0,_sfxChk=0,_clrChk=0,_plChk=0,jy=0,vy=0;
   W3.noctPos={x:L.blackdisk.x,z:L.blackdisk.z};
   function lerpAng(a,b,t){let d=b-a;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return a+d*t;}
   function animate(now){
@@ -6967,6 +6969,8 @@ if(HAS3D)(function(){
     const paused=Game.modal;
     const dt=paused?0:rdt;
     gameT+=dt;const t=gameT;_clrChk+=dt;if(_clrChk>0.8){_clrChk=0;try{if(window.W3&&W3.clearLevel)W3._clear=W3.clearLevel();}catch(e){}}
+    /* b89: dynamic point-light culling — mobile only, throttled */
+    try{if(_coarse&&W3._cullPL&&W3._cullPL.length){_plChk+=dt;if(_plChk>0.4){_plChk=0;var _arr=W3._cullPL,_n=W3._cullN||6,_px=(typeof S!=='undefined'&&S.px!=null)?S.px:0,_pz=(typeof S!=='undefined'&&S.pz!=null)?S.pz:0;for(var _ci=0;_ci<_arr.length;_ci++){var _o=_arr[_ci];_o._d=(_o.l.position.x-_px)*(_o.l.position.x-_px)+(_o.l.position.z-_pz)*(_o.l.position.z-_pz);}_arr.sort(function(a,b){return a._d-b._d;});for(var _cj=0;_cj<_arr.length;_cj++){_arr[_cj].l.intensity=(_cj<_n)?_arr[_cj].base:0;}}}}catch(e){}
     waterUni.t.value=t;
     updateWeather(t,dt);
     /* ---- gece-gündüz döngüsü (8 dk = 1 gün; gece başlar — kitap gibi) ---- */
@@ -6983,7 +6987,7 @@ if(HAS3D)(function(){
       skyU.top.value.setRGB(.012+.18*sun,.016+.34*sun,.047+.55*sun);
       skyU.mid.value.setRGB(.039+.42*sun,.075+.55*sun,.149+.62*sun);
       skyU.bot.value.setRGB(.078+.72*sun,.122+.62*sun,.22+.45*sun);
-      try{var _sd=1-0.95*_df*(1-_p*0.7);skyU.top.value.multiplyScalar(_sd);skyU.mid.value.multiplyScalar(_sd);skyU.bot.value.multiplyScalar(_sd);}catch(e){} /* b73: deep-south horizon goes near-black */ try{var _nfS=Math.max(0,Math.min(1,(110-((typeof S!=='undefined'&&S.pz!=null)?S.pz:120))/110));if(_nfS===_nfS&&_nfS>0){var _ds2=1+0.8*_nfS;skyU.top.value.multiplyScalar(_ds2);skyU.mid.value.multiplyScalar(_ds2);skyU.bot.value.r=Math.min(1,skyU.bot.value.r+0.10*_nfS);skyU.bot.value.g=Math.min(1,skyU.bot.value.g+0.07*_nfS);skyU.bot.value.multiplyScalar(_ds2);}}catch(e){} /* b83: far-north daylight sky */
+      try{var _sd=1-0.95*_df*(1-_p*0.7);skyU.top.value.multiplyScalar(_sd);skyU.mid.value.multiplyScalar(_sd);skyU.bot.value.multiplyScalar(_sd);}catch(e){} /* b73: deep-south horizon goes near-black */ try{var _nfS=Math.max(0,Math.min(1,(110-((typeof S!=='undefined'&&S.pz!=null)?S.pz:120))/110));if(_nfS===_nfS&&_nfS>0){var _ds2=1+0.8*_nfS;skyU.top.value.multiplyScalar(_ds2);skyU.mid.value.multiplyScalar(_ds2);skyU.bot.value.r=Math.min(1,skyU.bot.value.r+0.10*_nfS);skyU.bot.value.g=Math.min(1,skyU.bot.value.g+0.07*_nfS);skyU.bot.value.multiplyScalar(_ds2);try{var _g=Math.max(0,Math.min(1,_nfS));if(_g===_g){skyU.top.value.r=Math.min(1,skyU.top.value.r+0.16*_g);skyU.top.value.g=Math.min(1,skyU.top.value.g+0.20*_g);skyU.top.value.b=Math.min(1,skyU.top.value.b+0.30*_g);skyU.mid.value.r=Math.min(1,skyU.mid.value.r+0.10*_g);skyU.mid.value.g=Math.min(1,skyU.mid.value.g+0.12*_g);}}catch(e){}/* b89: warm daylight sun-glow in north sky */}}catch(e){} /* b83: far-north daylight sky */
       W3.starsM.opacity=.85*(1-sun);
       moonMesh.material.opacity=((W3._moonOp||.95)*(1-sun*.92))+.03;
       moonGlow.material.opacity=(W3._glowOp||.5)*(1-sun);
@@ -7352,7 +7356,7 @@ if(HAS3D)(function(){
       saveT+=dt;if(saveT>5){saveT=0;save();}
     }
     if(W3._portals)for(const pr of W3._portals)pr.rotation.z+=dt*.35;
-    try{if(W3._cityCars&&dt>0){for(var ci=0;ci<W3._cityCars.length;ci++){var car=W3._cityCars[ci];car.position.x+=car.userData.spd*dt;if(car.position.x>372)car.position.x=18;else if(car.position.x<18)car.position.x=372;}}if(W3._cityPeople&&dt>0){for(var pi=0;pi<W3._cityPeople.length;pi++){var pe=W3._cityPeople[pi];pe.userData.ph+=dt*1.3;pe.position.y=Math.abs(Math.sin(pe.userData.ph))*0.12;}}}catch(e){}
+    try{var _cityStep=true;if(_coarse){W3._cityFr=((W3._cityFr||0)+1);_cityStep=(W3._cityFr%3===0);}if(_cityStep){if(W3._cityCars&&dt>0){for(var ci=0;ci<W3._cityCars.length;ci++){var car=W3._cityCars[ci];car.position.x+=car.userData.spd*dt;if(car.position.x>372)car.position.x=18;else if(car.position.x<18)car.position.x=372;}}}if(_cityStep&&W3._cityPeople&&dt>0){for(var pi=0;pi<W3._cityPeople.length;pi++){var pe=W3._cityPeople[pi];pe.userData.ph+=dt*1.3;pe.position.y=Math.abs(Math.sin(pe.userData.ph))*0.12;}}}catch(e){}
     var _acs=(W3.inInterior&&W3.Interior)?W3.Interior.scene:scene;
     if(composer&&bloomOn){try{renderPass.scene=_acs;renderPass.camera=camera;composer.render();}catch(e){bloomOn=false;renderer.render(_acs,camera);}}
     else{renderer.render(_acs,camera);}
@@ -7396,20 +7400,21 @@ function drawBigMap(){
   const tr=(GAMELANG==='tr');
   c.width=Math.min(innerWidth*.92,980);c.height=c.width*WZ/WX;if(c.height>innerHeight*.9){c.height=innerHeight*.9;c.width=c.height*WX/WZ;}try{var _wb=document.getElementById('mapWhoBtn');if(_wb)_wb.textContent=(tr?'● KİMLER NEREDE':'● WHO IS WHERE');var _mw=document.getElementById('mapWho');if(_mw)_mw.style.display='none';}catch(e){}
   const ctx=c.getContext('2d'),sx=c.width/WX,sz=c.height/WZ;
+  var _fs=Math.max(0.6,Math.min(1,c.width/900));var _lblRects=[];
   drawMiniBase(ctx,c.width,c.height);
   (function(){var g=ctx.createLinearGradient(0,0,0,c.height);
     g.addColorStop(0,'rgba(150,200,255,.17)');g.addColorStop(.30,'rgba(120,170,235,.05)');g.addColorStop(.55,'rgba(10,14,26,0)');g.addColorStop(1,'rgba(6,8,16,.36)');
     ctx.fillStyle=g;ctx.fillRect(0,0,c.width,c.height);
     var wy=c.height*0.30;ctx.save();ctx.strokeStyle='rgba(127,212,193,.45)';ctx.lineWidth=1.4;ctx.setLineDash([7,6]);ctx.beginPath();ctx.moveTo(8,wy);ctx.lineTo(c.width-8,wy);ctx.stroke();ctx.setLineDash([]);ctx.restore();
-    ctx.textAlign='left';ctx.font='9px monospace';ctx.fillStyle='rgba(127,212,193,.7)';ctx.fillText(tr?'— SAVUNMA MEKANİZMALARI HATTI —':'— THE LINE OF DEFENCE MECHANISMS —',12,wy-5);
+    ctx.textAlign='left';ctx.font=(9*_fs|0)+'px monospace';ctx.fillStyle='rgba(127,212,193,.7)';ctx.fillText(tr?'— SAVUNMA MEKANİZMALARI HATTI —':'— THE LINE OF DEFENCE MECHANISMS —',12,wy-5);
     ctx.fillStyle='rgba(180,205,240,.05)';ctx.beginPath();ctx.moveTo(c.width/2,wy-c.height*0.16);ctx.lineTo(c.width/2+c.width*0.33,c.height);ctx.lineTo(c.width/2-c.width*0.33,c.height);ctx.closePath();ctx.fill();
     ctx.textAlign='center';
-    ctx.font='bold 15px monospace';ctx.fillStyle='rgba(210,232,255,.92)';ctx.fillText(tr?'◇ BİLİNÇ':'◇ CONSCIOUSNESS',c.width/2,24);
-    ctx.font='9px monospace';ctx.fillStyle='rgba(170,200,235,.6)';ctx.fillText(tr?'uzak ışık · arınma · anlatıcı':'the far light · clarity · the narrator',c.width/2,38);
-    ctx.font='bold 14px monospace';ctx.fillStyle='rgba(150,140,180,.85)';ctx.fillText(tr?'BİLİNÇALTI':'THE SUBCONSCIOUS',c.width/2,c.height*0.66);
-    ctx.font='9px monospace';ctx.fillStyle='rgba(140,130,170,.55)';ctx.fillText(tr?'gölge · mağara · en dipler':'the shadow · the cave · the depths',c.width/2,c.height*0.66+14);
+    ctx.font='bold '+(15*_fs|0)+'px monospace';ctx.fillStyle='rgba(210,232,255,.92)';ctx.fillText(tr?'◇ BİLİNÇ':'◇ CONSCIOUSNESS',c.width/2,24);
+    ctx.font=(9*_fs|0)+'px monospace';ctx.fillStyle='rgba(170,200,235,.6)';ctx.fillText(tr?'uzak ışık · arınma · anlatıcı':'the far light · clarity · the narrator',c.width/2,38);
+    ctx.font='bold '+(14*_fs|0)+'px monospace';ctx.fillStyle='rgba(150,140,180,.85)';ctx.fillText(tr?'BİLİNÇALTI':'THE SUBCONSCIOUS',c.width/2,c.height*0.66);
+    ctx.font=(9*_fs|0)+'px monospace';ctx.fillStyle='rgba(140,130,170,.55)';ctx.fillText(tr?'gölge · mağara · en dipler':'the shadow · the cave · the depths',c.width/2,c.height*0.66+14);
     ctx.textAlign='left';})();
-  function lbl(txt,x,y,color,size){size=size||10;ctx.font=size+'px monospace';ctx.textAlign='center';var w=ctx.measureText(txt).width;ctx.fillStyle='rgba(4,6,12,.66)';ctx.fillRect(x-w/2-3,y-size,w+6,size+4);ctx.fillStyle=color;ctx.fillText(txt,x,y-2);}
+  function lbl(txt,x,y,color,size,prio){size=(size||10)*_fs;ctx.font=size+'px monospace';ctx.textAlign='center';var w=ctx.measureText(txt).width;var bx=x-w/2-3,by=y-size,bw=w+6,bh=size+4;var pad=(c.width<520?5:2);var nr={x:bx-pad,y:by-pad,w:bw+pad*2,h:bh+pad*2};if(!prio){for(var _i=0;_i<_lblRects.length;_i++){var r=_lblRects[_i];if(nr.x<r.x+r.w&&nr.x+nr.w>r.x&&nr.y<r.y+r.h&&nr.y+nr.h>r.y)return;}}_lblRects.push(nr);ctx.fillStyle='rgba(4,6,12,.66)';ctx.fillRect(bx,by,bw,bh);ctx.fillStyle=color;ctx.fillText(txt,x,y-2);}
   ZONES.forEach(z=>lbl(z.name,z.x*sx,z.z*sz-z.r*sx-2,'#aeb8d4',11));
   lbl(tr?'AYNALAR KAPISI':'GATE OF MIRRORS',L.gate.x*sx,L.gate.z*sz-10,'#c9b6e6',10);
   lbl('SILVANUS',L.caravan.x*sx,L.caravan.z*sz-7,'#7fd4c1');
@@ -7424,18 +7429,18 @@ function drawBigMap(){
   /* b62: harita sadelestirildi — ajan isim etiketleri kaldirildi (kim nerede icin Roster) */
   var _trc=(window.__traces||[]).filter(t=>t.x!==undefined).slice(-40);
   ctx.fillStyle='rgba(157,140,201,.5)';_trc.forEach(t=>{const X=t.x*sx,Z=t.z*sz;ctx.beginPath();ctx.moveTo(X,Z-3);ctx.lineTo(X+3,Z);ctx.lineTo(X,Z+3);ctx.lineTo(X-3,Z);ctx.closePath();ctx.fill();});
-  (window.__mmP||[]).forEach(p=>{ctx.strokeStyle='rgba(230,195,110,.8)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x*sx,p.z*sz,6,0,7);ctx.stroke();if(p.n)lbl(p.n,p.x*sx,p.z*sz-9,'rgba(235,200,120,.95)',9);});
+  (window.__mmP||[]).forEach(p=>{ctx.strokeStyle='rgba(230,195,110,.8)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x*sx,p.z*sz,6,0,7);ctx.stroke();if(p.n&&c.width>=520)lbl(p.n,p.x*sx,p.z*sz-9,'rgba(235,200,120,.95)',9);});
   const wp=waypoint();
-  if(wp){ctx.fillStyle='#cdb878';ctx.beginPath();ctx.arc(wp.x*sx,wp.z*sz,5,0,7);ctx.fill();lbl(tr?'◆ HEDEF':'◆ OBJECTIVE',wp.x*sx,wp.z*sz+16,'#e3c878',9);}
-  [['echoChamber','◌',(tr?'Yankı Odası':'Echo Chamber'),'#b9a8e8'],['lucidaMirror','◑',(tr?'Lucida Aynası':'Lucida’s Mirror'),'#9fd0d8'],['crackedDoor','⟡',(tr?'Yarık Kapı':'Cracked Door'),'#b9a8e8'],['emptyDoor','▢',(tr?'Boş Oda':'Empty Room'),'#9aa6bd']].forEach(function(it){var Lp=L[it[0]];if(!Lp)return;var X=Lp.x*sx,Z=Lp.z*sz;ctx.fillStyle=it[3];ctx.font='13px monospace';ctx.textAlign='center';ctx.fillText(it[1],X,Z+4);lbl(it[2],X,Z-9,it[3],9);});
-  ctx.fillStyle='#e8e4d4';ctx.beginPath();ctx.arc(S.px*sx,S.pz*sz,5,0,7);ctx.fill();lbl(tr?'SEN':'YOU',S.px*sx,S.pz*sz-10,'#7fd4c1',10);
+  if(wp){ctx.fillStyle='#cdb878';ctx.beginPath();ctx.arc(wp.x*sx,wp.z*sz,5,0,7);ctx.fill();lbl(tr?'◆ HEDEF':'◆ OBJECTIVE',wp.x*sx,wp.z*sz+16,'#e3c878',9,true);}
+  [['echoChamber','◌',(tr?'Yankı Odası':'Echo Chamber'),'#b9a8e8'],['lucidaMirror','◑',(tr?'Lucida Aynası':'Lucida’s Mirror'),'#9fd0d8'],['crackedDoor','⟡',(tr?'Yarık Kapı':'Cracked Door'),'#b9a8e8'],['emptyDoor','▢',(tr?'Boş Oda':'Empty Room'),'#9aa6bd']].forEach(function(it){var Lp=L[it[0]];if(!Lp)return;var X=Lp.x*sx,Z=Lp.z*sz;ctx.fillStyle=it[3];ctx.font=(13*_fs|0)+'px monospace';ctx.textAlign='center';ctx.fillText(it[1],X,Z+4);if(c.width>=520)lbl(it[2],X,Z-9,it[3],9);});
+  ctx.fillStyle='#e8e4d4';ctx.beginPath();ctx.arc(S.px*sx,S.pz*sz,5,0,7);ctx.fill();lbl(tr?'SEN':'YOU',S.px*sx,S.pz*sz-10,'#7fd4c1',10,true);
   /* b62: lejant kaldirildi (harita sade) */
   ctx.textAlign='center';
   var _c=(window.__mmP||[]).length;
-  ctx.font='12px monospace';ctx.fillStyle=_c?'rgba(230,195,110,.95)':'#6b7689';
+  ctx.font=(12*_fs|0)+'px monospace';ctx.fillStyle=_c?'rgba(230,195,110,.95)':'#6b7689';
   var ctxt=_c?(tr?('● şu an '+_c+' yolcu daha burada'):('● '+_c+' other traveler'+(_c>1?'s':'')+' here now')):(tr?'● şu an buradaki tek yolcu sensin':'● you are the only traveler here right now');
   ctx.fillText(ctxt,c.width/2,c.height-30);
-  ctx.fillStyle='#6b7689';ctx.font='10px monospace';ctx.fillText(tr?'— KAPATMAK İÇİN [M] —':'— PRESS [M] TO CLOSE —',c.width/2,c.height-12);
+  ctx.fillStyle='#6b7689';ctx.font=(10*_fs|0)+'px monospace';ctx.fillText(tr?'— KAPATMAK İÇİN [M] —':'— PRESS [M] TO CLOSE —',c.width/2,c.height-12);
 }
 function drawMapLegend(ctx,tr,H){
   const items=[['#7fd4c1',tr?'karakterler':'characters'],['rgba(110,210,220,.95)',tr?'ayna-ajanları':'mirror-agents'],['rgba(230,195,110,.95)',tr?'şu anki yolcular':'travelers now'],['#cdb878',tr?'evler / hedef':'houses / objective'],['rgba(157,140,201,.7)',tr?'ritüeller & izler':'rites & traces']];
