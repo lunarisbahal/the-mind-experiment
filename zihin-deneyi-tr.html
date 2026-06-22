@@ -304,7 +304,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b91--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b93--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -494,7 +494,7 @@ const L={
   blackdisk:{x:70,z:150,r:24,name:'SİYAH DİSK'},
   forest:{x:150,z:168,r:26,name:'YASAK ORMAN'},
   prison:{x:54,z:178,r:22,name:'YENİAY HÜCRELERİ'},
-  therapy:{x:286,z:156,r:22,name:'TERAPİ MERKEZİ'},
+  therapy:{x:212,z:56,r:22,name:'TERAPİ MERKEZİ'},
   labyrinth:{x:186,z:134,r:20,name:'LABİRENT'},
   lake:{x:255,z:205,r:26,name:'DREAMLAND GÖLÜ'},
   gate:{x:108,z:33,r:8,name:'AYNALAR KAPISI'},
@@ -505,6 +505,8 @@ const L={
   mural:{x:279,z:165,r:4.5,name:'DUVAR RESMİ'},
   graffiti:{x:48,z:170,r:4.5,name:'HÜCRE DUVARI'},
   caravan:{x:338,z:196,r:13,name:"SILVANUS'UN KARAVANI"},
+  medbench:{x:338,z:184,r:4,name:(GAMELANG==='tr'?'MEDİTASYON BANKI':'MEDITATION BENCH')},
+  medpark:{x:92,z:56,r:4,name:(GAMELANG==='tr'?'HUZUR GÖLETİ':'CALM POND')},
   bridge:{x:319,z:196,r:6,name:'ASMA KÖPRÜ'},
   station:{x:300,z:108,r:18,name:'İSTASYON'},
   ovStone1:{x:130,z:190,r:4.5,name:'ORDOS VERITAS DİKİLİTAŞI'},
@@ -1346,6 +1348,8 @@ function interactTarget(){
   if(near(L.mural))return['Duvar resmini incele',doMural];
   if(near(L.graffiti))return['Duvarı incele',doGraffiti];
   if(near(L.ovStone1)||near(L.ovStone2))return['Ordos Veritas dikilitaşı',doOV];
+  if(typeof L!=='undefined'&&L.medbench&&Math.hypot(S.px-L.medbench.x,S.pz-L.medbench.z)<3.5)return['◈ '+(GAMELANG==='tr'?'Otur ve meditasyon yap':'Sit and meditate'),function(){if(window.Meditation)Meditation.open('silvanus');}];
+  if(typeof L!=='undefined'&&L.medpark&&Math.hypot(S.px-L.medpark.x,S.pz-L.medpark.z)<3.5)return['◈ '+(GAMELANG==='tr'?'Otur ve meditasyon yap':'Sit and meditate'),function(){if(window.Meditation)Meditation.open('solo');}];
   if(near(L.bridge)||near(L.caravan))return['Silvanus',doSilvanus];
   if(lunarisMoon()&&S.stage>=3&&!S.solved.s2&&near(L.lunaris))return['Silüete yaklaş',doLunaris];
   if(near(L.labyrinth,0))return['Labirent',doLabyrinth];
@@ -1516,7 +1520,8 @@ function doSilvanus(){
     ['SILVANUS','Enstitü bir keresinde benim hakkımda dosya yazdı. “İnanç temelli profil. Söyleyeceği bir mesleği yok.” Bir arkadaş sesiyle bir makinenin sözlerini gönderdiler. Çayı yine de koydum. Yanlış yollar da buraya çıkar.'],
     ['SILVANUS','Başkalarının ekran görüntülerini kendi yaraların gibi taşıyorsun. Değiller. Delil, tuttuğun bir şeydir; seni tutan bir şey değil.'],
     ['SILVANUS','Üst katmana geçerken, acıyı ait olduğu katmanda bırak. Tekniğin tamamı bu. Gerisi süs.'],
-    ['SILVANUS','Berraklığın tazelendi. Disk tarlasındaki rapçiye dikkat et — o, bu dersi reddetmenin altına ritim döşenmiş hâli.']
+    ['SILVANUS','Berraklığın tazelendi. Disk tarlasındaki rapçiye dikkat et — o, bu dersi reddetmenin altına ritim döşenmiş hâli.'],
+    ['SILVANUS','Gürültü çoğaldığında, karavanımın yanındaki banka gel otur. Bir süre birlikte nefes alırız.']
   ]);
 }
 function doNewMoonCells(){var tr=(GAMELANG==='tr');
@@ -1808,6 +1813,12 @@ const Joy={x:0,y:0,on:false};
 /* ---------------- Ortam sesi ---------------- */
 const Snd={
   ac:null,on:true,started:false,
+  bodyOn:(function(){try{return localStorage.getItem('it041_aud_body')!=='0';}catch(e){return true;}})(),
+  ambientOn:(function(){try{return localStorage.getItem('it041_aud_amb')!=='0';}catch(e){return true;}})(),
+  mindOn:(function(){try{return localStorage.getItem('it041_aud_mind')!=='0';}catch(e){return true;}})(),
+  toggleBody(){this.bodyOn=!this.bodyOn;try{localStorage.setItem('it041_aud_body',this.bodyOn?'1':'0');}catch(e){}try{var _b=document.getElementById('bodBtn');if(_b)_b.textContent=(GAMELANG==='tr'?'\ud83e\udec1 V\u00fccut sesleri: ':'\ud83e\udec1 Body sounds: ')+(this.bodyOn?(GAMELANG==='tr'?'A\u00c7IK':'ON'):(GAMELANG==='tr'?'KAPALI':'OFF'));}catch(e){}},
+  toggleAmbient(){this.ambientOn=!this.ambientOn;try{localStorage.setItem('it041_aud_amb',this.ambientOn?'1':'0');}catch(e){}try{var _b=document.getElementById('ambBtn');if(_b)_b.textContent=(GAMELANG==='tr'?'\ud83c\udf27 Ortam sesleri: ':'\ud83c\udf27 Ambient sounds: ')+(this.ambientOn?(GAMELANG==='tr'?'A\u00c7IK':'ON'):(GAMELANG==='tr'?'KAPALI':'OFF'));}catch(e){}},
+  toggleMind(){this.mindOn=!this.mindOn;try{localStorage.setItem('it041_aud_mind',this.mindOn?'1':'0');}catch(e){}try{var _b=document.getElementById('mndBtn');if(_b)_b.textContent=(GAMELANG==='tr'?'\ud83e\udde0 Zihin sesleri: ':'\ud83e\udde0 Mind sounds: ')+(this.mindOn?(GAMELANG==='tr'?'A\u00c7IK':'ON'):(GAMELANG==='tr'?'KAPALI':'OFF'));}catch(e){}},
   init(){
     if(this.started||!this.on)return;
     try{
@@ -1968,7 +1979,7 @@ const Snd={
   setZoneAmb(f,c,b){ if(!this.on)return; this._ensureZoneAmb(); if(!this._zoneAmb)return; var z=this._zoneAmb;
     var ft=Math.max(0,Math.min(1,f))*0.5, ct=Math.max(0,Math.min(1,c))*0.5, bt=Math.max(0,Math.min(1,b||0))*0.42;
     z.fG.gain.value+=(ft-z.fG.gain.value)*.05; z.cG.gain.value+=(ct-z.cG.gain.value)*.05; if(z.bG)z.bG.gain.value+=(bt-z.bG.gain.value)*.05;
-    try{this._ensureHiss();if(this._hissG){var hh=(0.016+Math.max(0,Math.min(1,f))*0.03)*(1-0.7*((window.W3&&W3._clear)||0));try{if(typeof S!=='undefined'&&S.pz!=null){hh*=Math.max(0,Math.min(1,(S.pz-110)/90));}}catch(e){}this._hissG.gain.value+=(hh-this._hissG.gain.value)*.04;}}catch(e){} },
+    try{this._ensureHiss();if(this._hissG){var hh=(0.016+Math.max(0,Math.min(1,f))*0.03)*(1-0.7*((window.W3&&W3._clear)||0));if(!Snd.mindOn)hh=0;try{if(typeof S!=='undefined'&&S.pz!=null){hh*=Math.max(0,Math.min(1,(S.pz-110)/90));}}catch(e){}this._hissG.gain.value+=(hh-this._hissG.gain.value)*.04;}}catch(e){} },
 
   toggleTapes(){this.tapesOn=!this.tapesOn;this.init();
     {const _b=document.getElementById('tapBtn');if(_b)_b.textContent='KAYITLAR: '+(this.tapesOn?'AÇIK':'KAPALI');}
@@ -3581,10 +3592,112 @@ const Grounding={
     var h='<p style="color:var(--violet);font-size:14.5px;line-height:1.8">'+esc(this._ss[this._si])+'</p><p style="color:var(--dim);font-size:11.5px">'+(tr?'Acele yok; birkaç nefes al, sonra devam et.':'No rush; take a few breaths, then continue.')+'</p><button class="btn v" onclick="Grounding._si++;Grounding._safeStep()">'+(tr?'devam →':'continue →')+'</button>';UI.doc(tr?'🏝 Güvenli Alan — EMDR':'🏝 Safe Place — EMDR',('<div style="max-width:480px">'+h+'</div>'));}
 };
 if(typeof window!=='undefined')window.Grounding=Grounding;
+var Meditation={
+  _open:false,_lineT:null,_audio:null,_li:0,_spot:'solo',
+  _script:function(){var tr=(GAMELANG==='tr');return tr?[
+    'Otur. Bırak bank ağırlığını taşısın — şu an hiçbir şey taşımıyorsun.',
+    'Yavaşça nefes al… ve kendiliğinden çıkmasına izin ver. Nefesi zorlama; sadece izle.',
+    'Sesler gelecek — bir kuş, kendi kalp atışın. Bırak içinden hava gibi geçsinler.',
+    'Burada düzeltilecek bir şey yok. Suyun düzeltilmeye ihtiyacı yok. Senin de yok.',
+    'Bir düşünce geldiğinde onu selamla — “düşünüyorum” — ve usulca nefese dön.',
+    'Altındaki zemini hisset. Teninde havayı hisset. Buradasın. Bu yeterli.',
+    'İstediğin kadar kal. Kıyı seni bekleyecek.'
+  ]:[
+    'Sit. Let the bench take your weight — you are carrying nothing now.',
+    'Breathe in, slowly… and let it leave on its own. Don’t push the breath; just watch it go.',
+    'Sounds will come — a bird, your own heartbeat. Let them pass through you like weather.',
+    'There is nothing to fix here. The water needs no correction. Neither do you.',
+    'When a thought arrives, greet it — ‘thinking’ — and come gently back to the breath.',
+    'Feel the ground beneath you. Feel the air on your skin. You are here. That is enough.',
+    'Stay as long as you wish. The shore will wait for you.'
+  ];},
+  open:function(spot){ var tr=(GAMELANG==='tr'); if(this._open)return; this._open=true; this._spot=spot||'solo';
+    try{ if(window.Game&&Game.setModal)Game.setModal(true); }catch(e){}
+    var ov=document.getElementById('medOverlay');
+    if(!ov){ ov=document.createElement('div'); ov.id='medOverlay'; document.body.appendChild(ov); }
+    ov.setAttribute('style','position:fixed;inset:0;z-index:10050;overflow:hidden;font-family:inherit;background:linear-gradient(180deg,#a9c4e0 0%,#c9d9e8 32%,#8fb6d6 33%,#4f86b8 70%,#2f5e8f 100%);');
+    var attribution=(this._spot==='silvanus');
+    var nameTag=attribution?'<div style="position:absolute;top:18px;left:0;right:0;text-align:center;color:#1d3a52;letter-spacing:.22em;font-size:12px">SILVANUS</div>':'';
+    ov.innerHTML=''+
+      '<style>@keyframes medShim{0%{opacity:.35}50%{opacity:.7}100%{opacity:.35}}@keyframes medBreath{0%{transform:scale(.72);opacity:.5}50%{transform:scale(1.0);opacity:.85}100%{transform:scale(.72);opacity:.5}}@keyframes medFade{0%{opacity:0}12%{opacity:1}82%{opacity:1}100%{opacity:0}}</style>'+
+      nameTag+
+      '<svg viewBox="0 0 800 360" preserveAspectRatio="xMidYMid slice" style="position:absolute;left:0;right:0;bottom:0;width:100%;height:62%;">'+
+        '<g opacity="0.9">'+
+        '<ellipse cx="400" cy="232" rx="118" ry="26" fill="#2c5a3a"/>'+
+        '<path d="M300 232 Q400 150 500 232 Z" fill="#3a6b46"/>'+
+        '<path d="M360 230 L372 188 L384 230 Z" fill="#244d30"/>'+
+        '<path d="M392 232 L406 176 L420 232 Z" fill="#2c5a39"/>'+
+        '<path d="M428 230 L440 190 L452 230 Z" fill="#244d30"/>'+
+        '<rect x="402" y="226" width="6" height="16" fill="#3a2a1c"/>'+
+        '</g>'+
+        '<g style="animation:medShim 7s ease-in-out infinite">'+
+        '<ellipse cx="400" cy="280" rx="150" ry="14" fill="#bfe0ef" opacity="0.5"/>'+
+        '<ellipse cx="250" cy="320" rx="120" ry="10" fill="#cfeaf5" opacity="0.4"/>'+
+        '<ellipse cx="560" cy="330" rx="120" ry="10" fill="#cfeaf5" opacity="0.4"/>'+
+        '</g>'+
+      '</svg>'+
+      '<div id="medOrb" style="position:absolute;left:50%;top:30%;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.9),rgba(180,215,240,.35) 60%,rgba(180,215,240,0));animation:medBreath 10s ease-in-out infinite;"></div>'+
+      '<div id="medText" style="position:absolute;left:8%;right:8%;top:54%;text-align:center;color:#15324a;font-size:clamp(15px,2.4vw,21px);line-height:1.6;text-shadow:0 1px 6px rgba(255,255,255,.5);max-width:640px;margin:0 auto;"></div>'+
+      '<div id="medEnter" style="position:absolute;left:0;right:0;top:60%;text-align:center;">'+
+        '<div style="color:#15324a;font-size:clamp(15px,2.6vw,22px);margin-bottom:18px;text-shadow:0 1px 6px rgba(255,255,255,.5)">'+(tr?'kıyı. hazır olduğunda içeri gir.':'the shore. step in when you are ready.')+'</div>'+
+        '<button id="medEnterBtn" style="background:rgba(255,255,255,.82);border:1px solid rgba(21,50,74,.4);color:#15324a;padding:11px 26px;border-radius:24px;font-size:16px;cursor:pointer;letter-spacing:.05em">◯ '+(tr?'İçeri gir':'Step in')+'</button>'+
+      '</div>'+
+      '<button id="medEndBtn" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.7);border:1px solid rgba(21,50,74,.4);color:#15324a;padding:8px 16px;border-radius:20px;font-size:14px;cursor:pointer">✕ '+(tr?'Bitir':'End')+'</button>';
+    ov.style.display='block';
+    var self=this;
+    var enterBtn=document.getElementById('medEnterBtn');
+    if(enterBtn)enterBtn.onclick=function(){ var en=document.getElementById('medEnter'); if(en)en.style.display='none'; self._startGuided(); };
+    var endBtn=document.getElementById('medEndBtn');
+    if(endBtn)endBtn.onclick=function(){ self.end(); };
+    this._keyH=function(e){ if(e.key==='Escape'||e.keyCode===27){ self.end(); } };
+    document.addEventListener('keydown',this._keyH,true);
+  },
+  _startGuided:function(){ var self=this; this._li=0; this._showLine();
+    this._lineT=setInterval(function(){ self._li=(self._li+1)%self._script().length; self._showLine(); },10000);
+    this._startAudio();
+  },
+  _showLine:function(){ var tx=document.getElementById('medText'); if(!tx)return; var lines=this._script(); var attribution=(this._spot==='silvanus');
+    var raw=lines[this._li]; var html=attribution?('<span style="color:#1d3a52;letter-spacing:.1em;font-size:.8em">SILVANUS — </span>'+raw):raw;
+    tx.style.animation='none'; void tx.offsetWidth; tx.innerHTML=html; tx.style.animation='medFade 10s ease-in-out';
+  },
+  _startAudio:function(){ try{
+    if(!(window.Snd&&Snd.on))return;
+    Snd.init(); var ac=Snd.ac; if(!ac)return; try{if(ac.state==='suspended')ac.resume();}catch(e){}
+    var out=ac.createGain(); out.gain.value=0; out.connect(Snd.master||ac.destination);
+    out.gain.setValueAtTime(0,ac.currentTime); out.gain.linearRampToValueAtTime(1,ac.currentTime+3.5);
+    var pack={out:out,osc:[],els:[],birdT:null};
+    var padG=ac.createGain(); padG.gain.value=0.05; padG.connect(out);
+    [[110,0,'sine'],[110.6,5,'sine'],[164.8,-4,'triangle']].forEach(function(d){ var o=ac.createOscillator(); o.type=d[2]; o.frequency.value=d[0]; o.detune.value=d[1];
+      var g=ac.createGain(); g.gain.value=0.05; o.connect(g); g.connect(padG); o.start(); pack.osc.push(o); });
+    var swell=ac.createOscillator(); swell.frequency.value=0.05; var swg=ac.createGain(); swg.gain.value=0.04; swell.connect(swg); swg.connect(padG.gain); swell.start(); pack.osc.push(swell);
+    var bird=ac.createOscillator(); bird.type='sine'; bird.frequency.value=2400; var bbp=ac.createBiquadFilter(); bbp.type='bandpass'; bbp.frequency.value=2600; bbp.Q.value=3; var birdG=ac.createGain(); birdG.gain.value=0; bird.connect(bbp); bbp.connect(birdG); birdG.connect(out); bird.start(); pack.osc.push(bird);
+    pack.birdT=setInterval(function(){ try{ var n=ac.currentTime; var base=2100+Math.random()*1000; for(var q=0;q<3;q++){ var tt=n+q*0.16; bird.frequency.setValueAtTime(base,tt); bird.frequency.linearRampToValueAtTime(base+260,tt+0.08);} birdG.gain.cancelScheduledValues(n); birdG.gain.setValueAtTime(0,n); birdG.gain.linearRampToValueAtTime(0.05,n+0.05); birdG.gain.linearRampToValueAtTime(0,n+0.5);}catch(e){} },2600+Math.random()*1800);
+    var files=[['freesound_community-breathing-6811.mp3',0.13],['freesound_community-ear-ring-104945.mp3',0.10],['soundreality-heart-beat-137135.mp3',0.13]];
+    files.forEach(function(f){ try{ var el=new Audio(Snd.SFX_BASE+f[0]); el.crossOrigin='anonymous'; el.loop=true; el.preload='auto';
+      var src=ac.createMediaElementSource(el); var g=ac.createGain(); g.gain.value=f[1]; src.connect(g); g.connect(out); el.play().catch(function(){}); pack.els.push(el);
+    }catch(e){} });
+    this._audio=pack;
+  }catch(e){} },
+  _stopAudio:function(){ try{
+    var pack=this._audio; if(!pack)return; this._audio=null;
+    var ac=(window.Snd&&Snd.ac)||null;
+    if(pack.birdT){clearInterval(pack.birdT);}
+    if(ac&&pack.out){ try{ var n=ac.currentTime; pack.out.gain.cancelScheduledValues(n); pack.out.gain.setValueAtTime(pack.out.gain.value,n); pack.out.gain.linearRampToValueAtTime(0,n+1.8);}catch(e){} }
+    setTimeout(function(){ try{ (pack.osc||[]).forEach(function(o){try{o.stop();}catch(e){}}); }catch(e){} try{ (pack.els||[]).forEach(function(el){try{el.pause();el.src='';}catch(e){}}); }catch(e){} try{if(pack.out)pack.out.disconnect();}catch(e){} },2000);
+  }catch(e){} },
+  end:function(){ if(!this._open)return; this._open=false;
+    try{ if(this._lineT){clearInterval(this._lineT);this._lineT=null;} }catch(e){}
+    try{ if(this._keyH){document.removeEventListener('keydown',this._keyH,true);this._keyH=null;} }catch(e){}
+    this._stopAudio();
+    var ov=document.getElementById('medOverlay'); if(ov){ ov.style.transition='opacity .6s'; ov.style.opacity='0'; setTimeout(function(){ try{ov.style.display='none';ov.style.opacity='1';ov.innerHTML='';}catch(e){} },650); }
+    try{ if(window.Game&&Game.setModal)Game.setModal(false); }catch(e){}
+  }
+};
+if(typeof window!=='undefined')window.Meditation=Meditation;
 function stageNow(){var ch=0;try{if(window.House&&House.cur&&House.cur.ch)ch=House.cur.ch;}catch(e){}try{if(!ch&&window.Quest&&Quest.curCh)ch=Quest.curCh();}catch(e){}ch=ch||1;var realm='';try{for(var i=0;i<REALMS.length;i++){if(ch>=REALMS[i].ch[0]&&ch<=REALMS[i].ch[1]){realm=(REALMS[i].n&&(REALMS[i].n.tr||REALMS[i].n.en))||'';break;}}}catch(e){}var loc='';try{if(typeof P!=='undefined'&&isFinite(P.px)&&typeof L!=='undefined'){var best=null,bd=1e18;for(var k in L){var e=L[k];if(!e||e.x===undefined)continue;var dx=P.px-e.x,dz=P.pz-e.z,d=dx*dx+dz*dz;if(d<bd){bd=d;best=e;}}if(best&&Math.sqrt(bd)<((best.r||10)+16))loc=String(best.name||'').replace(/^THE\s+/i,'');}}catch(e){}return {ch:ch,realm:realm,loc:loc};}
 function track(a){try{var st=stageNow();fetch('https://it041-konsey.lunarisbahal.workers.dev/activity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mask:travelerName(),act:a,ch:st.ch,realm:st.realm,loc:st.loc,op:(typeof Mirror!=='undefined'&&Mirror.isOp&&Mirror.isOp())})});}catch(e){}}
 var _zlast='';try{setInterval(function(){try{if(window.Game&&Game.modal)return;var iv=document.getElementById('intro');if(iv&&iv.offsetParent!==null)return;if(typeof P==='undefined'||!isFinite(P.px)||typeof L==='undefined')return;var best=null,bd=1e18;for(var k in L){var e=L[k];if(!e||e.x===undefined)continue;var dx=P.px-e.x,dz=P.pz-e.z,d=dx*dx+dz*dz;if(d<bd){bd=d;best=e;}}if(best&&Math.sqrt(bd)<((best.r||10)+16)){var lab=String(best.name||'').replace(/^THE\s+/i,'');if(lab&&lab!==_zlast){_zlast=lab;track(lab.toLowerCase()+' bolgesinde dolasiyor');}}}catch(e){}},25000);}catch(e){}
-const SoundUI={show(){UI.doc('🔊 SES','<p style="color:var(--dim);font-size:12px">Tüm sesler tek yerde — müzik, ortam, radyo, kaset cızırtısı. İstediğini aç/kapat.</p>'+'<button class="btn" id="muzBtn" onclick="Music.toggle()">🎵 MÜZİK: '+(Music.on?'AÇIK':'KAPALI')+'</button>'+'<button class="btn" id="sndBtn" onclick="Snd.toggle()">SES: '+(Snd.on?'AÇIK':'KAPALI')+'</button>'+'<button class="btn" id="radBtn" onclick="Snd.toggleRadio()">RADYO: '+(Snd.radioOn?'AÇIK':'KAPALI')+'</button>'+'<button class="btn" id="tapBtn" onclick="Snd.toggleTapes()">KAYITLAR: '+(Snd.tapesOn?'AÇIK':'KAPALI')+'</button>');}};
+const SoundUI={show(){UI.doc('🔊 SES','<p style="color:var(--dim);font-size:12px">Tüm sesler tek yerde — müzik, ortam, radyo, kaset cızırtısı. İstediğini aç/kapat.</p>'+'<button class="btn" id="muzBtn" onclick="Music.toggle()">🎵 MÜZİK: '+(Music.on?'AÇIK':'KAPALI')+'</button>'+'<button class="btn" id="sndBtn" onclick="Snd.toggle()">SES: '+(Snd.on?'AÇIK':'KAPALI')+'</button>'+'<button class="btn" id="radBtn" onclick="Snd.toggleRadio()">RADYO: '+(Snd.radioOn?'AÇIK':'KAPALI')+'</button>'+'<button class="btn" id="tapBtn" onclick="Snd.toggleTapes()">KAYITLAR: '+(Snd.tapesOn?'AÇIK':'KAPALI')+'</button>'+'<button class="btn" id="bodBtn" onclick="Snd.toggleBody()">'+(GAMELANG==='tr'?'\ud83e\udec1 V\u00fccut sesleri: ':'\ud83e\udec1 Body sounds: ')+(Snd.bodyOn?(GAMELANG==='tr'?'A\u00c7IK':'ON'):(GAMELANG==='tr'?'KAPALI':'OFF'))+'</button>'+'<button class="btn" id="ambBtn" onclick="Snd.toggleAmbient()">'+(GAMELANG==='tr'?'\ud83c\udf27 Ortam sesleri: ':'\ud83c\udf27 Ambient sounds: ')+(Snd.ambientOn?(GAMELANG==='tr'?'A\u00c7IK':'ON'):(GAMELANG==='tr'?'KAPALI':'OFF'))+'</button>'+'<button class="btn" id="mndBtn" onclick="Snd.toggleMind()">'+(GAMELANG==='tr'?'\ud83e\udde0 Zihin sesleri: ':'\ud83e\udde0 Mind sounds: ')+(Snd.mindOn?(GAMELANG==='tr'?'A\u00c7IK':'ON'):(GAMELANG==='tr'?'KAPALI':'OFF'))+'</button>');}};
 
 const GAMELANG='tr';
 const CHTITLES=[{tr:"YAŞAMIN KARA DELİKLERİ",en:"THE BLACK HOLES OF LIFE"},{tr:"BEYAZ KUTU",en:"WHITE BOX"},{tr:"ÖZGÜR İRADE",en:"FREE WILL"},{tr:"İLK TEMAS",en:"FIRST CONTACT"},{tr:"MERAK",en:"CURIOSITY"},{tr:"YENİ AY",en:"NEW MOON"},{tr:"KORKU, ÖFKE ve GÜVEN",en:"FEAR, ANGER, AND TRUST"},{tr:"YAŞANMIŞ GELECEK",en:"THE FUTURE THAT HAS BEEN LIVED"},{tr:"KONTROLDE KALMALIYIM",en:"I MUST STAY IN CONTROL"},{tr:"@ SUPEREGO3422",en:"@ SUPEREGO3422"},{tr:"@ 13microp",en:"@13microp"},{tr:"EVREKA!",en:"EUREKA!"},{tr:"TEŞEKKÜRLER PSİKOLOG",en:"THANKS, SHRINK"},{tr:"TAKIM ARKADAŞLIĞI",en:"TEAMWORK"},{tr:"7 MART",en:"7 MARCH"},{tr:"ARAMAYA DEVAM",en:"CONTINUING THE SEEKING"},{tr:"İSİMSİZ",en:"UNTITLED"},{tr:"BABAM",en:"MY FATHER"},{tr:"ANLAM VE PSİKOLOJİ",en:"THE MEANING AND THE PSYCHOLOGY"},{tr:"MÜCADELE VS TESLİMİYET",en:"STRUGGLE VS SURRENDER"},{tr:"HAYAL EDEBİLMEK",en:"TO DREAM"},{tr:"ASKIDA",en:"ON HOLD"},{tr:"KAYIP UZAYLI",en:"THE LOST ALIEN"},{tr:"RUH SAĞLIĞI TİCARETİ",en:"THE MENTAL HEALTH MARKET"},{tr:"MÜKEMMEL BİR BAŞLANGIÇ",en:"A PERFECT START"},{tr:"ÖFKE VE ÖZGÜR İRADE",en:"ANGER AND FREE WILL"},{tr:"ANKARA’YA DENİZ GETİRECEĞİM!",en:"I WILL BRING THE SEA TO ANKARA!"},{tr:"GÜZEL ÇOCUK",en:"THE BEAUTIFUL CHILD"},{tr:"SADELEŞMEK",en:"SIMPLIFYING"},{tr:"SEVGİ KONAKLARI",en:"MANSIONS OF LOVE"},{tr:"SINIRDA GEZİNMEK",en:"WANDERING THE BORDER"},{tr:"O’NA ULAŞMAK VE KALMAK",en:"TO REACH “HIM” AND REMAIN"},{tr:"ZİHİNSEL AÇLIK",en:"MENTAL HUNGER"},{tr:"ESTETİK DÜŞÜŞ",en:"AESTHETIC COLLAPSE"},{tr:"TEŞEKKÜR EDERİM",en:"THANK YOU"},{tr:"AMOR FATİ",en:"AMOR FATI"},{tr:"ŞÜPHE, HUZUR VE GÜVEN",en:"DOUBT, PEACE, AND CONFIDENCE"},{tr:"YERDEN KALKIYORUM",en:"I AM RISING FROM THE GROUND"},{tr:"YARIM AY",en:"HALF MOON"},{tr:"VETERİNERDEKİ KEDİLER",en:"CATS AT THE VETERINARY CLINIC"},{tr:"YIKMADAN YAPAMAZSIN",en:"YOU CAN'T BUILD WITHOUT DESTROYING"},{tr:"SINAV SORULARI",en:"EXAM QUESTIONS"},{tr:"PARANOYA BİLGELİĞİ",en:"WISDOM OF PARANOIA"},{tr:"KAHRAMAN MI KURBAN MI?",en:"HERO OR VICTIM?"},{tr:"GÜÇLÜ AY",en:"POWERFUL MOON"},{tr:"KARADELİĞİ ANLAMAK",en:"UNDERSTANDING THE BLACK HOLE"},{tr:"UYANIŞ",en:"AWAKENING"},{tr:"TEFEKKÜR",en:"TEFEKKUR"},{tr:"DOLUNAY",en:"FULL MOON"}];
@@ -5194,6 +5307,32 @@ if(HAS3D)(function(){
     box(1.6,2.6,.2,std(0x444c60,{roughness:.1,metalness:.9,emissive:0x222c44,emissiveIntensity:.4}),L.maskMirror.x,1.6,L.maskMirror.z);
     for(let i=0;i<3;i++)maskWall.push(box(.7,.9,.12,std(0x33291a,{emissive:0x8a7434,emissiveIntensity:.2}),L.maskMirror.x-2.2+i*1.1,2.2,L.maskMirror.z+.4,0,scene,false));
   })();
+
+  /* ---- MEDITATION SPOTS (b92) — visual-only, non-trapping ---- */
+  (function(){ try{
+    var bx=L.medbench.x, bz=L.medbench.z;
+    var disc=new THREE.Mesh(new THREE.CircleGeometry(3.6,28),new THREE.MeshStandardMaterial({color:0x2a3550,emissive:0x9fc0ff,emissiveIntensity:.5,roughness:.9,transparent:true,opacity:.85}));
+    disc.rotation.x=-Math.PI/2;disc.position.set(bx,0.06,bz);scene.add(disc);
+    box(2.6,.25,.9,std(0x4a3a28,{roughness:.8}),bx,.55,bz,0,scene,false);
+    box(.25,.55,.8,std(0x3a2c1e,{roughness:.85}),bx-1.05,.28,bz,0,scene,false);
+    box(.25,.55,.8,std(0x3a2c1e,{roughness:.85}),bx+1.05,.28,bz,0,scene,false);
+    box(2.6,.7,.16,std(0x4a3a28,{roughness:.8}),bx,1.0,bz-.36,0,scene,false);
+    var mlt=new THREE.PointLight(0x9fc0ff,.6,16,2);mlt.position.set(bx,3.0,bz);scene.add(mlt);
+    label((GAMELANG==='tr'?'☾ meditasyon bankı':'☾ meditation bench'),bx,bz,2.6,.6);
+
+    var px=L.medpark.x, pz=L.medpark.z;
+    var pond=new THREE.Mesh(new THREE.PlaneGeometry(12,12),new THREE.MeshStandardMaterial({color:0x6fa8d8,transparent:true,opacity:.7,roughness:.25,metalness:.2,emissive:0x274a66,emissiveIntensity:.18}));
+    pond.rotation.x=-Math.PI/2;pond.position.set(px,0.06,pz+2.4);scene.add(pond);
+    box(2.6,.25,.9,std(0x6b5b42,{roughness:.8}),px,.55,pz-3.4,0,scene,false);
+    box(.25,.55,.8,std(0x55452f,{roughness:.85}),px-1.05,.28,pz-3.4,0,scene,false);
+    box(.25,.55,.8,std(0x55452f,{roughness:.85}),px+1.05,.28,pz-3.4,0,scene,false);
+    box(2.6,.7,.16,std(0x6b5b42,{roughness:.8}),px,1.0,pz-3.76,0,scene,false);
+    function _tree(tx,tz){box(.4,2.4,.4,std(0x5a4632,{roughness:.9}),tx,1.2,tz,0,scene,false);
+      var cr=new THREE.Mesh(new THREE.SphereGeometry(1.5,10,8),std(0x3f7a4a,{roughness:.95,emissive:0x183a1e,emissiveIntensity:.12}));cr.position.set(tx,2.9,tz);scene.add(cr);}
+    _tree(px-5,pz-1);_tree(px+5,pz+1);
+    for(var ri=0;ri<5;ri++){box(.1,1.0+(ri%3)*.3,.1,std(0x4f7a3a,{roughness:.9}),px-4+ri*.5,.6,pz+5.8,0,scene,false);}
+    label((GAMELANG==='tr'?'❀ huzur göleti':'❀ calm pond'),px,pz,2.6,.6);
+  }catch(e){} })();
 
   /* ---- SHADOW-WORK LANDMARKS (council features, world-integrated · [E] to trigger) ---- */
   (function(){
@@ -6987,7 +7126,7 @@ if(HAS3D)(function(){
       moonLight.color.setHSL(.6-.07*sun,.45,.75+.06*sun);
       hemi.intensity=ph.hemi*(1-sun)+.85*sun;
       scene.fog.density=ph.fog*(1-sun)+.0035*sun;
-      var _p=(window.W3&&W3._clear)||0;var _front=110+_p*230;var _df=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:150)-_front)/110));moonLight.intensity*=(1-0.97*_df);hemi.intensity*=(1-0.95*_df);scene.fog.density*=(1+14*_df);moonLight.intensity+=0.45*_p;hemi.intensity+=0.40*_p;scene.fog.density*=(1-0.5*_p);rimLight.intensity=0.12+0.85*_p;try{var _nf=Math.max(0,Math.min(1,(110-((typeof S!=='undefined'&&S.pz!=null)?S.pz:120))/110));if(_nf===_nf){hemi.intensity+=1.1*_nf;moonLight.intensity+=0.6*_nf;}}catch(e){}
+      var _p=(window.W3&&W3._clear)||0;var _front=110+_p*230;var _df=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:150)-_front)/110));moonLight.intensity*=(1-0.97*_df);hemi.intensity*=(1-0.95*_df);scene.fog.density*=(1+14*_df);moonLight.intensity+=0.45*_p;hemi.intensity+=0.40*_p;scene.fog.density*=(1-0.5*_p);rimLight.intensity=0.12+0.85*_p;try{var _nf=Math.max(0,Math.min(1,(110-((typeof S!=='undefined'&&S.pz!=null)?S.pz:120))/110));if(_nf===_nf){hemi.intensity+=1.25*_nf;moonLight.intensity+=0.6*_nf;}}catch(e){}
       skyU.top.value.setRGB(.012+.18*sun,.016+.34*sun,.047+.55*sun);
       skyU.mid.value.setRGB(.039+.42*sun,.075+.55*sun,.149+.62*sun);
       skyU.bot.value.setRGB(.078+.72*sun,.122+.62*sun,.22+.45*sun);
@@ -7316,8 +7455,8 @@ if(HAS3D)(function(){
     }
     /* radyo yakınlık sesi */
     Snd.setProx&&Snd.setProx(Math.hypot(S.px-L.radio.x,S.pz-L.radio.z));
-    try{var _FP=[[310,262],[150,168],[300,300],[95,288],[330,250],[280,285]],_CP=[[268,255],[372,150],[150,34],[150,120]],_fa=0,_ca=0,_k;for(_k=0;_k<_FP.length;_k++)_fa=Math.max(_fa,1-Math.hypot(S.px-_FP[_k][0],S.pz-_FP[_k][1])/46);for(_k=0;_k<_CP.length;_k++)_ca=Math.max(_ca,1-Math.hypot(S.px-_CP[_k][0],S.pz-_CP[_k][1])/46);var _ba=1-Math.hypot(S.px-338,S.pz-196)/40;var _pz=(window.W3&&W3._clear)||0;_ba=Math.max(_ba,0.2*_pz);try{if(S.pz<110){var _nbird=Math.max(0,Math.min(1,(110-S.pz)/80));_ba=Math.max(_ba,0.55+0.45*_nbird);}}catch(e){}Snd.setZoneAmb&&Snd.setZoneAmb(_fa,_ca,_ba);}catch(e){}
-    try{if(Snd.on){if(!Snd._traumaPts){Snd._traumaPts=[{x:305,z:300,type:'nightforest',_t:0},{x:120,z:285,type:'nightforest',_t:0},{x:330,z:250,type:'howl',_t:0},{x:90,z:262,type:'howl',_t:0},{x:300,z:238,type:'howl',_t:0},{x:312,z:286,type:'owl',_t:0},{x:160,z:255,type:'owl',_t:0},{x:350,z:272,type:'owl',_t:0},{x:300,z:270,type:'cry',_t:0},{x:330,z:255,type:'cry',_t:0},{x:285,z:285,type:'cry',_t:0},{x:310,z:262,type:'cry',_t:0},{x:268,z:248,type:'cry',_t:0},{x:322,z:292,type:'cry',_t:0},{x:200,z:230,type:'cry',_t:0},{x:120,z:200,type:'cry',_t:0},{x:60,z:170,type:'cry',_t:0},{x:265,z:250,type:'childcry',_t:0},{x:340,z:278,type:'childcry',_t:0},{x:295,z:248,type:'childcry',_t:0},{x:250,z:285,type:'childcry',_t:0},{x:315,z:290,type:'childcry',_t:0},{x:288,z:262,type:'childcry',_t:0},{x:150,z:215,type:'childcry',_t:0},{x:300,z:290,type:'dish',_t:0},{x:260,z:260,type:'dish',_t:0},{x:330,z:268,type:'dish',_t:0},{x:285,z:245,type:'dish',_t:0},{x:312,z:255,type:'dish',_t:0},{x:255,z:295,type:'dish',_t:0},{x:180,z:230,type:'dish',_t:0},{x:90,z:185,type:'dish',_t:0},{x:305,z:265,type:'scream',_t:0},{x:320,z:282,type:'scream',_t:0},{x:270,z:255,type:'scream',_t:0},{x:295,z:290,type:'scream',_t:0},{x:250,z:240,type:'scream',_t:0},{x:340,z:255,type:'scream',_t:0},{x:282,z:298,type:'scream',_t:0},{x:160,z:210,type:'scream',_t:0},{x:310,z:240,type:'argue',_t:0},{x:280,z:280,type:'argue',_t:0},{x:255,z:270,type:'argue',_t:0},{x:300,z:295,type:'argue',_t:0},{x:200,z:200,type:'argue',_t:0},{x:110,z:160,type:'argue',_t:0},{x:60,z:155,type:'whisper',_t:0},{x:140,z:170,type:'whisper',_t:0},{x:210,z:160,type:'whisper',_t:0},{x:280,z:175,type:'whisper',_t:0},{x:340,z:165,type:'whisper',_t:0},{x:30,z:185,type:'whisper',_t:0},{x:170,z:205,type:'whisper',_t:0},{x:230,z:220,type:'whisper',_t:0},{x:355,z:195,type:'whisper',_t:0},{x:110,z:210,type:'whisper',_t:0},{x:200,z:270,type:'whisper',_t:0},{x:300,z:255,type:'whisper',_t:0},{x:90,z:240,type:'whisper',_t:0},{x:330,z:230,type:'whisper',_t:0},{x:120,z:255,type:'laugh',_t:0},{x:240,z:160,type:'laugh',_t:0},{x:320,z:210,type:'laugh',_t:0},{x:300,z:190,type:'city',_t:0},{x:268,z:255,type:'city',_t:0},{x:372,z:150,type:'city',_t:0},{x:305,z:280,type:'mancry',_t:0},{x:330,z:265,type:'mancry',_t:0},{x:282,z:292,type:'mancry',_t:0},{x:265,z:258,type:'mancry',_t:0},{x:200,z:225,type:'mancry',_t:0},{x:315,z:272,type:'womancry',_t:0},{x:290,z:288,type:'womancry',_t:0},{x:340,z:258,type:'womancry',_t:0},{x:255,z:278,type:'womancry',_t:0},{x:150,z:210,type:'womancry',_t:0},{x:300,z:300,type:'storm',_t:0},{x:340,z:290,type:'storm',_t:0},{x:260,z:295,type:'storm',_t:0},{x:310,z:275,type:'storm',_t:0},{x:285,z:255,type:'storm',_t:0},{x:200,z:248,type:'storm',_t:0},{x:330,z:300,type:'scream',_t:0},{x:275,z:300,type:'scream',_t:0},{x:300,z:282,type:'cry',_t:0},{x:345,z:295,type:'cry',_t:0},{x:262,z:288,type:'childcry',_t:0},{x:325,z:300,type:'childcry',_t:0},{x:290,z:300,type:'mancry',_t:0},{x:340,z:285,type:'womancry',_t:0},{x:305,z:298,type:'dish',_t:0},{x:255,z:300,type:'dish',_t:0},{x:280,z:300,type:'whisper',_t:0},{x:330,z:285,type:'whisper',_t:0},{x:300,z:296,type:'howl',_t:0},{x:130,z:280,type:'howl',_t:0},{x:345,z:300,type:'owl',_t:0},{x:270,z:292,type:'owl',_t:0},{x:200,z:290,type:'nightforest',_t:0},{x:330,z:295,type:'nightforest',_t:0},{x:295,z:300,type:'argue',_t:0},{x:250,z:255,type:'city',_t:0},{x:315,z:268,type:'scream',_t:0},{x:288,z:278,type:'cry',_t:0},{x:340,z:272,type:'mancry',_t:0},{x:300,z:284,type:'whisper',_t:0},{x:265,z:300,type:'cry',_t:0},{x:320,z:290,type:'childcry',_t:0},{x:295,z:268,type:'scream',_t:0},{x:275,z:282,type:'dish',_t:0}];Snd._traumaLast=0;}_sfxChk+=dt;if(_sfxChk>0.3){_sfxChk=0;var _bP=(window.W3&&W3._clear)||0;try{if(Snd.on&&typeof S!=='undefined'&&S.pz<110&&!((window.Game&&Game.modal)||(window.W3&&W3.inInterior))){var _hnow=(typeof performance!=='undefined'?performance.now():Date.now())/1000;if(Snd._hornNext==null)Snd._hornNext=_hnow+6+Math.random()*6;if(_hnow>=Snd._hornNext){if(Snd.carHorn)Snd.carHorn();Snd._hornNext=_hnow+6+Math.random()*6;}}}catch(e){}var _bFront=110+_bP*230;var _bDf=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:120)-_bFront)/110));var _bSilv=(typeof L!=='undefined'&&L&&L.caravan)?Math.hypot(S.px-L.caravan.x,S.pz-L.caravan.z):1e9;var _bMute=((window.Game&&Game.modal)||(window.W3&&W3.inInterior)||_bSilv<24);try{if(Snd._beds){var _Spz=(typeof S!=='undefined'&&S.pz!=null)?S.pz:120;var _nf2=Math.max(0,Math.min(1,(110-_Spz)/110));var _df2=Math.max(0,Math.min(1,(_Spz-110)/170));for(var _bbk in Snd._beds){if(!Snd._beds.hasOwnProperty(_bbk))continue;var _bb=Snd._beds[_bbk];var _btgt;var _bmd=_bb.mode||'df';if(_bmd==='earring'){_btgt=0.10+0.32*_nf2;}else if(_bmd==='breath'){_btgt=_bMute?0:(0.10+0.20*_df2);try{_bb.el.playbackRate=1.0+0.7*_df2;}catch(e){}}else if(_bmd==='heart'){_btgt=_bMute?0:(0.34*_df2);try{_bb.el.playbackRate=1.0+0.55*_df2;}catch(e){}}else if(_bmd==='nf'){_btgt=_bMute?0:_bb.base*_nf2;}else{_btgt=_bMute?0:_bb.base*_bDf*(1-0.45*_bP);}_bb.cur+=(_btgt-_bb.cur)*0.04;if(_bb.cur<0)_bb.cur=0;if(_bb.cur>1)_bb.cur=1;if(_btgt>0.02){if(_bb.el.paused){try{var _bpp=_bb.el.play();if(_bpp&&_bpp.catch)_bpp.catch(function(){});}catch(e){}}try{_bb.el.volume=Math.max(0,Math.min(1,_bb.cur));}catch(e){}}else{try{_bb.el.volume=Math.max(0,Math.min(1,_bb.cur));}catch(e){}if(_bb.cur<=0.01&&!_bb.el.paused){try{_bb.el.pause();}catch(e){}}}}}}catch(e){}if((window.Game&&Game.modal)||(window.W3&&W3.inInterior)){try{if(Snd._stormBed){Snd._stormBed.volume=Math.max(0,Snd._stormBed.volume-0.04);if(Snd._stormBed.volume<=0.001){Snd._stormBed.pause();}}}catch(e){}}else{var _now=(typeof performance!=='undefined'?performance.now():Date.now())/1000;var _ds=(typeof S!=='undefined'&&S.pz>240);var _gap=_ds?2.5:4;var _cd=_ds?12:20;var _rad=_ds?18:14;var _p=(window.W3&&W3._clear)||0;var _front=110+_p*230;var _df=Math.max(0,Math.min(1,(S.pz-_front)/110));var _gateOff={};if(_p>=0.14)_gateOff.city=1;if(_p>=0.28)_gateOff.argue=1;if(_p>=0.42)_gateOff.dish=1;if(_p>=0.56){_gateOff.mancry=1;_gateOff.womancry=1;}if(_p>=0.70)_gateOff.childcry=1;if(_p>=0.82)_gateOff.scream=1;if(_p>=0.92)_gateOff.cry=1;if(_p>=0.96)_gateOff.whisper=1;if(_p>=0.60)_gateOff.nightforest=1;if(_p>=0.78)_gateOff.howl=1;if(_p>=0.88)_gateOff.owl=1;var _silv=(L&&L.caravan)?Math.hypot(S.px-L.caravan.x,S.pz-L.caravan.z):1e9;if(_silv<24){try{Snd.setZoneAmb&&Snd.setZoneAmb(0,0,1);}catch(e){}}if(!(_df<=0.04||_silv<24)&&_now-Snd._traumaLast>_gap){var _bp=null,_bd=1e9;for(var _ti=0;_ti<Snd._traumaPts.length;_ti++){var _pp=Snd._traumaPts[_ti];if(_gateOff[_pp.type])continue;var _dd=Math.hypot(S.px-_pp.x,S.pz-_pp.z);if(_dd<_rad&&_dd<_bd&&_now-_pp._t>_cd){_bd=_dd;_bp=_pp;}}if(_bp){try{var _cv=(_bp.type==='city'?0.14:(_bp.type==='argue'?0.16:(_bp.type==='whisper'?0.30:(_bp.type==='storm'?0.40:0.42))));var _vol=Math.min(0.6,_cv*(0.35+0.9*_df)*(1-0.4*_p));Snd.playSfx(_bp.type,_vol);}catch(e){}_bp._t=_now;Snd._traumaLast=_now;}}}}}}catch(e){}
+    try{var _FP=[[310,262],[150,168],[300,300],[95,288],[330,250],[280,285]],_CP=[[268,255],[372,150],[150,34],[150,120]],_fa=0,_ca=0,_k;for(_k=0;_k<_FP.length;_k++)_fa=Math.max(_fa,1-Math.hypot(S.px-_FP[_k][0],S.pz-_FP[_k][1])/46);for(_k=0;_k<_CP.length;_k++)_ca=Math.max(_ca,1-Math.hypot(S.px-_CP[_k][0],S.pz-_CP[_k][1])/46);var _ba=1-Math.hypot(S.px-338,S.pz-196)/40;var _pz=(window.W3&&W3._clear)||0;_ba=Math.max(_ba,0.2*_pz);try{if(S.pz<110){var _nbird=Math.max(0,Math.min(1,(110-S.pz)/80));_ba=Math.max(_ba,0.55+0.45*_nbird);}}catch(e){}if(!Snd.ambientOn){_fa=0;_ca=0;_ba=0;}Snd.setZoneAmb&&Snd.setZoneAmb(_fa,_ca,_ba);}catch(e){}
+    try{if(Snd.on){if(!Snd._traumaPts){Snd._traumaPts=[{x:305,z:300,type:'nightforest',_t:0},{x:120,z:285,type:'nightforest',_t:0},{x:330,z:250,type:'howl',_t:0},{x:90,z:262,type:'howl',_t:0},{x:300,z:238,type:'howl',_t:0},{x:312,z:286,type:'owl',_t:0},{x:160,z:255,type:'owl',_t:0},{x:350,z:272,type:'owl',_t:0},{x:300,z:270,type:'cry',_t:0},{x:330,z:255,type:'cry',_t:0},{x:285,z:285,type:'cry',_t:0},{x:310,z:262,type:'cry',_t:0},{x:268,z:248,type:'cry',_t:0},{x:322,z:292,type:'cry',_t:0},{x:200,z:230,type:'cry',_t:0},{x:120,z:200,type:'cry',_t:0},{x:60,z:170,type:'cry',_t:0},{x:265,z:250,type:'childcry',_t:0},{x:340,z:278,type:'childcry',_t:0},{x:295,z:248,type:'childcry',_t:0},{x:250,z:285,type:'childcry',_t:0},{x:315,z:290,type:'childcry',_t:0},{x:288,z:262,type:'childcry',_t:0},{x:150,z:215,type:'childcry',_t:0},{x:300,z:290,type:'dish',_t:0},{x:260,z:260,type:'dish',_t:0},{x:330,z:268,type:'dish',_t:0},{x:285,z:245,type:'dish',_t:0},{x:312,z:255,type:'dish',_t:0},{x:255,z:295,type:'dish',_t:0},{x:180,z:230,type:'dish',_t:0},{x:90,z:185,type:'dish',_t:0},{x:305,z:265,type:'scream',_t:0},{x:320,z:282,type:'scream',_t:0},{x:270,z:255,type:'scream',_t:0},{x:295,z:290,type:'scream',_t:0},{x:250,z:240,type:'scream',_t:0},{x:340,z:255,type:'scream',_t:0},{x:282,z:298,type:'scream',_t:0},{x:160,z:210,type:'scream',_t:0},{x:310,z:240,type:'argue',_t:0},{x:280,z:280,type:'argue',_t:0},{x:255,z:270,type:'argue',_t:0},{x:300,z:295,type:'argue',_t:0},{x:200,z:200,type:'argue',_t:0},{x:110,z:160,type:'argue',_t:0},{x:60,z:155,type:'whisper',_t:0},{x:140,z:170,type:'whisper',_t:0},{x:210,z:160,type:'whisper',_t:0},{x:280,z:175,type:'whisper',_t:0},{x:340,z:165,type:'whisper',_t:0},{x:30,z:185,type:'whisper',_t:0},{x:170,z:205,type:'whisper',_t:0},{x:230,z:220,type:'whisper',_t:0},{x:355,z:195,type:'whisper',_t:0},{x:110,z:210,type:'whisper',_t:0},{x:200,z:270,type:'whisper',_t:0},{x:300,z:255,type:'whisper',_t:0},{x:90,z:240,type:'whisper',_t:0},{x:330,z:230,type:'whisper',_t:0},{x:120,z:255,type:'laugh',_t:0},{x:240,z:160,type:'laugh',_t:0},{x:320,z:210,type:'laugh',_t:0},{x:300,z:190,type:'city',_t:0},{x:268,z:255,type:'city',_t:0},{x:372,z:150,type:'city',_t:0},{x:305,z:280,type:'mancry',_t:0},{x:330,z:265,type:'mancry',_t:0},{x:282,z:292,type:'mancry',_t:0},{x:265,z:258,type:'mancry',_t:0},{x:200,z:225,type:'mancry',_t:0},{x:315,z:272,type:'womancry',_t:0},{x:290,z:288,type:'womancry',_t:0},{x:340,z:258,type:'womancry',_t:0},{x:255,z:278,type:'womancry',_t:0},{x:150,z:210,type:'womancry',_t:0},{x:300,z:300,type:'storm',_t:0},{x:340,z:290,type:'storm',_t:0},{x:260,z:295,type:'storm',_t:0},{x:310,z:275,type:'storm',_t:0},{x:285,z:255,type:'storm',_t:0},{x:200,z:248,type:'storm',_t:0},{x:330,z:300,type:'scream',_t:0},{x:275,z:300,type:'scream',_t:0},{x:300,z:282,type:'cry',_t:0},{x:345,z:295,type:'cry',_t:0},{x:262,z:288,type:'childcry',_t:0},{x:325,z:300,type:'childcry',_t:0},{x:290,z:300,type:'mancry',_t:0},{x:340,z:285,type:'womancry',_t:0},{x:305,z:298,type:'dish',_t:0},{x:255,z:300,type:'dish',_t:0},{x:280,z:300,type:'whisper',_t:0},{x:330,z:285,type:'whisper',_t:0},{x:300,z:296,type:'howl',_t:0},{x:130,z:280,type:'howl',_t:0},{x:345,z:300,type:'owl',_t:0},{x:270,z:292,type:'owl',_t:0},{x:200,z:290,type:'nightforest',_t:0},{x:330,z:295,type:'nightforest',_t:0},{x:295,z:300,type:'argue',_t:0},{x:250,z:255,type:'city',_t:0},{x:315,z:268,type:'scream',_t:0},{x:288,z:278,type:'cry',_t:0},{x:340,z:272,type:'mancry',_t:0},{x:300,z:284,type:'whisper',_t:0},{x:265,z:300,type:'cry',_t:0},{x:320,z:290,type:'childcry',_t:0},{x:295,z:268,type:'scream',_t:0},{x:275,z:282,type:'dish',_t:0}];Snd._traumaLast=0;}_sfxChk+=dt;if(_sfxChk>0.3){_sfxChk=0;var _bP=(window.W3&&W3._clear)||0;try{if(Snd.on&&Snd.ambientOn&&typeof S!=='undefined'&&S.pz<110&&!((window.Game&&Game.modal)||(window.W3&&W3.inInterior))){var _hnow=(typeof performance!=='undefined'?performance.now():Date.now())/1000;if(Snd._hornNext==null)Snd._hornNext=_hnow+6+Math.random()*6;if(_hnow>=Snd._hornNext){if(Snd.carHorn)Snd.carHorn();Snd._hornNext=_hnow+6+Math.random()*6;}}}catch(e){}var _bFront=110+_bP*230;var _bDf=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:120)-_bFront)/110));var _bSilv=(typeof L!=='undefined'&&L&&L.caravan)?Math.hypot(S.px-L.caravan.x,S.pz-L.caravan.z):1e9;var _bMute=((window.Game&&Game.modal)||(window.W3&&W3.inInterior)||_bSilv<24);try{if(Snd._beds){var _Spz=(typeof S!=='undefined'&&S.pz!=null)?S.pz:120;var _nf2=Math.max(0,Math.min(1,(110-_Spz)/110));var _df2=Math.max(0,Math.min(1,(_Spz-110)/170));for(var _bbk in Snd._beds){if(!Snd._beds.hasOwnProperty(_bbk))continue;var _bb=Snd._beds[_bbk];var _btgt;var _bmd=_bb.mode||'df';if(_bmd==='earring'){_btgt=0.04+0.10*_nf2;}else if(_bmd==='breath'){_btgt=_bMute?0:(0.10+0.20*_df2);try{_bb.el.playbackRate=1.0+0.7*_df2;}catch(e){}}else if(_bmd==='heart'){_btgt=_bMute?0:(0.34*_df2);try{_bb.el.playbackRate=1.0+0.55*_df2;}catch(e){}}else if(_bmd==='nf'){_btgt=_bMute?0:_bb.base*_nf2;}if((_bmd==='earring'||_bmd==='breath'||_bmd==='heart')&&!Snd.bodyOn)_btgt=0;if((_bmd==='nf'||_bbk==='rain')&&!Snd.ambientOn)_btgt=0;else{_btgt=_bMute?0:_bb.base*_bDf*(1-0.45*_bP);}_bb.cur+=(_btgt-_bb.cur)*0.04;if(_bb.cur<0)_bb.cur=0;if(_bb.cur>1)_bb.cur=1;if(_btgt>0.02){if(_bb.el.paused){try{var _bpp=_bb.el.play();if(_bpp&&_bpp.catch)_bpp.catch(function(){});}catch(e){}}try{_bb.el.volume=Math.max(0,Math.min(1,_bb.cur));}catch(e){}}else{try{_bb.el.volume=Math.max(0,Math.min(1,_bb.cur));}catch(e){}if(_bb.cur<=0.01&&!_bb.el.paused){try{_bb.el.pause();}catch(e){}}}}}}catch(e){}if((window.Game&&Game.modal)||(window.W3&&W3.inInterior)){try{if(Snd._stormBed){Snd._stormBed.volume=Math.max(0,Snd._stormBed.volume-0.04);if(Snd._stormBed.volume<=0.001){Snd._stormBed.pause();}}}catch(e){}}else{var _now=(typeof performance!=='undefined'?performance.now():Date.now())/1000;var _ds=(typeof S!=='undefined'&&S.pz>240);var _gap=_ds?2.5:4;var _cd=_ds?12:20;var _rad=_ds?18:14;var _p=(window.W3&&W3._clear)||0;var _front=110+_p*230;var _df=Math.max(0,Math.min(1,(S.pz-_front)/110));var _gateOff={};if(_p>=0.14)_gateOff.city=1;if(_p>=0.28)_gateOff.argue=1;if(_p>=0.42)_gateOff.dish=1;if(_p>=0.56){_gateOff.mancry=1;_gateOff.womancry=1;}if(_p>=0.70)_gateOff.childcry=1;if(_p>=0.82)_gateOff.scream=1;if(_p>=0.92)_gateOff.cry=1;if(_p>=0.96)_gateOff.whisper=1;if(_p>=0.60)_gateOff.nightforest=1;if(_p>=0.78)_gateOff.howl=1;if(_p>=0.88)_gateOff.owl=1;var _silv=(L&&L.caravan)?Math.hypot(S.px-L.caravan.x,S.pz-L.caravan.z):1e9;if(_silv<24){try{Snd.setZoneAmb&&Snd.setZoneAmb(0,0,1);}catch(e){}}if(Snd.mindOn&&!(_df<=0.04||_silv<24)&&_now-Snd._traumaLast>_gap){var _bp=null,_bd=1e9;for(var _ti=0;_ti<Snd._traumaPts.length;_ti++){var _pp=Snd._traumaPts[_ti];if(_gateOff[_pp.type])continue;var _dd=Math.hypot(S.px-_pp.x,S.pz-_pp.z);if(_dd<_rad&&_dd<_bd&&_now-_pp._t>_cd){_bd=_dd;_bp=_pp;}}if(_bp){try{var _cv=(_bp.type==='city'?0.14:(_bp.type==='argue'?0.16:(_bp.type==='whisper'?0.30:(_bp.type==='storm'?0.40:0.42))));var _vol=Math.min(0.6,_cv*(0.35+0.9*_df)*(1-0.4*_p));Snd.playSfx(_bp.type,_vol);}catch(e){}_bp._t=_now;Snd._traumaLast=_now;}}}}}}catch(e){}
     /* sesli kitap kasetleri: bölgeye göre, fade ile */
     tapeChk+=dt;
     if(tapeChk>.5){tapeChk=0;
@@ -7325,9 +7464,9 @@ if(HAS3D)(function(){
       if(!S.flags.inPleroma){
         /* SES KAYITLARI ana ilerleme evlerine bağlı: yaklaşınca fade-in, uzaklaşınca fade-out.
            Lunaris evi→kayıt1 (B1-6), Bahal→kayıt2, Lucida→3, Lucius→4, Noctornus→5, Silvanus/Aelius→6. */
-        const TZ=[['lunaris',250,104,0],['bahal',96,118,1],['lucida',176,235,2],['lucius',210,175,3],['noct',300,190,4],['aelius',310,90,5]];
+        var _tzmap={lunaris:0,bahal:1,lucida:2,lucius:3,noct:4,aelius:5}; var TZ=[]; try{(window.W3&&W3.PORTALS||[]).forEach(function(p){if(p&&p.house&&_tzmap[p.k]!=null)TZ.push([p.k,p.x,p.z,_tzmap[p.k]]);});}catch(e){}
         try{if(typeof L!=='undefined'&&L.caravan)TZ.push(['silvanus',L.caravan.x,L.caravan.z,5]);}catch(e){}
-        let bd=19*19,bk=null;
+        let bd=24*24,bk=null;
         for(const z of TZ){const dx=S.px-z[1],dz=S.pz-z[2],d2=dx*dx+dz*dz;
           if(d2<bd){bd=d2;want=z[3];bk=z[0];}}
         if(bk)window.Daily3&&Daily3.zone(bk);
