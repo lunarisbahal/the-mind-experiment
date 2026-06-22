@@ -310,7 +310,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b61 · <span style="color:var(--accent)">a mobile performance pass — phones now run the light preset by default with shadows and bloom switched off, pixel ratio held at 1.0, and the far decoration (labyrinth walls, dark woods, the deep mindscape) thinned out, so touch responds and the world stops stuttering. Desktop is untouched; raise it again any time under ⚙ GRAPHICS</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b62 · <span style="color:var(--accent)">Lucida and Lucius now stand as real people (only the IT-subjects stay machines); Noctornus's cave was pulled inside the walkable edge so you can actually reach it; Aelius can now be entered from a marked landing at the foot of the hill while the tiers stay climbable; the world brightens a touch toward consciousness and darkens toward the depths; and the map was cleared of its overlapping labels</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -6649,7 +6649,7 @@ if(HAS3D)(function(){
       box(1.6,h,1.6,std(0x14182a,{emissive:0xbcd0f0,emissiveIntensity:.18+(i%3)*0.04,roughness:.9}),bx,h/2,bz);}
     collide(x,z,6);
     const pl=new THREE.PointLight(0xbcd0f0,.7,18,2);pl.position.set(x,6,z);scene.add(pl);
-    const fig=makeFigure(0x223044,0xcfc0a8,0xbcd0f0,1);fig.g.position.set(x+1.6,.42,z+5.4);scene.add(fig.g);
+    const fig=makeChar(k,1);fig.g.position.set(x+1.6,.42,z+5.4);scene.add(fig.g);
     label(name,x,z,7.4,.85);
     W3.PORTALS.push({k:k,x:x,z:z+6,r:3.6,name:name,house:true});
   }
@@ -6691,7 +6691,7 @@ if(HAS3D)(function(){
       var lp=new THREE.PointLight(0xffd080,.42,13,2);lp.position.set(lx,4.2,z+lz);scene.add(lp);});}
     label((GAMELANG==='tr'?'MAHALLE — GECE':'THE BLOCK — NIGHT'),x,z+19,3,.7);
   }
-  var AEL={x:215,z:165,steps:[]};
+  var AEL={x:215,z:165,steps:[]};var _depthFill=new THREE.PointLight(0xbfd0ff,0,46,2);try{scene.add(_depthFill);W3._depthFill=_depthFill;}catch(e){}
   function buildAeliusHill(x,z,name){
     AEL.x=x;AEL.z=z;AEL.steps=[];
     var N=10,baseR=18,topR=3.6,stepH=0.92;
@@ -6716,12 +6716,13 @@ if(HAS3D)(function(){
     _ch.visible=false;scene.add(_ch);
     W3._aelChaser={g:_ch,light:_chl,active:false,speed:5.4};
     label(name,x,z,topY+3.4,.85);
-    W3.PORTALS.push({k:'aelius',x:x,z:z,r:4.2,name:name,house:true});
+    var _bz=z+baseR+3;box(3,.4,3,std(0x10131f,{emissive:0xbcd0f0,emissiveIntensity:.18}),x,.2,_bz);var _bpl=new THREE.PointLight(0xbcd0f0,.7,16,2);_bpl.position.set(x,2.4,_bz);scene.add(_bpl);label((GAMELANG==='tr'?'AELIUS SEANSI — gir ↑':'THE AELIUS SESSION — enter ↑'),x,_bz,3.2,.72);
+    W3.PORTALS.push({k:'aelius',x:x,z:_bz,r:4.2,name:name,house:true});
   }
   W3._aelOpen=false;W3.aeliusGroundY=function(px,pz){if(!W3._aelOpen)return 0;var dx=px-AEL.x,dz=pz-AEL.z,d=Math.hypot(dx,dz);for(var i=AEL.steps.length-1;i>=0;i--){if(d<=AEL.steps[i].r)return AEL.steps[i].y;}return 0;};
   buildCity('lucida',95,60,(GAMELANG==='tr'?"LUCIDA'NIN ŞEHRİ ✦":"LUCIDA'S CITY ✦"));
   buildCity('lucius',165,92,(GAMELANG==='tr'?"LUCIUS'UN PLAZASI ✦":"LUCIUS'S PLAZA ✦"));
-  buildNoctCave(320,285,(GAMELANG==='tr'?'NOCTORNUS GECESİ — MAĞARA ☾':"NOCTORNUS'S NIGHT — THE CAVE ☾"));
+  buildNoctCave(310,262,(GAMELANG==='tr'?'NOCTORNUS GECESİ — MAĞARA ☾':"NOCTORNUS'S NIGHT — THE CAVE ☾"));
   W3.PORTALS.push({k:'silvanus',x:L.caravan.x,z:L.caravan.z+4,r:3.6,name:(GAMELANG==='tr'?"SILVANUS'UN KARAVANI ☽":"SILVANUS'S CARAVAN ☽"),house:true});
   buildAeliusHill(215,165,(GAMELANG==='tr'?'AELIUS SEANSI ✦':'THE AELIUS SESSION ✦'));
 
@@ -6914,7 +6915,7 @@ if(HAS3D)(function(){
     if(vy!==0||jy>_gy+0.001||_gy>0){jy+=vy*dt;vy-=16*dt;if(jy<_gy){jy=_gy;vy=0;}}
     if(_gy>jy&&_gy-jy<0.34){jy=_gy;if(vy<0)vy=0;}
     S.heading=Math.PI-meshAng; /* v8: minimap arrow now matches travel direction */
-    player.g.position.set(P.px,jy+Math.abs(Math.sin(walkT))*.05,P.pz);
+    player.g.position.set(P.px,jy+Math.abs(Math.sin(walkT))*.05,P.pz);try{if(W3._depthFill){W3._depthFill.position.set(P.px,9,P.pz);W3._depthFill.intensity=Math.max(0,(150-S.pz)/150)*0.4;}}catch(e){}
     /* b59: Aelius tirmanisi — kilit (onceki arketip) + kovalamaca (kusbakisi kacis) */
     try{ if(typeof AEL!=='undefined'&&AEL.steps&&AEL.steps.length){
       if(W3._aelT===undefined)W3._aelT=0; W3._aelT+=dt;
@@ -7155,7 +7156,7 @@ if(HAS3D)(function(){
     }
     /* radyo yakınlık sesi */
     Snd.setProx&&Snd.setProx(Math.hypot(S.px-L.radio.x,S.pz-L.radio.z));
-    try{var _FP=[[320,285],[154,56],[300,300],[95,288]],_CP=[[268,255],[372,150]],_fa=0,_ca=0,_k;for(_k=0;_k<_FP.length;_k++)_fa=Math.max(_fa,1-Math.hypot(S.px-_FP[_k][0],S.pz-_FP[_k][1])/46);for(_k=0;_k<_CP.length;_k++)_ca=Math.max(_ca,1-Math.hypot(S.px-_CP[_k][0],S.pz-_CP[_k][1])/46);var _ba=1-Math.hypot(S.px-338,S.pz-196)/40;Snd.setZoneAmb&&Snd.setZoneAmb(_fa,_ca,_ba);}catch(e){}
+    try{var _FP=[[310,262],[154,56],[300,300],[95,288]],_CP=[[268,255],[372,150]],_fa=0,_ca=0,_k;for(_k=0;_k<_FP.length;_k++)_fa=Math.max(_fa,1-Math.hypot(S.px-_FP[_k][0],S.pz-_FP[_k][1])/46);for(_k=0;_k<_CP.length;_k++)_ca=Math.max(_ca,1-Math.hypot(S.px-_CP[_k][0],S.pz-_CP[_k][1])/46);var _ba=1-Math.hypot(S.px-338,S.pz-196)/40;Snd.setZoneAmb&&Snd.setZoneAmb(_fa,_ca,_ba);}catch(e){}
     /* audiobook tapes: zone-based, with fades */
     tapeChk+=dt;
     if(tapeChk>.5){tapeChk=0;
@@ -7267,7 +7268,7 @@ function drawBigMap(){
   (window.W3&&W3.PORTALS||[]).forEach(function(p){if(!p.house)return;var X=p.x*sx,Z=p.z*sz;var integ=S.flags&&S.flags[p.k+'Integrated'];var col=integ?'#7fd4c1':'#cdb878';ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(X,Z,7,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(X,Z-4);ctx.lineTo(X+3.5,Z+3);ctx.lineTo(X-3.5,Z+3);ctx.closePath();ctx.fill();var nm=(function(){var R=(window.REALMS||[]).find(function(x){return x.k===p.k;});return R&&window.Realms?Realms.T(R.n):((window.House&&House.NAMES[p.k])||p.k);})();lbl((integ?'✓ ':'☽ ')+nm,X,Z-10,col,9);});
   ctx.fillStyle='rgba(157,140,201,.95)';RITE_SITES.forEach((k,i)=>{if(S.rites['r'+(i+1)]===undefined){const X=L[k].x*sx,Z=L[k].z*sz;ctx.beginPath();ctx.moveTo(X,Z-6);ctx.lineTo(X+6,Z);ctx.lineTo(X,Z+6);ctx.lineTo(X-6,Z);ctx.closePath();ctx.fill();}});
   ctx.fillStyle='rgba(110,210,220,.95)';(window.__mmA||[]).forEach(a=>{ctx.beginPath();ctx.arc(a.x*sx,a.z*sz,4.5,0,7);ctx.fill();});
-  (window.__mmA||[]).forEach(a=>{if(a.nm)lbl(a.nm,a.x*sx,a.z*sz-6,'rgba(150,225,235,.95)',9);});
+  /* b62: harita sadelestirildi — ajan isim etiketleri kaldirildi (kim nerede icin Roster) */
   var _trc=(window.__traces||[]).filter(t=>t.x!==undefined).slice(-40);
   ctx.fillStyle='rgba(157,140,201,.5)';_trc.forEach(t=>{const X=t.x*sx,Z=t.z*sz;ctx.beginPath();ctx.moveTo(X,Z-3);ctx.lineTo(X+3,Z);ctx.lineTo(X,Z+3);ctx.lineTo(X-3,Z);ctx.closePath();ctx.fill();});
   (window.__mmP||[]).forEach(p=>{ctx.strokeStyle='rgba(230,195,110,.8)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x*sx,p.z*sz,6,0,7);ctx.stroke();if(p.n)lbl(p.n,p.x*sx,p.z*sz-9,'rgba(235,200,120,.95)',9);});
@@ -7275,7 +7276,7 @@ function drawBigMap(){
   if(wp){ctx.fillStyle='#cdb878';ctx.beginPath();ctx.arc(wp.x*sx,wp.z*sz,5,0,7);ctx.fill();lbl(tr?'◆ HEDEF':'◆ OBJECTIVE',wp.x*sx,wp.z*sz+16,'#e3c878',9);}
   [['echoChamber','◌',(tr?'Yankı Odası':'Echo Chamber'),'#b9a8e8'],['lucidaMirror','◑',(tr?'Lucida Aynası':'Lucida’s Mirror'),'#9fd0d8'],['crackedDoor','⟡',(tr?'Yarık Kapı':'Cracked Door'),'#b9a8e8'],['emptyDoor','▢',(tr?'Boş Oda':'Empty Room'),'#9aa6bd']].forEach(function(it){var Lp=L[it[0]];if(!Lp)return;var X=Lp.x*sx,Z=Lp.z*sz;ctx.fillStyle=it[3];ctx.font='13px monospace';ctx.textAlign='center';ctx.fillText(it[1],X,Z+4);lbl(it[2],X,Z-9,it[3],9);});
   ctx.fillStyle='#e8e4d4';ctx.beginPath();ctx.arc(S.px*sx,S.pz*sz,5,0,7);ctx.fill();lbl(tr?'SEN':'YOU',S.px*sx,S.pz*sz-10,'#7fd4c1',10);
-  drawMapLegend(ctx,tr,c.height);
+  /* b62: lejant kaldirildi (harita sade) */
   ctx.textAlign='center';
   var _c=(window.__mmP||[]).length;
   ctx.font='12px monospace';ctx.fillStyle=_c?'rgba(230,195,110,.95)':'#6b7689';
