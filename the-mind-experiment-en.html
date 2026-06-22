@@ -235,7 +235,7 @@
   <button class="btn ghost" style="margin-top:14px" onclick="UI.toggleJournal(false)">Close [J]</button>
 </div></div>
 
-<div id="bigmapWrap"><canvas id="bigmap"></canvas></div>
+<div id="bigmapWrap"><canvas id="bigmap"></canvas><button id="mapWhoBtn" onclick="event.stopPropagation();if(window.MapWho)MapWho.toggle();" style="position:absolute;top:12px;right:14px;z-index:6;background:rgba(8,10,17,.92);border:1px solid var(--accent);color:var(--accent);font-family:inherit;font-size:11px;letter-spacing:.12em;padding:8px 12px;border-radius:6px;cursor:pointer">● WHO IS WHERE</button><div id="mapWho" onclick="event.stopPropagation()" style="display:none;position:absolute;top:50px;right:14px;bottom:40px;width:min(86vw,300px);z-index:6;overflow-y:auto;background:rgba(6,8,14,.96);border:1px solid var(--violet);border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.9;color:var(--ink)"></div></div>
 
 <!-- AI MIRRORS: chat -->
 <div class="modal" id="mirrorModal"><div class="panel">
@@ -310,7 +310,7 @@
   <p>The only mindscape any door ever opens into is <b style="color:var(--moon)">your own</b>. Bahal's map is the lantern. Lunaris walks beside you. The disks, the masks, the witch, the fire — they were always yours.</p>
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b62b · <span style="color:var(--accent)">Lucida and Lucius now stand as real people (only the IT-subjects stay machines); Noctornus's cave was pulled inside the walkable edge so you can actually reach it; Aelius can now be entered from a marked landing at the foot of the hill while the tiers stay climbable; the world brightens a touch toward consciousness and darkens toward the depths; and the map was cleared of its overlapping labels</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026 · b63 · <span style="color:var(--accent)">the map now has a WHO IS WHERE panel — a button opens a clean list of the archetypes, the travelers online right now and the mirror-agents, each with their nearest place, so the map face itself stays uncluttered. The Council threshold already warns you to finish the realms first</span> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -7241,7 +7241,7 @@ function drawMini(){
 function drawBigMap(){
   const c=document.getElementById('bigmap');
   const tr=(GAMELANG==='tr');
-  c.width=Math.min(innerWidth*.92,980);c.height=c.width*WZ/WX;if(c.height>innerHeight*.9){c.height=innerHeight*.9;c.width=c.height*WX/WZ;}
+  c.width=Math.min(innerWidth*.92,980);c.height=c.width*WZ/WX;if(c.height>innerHeight*.9){c.height=innerHeight*.9;c.width=c.height*WX/WZ;}try{var _wb=document.getElementById('mapWhoBtn');if(_wb)_wb.textContent=(tr?'● KİMLER NEREDE':'● WHO IS WHERE');var _mw=document.getElementById('mapWho');if(_mw)_mw.style.display='none';}catch(e){}
   const ctx=c.getContext('2d'),sx=c.width/WX,sz=c.height/WZ;
   drawMiniBase(ctx,c.width,c.height);
   (function(){var g=ctx.createLinearGradient(0,0,0,c.height);
@@ -7294,6 +7294,22 @@ function drawMapLegend(ctx,tr,H){
   ctx.fillText(tr?'EVREN HARİTASI':'UNIVERSE MAP',lx+pad,ly+pad+8);
   items.forEach((it,i)=>{const y=ly+pad+24+i*lh;ctx.fillStyle=it[0];ctx.beginPath();ctx.arc(lx+pad+5,y-3,4,0,7);ctx.fill();ctx.fillStyle='#c2cadf';ctx.fillText(it[1],lx+pad+16,y);});
 }
+
+window.MapWho={
+  toggle:function(){var d=document.getElementById('mapWho');if(!d)return;var on=(d.style.display==='none'||!d.style.display);if(on)d.innerHTML=this.html();d.style.display=on?'block':'none';},
+  html:function(){var tr=(GAMELANG==='tr');var places=[];
+    try{(ZONES||[]).forEach(function(z){if(z&&z.name)places.push({n:z.name,x:z.x,z:z.z});});}catch(e){}
+    try{(window.W3&&W3.PORTALS||[]).forEach(function(p){if(p.house&&p.name)places.push({n:p.name,x:p.x,z:p.z});});}catch(e){}
+    function nr(x,z){var b=null,bd=1e9;places.forEach(function(p){var d=Math.hypot(x-p.x,z-p.z);if(d<bd){bd=d;b=p;}});return b?b.n:'—';}
+    var h='<div style="color:var(--violet);letter-spacing:.18em;font-size:10px;margin-bottom:8px">'+(tr?'KİMLER NEREDE':'WHO IS WHERE')+'</div>';
+    try{h+='<div style="color:var(--moon);margin-bottom:6px">'+(tr?'★ SEN':'★ YOU')+' — '+nr(S.px,S.pz)+'</div>';}catch(e){}
+    h+='<div style="color:var(--violet);font-size:10px;margin:8px 0 4px">'+(tr?'ARKETİPLER':'ARCHETYPES')+'</div>';
+    try{(window.W3&&W3.PORTALS||[]).forEach(function(p){if(p.house&&p.name){var R=(window.REALMS||[]).find(function(r){return r.k===p.k;});var nm=(R&&window.Realms)?Realms.T(R.n):p.name;h+='<div style="color:#7fd4c1">◈ '+nm+'</div>';}});}catch(e){}
+    var trav=(window.__mmP||[]);if(trav.length){h+='<div style="color:var(--violet);font-size:10px;margin:8px 0 4px">'+(tr?'ŞU AN BURADAKİ YOLCULAR':'TRAVELERS HERE NOW')+'</div>';trav.forEach(function(t){h+='<div style="color:#e6c878">● '+(t.n||(tr?'yolcu':'traveler'))+' — '+nr(t.x,t.z)+'</div>';});}
+    var ag=(window.__mmA||[]);if(ag.length){h+='<div style="color:var(--violet);font-size:10px;margin:8px 0 4px">'+(tr?'AYNA-AJANLARI':'MIRROR-AGENTS')+'</div>';ag.forEach(function(a){h+='<div style="color:#6ed2dc">◌ '+(a.nm||(tr?'ajan':'agent'))+' — '+nr(a.x,a.z)+'</div>';});}
+    return h;}
+};
+
 document.getElementById('bigmapWrap').addEventListener('click',()=>Game.toggleMap());
 document.getElementById('bigmap').addEventListener('click',function(ev){const c=this,rect=c.getBoundingClientRect();const wx=(ev.clientX-rect.left)/rect.width*WX,wz=(ev.clientY-rect.top)/rect.height*WZ;let hit=null,best=1e9;(window.__traces||[]).forEach(t=>{if(t.x===undefined)return;const d=Math.hypot(wx-t.x,wz-t.z);if(d<best){best=d;hit=t;}});if(hit&&best<WX*0.05){ev.stopPropagation();UI.toast('◈ '+hit.mask+': "'+hit.text+'"'+(hit.ack>0?'  ◇'+hit.ack:''),6000);}});
 /* film grain */
