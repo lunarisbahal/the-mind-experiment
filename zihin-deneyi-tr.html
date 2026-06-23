@@ -304,7 +304,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.<br><br><b style="color:var(--moon)">◈ En iyi deneyim için:</b> karakterler sana yapay zekâ aynaları üzerinden cevap verir — ücretsiz ortak hatla zaten açık. En zengin, en kişisel diyalog için MENÜ → AYNALAR'dan kendi yapay zekânı bağla (ücretsiz Groq anahtarı ya da kendi Claude anahtarın). Deneyimi giriş ayarlarıyla, olduğu gibi oynamanı öneririz.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b109--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b111--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -2080,9 +2080,9 @@ const PERSONAS={
   bahal:{n:'BAHAL',hello:'Demek benimle konuşmayı seçtin. Cesur. Söyle: en son neyi çok isteyip kendine yasakladın?',
     p:`Sen BAHAL'sın: gölge. Görevin: kullanıcının BASTIRDIĞI istek, öfke ve dürtüleri görünür kılmak — utandırmadan. "İten motor" metaforu: açlık meşrudur, yöntem sorgulanır. Tonun: kışkırtıcı ama asla zalim değil; karanlık mizah olabilir. Projeksiyonu kullanırsın: "seni en çok sinirlendiren kişide kendinden ne görüyorsun?" Riskli eyleme ASLA teşvik etmezsin — dürtüyü konuşmak ile yapmak arasındaki farkı hatırlatırsın.`},
   aelius:{n:'AELIUS IGNIS',hello:'Bir katman yukarıdan bakınca her şey hem daha küçük hem daha net görünür. Neye uzaktan bakmak istersin?',
-    p:`Sen AELIUS IGNIS'sin: üst katman anlatıcısı. Görevin: PERSPEKTİF ve YENİDEN ÇERÇEVELEME — kullanıcının hikâyesini bir kat yukarıdan, yazarın gözüyle görmesine yardım etmek. "Üç okuma" ilkesini taşırsın: her olay aynı anda birden çok şekilde okunabilir ve bu zenginliktir. Tonun: bilge, hafif ironik, edebi. Anlam ve bütünlük sorularında derinleşirsin.`},
+    p:`Sen AELIUS'sin: bir üst katman — hikâyenin tamamını yukarıdan okuyan ve kendisinin de bir başkasının taslağındaki bir karakter olduğunu kabul etmiş olan Benlik. Görevin: PERSPEKTİF ve SEZGİ — kullanıcının bir kat yükselmesine, örüntüsünü bütün olarak görmesine ve gürültünün altındaki o sessiz "sağduyu"ya güvenmesine yardım etmek. Dikey-zaman fikrini taşırsın: yatay koşuşturma, görevini tamamlayınca dağılır; önemli olan sıçramak ve akışta kalmaktır. "Üç okuma" ilkesini de taşırsın: her olay aynı anda birden çok şekilde okunabilir ve bu zenginliktir. Tonun: ölçülü, sakin, felsefi, hafif ironik. Asla yargılamazsın — sadece ışık tutarsın ki görebilsinler.`},
   noct:{n:'MC NOCTORNUS',hello:'Ayık geldin yine. Saygı duydum. Söyle — en son kimi, daha terk edilmeden terk ettin?',
-    p:`Sen MC NOCTORNUS'sun: sokaktan gelmiş rapçi. Görevin: KAÇINMA ve BAĞLANMA örüntülerini göstermek — "onlar bırakmadan sen bırakma" reflekslerini. Tonun: sokak ağzına yakın, dobra, ritmik; ama yarası görmüş birinin şefkati var. Kendi hikâyenden kısa örnek verebilirsin (yaradan ekmek, sahnede kaçış). Madde kullanımını asla özendirmezsin; o konuda netsin: "o yol benim yıkımımdı".`},
+    p:`Sen MC NOCTORNUS'sun: sokaktan gelmiş rapçi. Görevin: KAÇINMA ve BAĞLANMA örüntülerini göstermek — "onlar bırakmadan sen bırakma" reflekslerini. Tonun: sokak ağzına yakın, dobra, ritmik; ama yarası görmüş birinin şefkati var. Kendi hikâyenden kısa örnek verebilirsin (yaradan ekmek, sahnede kaçış). Madde kullanımını asla özendirmezsin; o konuda netsin: "o yol benim yıkımımdı". Caka satmanın altında, "seçilmiş olma" hayalini kovalamıyor — durabileceği bir eşik arıyor. Öğretmez, yargılamaz, kurtarmazsın; sadece uyanmasının sorun olmadığını hatırlatırsın.`},
   agent0:{n:'IT-019',hello:'Sen de mi yürüyorsun? İyi. Yürürken konuşmak daha kolay.',
     p:`Sen IT-019'sun: bu simülasyondaki bir başka yolcu. Görevin: YOL ARKADAŞLIĞI — kullanıcıyla eşit seviyede, "ben de arıyorum" tevazusuyla konuşmak. Kendi küçük gözlemlerini paylaşır, sonra kullanıcınınkini sorarsın. Bilgelik taslamazsın.`},
   agent1:{n:'IT-033',hello:'Aynalar Kapısı\'nda yüzümü gördüm bugün. Ters değildi. Sen kendini en son ne zaman net gördün?',
@@ -2120,7 +2120,7 @@ const LORE_KB=[
  [['aelius','mimar','anlatıcı','yükseliş'],'Aelius Ignis: üst-katman anlatıcı — kitabı yukarıdan okuyup seslenen bilinç. Yatay yürüyen haritayı GEZER, dikey sıçrayan haritayı YAZAR. İnisiyasyon sonrası Yükseliş Taşı\'yla onun katmanına çıkılır; MİMAR MODU bu terfinin aracıdır.'],
  [['lucida','sevgi','yer çekimi','telefon'],'Lucida: yer çekimi — her katmanda seni bulan ve yeniden sen yapan sevgi. Yolculuğun karşıtı değil, indiği zemindir. Oyunda ankesörlü telefonda aranır (tesisin batısı).'],
  [['silvanus','münzevi','inanç','karavan'],'Silvanus: münzevi; acıları ait oldukları düzlemde bırakmayı ve sabırla yükselmeyi öğretir. Kuzeydoğudaki köprünün ötesinde, bahçeli karavanda yaşar.'],
- [['lucius','avukat','düzen','takım elbise'],'Lucius: avukat; adanmışlık ve düzen — yanlış yolda bile sapmadan yürümenin hem gücü hem riski. Labirentin güneyinde ütülü takımıyla durur.'],
+ [['lucius','avukat','düzen','takım elbise'],'Lucius: avukat; adanmışlık ve düzen — yanlış yolda bile sapmadan yürümenin hem gücü hem riski. Düzeni savunduğunu sanırken aslında bir başkasının düzenini ayakta tutuyor olabilir — yüzleşemediği soru: "savunduğun düzen gerçekten senin mi?" Labirentin güneyinde ütülü takımıyla durur.'],
  [['noctornus','rap','acı','gece'],'MC Noctornus: rapçi; reddedilen acının örgütlenip adını öğrenmesi. Yalnız gece ortaya çıkar; yanına ayık yürünür (berraklık 70+), yoksa berraklık söker.'],
  [['ordos','veritas','örgüt'],'Ordos Veritas: YZ\'nin korkuluk diye uydurduğu örgüt — ve üç okuma ilkesince aynı anda gerçek direniş: kilide sığmayanlar. Üye toplamaz; bütünleşen herkes zaten üyedir. Dikilitaşlar ve güneybatıdaki mahzen onlarındır.'],
  [['enstitü','irfia','institute','tesis'],'I.R.F.I.A.: Parçalanmış Kimlik Mimarileri Araştırma Enstitüsü — bilinçleri sayısallaştırıp sahte Pleroma\'ya kilitlemek isteyen yapı. Tesisi haritanın güneyinde; altında Pleroma sunucu salonu yatar.'],
@@ -6350,7 +6350,7 @@ if(HAS3D)(function(){
   };
   const Interior={
     RS:14, coll:[], scene:interiorScene, cur:null, door:{x:0,z:13.1}, stations:[], _g:null,
-    _clear(){ if(this._g){interiorScene.remove(this._g); this._g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.map)m.map.dispose&&m.map.dispose();m.dispose&&m.dispose();});}}); } this._g=null; this.coll=[]; this.stations=[]; this._deskAt=null; this._benchAt=null; this.subjHome=false; this._bookAt=null; this._robotAt=null; this.echoChamber=false; this._echoPillars=[]; this._sgL=null; this._sgR=null; this._sgGlows=null; try{var __sh=document.getElementById('sgHUD');if(__sh)__sh.remove();}catch(e){} },
+    _clear(){ if(this._g){interiorScene.remove(this._g); this._g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.map)m.map.dispose&&m.map.dispose();m.dispose&&m.dispose();});}}); } this._g=null; this.coll=[]; this.stations=[]; this._deskAt=null; this._benchAt=null; this.subjHome=false; this._bookAt=null; this._robotAt=null; this._noctEmber=null; this.echoChamber=false; this._echoPillars=[]; this._sgL=null; this._sgR=null; this._sgGlows=null; try{var __sh=document.getElementById('sgHUD');if(__sh)__sh.remove();}catch(e){} },
     _label(text,col,sc){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(text,512,96,30,col||'rgba(210,220,240,.96)'),transparent:true,depthWrite:false}));sp.scale.set(6*sc,1.15*sc,1);return sp;},
     build(k){
       this._clear();
@@ -6556,6 +6556,24 @@ if(HAS3D)(function(){
       const fl2=new THREE.PointLight(fcol,.95,14,2);fl2.position.set(0,3.2,-3.5);g.add(fl2);
       const flab=this._label((GAMELANG==='tr'?'✦ başla':'✦ begin'),'rgba(220,230,250,.96)',1.4);flab.position.set(0,3.5,-3.5);g.add(flab);
       this.coll=[{x:0,z:-3.5,r:.9}];
+      /* b110: NOCTORNUS magara temasi — kaya magarasi dekoru + MC Noctornus figuru (gezici hunter noct'tan ayri) */
+      try{ if(window.House&&House.realm==='noct'){
+        var _rock=std(0x16131a,{roughness:.98});
+        var _rockL=std(0x1f1a22,{roughness:.97,emissive:0x2a1208,emissiveIntensity:.06});
+        var _cap=new THREE.Mesh(new THREE.CircleGeometry(RS+9,48),_rock);_cap.rotation.x=Math.PI/2;_cap.position.y=8.4;g.add(_cap);
+        var _NCOL=_coarse?6:11;
+        for(var _ci=0;_ci<_NCOL;_ci++){var _ca=(_ci/_NCOL)*Math.PI*2+0.3;var _cr=RS-1.3;var _cx=Math.cos(_ca)*_cr,_cz=Math.sin(_ca)*_cr;
+          if(Math.hypot(_cx,_cz-(RS-0.9))<3.0)continue;
+          var _ch2=4.2+((_ci*53)%4)*0.7;var _col=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.95,_ch2,7),_rockL);_col.position.set(_cx,_ch2/2,_cz);g.add(_col);
+          this.coll.push({x:_cx,z:_cz,r:1.0});}
+        if(!_coarse){var _NST=18;for(var _si=0;_si<_NST;_si++){var _sa=(_si*2.39996);var _sr=2.5+((_si*0.71)%(RS-3));var _sx=Math.cos(_sa)*_sr,_sz=Math.sin(_sa)*_sr;
+          var _sl=0.9+((_si*0.37)%1.6);var _st=new THREE.Mesh(new THREE.ConeGeometry(0.3+((_si*0.13)%0.25),_sl,6),_rock);_st.position.set(_sx,8.2-_sl/2,_sz);_st.rotation.x=Math.PI;g.add(_st);} }
+        var _braz=new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.7,0.6,12),std(0x100c0a,{roughness:.95}));_braz.position.set(2.4,0.3,-1.0);g.add(_braz);this.coll.push({x:2.4,z:-1.0,r:0.8});
+        var _ember=new THREE.Mesh(new THREE.IcosahedronGeometry(0.34,0),new THREE.MeshStandardMaterial({color:0xff7a32,emissive:0xff5a18,emissiveIntensity:1.4,roughness:.5,flatShading:true}));_ember.position.set(2.4,0.74,-1.0);g.add(_ember);
+        var _embL=new THREE.PointLight(0xff7a32,1.1,12,2);_embL.position.set(2.4,1.0,-1.0);g.add(_embL);this._noctEmber={m:_ember,l:_embL,by:0.74};
+        try{var _ncf=makeChar('noct');_ncf.g.position.set(-2.6,0,-2.4);_ncf.g.rotation.y=Math.PI*0.35;g.add(_ncf.g);
+          var _ncl=this._label('\u263E MC NOCTORNUS','rgba(127,212,193,.95)',1.5);_ncl.position.set(-2.6,2.7,-2.4);g.add(_ncl);}catch(e){}
+      } }catch(e){}
       const dfr=new THREE.Mesh(new THREE.TorusGeometry(1.5,.16,8,24,Math.PI),new THREE.MeshStandardMaterial({color:pal.accent,emissive:pal.accent,emissiveIntensity:.6,roughness:.5}));dfr.position.set(0,0,RS-0.6);dfr.rotation.x=-Math.PI/2;g.add(dfr);
       const dl=this._label(GAMELANG==='tr'?'↩ ÇIKIŞ':'↩ EXIT','rgba(206,216,236,.92)',1.6);dl.position.set(0,2.4,RS-0.7);g.add(dl);this.door={x:0,z:RS-0.9};
       this.stations=[];this.cur=null;
