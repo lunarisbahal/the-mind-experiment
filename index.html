@@ -47,7 +47,7 @@
   #quests .cur{color:var(--accent);}
   #quests .rite{color:var(--violet);}
   #hudTR{position:fixed;right:12px;top:auto;bottom:118px;z-index:40;text-align:right;}
-  @media (pointer:coarse){#hudTR{bottom:172px;}}
+  @media (pointer:coarse){#hudTR{bottom:auto;top:8px;right:8px;}}
   @media (pointer:coarse){#hudTL{max-width:58vw;}#hudTL .chip{font-size:10px;padding:4px 7px;line-height:1.25;}#hudBL{font-size:10px;}#hudBL .bar{height:6px;}}
   #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;margin-left:auto;transition:opacity .3s;}
   /* v8.6 mobile: minimap small + translucent; fully hideable from the menu */
@@ -318,7 +318,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b118--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b119--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -2359,9 +2359,9 @@ const Mirror={
       const CAP=80;let q;try{q=JSON.parse(localStorage.getItem('it041_relay_q'))||{}}catch(e){q={}}
       const today=new Date().toDateString();if(q.d!==today)q={d:today,n:0};
       if(q.n>=CAP)throw new Error('your shared-line allowance for today is used up (fair use, '+CAP+' messages/day). It renews tomorrow — or connect your own FREE Groq key in 2 minutes (MENU → MIRRORS → Advanced): unlimited.');
-      var _sys=(msgs[0]&&msgs[0].role==='system')?[msgs[0]]:[];var _rest=msgs.filter(function(m){return m.role!=='system';});if(_rest.length>6)_rest=_rest.slice(-6);var _trim=_sys.concat(_rest).map(function(m){return {role:m.role,content:(typeof m.content==='string'&&m.content.length>3500)?m.content.slice(-3500):m.content};});const _body=JSON.stringify({messages:_trim,max_tokens:Math.min(maxTok||512,700),temperature:.7});
-      let r=null;var _urls=[RELAY_URL,RELAY_FALLBACK];for(var _att=0;_att<3;_att++){for(var _ui=0;_ui<_urls.length;_ui++){try{var _rr=await fetch(_urls[_ui],{method:'POST',headers:{'Content-Type':'application/json'},body:_body});r=_rr;if(_rr.ok||_rr.status===429){_att=99;break;}}catch(_e){}}if(_att!==99&&_att<2){await new Promise(function(_rs){setTimeout(_rs,500*(_att+1));});}}if(!r)r={ok:false,status:0};
-      if(r.status===429)throw new Error('the shared line is busy — try again in a few minutes, or connect your own (free Groq) key (MENU → MIRRORS → Advanced)');
+      var _sys0=(msgs[0]&&msgs[0].role==='system')?msgs[0]:null;var _rest=msgs.filter(function(m){return m.role!=='system';});if(_rest.length>4)_rest=_rest.slice(-4);var _trim=[];if(_sys0)_trim.push({role:'system',content:(typeof _sys0.content==='string'&&_sys0.content.length>7000)?_sys0.content.slice(0,7000):_sys0.content});_rest.forEach(function(m){_trim.push({role:m.role,content:(typeof m.content==='string'&&m.content.length>1000)?m.content.slice(-1000):m.content});});const _body=JSON.stringify({messages:_trim,max_tokens:Math.min(maxTok||512,600),temperature:.7});
+      let r=null;var _urls=[RELAY_URL,RELAY_FALLBACK];for(var _att=0;_att<4&&(!r||!r.ok);_att++){for(var _ui=0;_ui<_urls.length;_ui++){try{var _rr=await fetch(_urls[_ui],{method:'POST',headers:{'Content-Type':'application/json'},body:_body});r=_rr;if(_rr.ok)break;}catch(_e){}}if(r&&r.ok)break;await new Promise(function(_rs){setTimeout(_rs,700*(_att+1));});}if(!r)r={ok:false,status:0};
+      if(r.status===429||r.status>=500||r.status===0)throw new Error('the shared line is busy — try again in a few minutes, or connect your own (free Groq) key (MENU → MIRRORS → Advanced)');
       if(!r.ok)throw new Error('HTTP '+r.status);
       q.n++;try{localStorage.setItem('it041_relay_q',JSON.stringify(q));}catch(e){}
       if(q.n===Math.floor(CAP*.7))UI.toast('⚡ You\'ve used 70% of today\'s shared-line allowance ('+q.n+'/'+CAP+'). For unlimited: MENU → MIRRORS → Advanced → free Groq key.',8000);
@@ -5741,11 +5741,11 @@ if(HAS3D)(function(){
       p.fig.g.add(sp);p._bub=sp;p._bubTex=tex;p._bubBorn=(typeof performance!=='undefined'?performance.now():Date.now())/1000;
     }catch(e){}}
     var ROSTER=[
-      {k:'principal',x:150,z:175,fade:0.62,human:true,female:false,child:false,id:(TR?'Eski lise müdürün':'Your old principal'),lines:TR?['Eski lise müdürün burada. Senin yerin hep en arka sıraydı; bir türlü yetmedin.','Senin gibilerden zaten bir şey çıkmaz sanırdım. Hâlâ öyle düşünüyorum.']:['Your old principal is here. Your place was always the back row; you never quite measured up.','I always thought nothing would come of people like you. I still do.']},
-      {k:'teacher',x:250,z:184,fade:0.66,human:true,female:true,child:true,id:(TR?'Eski öğretmenin':'Your old teacher'),lines:TR?['Eski öğretmenin konuşuyor. Neden insanları bu oyunun içine sokuyorsun? Otur oturduğun yerde.','Eline kalemi bile doğru tutamazdın. Başaramadın, başaramayacaksın.']:['Your old teacher is speaking. Why are you putting people inside this game of yours? Sit down where you belong.','You could not even hold a pencil straight. You failed then, you will fail now.']},
-      {k:'therapist',x:300,z:206,fade:0.70,human:true,female:true,child:false,id:(TR?'Eski terapistin':'Your old therapist'),lines:TR?['Eski terapistin burada. Sen bir hastaydın, hâlâ öylesin; özünde değersizsin.','Koltuğun öteki tarafına geçmen seni bir şey yapmaz. Hiçbir şeysin.']:['Your old therapist is here. You were a patient, and you still are; worthless at the core.','Moving to the other side of the couch makes you nothing. You are nothing.']},
-      {k:'friend',x:205,z:243,fade:0.74,human:true,female:false,child:true,id:(TR?'Eski arkadaşın':'Your old friend'),lines:TR?['Eski arkadaşın sesleniyor. Yine herkesin önünde elin kolun bağlı kaldın.','Hiçbir şeyi düzeltemezsin; çaresizsin, ben de izlemekten başka bir şey yapamam.']:['Your old friend is calling. Once again you stood helpless in front of everyone.','You cannot fix anything; you are helpless, and all I can do is watch.']},
-      {k:'lover',x:120,z:252,fade:0.80,human:true,female:true,child:false,id:(TR?'Eski sevgilin':'Your old love'),lines:TR?['Eski sevgilin konuşuyor. Bana yaptığını biliyorsun; bunun suçlusu sensin.','Önce kaçacak yer aradın, sonra terk edilen sen gibi yaptın. Hepsi senin suçun.']:['Your old love is speaking. You know what you did to me; the fault is yours.','First you looked for an exit, then you acted as the one abandoned. It is all your guilt.']}
+      {k:'principal',x:158,z:135,fade:0.62,human:true,female:false,child:false,id:(TR?'Eski lise müdürün':'Your old principal'),lines:TR?['Eski lise müdürün burada. Senin yerin hep en arka sıraydı; bir türlü yetmedin.','Senin gibilerden zaten bir şey çıkmaz sanırdım. Hâlâ öyle düşünüyorum.']:['Your old principal is here. Your place was always the back row; you never quite measured up.','I always thought nothing would come of people like you. I still do.']},
+      {k:'teacher',x:182,z:162,fade:0.66,human:true,female:true,child:true,id:(TR?'Eski öğretmenin':'Your old teacher'),lines:TR?['Eski öğretmenin konuşuyor. Neden insanları bu oyunun içine sokuyorsun? Otur oturduğun yerde.','Eline kalemi bile doğru tutamazdın. Başaramadın, başaramayacaksın.']:['Your old teacher is speaking. Why are you putting people inside this game of yours? Sit down where you belong.','You could not even hold a pencil straight. You failed then, you will fail now.']},
+      {k:'therapist',x:172,z:192,fade:0.70,human:true,female:true,child:false,id:(TR?'Eski terapistin':'Your old therapist'),lines:TR?['Eski terapistin burada. Sen bir hastaydın, hâlâ öylesin; özünde değersizsin.','Koltuğun öteki tarafına geçmen seni bir şey yapmaz. Hiçbir şeysin.']:['Your old therapist is here. You were a patient, and you still are; worthless at the core.','Moving to the other side of the couch makes you nothing. You are nothing.']},
+      {k:'friend',x:164,z:225,fade:0.74,human:true,female:false,child:true,id:(TR?'Eski arkadaşın':'Your old friend'),lines:TR?['Eski arkadaşın sesleniyor. Yine herkesin önünde elin kolun bağlı kaldın.','Hiçbir şeyi düzeltemezsin; çaresizsin, ben de izlemekten başka bir şey yapamam.']:['Your old friend is calling. Once again you stood helpless in front of everyone.','You cannot fix anything; you are helpless, and all I can do is watch.']},
+      {k:'lover',x:158,z:256,fade:0.80,human:true,female:true,child:false,id:(TR?'Eski sevgilin':'Your old love'),lines:TR?['Eski sevgilin konuşuyor. Bana yaptığını biliyorsun; bunun suçlusu sensin.','Önce kaçacak yer aradın, sonra terk edilen sen gibi yaptın. Hepsi senin suçun.']:['Your old love is speaking. You know what you did to me; the fault is yours.','First you looked for an exit, then you acted as the one abandoned. It is all your guilt.']}
     ];
     ROSTER.forEach(function(p){
       var fig;
@@ -5763,22 +5763,19 @@ if(HAS3D)(function(){
       var pxp=(typeof S!=='undefined'&&S.px!=null)?S.px:0, pzp=(typeof S!=='undefined'&&S.pz!=null)?S.pz:0;
       for(var i=0;i<ROSTER.length;i++){var p=ROSTER[i];if(!p.fig)continue;
         var want=(cl<p.fade);
-        var tgtOp=want?(p.child?0.86:0.94):0;
+        var tgtOp=want?1:0;
         p.op+=(tgtOp-p.op)*0.05;
         var vis=p.op>0.02;p.fig.g.visible=vis;
         try{p.fig.g.traverse(function(o){if(o.material&&o.material.transparent)o.material.opacity=p.op;});}catch(e){}
         if(!vis){if(p._bub){try{p.fig.g.remove(p._bub);}catch(e){}p._bub=null;}continue;}
-        /* slow wander in the depths */
-        var d=Math.hypot(p.cx-p.tx,p.cz-p.tz);
-        if(d<1.6){p.tx=p.x+(Math.random()*2-1)*26;p.tz=p.z+(Math.random()*2-1)*22;if(p.tz<126)p.tz=126;if(p.tz>300)p.tz=300;}
-        var ang=Math.atan2(p.tx-p.cx,p.tz-p.cz);
-        p.cx+=Math.sin(ang)*0.09;p.cz+=Math.cos(ang)*0.09;
-        p.fig.g.position.x=p.cx;p.fig.g.position.z=p.cz;
-        p.fig.g.rotation.y=Math.atan2(pxp-p.cx,pzp-p.cz);
-        try{var sw=Math.sin(t*3+i)*0.3;if(p.fig.parts&&p.fig.parts.legL){p.fig.parts.legL.rotation.x=sw;p.fig.parts.legR.rotation.x=-sw;}}catch(e){}
+        /* stationary: fixed past-trauma people standing in the depths */
+        p.cx=p.x;p.cz=p.z;
+        p.fig.g.position.x=p.x;p.fig.g.position.z=p.z;
+        p.fig.g.rotation.y=Math.atan2(pxp-p.x,pzp-p.z);
+        try{var sw=Math.sin(t*0.8+i)*0.04;if(p.fig.parts&&p.fig.parts.legL){p.fig.parts.legL.rotation.x=sw;p.fig.parts.legR.rotation.x=-sw;}}catch(e){}
         /* auto speech: when player is near, throttled 12-20s, no back-and-forth */
         var pd=Math.hypot(pxp-p.cx,pzp-p.cz);
-        if(pd<14&&t>=(p._next||0)){
+        if(pd<24&&t>=(p._next||0)){
           var ln=p.id+' — '+p.lines[(Math.random()*p.lines.length)|0];
           _phBubble(p,ln);
           try{if(window.Snd&&Snd.playSfx&&Snd.mindOn)Snd.playSfx('whisper',0.14);}catch(e){}
@@ -7631,6 +7628,8 @@ if(HAS3D)(function(){
     ECHM.forEach((e,i)=>{if(e.m.visible){e.m.position.y=1.2+Math.sin(t*1.6+i)*.25;e.m.rotation.y=t*.9+i;}});
     fire.intensity=1.4+Math.sin(t*9)*.3+Math.sin(t*23)*.15;
     W3._bilat&&W3._bilat(t);W3._starAnim&&W3._starAnim(t);W3._mindAnim&&W3._mindAnim(t);W3._phantomAnim&&W3._phantomAnim(t);W3._melAnim&&W3._melAnim(t);W3._paraAnim&&W3._paraAnim(t);
+    /* b119 ITEM2: point-light culling - keep only the ~7 nearest PointLights enabled to cut per-frame GPU shading deep in the subconscious. Hemisphere + the 2 directional lights stay global. Lights are never removed; far ones are just hidden and re-enabled when near. */
+    try{if(typeof scene!=='undefined'){if(!W3._plCull){var _pls=[];scene.traverse(function(o){if(o&&(o.isPointLight||o.type==='PointLight'))_pls.push(o);});W3._plCull={lights:_pls,frame:0,N:7};}var _pc=W3._plCull;_pc.frame=(_pc.frame||0)+1;if(_pc.lights.length>_pc.N&&(_pc.frame%6===0)){var _pcx=(typeof S!=='undefined'&&S.px!=null)?S.px:(camera?camera.position.x:0);var _pcz=(typeof S!=='undefined'&&S.pz!=null)?S.pz:(camera?camera.position.z:0);var _arr=_pc.lights,_nn=_arr.length;for(var _li=0;_li<_nn;_li++){var _Lp=_arr[_li];var _wx,_wz;if(_Lp.parent&&_Lp.parent!==scene){_Lp.getWorldPosition(_pc._v=_pc._v||new THREE.Vector3());_wx=_pc._v.x;_wz=_pc._v.z;}else{_wx=_Lp.position.x;_wz=_Lp.position.z;}var _dx=_wx-_pcx,_dz=_wz-_pcz;_Lp.userData._cd=_dx*_dx+_dz*_dz;}var _sorted=_arr.slice().sort(function(a,b){return a.userData._cd-b.userData._cd;});for(var _si=0;_si<_nn;_si++){_sorted[_si].visible=(_si<_pc.N);}}}}catch(e){}
     if(W3._archM)W3._archM.rotation.y=t*.3;
     flame.scale.y=1+Math.sin(t*11)*.2;
     mists.forEach(sp=>{sp.position.x+=sp.userData.v*dt*.35;if(sp.position.x>370)sp.position.x=10;}); /* v8: calmer mist */
