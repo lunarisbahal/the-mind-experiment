@@ -311,7 +311,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b111--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b112--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -1357,7 +1357,7 @@ function interactTarget(){
   /* persons */
   if(near(L.trail1)||near(L.trail2)||near(L.trail3))return['◈ Traveler cairn — leave/read traces',doTrail];
   if(near(L.payphone))return[S.flags.lucida&&Mirror.ready()?'◐ Talk with Lucida (mirror)':'Answer the payphone',doLucida];
-  if(near(L.lucius))return['The man in the pressed suit',doLucius];
+  /* b112: Lucius acik dunya etkilesimi kaldirildi — OFISTE doLucius cagriliyor. */
   {const nt=noctTalkable();
    if(nt==='mirror')return['◐ Talk with MC Noctornus (mirror)',()=>Mirror.open('noct')];
    if(nt)return['Speak to MC Noctornus',doNoctornus];}
@@ -5709,10 +5709,9 @@ if(HAS3D)(function(){
   noct.g.position.set(L.blackdisk.x,0,L.blackdisk.z);scene.add(noct.g);
   const silv=makeChar('silv');
   silv.g.position.set(L.caravan.x,0,L.caravan.z-3);silv.g.rotation.y=Math.PI;scene.add(silv.g);
-  const lucius=makeChar('lucius');
-  lucius.g.position.set(L.lucius.x,0,L.lucius.z);lucius.g.rotation.y=Math.PI;scene.add(lucius.g);
+  /* b112: Lucius artik acik dunyada gezmiyor — OFIS ic mekaninda yasiyor (buildCityRoom realm==='lucius' dali). */
   /* b106: gecmis/travma hayaletleri — oyuncunun canini sikar, aydinlandikca teker teker kaybolur */
-  (function(){try{var TR=(GAMELANG==='tr');var ROSTER=[{k:'principal',x:150,z:175,fade:0.10,nm:TR?'ESKİ LİSE MÜDÜRÜ':'THE OLD PRINCIPAL',lines:TR?['Bu saatte burada ne işin var?','Senin gibilerden zaten pek bir şey olmazdı.']:['What are you doing out here at this hour?','People like you never really amounted to much.']},{k:'ex',x:95,z:212,fade:0.20,nm:TR?'ESKİ BİR SES':'AN OLD FLAME',lines:TR?['Yine mi bu oyunlarla vakit harcıyorsun?','Hiç değişmemişsin.']:['Wasting time with these little games again?','You never changed.']},{k:'parent',x:250,z:184,fade:0.30,nm:TR?'TANIDIK BİR SİTEM':'A FAMILIAR REPROACH',lines:TR?['Herkesin çocuğu bir yere geldi.','Ya sen?']:['Everyone else’s child got somewhere.','And you?']},{k:'boss',x:300,z:206,fade:0.42,nm:TR?'ESKİ BİR AMİR':'A FORMER BOSS',lines:TR?['Seni işe aldığım gün hata ettim.']:['The day I hired you was a mistake.']},{k:'friend',x:205,z:243,fade:0.55,nm:TR?'UZAKLAŞAN BİRİ':'SOMEONE WHO DRIFTED',lines:TR?['Aramayı sen bıraktın.','Biz de seni unuttuk.']:['You stopped calling.','So we let you fade.']},{k:'voice',x:120,z:252,fade:0.65,nm:TR?'KIYASLAYAN İÇ SES':'THE COMPARING VOICE',lines:TR?['Akranların çoktan geçti seni.','Sen hâlâ buralardasın.']:['Your peers passed you long ago.','You’re still down here.']}];ROSTER.forEach(function(p){var m=new THREE.Mesh(new THREE.PlaneGeometry(1.7,3.4),new THREE.MeshBasicMaterial({color:0x3a4252,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide}));m.position.set(p.x,1.7,p.z);m.visible=false;scene.add(m);p.mesh=m;try{label('\u2609 '+p.nm,p.x,p.z,3.9,.58);}catch(e){}});W3.Phantoms={list:ROSTER,near:function(){try{for(var i=0;i<ROSTER.length;i++){var p=ROSTER[i];if(p.mesh.visible&&typeof S!=='undefined'&&Math.hypot(S.px-p.x,S.pz-p.z)<3.6)return p;}}catch(e){}return null;}};W3._phantomAnim=function(){try{var cl=(window.W3&&W3._clear)||0;for(var i=0;i<ROSTER.length;i++){var p=ROSTER[i];var want=(cl<p.fade);if(want){p.mesh.visible=true;p.mesh.lookAt(camera.position.x,1.7,camera.position.z);p.mesh.material.opacity+=(0.62-p.mesh.material.opacity)*0.05;}else{p.mesh.material.opacity+=(0-p.mesh.material.opacity)*0.05;if(p.mesh.material.opacity<0.02)p.mesh.visible=false;}}}catch(e){}};}catch(e){}})();
+  (function(){try{var TR=(GAMELANG==='tr');var ROSTER=[{k:'principal',x:150,z:175,fade:0.12,nm:TR?'ESKİ LİSE MÜDÜRÜ':'THE OLD PRINCIPAL',lines:TR?['Bu saatte burada ne işin var? Senin yerin hep en arka sıraydı.','Senin gibilerden zaten pek bir şey olmazdı.']:['What are you doing out here at this hour? Your place was always the back row.','People like you never really amounted to much.']},{k:'teacher',x:250,z:184,fade:0.25,nm:TR?'TOKAT ATAN İLKOKUL ÖĞRETMENİ':'THE SLAPPING PRIMARY-SCHOOL TEACHER',lines:TR?['Neden insanları bu oyunun içine sokuyorsun? Otur oturduğun yerde!','Eline kalemi bile doğru tutamayan sen, kimi kurtaracakmışsın?']:['Why are you putting people inside this little game of yours? Sit down where you belong!','You could not even hold a pencil straight — and now you think you can save someone?']},{k:'therapist',x:300,z:206,fade:0.38,nm:TR?'ESKİ TERAPİST':'THE EX-THERAPIST',lines:TR?['Bu hâle senin yüzünden geldim. Sen bir hastaydın, hâlâ öylesin.','Koltuğun öteki tarafına geçmen seni iyileşmiş yapmaz.']:['I ended up like this because of you. You were a patient, and you still are.','Moving to the other side of the couch does not make you healed.']},{k:'friend',x:205,z:243,fade:0.50,nm:TR?'DALGA GEÇEN ARKADAŞ':'THE MOCKING FRIEND',lines:TR?['Şuna bak, herkese kendini rezil ediyorsun yine.','Bir oyun yaptım diye herkese mi anlatıyorsun? Gülünç oluyorsun.']:['Look at you, embarrassing yourself in front of everyone again.','You built a little game and now you tell everyone? You are ridiculous.']},{k:'lover',x:120,z:252,fade:0.63,nm:TR?'ESKİ SEVGİLİ':'THE EX-LOVER',lines:TR?['Sen kimseyi gerçekten sevemezsin. Onu ikimiz de biliyoruz.','Hep böyle olacak: önce kaçacak yer ararsın, sonra terk edilmiş gibi yaparsın.']:['You cannot really love anyone. We both know that.','It will always be this way: first you look for an exit, then you act as if you were the one abandoned.']}];ROSTER.forEach(function(p){var m=new THREE.Mesh(new THREE.PlaneGeometry(1.7,3.4),new THREE.MeshBasicMaterial({color:0x3a4252,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide}));m.position.set(p.x,1.7,p.z);m.visible=false;scene.add(m);p.mesh=m;try{label('\u2609 '+p.nm,p.x,p.z,3.9,.58);}catch(e){}});W3.Phantoms={list:ROSTER,near:function(){try{for(var i=0;i<ROSTER.length;i++){var p=ROSTER[i];if(p.mesh.visible&&typeof S!=='undefined'&&Math.hypot(S.px-p.x,S.pz-p.z)<3.6)return p;}}catch(e){}return null;}};W3._phantomAnim=function(){try{var cl=(window.W3&&W3._clear)||0;for(var i=0;i<ROSTER.length;i++){var p=ROSTER[i];var want=(cl<p.fade);if(want){p.mesh.visible=true;p.mesh.lookAt(camera.position.x,1.7,camera.position.z);p.mesh.material.opacity+=(0.62-p.mesh.material.opacity)*0.05;}else{p.mesh.material.opacity+=(0-p.mesh.material.opacity)*0.05;if(p.mesh.material.opacity<0.02)p.mesh.visible=false;}}}catch(e){}};}catch(e){}})();
 
   /* Bahal — the shadow */
   const bahal=makeChar('bahal');
@@ -6627,6 +6626,48 @@ if(HAS3D)(function(){
         try{var _ncf=makeChar('noct');_ncf.g.position.set(-2.6,0,-2.4);_ncf.g.rotation.y=Math.PI*0.35;g.add(_ncf.g);
           var _ncl=this._label('\u263E MC NOCTORNUS','rgba(127,212,193,.95)',1.5);_ncl.position.set(-2.6,2.7,-2.4);g.add(_ncl);}catch(e){}
       } }catch(e){}
+      /* b112: LUCIUS OFIS ic mekani — masalar, parlayan monitorler, calisan figurleri; Lucius iceride, doLucius'a baglanir */
+      try{ if(window.House&&House.realm==='lucius'){
+        var _oFloor=std(0x1c2230,{roughness:.9});
+        var _ocarp=new THREE.Mesh(new THREE.CircleGeometry(RS+8,40),std(0x14202c,{roughness:.95}));_ocarp.rotation.x=-Math.PI/2;_ocarp.position.y=0.012;g.add(_ocarp);
+        var _ocap=new THREE.Mesh(new THREE.CircleGeometry(RS+9,40),std(0x10141c,{roughness:.95}));_ocap.rotation.x=Math.PI/2;_ocap.position.y=7.6;g.add(_ocap);
+        g.add(new THREE.AmbientLight(0xbcd6ee,.45));
+        var _ND=_coarse?5:9;
+        for(var _di=0;_di<_ND;_di++){var _da=(_di/_ND)*Math.PI*2+0.2;var _dr=RS-3.4;var _dx=Math.cos(_da)*_dr,_dz=Math.sin(_da)*_dr;
+          if(Math.hypot(_dx,_dz-(RS-0.9))<3.2)continue;
+          var _desk=box(1.7,0.78,0.9,std(0x2a2620,{roughness:.85}),_dx,0.39,_dz,_da,g,false);
+          var _scr=new THREE.Mesh(new THREE.PlaneGeometry(0.9,0.56),new THREE.MeshBasicMaterial({color:0x6fd0ff,transparent:true,opacity:.85}));
+          _scr.position.set(_dx,1.06,_dz);_scr.lookAt(0,1.06,0);g.add(_scr);
+          var _scl=new THREE.PointLight(0x6fd0ff,.35,5,2);_scl.position.set(_dx,1.1,_dz);g.add(_scl);
+          this.coll.push({x:_dx,z:_dz,r:1.0});
+          if(!_coarse){var _wb=box(.42,1.2,.28,std(0x2c3340,{emissive:0x10151e,emissiveIntensity:.1}),_dx*0.86,0.6,_dz*0.86,_da,g,false);
+            var _wh=new THREE.Mesh(new THREE.SphereGeometry(.16,9,9),std(0xd8c2a8,{roughness:.7}));_wh.position.set(_dx*0.86,1.42,_dz*0.86);g.add(_wh);} }
+        var _fcab=box(1.0,2.0,0.7,std(0x232a36,{roughness:.85,emissive:0x0e1218,emissiveIntensity:.1}),-(RS-2.2),1.0,-(RS-3.0),0.5,g,false);this.coll.push({x:-(RS-2.2),z:-(RS-3.0),r:0.9});
+        try{var _lcf=makeChar('lucius');_lcf.g.position.set(-2.4,0,-3.0);_lcf.g.rotation.y=Math.PI*0.15;g.add(_lcf.g);this._luciusFig={x:-2.4,z:-3.0};
+          var _lcl=this._label('\u25C8 LUCIUS','rgba(170,182,196,.96)',1.5);_lcl.position.set(-2.4,2.7,-3.0);g.add(_lcl);}catch(e){}
+      } }catch(e){}
+      /* b112: SILVANUS deniz-orman + KARAVAN ic mekani — kum zemin, agaclar, sakin su, karavan; yumusak gunduz isigi */
+      try{ if(window.House&&House.realm==='silvanus'){
+        var _sand=new THREE.Mesh(new THREE.CircleGeometry(RS+8,40),std(0xcdb487,{roughness:.98}));_sand.rotation.x=-Math.PI/2;_sand.position.y=0.012;g.add(_sand);
+        var _sky=new THREE.Mesh(new THREE.CircleGeometry(RS+9,40),new THREE.MeshBasicMaterial({color:0x9fc8e0}));_sky.rotation.x=Math.PI/2;_sky.position.y=8.2;g.add(_sky);
+        g.add(new THREE.AmbientLight(0xffe6c0,.7));
+        var _sun=new THREE.DirectionalLight(0xfff0d8,.6);_sun.position.set(6,12,4);g.add(_sun);
+        var _water=new THREE.Mesh(new THREE.PlaneGeometry((RS+6)*2,(RS-2)),new THREE.MeshStandardMaterial({color:0x2f80b0,transparent:true,opacity:.7,roughness:.4}));
+        _water.rotation.x=-Math.PI/2;_water.position.set(0,0.02,-(RS-1));g.add(_water);
+        var _NT=_coarse?4:8;
+        for(var _ti=0;_ti<_NT;_ti++){var _ta=(_ti/_NT)*Math.PI*2+0.6;var _tr2=RS-2.0;var _tx=Math.cos(_ta)*_tr2,_tz=Math.sin(_ta)*_tr2;
+          if(_tz<-(RS-4))continue;if(Math.hypot(_tx,_tz-(RS-0.9))<3.0)continue;
+          box(.28,2.4,.28,std(0x5a3a22,{roughness:.95}),_tx,1.2,_tz,0,g,false);
+          var _crown=new THREE.Mesh(new THREE.ConeGeometry(1.3,2.4,7),std(0x2f6a3a,{roughness:.9,flatShading:true}));_crown.position.set(_tx,3.4,_tz);g.add(_crown);
+          this.coll.push({x:_tx,z:_tz,r:0.7}); }
+        var _car=box(3.4,2.2,1.8,std(0xc26a2a,{roughness:.85,emissive:0x2a1408,emissiveIntensity:.08}),3.2,1.1,-1.6,0.3,g,false);this.coll.push({x:3.2,z:-1.6,r:1.6});
+        var _carRoof=new THREE.Mesh(new THREE.CylinderGeometry(1.0,1.0,3.5,12,1,false,0,Math.PI),std(0xe8ddca,{roughness:.9}));_carRoof.rotation.z=Math.PI/2;_carRoof.rotation.y=0.3;_carRoof.position.set(3.2,2.3,-1.6);g.add(_carRoof);
+        var _carWin=new THREE.Mesh(new THREE.PlaneGeometry(0.7,0.6),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:.8}));_carWin.position.set(3.2+1.3,1.3,-1.6+0.95);_carWin.lookAt(0,1.3,0);g.add(_carWin);
+        var _carL=new THREE.PointLight(0xffce7a,.5,8,2);_carL.position.set(3.2,1.6,-1.0);g.add(_carL);
+        if(!_coarse){var _kettle=new THREE.Mesh(new THREE.SphereGeometry(.22,10,10),std(0x3a3a40,{metalness:.4,roughness:.5}));_kettle.position.set(1.4,0.5,-0.2);g.add(_kettle);}
+        try{var _scf=makeChar('silv');_scf.g.position.set(-2.2,0,-2.0);_scf.g.rotation.y=Math.PI*0.2;g.add(_scf.g);
+          var _scl2=this._label('\u263D SILVANUS','rgba(255,160,80,.95)',1.5);_scl2.position.set(-2.2,2.7,-2.0);g.add(_scl2);}catch(e){}
+      } }catch(e){}
       const dfr=new THREE.Mesh(new THREE.TorusGeometry(1.5,.16,8,24,Math.PI),new THREE.MeshStandardMaterial({color:pal.accent,emissive:pal.accent,emissiveIntensity:.6,roughness:.5}));dfr.position.set(0,0,RS-0.6);dfr.rotation.x=-Math.PI/2;g.add(dfr);
       const dl=this._label(GAMELANG==='tr'?'↩ ÇIKIŞ':'↩ EXIT','rgba(206,216,236,.92)',1.6);dl.position.set(0,2.4,RS-0.7);g.add(dl);this.door={x:0,z:RS-0.9};
       this.stations=[];this.cur=null;
@@ -6819,6 +6860,7 @@ if(HAS3D)(function(){
       if(this.house){const f=this._foc;if(f&&Math.hypot(p.px-f.position.x,p.pz-f.position.z)<2.4){const ch=this.houseCh;const rooms=(window.House&&House.data().rooms)||[];const room=rooms[ch-1]||{};const allDone=window.House&&House.curChapter()>7;return['◈ '+(GAMELANG==='tr'?'Bölüm ':'Chapter ')+(window.House?House.abs(ch):ch)+' · '+(room.room?(room.room[GAMELANG]||room.room.en):'')+(GAMELANG==='tr'?' — başla':' — begin'),()=>{if(allDone&&window.House){House.realmGate();}else if(window.House){House.openRoom(ch);}}];}
         if(this._deskAt&&Math.hypot(p.px-this._deskAt.x,p.pz-this._deskAt.z)<2.6)return['🪑 '+(GAMELANG==='tr'?'masaya otur — günlüğünü yaz':'sit at the desk — write your journal'),()=>{try{sitAtDesk();}catch(e){}}];
         if(this._benchAt&&Math.hypot(p.px-this._benchAt.x,p.pz-this._benchAt.z)<2.6)return['🧘 '+(GAMELANG==='tr'?'bankta otur — sakinleş / topraklan':'sit on the bench — settle / ground'),()=>{try{if(window.Grounding)Grounding.start();}catch(e){}}];
+        if(this._luciusFig&&window.House&&House.realm==='lucius'&&Math.hypot(p.px-this._luciusFig.x,p.pz-this._luciusFig.z)<2.8)return['◈ '+(GAMELANG==='tr'?'Lucius ile yüzleş':'meet Lucius'),()=>{try{if(window.doLucius)doLucius();}catch(e){}}];
         return null;}
       let best=null,bd=2.4;for(const st of this.stations){const d=Math.hypot(p.px-st.x,p.pz-st.z);if(d<bd){bd=d;best=st;}}
       if(best){const dn=!!(S.zones&&S.zones[this.cur]&&S.zones[this.cur].done&&S.zones[this.cur].done[best.id]);return[(dn?'✓ ':'◇ ')+(GAMELANG==='tr'?'Bölüm ':'Ch ')+best.ch+' · '+Scene.T(best.t)+(GAMELANG==='tr'?' — performe et':' — perform'),()=>Scene.run(W3.Interior.cur,best.id)];}
