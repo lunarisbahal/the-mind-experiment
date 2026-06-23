@@ -311,7 +311,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b97--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b98--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -529,7 +529,7 @@ const L={
   /* rite sites */
   diskAltar:{x:68,z:106,r:4.5,name:'THE HEAVY DISK'},
   maskMirror:{x:293,z:164,r:4.5,name:'THE WAITING-ROOM MIRROR'},
-  whitePage:{x:114,z:40,r:4,name:'THE WHITE PAGE'},
+  whitePage:{x:120,z:180,r:4,name:'THE WHITE PAGE'},
   cbtDesk:{x:278,z:147,r:4,name:'DISTORTION HUNTER'},
   bilatStone:{x:295,z:172,r:4,name:'TWIN-LIGHT STONE'},
   archStone:{x:302,z:158,r:4,name:'ARCHETYPE MIRROR'},
@@ -5120,8 +5120,8 @@ if(HAS3D)(function(){
     W3._mind={core:coreM,halo:halo,light:beamLight,rays:rays,shields:shields};
     W3._mindAnim=function(t){try{
       var pu=0.5+0.5*Math.sin(t*0.5);
-      coreM.material.opacity=0.72+0.2*pu; halo.scale.setScalar(1+0.06*Math.sin(t*0.4)); halo.material.opacity=0.10+0.10*pu; beamLight.intensity=0.55+0.4*pu;
-      for(var i=0;i<rays.length;i++){var rr=rays[i];rr.material.opacity=rr.userData.base*(0.55+0.75*(0.5+0.5*Math.sin(t*0.7+rr.userData.ph)));}
+      var _vis=1;try{_vis=Math.max(0.05,Math.min(1,1-((S.pz-90)/220)));}catch(e){}coreM.material.opacity=(0.72+0.2*pu)*_vis; halo.scale.setScalar(1+0.06*Math.sin(t*0.4)); halo.material.opacity=(0.10+0.10*pu)*_vis; beamLight.intensity=(0.55+0.4*pu)*_vis;
+      for(var i=0;i<rays.length;i++){var rr=rays[i];rr.material.opacity=rr.userData.base*(0.55+0.75*(0.5+0.5*Math.sin(t*0.7+rr.userData.ph)))*_vis;}
       for(var j=0;j<shields.length;j++){var sh=shields[j];sh.material.opacity=sh.userData.base*(0.5+0.85*(0.5+0.5*Math.sin(t*0.9+sh.userData.ph)));sh.rotation.y+=0.00012*(j%2?-1:1);}
     }catch(e){}};
   }catch(e){}})();
@@ -7201,14 +7201,15 @@ if(HAS3D)(function(){
       moonLight.color.setHSL(.6-.07*sun,.45,.75+.06*sun);
       hemi.intensity=ph.hemi*(1-sun)+.85*sun;
       scene.fog.density=ph.fog*(1-sun)+.0035*sun;
-      var _p=(window.W3&&W3._clear)||0;var _front=110+_p*230;var _df=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:150)-_front)/110));moonLight.intensity*=(1-0.97*_df);hemi.intensity*=(1-0.95*_df);scene.fog.density*=(1+14*_df);moonLight.intensity+=0.45*_p;hemi.intensity+=0.40*_p;scene.fog.density*=(1-0.5*_p);rimLight.intensity=0.12+0.85*_p;try{var _nf=Math.max(0,Math.min(1,(110-((typeof S!=='undefined'&&S.pz!=null)?S.pz:120))/110));if(_nf===_nf){hemi.intensity+=1.25*_nf;moonLight.intensity+=0.6*_nf;}}catch(e){}
+      var _cn=Math.max(0,Math.min(1,(110-((typeof S!=='undefined'&&S.pz!=null)?S.pz:120))/110));var _p=(window.W3&&W3._clear)||0;var _front=110+_p*230;var _df=Math.max(0,Math.min(1,((typeof S!=='undefined'&&S.pz!=null?S.pz:150)-_front)/110));moonLight.intensity*=(1-0.97*_df);hemi.intensity*=(1-0.95*_df);scene.fog.density*=(1+14*_df);moonLight.intensity+=0.45*_p;hemi.intensity+=0.40*_p;scene.fog.density*=(1-0.5*_p);rimLight.intensity=0.12+0.85*_p;try{var _nf=Math.max(0,Math.min(1,(110-((typeof S!=='undefined'&&S.pz!=null)?S.pz:120))/110));if(_nf===_nf){hemi.intensity+=1.25*_nf;moonLight.intensity+=0.6*_nf;}}catch(e){}
       skyU.top.value.setRGB(.012+.18*sun,.016+.34*sun,.047+.55*sun);
       skyU.mid.value.setRGB(.039+.42*sun,.075+.55*sun,.149+.62*sun);
       skyU.bot.value.setRGB(.078+.72*sun,.122+.62*sun,.22+.45*sun);
       try{var _sd=1-0.95*_df*(1-_p*0.7);skyU.top.value.multiplyScalar(_sd);skyU.mid.value.multiplyScalar(_sd);skyU.bot.value.multiplyScalar(_sd);}catch(e){} /* b73: deep-south horizon goes near-black */ try{var _nfS=Math.max(0,Math.min(1,(110-((typeof S!=='undefined'&&S.pz!=null)?S.pz:120))/110));if(_nfS===_nfS&&_nfS>0){var _ds2=1+0.8*_nfS;skyU.top.value.multiplyScalar(_ds2);skyU.mid.value.multiplyScalar(_ds2);skyU.bot.value.r=Math.min(1,skyU.bot.value.r+0.10*_nfS);skyU.bot.value.g=Math.min(1,skyU.bot.value.g+0.07*_nfS);skyU.bot.value.multiplyScalar(_ds2);try{var _g=Math.max(0,Math.min(1,_nfS));if(_g===_g){skyU.top.value.r=Math.min(1,skyU.top.value.r+0.16*_g);skyU.top.value.g=Math.min(1,skyU.top.value.g+0.20*_g);skyU.top.value.b=Math.min(1,skyU.top.value.b+0.30*_g);skyU.mid.value.r=Math.min(1,skyU.mid.value.r+0.10*_g);skyU.mid.value.g=Math.min(1,skyU.mid.value.g+0.12*_g);}}catch(e){}/* b89: warm daylight sun-glow in north sky */}}catch(e){} /* b83: far-north daylight sky */
+      try{if(_cn>0){if(!W3._dayTop){W3._dayTop=new THREE.Color(0.34,0.58,0.93);W3._dayMid=new THREE.Color(0.57,0.76,0.97);W3._dayBot=new THREE.Color(0.82,0.90,0.99);}var _ca=_cn*0.92;skyU.top.value.lerp(W3._dayTop,_ca);skyU.mid.value.lerp(W3._dayMid,_ca);skyU.bot.value.lerp(W3._dayBot,_ca);hemi.intensity=Math.max(hemi.intensity,0.45+1.2*_cn);moonLight.intensity=Math.max(moonLight.intensity,0.35+0.9*_cn);scene.fog.density=Math.min(scene.fog.density,0.0065*(1-0.55*_cn));}}catch(e){}
       W3.starsM.opacity=.85*(1-sun);
-      moonMesh.material.opacity=((W3._moonOp||.95)*(1-sun*.92))+.03;
-      moonGlow.material.opacity=(W3._glowOp||.5)*(1-sun);
+      moonMesh.material.opacity=(((W3._moonOp||.95)*(1-sun*.92))+.03)*(1-0.93*_cn);
+      moonGlow.material.opacity=(W3._glowOp||.5)*(1-sun)*(1-0.93*_cn);
     }
     window.__mmA=AGENTS.map(a=>({x:a.f.g.position.x,z:a.f.g.position.z,nm:a.nm}));
     window.__mmP=window.MP&&MP.on?Object.values(MP.peers).filter(p=>p.tx!==undefined).map(p=>({x:p.tx,z:p.tz,n:p.nm||'traveler'})):[];
@@ -7330,7 +7331,7 @@ if(HAS3D)(function(){
     if(W3._ash){ /* b41: kül/köz yağışı düşer + sürüklenir, oyuncuyu takip eder */
       var _aa=W3._ash.geometry.attributes.position,_asp=W3._ash.userData.spd;
       for(var _m=0;_m<_asp.length;_m++){_aa.array[_m*3+1]-=_asp[_m]*dt*1.1;_aa.array[_m*3]+=Math.sin(t*.6+_m)*0.004;if(_aa.array[_m*3+1]<0){_aa.array[_m*3+1]=22;_aa.array[_m*3]=(Math.random()-.5)*40;_aa.array[_m*3+2]=(Math.random()-.5)*40;}}
-      _aa.needsUpdate=true;W3._ash.position.set(P.px,0,P.pz);
+      _aa.needsUpdate=true;W3._ash.position.set(P.px,0,P.pz);try{var _adf=Math.max(0,Math.min(1,(P.pz-110)/90));W3._ash.material.opacity=0.42*_adf;W3._ash.visible=_adf>0.02;}catch(e){}
     }
 
     /* camera — completely static while paused */
