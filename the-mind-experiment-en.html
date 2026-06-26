@@ -318,10 +318,11 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b152--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b153--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
+    <button class="btn ghost" id="introForumBtn" style="margin-top:8px;font-size:11.5px" onclick="if(window.Forum)Forum.show()">● KOLLEKTİF BİLİNÇ · forum</button><br>
     <button class="btn ghost" id="contBtn" style="display:none" onclick="Game.start(true)">Continue</button><br>
     <button class="btn ghost" id="codeBtn" style="margin-top:8px;font-size:11.5px" onclick="enterWithCode()">☁ Continue with a progress code (another device)</button>
   </div>
@@ -372,6 +373,7 @@
   <button class="mini" onclick="Voices.menu()">◈ ARCHETYPE VOICES</button>
   <button class="mini" onclick="Voices.audio()">🎧 AUDIOBOOK</button>
   <button class="mini" onclick="Journal.menu()">📖 MY BOOK</button>
+<button class="mini" onclick="if(window.Forum)Forum.show()">● KOLLEKTİF BİLİNÇ</button>
 <button class="mini" onclick="if(window.Roster)Roster.show()">◈ WHO IS IN THIS UNIVERSE</button>
 <button class="mini" onclick="Daily3.show()">🜂 DAILY TRIAD</button>
 <button class="mini" onclick="Therapy.menuRedirect()">🛋 THERAPY CENTER</button>
@@ -8008,6 +8010,60 @@ document.getElementById('bigmap').addEventListener('click',function(ev){const c=
   for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255|0;
     d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255;}
   x.putImageData(d,0,0);})();
+</script>
+<script>
+window.Forum=(function(){
+  var B='https://it041-konsey.lunarisbahal.workers.dev';
+  function TR(){return (typeof GAMELANG!=='undefined'&&GAMELANG==='tr');}
+  function esc(s){s=(s==null?'':''+s);return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function who(){try{var n=(window.travelerName&&travelerName())||localStorage.getItem('it041_handle');return n||(TR()?'Bir yolcu':'A traveler');}catch(e){return 'Bir yolcu';}}
+  function doc(t,h){if(window.UI&&UI.doc)UI.doc(t,h);}
+  function when(t){try{var d=Math.floor((Date.now()-t)/60000);if(d<1)return TR()?'az önce':'now';if(d<60)return d+'dk';var hh=Math.floor(d/60);if(hh<24)return hh+'sa';return Math.floor(hh/24)+'g';}catch(e){return '';}}
+  function TT(){return '● '+(TR()?'KOLLEKTİF BİLİNÇ':'COLLECTIVE CONSCIOUSNESS');}
+  var F={_threads:[],
+    show:function(){doc(TT(),'<p style="opacity:.7">'+(TR()?'yükleniyor…':'loading…')+'</p>');
+      fetch(B+'/forum').then(function(r){return r.json();}).then(function(d){F._threads=(d&&d.threads)||[];F._render(false);}).catch(function(){F._render(true);});},
+    _render:function(err){var h='<div style="text-align:left;max-height:62vh;overflow:auto">';
+      h+='<button class="btn v" onclick="Forum.newForm()">＋ '+(TR()?'Yeni başlık aç':'New thread')+'</button>';
+      h+='<p style="opacity:.6;font-size:12px;margin:6px 0 10px">'+(TR()?'Fikir alışverişi forumu. Saygılı ol; yazdıkların herkese açıktır.':'Idea-exchange forum. Be kind; posts are public.')+'</p>';
+      if(err)h+='<p style="color:var(--warn)">'+(TR()?'Foruma ulaşılamadı (çevrimdışı olabilir).':'Forum unreachable.')+'</p>';
+      var t=F._threads.slice().reverse();
+      if(!t.length&&!err)h+='<p style="opacity:.6">'+(TR()?'Henüz başlık yok — ilk soruyu sen aç.':'No threads yet — open the first.')+'</p>';
+      for(var i=0;i<t.length;i++){var th=t[i];
+        h+='<div onclick="Forum.thread(\''+th.id+'\')" style="cursor:pointer;border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin-bottom:7px"><b>'+esc(th.title)+'</b><br><span style="opacity:.6;font-size:12px">'+esc(th.by)+' · '+((th.posts&&th.posts.length)||1)+' '+(TR()?'yanıt':'posts')+' · '+when(th.t)+'</span></div>';}
+      h+='</div>';doc(TT(),h);},
+    thread:function(id){var th=null,i;for(i=0;i<F._threads.length;i++)if(F._threads[i].id===id)th=F._threads[i];
+      if(!th){F.show();return;}
+      var h='<div style="text-align:left;max-height:62vh;overflow:auto">';
+      h+='<button class="btn ghost" onclick="Forum.show()">↩ '+(TR()?'başlıklar':'threads')+'</button>';
+      h+='<h3 style="margin:8px 0 4px">'+esc(th.title)+'</h3>';
+      var p=th.posts||[],j;
+      for(j=0;j<p.length;j++){h+='<div style="border-bottom:1px solid var(--line);padding:7px 0"><span style="opacity:.6;font-size:12px">'+esc(p[j].by)+' · '+when(p[j].t)+'</span><br>'+esc(p[j].text).replace(/\n/g,'<br>')+'</div>';}
+      h+='<div style="margin-top:10px"><input id="fReplyName" placeholder="'+(TR()?'isim (ops.)':'name (opt.)')+'" value="'+esc(who())+'" style="width:42%;margin-bottom:6px"><br><textarea id="fReplyTxt" rows="3" placeholder="'+(TR()?'yanıtın…':'your reply…')+'" style="width:96%"></textarea><br><button class="btn v" onclick="Forum.send(\'reply\',\''+th.id+'\')">'+(TR()?'gönder':'send')+'</button></div></div>';
+      doc(esc(th.title),h);},
+    newForm:function(){var h='<div style="text-align:left">';
+      h+='<button class="btn ghost" onclick="Forum.show()">↩ '+(TR()?'başlıklar':'threads')+'</button>';
+      h+='<p style="margin:8px 0 4px">'+(TR()?'Yeni başlık':'New thread')+'</p>';
+      h+='<input id="fNewName" placeholder="'+(TR()?'isim (ops.)':'name (opt.)')+'" value="'+esc(who())+'" style="width:52%;margin-bottom:6px"><br>';
+      h+='<input id="fNewTitle" placeholder="'+(TR()?'başlık':'title')+'" style="width:96%;margin-bottom:6px"><br>';
+      h+='<textarea id="fNewTxt" rows="4" placeholder="'+(TR()?'sorun / düşüncen…':'your question / thought…')+'" style="width:96%"></textarea><br>';
+      h+='<button class="btn v" onclick="Forum.send(\'thread\')">'+(TR()?'başlık aç':'create')+'</button></div>';
+      doc((TR()?'Yeni başlık':'New thread'),h);},
+    send:function(kind,id){try{var name,txt,title='',body={action:kind};
+      if(kind==='thread'){name=(document.getElementById('fNewName')||{}).value;title=(document.getElementById('fNewTitle')||{}).value||'';txt=(document.getElementById('fNewTxt')||{}).value;body.title=title;}
+      else{name=(document.getElementById('fReplyName')||{}).value;txt=(document.getElementById('fReplyTxt')||{}).value;body.id=id;}
+      name=((name||who())+'').trim().slice(0,40);txt=((txt||'')+'').trim();
+      if(!txt||(kind==='thread'&&!(''+title).trim())){if(window.UI&&UI.toast)UI.toast(TR()?'boş bırakma':'do not leave it empty');return;}
+      try{localStorage.setItem('it041_handle',name);}catch(e){}
+      body.by=name;body.text=txt;
+      if(window.UI&&UI.toast)UI.toast(TR()?'gönderiliyor…':'sending…');
+      fetch(B+'/forum',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json();}).then(function(d){
+        if(d&&d.safe){doc('●','<p style="line-height:1.7">'+esc(d.reply)+'</p>');return;}
+        if(d&&d.ok){if(kind==='thread')F.show();else{fetch(B+'/forum').then(function(r){return r.json();}).then(function(dd){F._threads=(dd&&dd.threads)||[];F.thread(id);});}}
+        else if(window.UI&&UI.toast)UI.toast(TR()?'gönderilemedi':'failed');
+      }).catch(function(){if(window.UI&&UI.toast)UI.toast(TR()?'bağlantı yok':'no connection');});
+      }catch(e){}}
+  };return F;})();
 </script>
 </body>
 </html>
