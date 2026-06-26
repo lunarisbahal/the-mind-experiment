@@ -319,7 +319,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b161--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b162--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -1772,9 +1772,11 @@ const Game={
     if(HAS3D)W3.applyMoon&&W3.applyMoon();
     if(!cont)setTimeout(()=>Dlg.open([
       ['LUNARIS','Open your eyes slowly. The Institute\'s anesthetic is honest, at least.'],
-      ['LUNARIS','They told you this machine rebuilds Bahal\'s mind. It does not. No machine rebuilds another person\'s mind. There is only one mindscape any door opens into.'],
+      ['LUNARIS','This is not a game. This is your relationship with your own mind — its noise, its dark, the voices wandering inside it are all yours.'],
+      ['LUNARIS','They told you this machine rebuilds Bahal\'s mind. It does not. No machine rebuilds another person\'s mind. A man recorded himself for three years and found a second voice answering from inside his own handwriting; that voice drew this map. There is only one mindscape any door opens into — yours.'],
       ['LUNARIS','Look around when you step outside. The disks, the cells, the lake — the furniture is from his book. The gravity is from you.'],
-      ['LUNARIS','I walked beside him for three years and he chose the mirror. I will walk beside you instead. Start with the case file, under the canopy. And when you see violet light — that is not a quest. That is an invitation.']
+      ['LUNARIS','One more law: what is copied wants to possess; an integrated consciousness cannot be copied. What you flee here will not follow you — it waits here to be named. Closing this is also an escape.'],
+      ['LUNARIS','The violet lights are invitations, not quests. I walked beside him for three years; now I will walk beside you. I need you — this universe completes only with you.']
     ]),500);
     if(!cont){try{S.flags=S.flags||{};if(!S.flags._introTold){S.flags._introTold=true;try{if(window.Cam)Cam.yaw=0;}catch(e){}setTimeout(function(){try{UI.toast((GAMELANG==='tr'?'✦ Giriş bölümünün kilidi açıldı — Kütüphane\'de 📖. Nerede olduğunu anlamak için oku.':'✦ Intro unlocked — it\'s in the Library 📖. Read it to understand where you are.'),8000);}catch(e){}try{if(window.Library&&Library.show)Library.show();}catch(e){}},2400);try{save();}catch(e){}}}catch(e){}}
     Snd.init();
@@ -8129,6 +8131,10 @@ window.AgeGate=(function(){
 try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite;}catch(e){}try{window.Snd=Snd;}catch(e){}try{window.Daily=Daily;}catch(e){}try{window.S=S;}catch(e){}
 /* b161: LOCKED bulletproof PROGRESS button — real coded touchend+click listeners replace fragile inline handlers (recurring mobile bug). DO NOT revert to inline-only. */
 (function(){function wire(){var b=document.getElementById('progBtn');if(!b){return setTimeout(wire,400);}var last=0;function go(e){var n=Date.now();if(n-last<600)return;last=n;try{e&&e.stopPropagation();}catch(_){}try{Realms.show();}catch(_){}}b.addEventListener('click',go,false);b.addEventListener('touchend',function(e){try{e.preventDefault();}catch(_){}go(e);},{passive:false});try{b.removeAttribute('onpointerup');b.removeAttribute('onclick');}catch(_){}}if(document.readyState!=='loading')wire();else document.addEventListener('DOMContentLoaded',wire);})();
+</script>
+<script>
+/* b162: visible build stamp (debug) — lets us confirm which build a device is actually running (cache check) */
+(function(){try{var v=document.createElement('div');v.textContent='b162';v.style.cssText='position:fixed;left:4px;bottom:3px;font:9px monospace;color:#9aa;opacity:.32;z-index:2147483647;pointer-events:none;letter-spacing:.5px';function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 </body>
 </html>

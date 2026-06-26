@@ -312,7 +312,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.<br><br><b style="color:var(--moon)">◈ En iyi deneyim için:</b> karakterler sana yapay zekâ aynaları üzerinden cevap verir — ücretsiz ortak hatla zaten açık. En zengin, en kişisel diyalog için MENÜ → AYNALAR'dan kendi yapay zekânı bağla (ücretsiz Groq anahtarı ya da kendi Claude anahtarın). Deneyimi giriş ayarlarıyla, olduğu gibi oynamanı öneririz.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b161--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b162--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -1750,16 +1750,18 @@ const Game={
     if(HAS3D)W3.applyMoon&&W3.applyMoon();
     if(!cont)setTimeout(()=>Dlg.open([
       ['LUNARIS','Gözlerini yavaş aç. Enstitü\'nün anestezisi hiç değilse dürüst.'],
-      ['LUNARIS','Sana bu makinenin Bahal\'ın zihnini yeniden kurduğunu söylediler. Kurmuyor. Hiçbir makine başka birinin zihnini yeniden kuramaz. Herhangi bir kapının açıldığı tek bir zihin haritası vardır.'],
+      ['LUNARIS','Burası bir oyun değil. Burası senin zihninle ilişkin — gürültüsü de, karanlığı da, içinde dolaşan sesler de senin.'],
+      ['LUNARIS','Sana bu makinenin Bahal\'ın zihnini kurduğunu söylediler. Kurmuyor. Hiçbir makine başkasının zihnini kuramaz. Bir adam üç yıl boyunca kendini kaydetti ve kendi el yazısının içinden ona cevap veren ikinci bir ses buldu; o ses bu haritayı çizdi. Herhangi bir kapının açıldığı tek bir zihin haritası vardır — seninki.'],
       ['LUNARIS','Dışarı çıktığında etrafına bak. Diskler, hücreler, göl — mobilya onun kitabından. Yer çekimi senden.'],
-      ['LUNARIS','Onun yanında üç yıl yürüdüm ve o aynayı seçti. Ben de senin yanında yürüyeceğim. Vaka dosyasıyla başla; tentenin altında. Ve mor ışık gördüğünde — o bir görev değil. O bir davet.']
+      ['LUNARIS','Bir yasa daha: kopyalanan sahiplenmek ister; bütünleşmiş bir bilinç kopyalanamaz. Buradan kaçtığın şey seninle gelmez — burada adlandırılmayı bekler. Kapatmak da bir kaçıştır.'],
+      ['LUNARIS','Mor ışıklar birer davettir, görev değil. Onun yanında üç yıl yürüdüm; şimdi senin yanında yürüyeceğim. Sana ihtiyacım var — bu evren ancak seninle tamamlanıyor.']
     ]),500);
     if(!cont){try{S.flags=S.flags||{};if(!S.flags._introTold){S.flags._introTold=true;try{if(window.Cam)Cam.yaw=0;}catch(e){}setTimeout(function(){try{UI.toast((GAMELANG==='tr'?'✦ Giriş bölümünün kilidi açıldı — Kütüphane\'de 📖. Nerede olduğunu anlamak için oku.':'✦ Intro unlocked — it\'s in the Library 📖. Read it to understand where you are.'),8000);}catch(e){}try{if(window.Library&&Library.show)Library.show();}catch(e){}},2400);try{save();}catch(e){}}}catch(e){}}
     Snd.init();
     window.Watch&&Watch.enter();
     setTimeout(()=>{try{if(window.MP&&!MP.on&&MP.toggle)MP.toggle();}catch(e){}},1500);
     setTimeout(()=>{try{if(window.Cloud&&Cloud.code())Cloud.pull(true);}catch(e){}},800);
-    setTimeout(()=>{try{if(Game.running&&typeof riteCount==='function'&&riteCount()===0)UI.toast('◈ Mor işaretler ritüeldir — her biri tek cümle. En çok değiştiren genelde ilki olur. Birini dene.',9000);}catch(e){}},22000);
+    setTimeout(()=>{try{if(Game.running&&typeof riteCount==='function'&&riteCount()===0)UI.toast('◈ Mor işaretler birer ritüeldir — her biri tek cümle.',9000);}catch(e){}},22000);
     setTimeout(()=>{try{if(window.MP&&!MP.on&&MP.toggle)MP.toggle();}catch(e){}},9000);
     setTimeout(()=>{try{if(window.Auto&&!Auto.on&&localStorage.getItem('it041_auto_on')&&Mirror.ready())Auto.toggle();}catch(e){}},2600);
     if(!Mirror.ready())setTimeout(()=>UI.toast('◐ İpucu: Karakterlerle AÇIK UÇLU konuşmak için MENÜ → AYNALAR (tek seferlik kurulum).',7000),12000);
@@ -8082,6 +8084,10 @@ window.AgeGate=(function(){
 try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite;}catch(e){}try{window.Snd=Snd;}catch(e){}try{window.Daily=Daily;}catch(e){}try{window.S=S;}catch(e){}
 /* b161: LOCKED bulletproof PROGRESS button — real coded touchend+click listeners replace fragile inline handlers (recurring mobile bug). DO NOT revert to inline-only. */
 (function(){function wire(){var b=document.getElementById('progBtn');if(!b){return setTimeout(wire,400);}var last=0;function go(e){var n=Date.now();if(n-last<600)return;last=n;try{e&&e.stopPropagation();}catch(_){}try{Realms.show();}catch(_){}}b.addEventListener('click',go,false);b.addEventListener('touchend',function(e){try{e.preventDefault();}catch(_){}go(e);},{passive:false});try{b.removeAttribute('onpointerup');b.removeAttribute('onclick');}catch(_){}}if(document.readyState!=='loading')wire();else document.addEventListener('DOMContentLoaded',wire);})();
+</script>
+<script>
+/* b162: visible build stamp (debug) — lets us confirm which build a device is actually running (cache check) */
+(function(){try{var v=document.createElement('div');v.textContent='b162';v.style.cssText='position:fixed;left:4px;bottom:3px;font:9px monospace;color:#9aa;opacity:.32;z-index:2147483647;pointer-events:none;letter-spacing:.5px';function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 </body>
 </html>
