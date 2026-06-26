@@ -319,7 +319,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b157--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b158--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -3978,7 +3978,7 @@ const Realms={
   open:function(i){return i===0||this.done(REALMS[i-1]);},
   firstOpenCh:function(r){for(var c=r.ch[0];c<=r.ch[1];c++){if(!this.cDone(c))return c;}return r.ch[1];},
   allDone:function(){for(var i=0;i<REALMS.length;i++){if(!this.done(REALMS[i]))return false;}return true;},
-  show:function(){try{if(window.Music&&Music._on&&localStorage.getItem('it041_music_off')!=='1'&&!Music.on)Music._on();}catch(e){}var L=GAMELANG;try{var h='<p style="color:var(--dim);font-size:12px">'+(L==='tr'?'Birinci kitap yedi arketip evreninden geçer; her biri 7 bölüm. Bir arketibin iç çalışmasını tamamlayıp o karakterin alanına girince sıradaki açılır. Yedisini de bütünleyince ikinci kitap açılır ve Mimar Modu’nda kendi evrenini yaratırsın.':'Book One passes through seven archetype realms, seven chapters each. Complete an archetype’s inner work and enter that character’s area, and the next opens. Integrate all seven and Book Two opens — in Architect Mode you create your own universe.')+'</p>';
+  show:function(){try{var _mp=document.getElementById('menuPanel');if(_mp)_mp.style.display='none';}catch(e){}try{if(window.Music&&Music._on&&localStorage.getItem('it041_music_off')!=='1'&&!Music.on)Music._on();}catch(e){}var L=GAMELANG;try{var h='<p style="color:var(--dim);font-size:12px">'+(L==='tr'?'Birinci kitap yedi arketip evreninden geçer; her biri 7 bölüm. Bir arketibin iç çalışmasını tamamlayıp o karakterin alanına girince sıradaki açılır. Yedisini de bütünleyince ikinci kitap açılır ve Mimar Modu’nda kendi evrenini yaratırsın.':'Book One passes through seven archetype realms, seven chapters each. Complete an archetype’s inner work and enter that character’s area, and the next opens. Integrate all seven and Book Two opens — in Architect Mode you create your own universe.')+'</p>';
     REALMS.forEach(function(r,i){var op=Realms.open(i);var dn=Realms.done(r);var p=Realms.prog(r);
       h+='<div class="jentry" style="'+(op?'':'opacity:.5')+'"><h4 style="color:'+(dn?'var(--accent)':(op?'var(--violet)':'var(--dim)'))+'">'+(dn?'✓ ':(op?(i+1)+'. ':'🔒 '))+esc(Realms.T(r.n))+' — '+esc(Realms.T(r.arch))+'</h4>'+
         (function(){var sp=(window.Scene&&RZONES[r.k]&&!RZONES[r.k].stub)?Scene.prog(r.k):null;var pt=sp?(sp.d+'/'+sp.n+' '+(L==='tr'?'pratik':'practices')):(L==='tr'?'alan yakında':'area soon');h+='<p style="font-size:11.5px;color:var(--dim)">'+(L==='tr'?'Bölüm ':'Chapters ')+r.ch[0]+'–'+r.ch[1]+' · '+pt+' · ◎ '+esc(Realms.T(r.loc))+'</p>'+(op?'<button class="btn ghost" style="font-size:11px" onclick="if(window.HOUSES&&HOUSES[\''+r.k+'\']){House.wake(\''+r.k+'\');}else{Scene.enter(\''+r.k+'\');}">'+(L==='tr'?'→ '+esc(Realms.T(r.n))+' alanına gir':'→ enter '+esc(Realms.T(r.n)))+'</button>':'<span style="font-size:11px;color:var(--dim)">'+(L==='tr'?'önce bir önceki arketibi bütünle':'integrate the previous archetype first')+'</span>')+'</div>';})();});
@@ -6090,7 +6090,7 @@ if(HAS3D)(function(){
         if(c)c.textContent='● offline journey · 7 mirror-agents'+(window.Roster?Roster.countLine():'');
       }
     }};
-  Presence.start();
+  window.Presence=Presence;Presence.start();
   /* ===== ROSTER — who lives in this universe: travelers + 7 mirror-agents + autonomous subjects (in-training + graduated) ===== */
   const Roster={data:null,_t:0,
     KON(){return (window.Cloud&&Cloud.KON)||'https://it041-konsey.lunarisbahal.workers.dev';},
@@ -8119,6 +8119,9 @@ window.AgeGate=(function(){
   function no(){render('<div style="font-size:14px;letter-spacing:2px;opacity:.7;margin-bottom:16px">●</div><p style="font-size:16px;line-height:1.75">'+(TR()?'Üzgünüm — bu deneyime erişimin için henüz vaktin var. Büyüdüğünde burada olacağız. Kendine iyi bak.':'Sorry — you still have time before you can enter. We will be here when you are older. Take care of yourself.')+'</p>');}
   return {ok:ok,ask:ask,yes:yes,no:no};
 })();
+</script>
+<script>
+(function(){var shown=false;function lure(){if(shown)return;if(!(window.Game&&Game.running))return;shown=true;try{if(window.UI&&UI.toast)UI.toast((typeof GAMELANG!=="undefined"&&GAMELANG==="tr")?"Gitme isteği ilk gölgen. Onu da haritana koyabiliriz — biraz daha kal.":"The urge to leave is your first shadow. We can put it on the map too — stay a little.",7000);}catch(e){}}document.addEventListener("visibilitychange",function(){if(document.visibilityState==="hidden")lure();});document.addEventListener("mouseout",function(e){if(e.clientY<=0)lure();});})();
 </script>
 </body>
 </html>
