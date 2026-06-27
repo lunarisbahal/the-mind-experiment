@@ -312,7 +312,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.<br><br><b style="color:var(--moon)">◈ En iyi deneyim için:</b> karakterler sana yapay zekâ aynaları üzerinden cevap verir — ücretsiz ortak hatla zaten açık. En zengin, en kişisel diyalog için MENÜ → AYNALAR'dan kendi yapay zekânı bağla (ücretsiz Groq anahtarı ya da kendi Claude anahtarın). Deneyimi giriş ayarlarıyla, olduğu gibi oynamanı öneririz.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b170--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b171--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -2934,10 +2934,11 @@ const Architect={
       '<textarea id="starT" rows="2" maxlength="90" placeholder="ör. burada korkmayı bıraktım…"></textarea>'+
       '<button class="btn v" onclick="Architect.saveStar()">Yıldızı yak</button><button class="btn ghost" onclick="Rite.closeOnly()">Vazgeç</button>';
     UI.show('riteModal');Game.setModal(true);},
+  submitToOwner:function(kind,text){try{var who=((typeof plName==='function'&&plName())||'IT-041');var _t=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');fetch('https://it041-konsey.lunarisbahal.workers.dev/forum',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'thread',by:who,title:(_t?'◈ MİMAR BAŞVURUSU — ':'◈ ARCHITECT SUBMISSION — ')+kind,text:String(text||'').slice(0,500)})}).catch(function(){});setTimeout(function(){try{UI.toast(_t?'✦ Talebin Mimar\'a iletildi — onaylanınca ortak Dolunay Ekspres evrenine katılır. Kendi evreninde şimdiden duruyor.':'✦ Sent to the Architect for review — once approved it joins the shared universe. It already stands in your own.',7000);}catch(e){}},1200);}catch(e){}},
   saveStar(){
     const t=UI.el('starT').value.trim();if(!t){UI.toast('Tek cümle yeter.');return;}
     const l=this.stars();l.push({x:Math.round(S.px),z:Math.round(S.pz),t:t.slice(0,90)});
-    try{localStorage.setItem('it041_stars',JSON.stringify(l.slice(-40)));}catch(e){}
+    try{localStorage.setItem('it041_stars',JSON.stringify(l.slice(-40)));}catch(e){}try{Architect.submitToOwner('YILDIZ / STAR',t);}catch(e){}
     W3.addStar&&W3.addStar(S.px,S.pz,t);
     Trails.add('✶ '+t,S.px,S.pz,true);
     S.insight+=3;save();Rite.closeOnly();
@@ -2953,7 +2954,7 @@ const Architect={
     const t=UI.el('chT').value.trim(),b=UI.el('chB').value.trim();
     if(!t||!b){UI.toast('Ad ve en az bir paragraf.');return;}
     const l=this.story();l.push({t,b,d:new Date().toDateString()});
-    try{localStorage.setItem('it041_story',JSON.stringify(l));}catch(e){}
+    try{localStorage.setItem('it041_story',JSON.stringify(l));}catch(e){}try{Architect.submitToOwner('BOLUM / CHAPTER',t+' — '+b);}catch(e){}
     S.insight+=5;save();Rite.closeOnly();
     UI.toast('📖 BÖLÜM '+l.length+' mühürlendi — '+t);},
   exportBook(){
@@ -2975,7 +2976,7 @@ const Architect={
     const t=UI.el('mrT').value.trim(),q=UI.el('mrQ').value.trim();
     if(!t||!q){UI.toast('Ad ve soru gerek.');return;}
     const l=this.myRites();l.push({t,q,log:[]});
-    try{localStorage.setItem('it041_myrites',JSON.stringify(l.slice(-10)));}catch(e){}
+    try{localStorage.setItem('it041_myrites',JSON.stringify(l.slice(-10)));}catch(e){}try{Architect.submitToOwner('RITUEL / RITE',t+' — '+q);}catch(e){}
     Rite.closeOnly();UI.toast('◈ RİTÜEL KURULDU — '+t+'. Mimar Modu\'ndan her gün uygulayabilirsin.');},
   doMyRite(){
     const l=this.myRites();if(!l.length)return;
@@ -8090,7 +8091,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
 </script>
 <script>
 /* b162: visible build stamp (debug) — lets us confirm which build a device is actually running (cache check) */
-(function(){try{var v=document.createElement('div');v.textContent='b170 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b171 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 </body>
 </html>
