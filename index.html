@@ -319,7 +319,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b201--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b202--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -8111,7 +8111,7 @@ window.Forum=(function(){
       body.by=name;body.text=txt;
       fetch(B+'/forum',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json();}).then(function(d){
         if(d&&d.safe){setH('<p style="line-height:1.7">'+esc(d.reply)+'</p>');return;}
-        if(d&&d.ok){fetch(B+'/forum').then(function(r){return r.json();}).then(function(dd){F._threads=(dd&&dd.threads)||[];if(kind==='thread')F._list(false);else F.thread(id);});}
+        if(d&&d.ok){try{fetch('https://ntfy.sh/dolunay-it041-forum-3713',{method:'POST',headers:{'Title':'Forum - yeni mesaj','Tags':'speech_balloon'},body:(name||'yolcu')+' yazdi: '+(title?('['+title+'] '):'')+(txt||'').slice(0,180)});}catch(_e){}fetch(B+'/forum').then(function(r){return r.json();}).then(function(dd){F._threads=(dd&&dd.threads)||[];if(kind==='thread')F._list(false);else F.thread(id);});}
         else alert(TR()?'Gönderilemedi.':'Failed.');
       }).catch(function(){alert(TR()?'Bağlantı yok.':'No connection.');});
       }catch(e){}}
@@ -8151,7 +8151,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
 </script>
 <script>
 /* b162: visible build stamp (debug) — lets us confirm which build a device is actually running (cache check) */
-(function(){try{var v=document.createElement('div');v.textContent='b201 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b202 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
