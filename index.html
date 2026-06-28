@@ -192,7 +192,7 @@
 <div id="hudTR">
   <canvas id="minimap" width="164" height="126"></canvas>
   <div class="chip" id="moonchip" style="font-size:10px;padding:4px 8px;margin-top:4px;"><b id="moonGlyph">○</b> <span id="moonName"></span> · <span id="dateStr"></span></div>
-  <div class="chip" id="onlineChip" style="font-size:10px;padding:4px 8px;margin-top:4px;color:var(--accent);cursor:pointer" onclick="if(window.Roster)Roster.show()" title="who is in this universe">● — travelers · 7 agents</div>
+  <div class="chip" id="onlineChip" style="font-size:10px;padding:4px 8px;margin-top:4px;color:var(--accent);cursor:pointer" onclick="if(window.Roster)Roster.show()" title="who is in this universe">● — travelers</div>
 </div>
 <img src="https://hits.sh/lunarisbahal.github.io/the-mind-experiment.svg" style="display:none" alt="" aria-hidden="true">
 <div id="hudBL">
@@ -319,7 +319,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b205--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b206--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -6103,11 +6103,11 @@ if(HAS3D)(function(){
         setInterval(()=>{
           try{this.n=Object.keys(this.room.getPeers()).length;}catch(e){}
           const c=document.getElementById('onlineChip');
-          if(c)c.textContent='● '+this.n+' travelers online · 7 mirror-agents'+(window.Roster?Roster.countLine():'');
+          if(c)c.textContent='● '+this.n+' travelers online'+(window.Roster?Roster.countLine():'');
         },4000);
       }catch(e){
         const c=document.getElementById('onlineChip');
-        if(c)c.textContent='● offline journey · 7 mirror-agents'+(window.Roster?Roster.countLine():'');
+        if(c)c.textContent='● offline journey'+(window.Roster?Roster.countLine():'');
       }
     }};
   window.Presence=Presence;Presence.start();
@@ -6119,7 +6119,7 @@ if(HAS3D)(function(){
     async show(){var tr=(GAMELANG==='tr');if(!this.data||Date.now()-this._t>20000){UI.toast(tr?'Evren listesi yükleniyor…':'Loading the universe roster…',1200);await this.load();}var d=this.data||{};var g=(d.roster)||[];
       var h='<p style="color:var(--dim);font-size:12px;line-height:1.6">'+(tr?'Bu evrende kimler var? Yolcular, yedi ayna-arketipi ve kendi yolunu yürüyen otonom denekler.':'Who lives in this universe? Travelers, the seven mirror-archetypes, and the autonomous subjects walking their own path.')+'</p>';
       h+='<p style="font-size:12.5px">🧑‍🚀 '+(tr?'Çevrimiçi yolcular':'Travelers online')+': <b id="rosterOnline">'+((window.Presence&&Presence.n)||0)+'</b></p>';
-      h+='<p style="font-size:12.5px">◈ '+(tr?'Ayna-ajanları (7 arketip)':'Mirror-agents (7 archetypes)')+': <b>7</b> <span style="color:var(--dim)">— Lunaris · Bahal · Lucida · Lucius · Noctornus · Silvanus · Aelius</span></p>';
+      h+='<p style="font-size:12.5px">◈ '+(tr?'7 Arketip (diyar karakterleri)':'7 Archetypes (realm characters)')+': <b>7</b> <span style="color:var(--dim)">— Lunaris · Bahal · Lucida · Lucius · Noctornus · Silvanus · Aelius</span></p>';
       h+='<p style="font-size:12.5px">◍ '+(tr?'Yetişen otonom denek':'Subject in training')+': <b>'+esc((d.name&&d.name.trim())?d.name:'DENEK-019')+'</b> · '+(tr?'Bölüm ':'Ch ')+(d.ch||1)+'/49</p>';
       var ec=d.economy||{ember:0,produced:0,spent:0};
       h+='<div style="margin:9px 0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:rgba(186,117,23,.06)"><div style="color:#caa46a;font-size:10.5px;letter-spacing:.05em">'+(tr?'EVRENİN İÇ EKONOMİSİ':'THE UNIVERSE’S INNER ECONOMY')+'</div><p style="font-size:12px;color:var(--moon);margin:4px 0 0">🔥 '+(tr?'Kıvılcım hazinesi':'Ember treasury')+': <b>'+(ec.ember||0)+'</b> <span style="color:var(--dim)">· '+(tr?'üretildi':'produced')+' '+(ec.produced||0)+' · '+(tr?'harcandı':'spent')+' '+(ec.spent||0)+'</span></p><p style="font-size:11px;color:var(--dim);margin:3px 0 0;line-height:1.5">'+(tr?'Denekler çalıştıkça (bölüm, keşif, hikâye) kıvılcım üretir; yeni denek yetiştirmek harcar. Evren sen yokken bile kendi yakıtını üretir.':'Subjects produce ember as they work (chapters, finds, stories); raising a new one spends it. The universe makes its own fuel even when you are away.')+'</p></div>';
@@ -8151,7 +8151,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
 </script>
 <script>
 /* b162: visible build stamp (debug) — lets us confirm which build a device is actually running (cache check) */
-(function(){try{var v=document.createElement('div');v.textContent='b205 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b206 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
