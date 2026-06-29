@@ -57,8 +57,10 @@ a{color:var(--violet)}
   </div>
 
   <div class="card" style="margin-top:12px">
-    <h2>GİRİŞ / ÇIKIŞ & EYLEM İSTATİSTİĞİ <span class="pill">worker ucu gerekli</span></h2>
-    <p class="muted">Oyun her eylemi worker'ın <code>/activity</code> ucuna <b>yazıyor</b> ama şu an <b>okuma ucu yok</b> (GET 404). Giriş/çıkış sayıları ve eylem dökümünü burada göstermek için worker'a küçük bir salt-okunur uç (örn. <code>/stats</code>) eklemen yeterli — kodu paylaşınca bağlarım. O zamana kadar canlı giriş/çıkış için ntfy <b>gözcü</b> bildirimleri devrede.</p>
+    <h2>GİRİŞ / ÇIKIŞ & EYLEM İSTATİSTİĞİ</h2>
+    <div id="stats">…</div>
+    <div id="acts" style="margin-top:8px"></div>
+    <p class="muted" style="margin-top:6px">Worker'ın <code>/state</code> ucundan (operatör anahtarıyla) okunur — son 100 eylem. Anlık giriş/çıkış için ntfy <b>gözcü</b> bildirimleri de devrede.</p>
   </div>
 
   <p class="tag" style="margin-top:14px">Bu panel yalnız zaten herkese açık olan worker verilerini gösterir; gerçek isim içermez. Otomatik 60 sn'de bir yenilenir.</p>
@@ -143,11 +145,35 @@ async function loadMem(){
   }catch(e){document.getElementById('mem').innerHTML='<span class="muted">okunamadı (anahtar gerekebilir)</span>';}
 }
 
+async function loadState(){
+  var sb=document.getElementById('stats'),ab=document.getElementById('acts');
+  try{
+    var d=await getJSON('/state',true);
+    if(!d||d.op!==true){sb.innerHTML='<span class="muted">operatör anahtarı geçersiz/boş — /state kapalı. Gerçek bakım anahtarını gir.</span>';ab.innerHTML='';return;}
+    var acts=(d.activity||[]);
+    var td=new Date().toISOString().slice(0,10);
+    var isEnter=function(x){return /girdi|evrene/i.test(x.act||'');};
+    var ent=acts.filter(isEnter);
+    var entT=ent.filter(function(x){return (new Date(x.t||0)).toISOString().slice(0,10)===td;}).length;
+    sb.innerHTML='<p class="muted" style="font-size:12px;color:var(--moon)">'+esc(d.pstats||'')+'</p>'
+      +'<div class="row"><span class="k">Girişler (bugün / kayıttaki)</span><span class="v">'+entT+' / '+ent.length+'</span></div>'
+      +'<div class="row"><span class="k">Toplam kayıtlı eylem (son 100)</span><span class="v">'+acts.length+'</span></div>'
+      +'<div class="row"><span class="k">Konsey otomatik akış</span><span class="v">'+(d.autoStopped?'durduruldu':'açık')+'</span></div>'
+      +(d.sat?('<div class="row"><span class="k">Tatmin · otonom/karakter/topluluk</span><span class="v">'+d.sat.otonom+' / '+d.sat.karakter+' / '+d.sat.topluluk+'</span></div>'):'');
+    var a=acts.slice().reverse().slice(0,40);
+    var h=a.map(function(x){
+      var stage=(x.ch?('B'+x.ch):'')+(x.realm?(' · '+esc(x.realm)):'')+(x.loc?(' · '+esc(x.loc)):'');
+      return '<div class="row" style="font-size:12px"><span class="v">'+esc(x.mask||'—')+(x.op?' <span class="tag">(op)</span>':'')+' — '+esc(x.act||'')+'</span><span class="k tag" style="text-align:right">'+esc(stage)+'<br>'+fmtDate(x.t)+'</span></div>';
+    }).join('');
+    ab.innerHTML=a.length?('<h2 style="margin:10px 0 4px">SON EYLEMLER ('+acts.length+')</h2>'+h):'<span class="muted">henüz eylem kaydı yok.</span>';
+  }catch(e){sb.innerHTML='<span class="muted">okunamadı: '+esc(e.message)+'</span>';}
+}
+
 async function loadAll(){
   document.getElementById('stamp').textContent='son güncelleme: '+new Date().toLocaleString('tr-TR');
   await loadSubject();
   loadRoster();
-  await Promise.all([loadGrad(),loadTraces(),loadMem()]);
+  await Promise.all([loadGrad(),loadTraces(),loadMem(),loadState()]);
 }
 
 // prefill key if already set in this origin's localStorage (same origin as the game)
