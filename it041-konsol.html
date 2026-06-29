@@ -150,12 +150,15 @@ async function loadState(){
   try{
     var d=await getJSON('/state',true);
     if(!d||d.op!==true){sb.innerHTML='<span class="muted">operatör anahtarı geçersiz/boş — /state kapalı. Gerçek bakım anahtarını gir.</span>';ab.innerHTML='';return;}
+    var hv=null;try{hv=await getJSON('/health',true);}catch(e){}
+    var wver=(hv&&hv.ver)||'?';
     var acts=(d.activity||[]);
     var td=new Date().toISOString().slice(0,10);
     var isEnter=function(x){return /girdi|evrene/i.test(x.act||'');};
     var ent=acts.filter(isEnter);
     var entT=ent.filter(function(x){return (new Date(x.t||0)).toISOString().slice(0,10)===td;}).length;
-    sb.innerHTML='<p class="muted" style="font-size:12px;color:var(--moon)">'+esc(d.pstats||'')+'</p>'
+    sb.innerHTML='<div class="row"><span class="k">Worker sürümü</span><span class="v">'+esc(wver)+(wver==='v10.6-pace'?' ✓':'')+'</span></div>'
+      +'<p class="muted" style="font-size:12px;color:var(--moon)">'+esc(d.pstats||'')+'</p>'
       +'<div class="row"><span class="k">Girişler (bugün / kayıttaki)</span><span class="v">'+entT+' / '+ent.length+'</span></div>'
       +'<div class="row"><span class="k">Toplam kayıtlı eylem (son 100)</span><span class="v">'+acts.length+'</span></div>'
       +'<div class="row"><span class="k">Konsey otomatik akış</span><span class="v">'+(d.autoStopped?'durduruldu':'açık')+'</span></div>'
