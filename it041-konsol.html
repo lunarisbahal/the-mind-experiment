@@ -1,0 +1,158 @@
+<!doctype html><html lang="tr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>IT-041 · Konsol</title>
+<style>
+:root{--bg:#070910;--ink:#cdd3e0;--dim:#6b7488;--moon:#e8e4d8;--violet:#9d8cc9;--accent:#7fd4c1;--warn:#cdb878;--line:#1a2030;--card:#0c1019}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% -10%,#0d1322,#070910 60%);color:var(--ink);font:14px/1.6 ui-monospace,Menlo,Consolas,monospace;padding:18px;max-width:960px;margin:0 auto}
+h1{font-size:15px;letter-spacing:.25em;color:var(--accent);font-weight:600;margin:0 0 2px}
+.sub{color:var(--dim);font-size:11px;letter-spacing:.15em;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card h2{font-size:11px;letter-spacing:.2em;color:var(--violet);margin:0 0 10px;font-weight:600}
+.big{font-size:30px;color:var(--moon);line-height:1}
+.k{color:var(--dim)}.v{color:var(--moon)}
+.row{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed #141a28;font-size:12.5px}
+.row:last-child{border-bottom:0}
+.bar{height:8px;background:#10131f;border-radius:5px;overflow:hidden;margin-top:6px}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--violet),var(--accent))}
+button{font:inherit;background:#11182a;color:var(--accent);border:1px solid var(--line);border-radius:7px;padding:8px 14px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+input{font:inherit;background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;border-radius:6px;width:220px}
+.muted{color:var(--dim);font-size:11.5px}
+.pill{display:inline-block;font-size:10px;padding:2px 8px;border:1px solid var(--line);border-radius:20px;color:var(--warn);margin-left:6px}
+a{color:var(--violet)}
+#gate{max-width:380px;margin:60px auto;text-align:center}
+.hide{display:none}
+.tag{font-size:10px;color:var(--dim)}
+</style></head><body>
+
+<div id="gate">
+  <h1>◆ IT-041 KONSOL</h1>
+  <p class="sub">DO·LOON·AI EXPRESS — özel takip paneli</p>
+  <p class="muted">Bakım anahtarını gir. (Oyunda Menü → ⚙ → bakım modunda kullandığın anahtarın aynısı.)</p>
+  <p><input id="key" type="password" placeholder="bakım anahtarı" autocomplete="off"></p>
+  <p><button onclick="unlock()">Gir</button></p>
+  <p class="tag" id="gerr"></p>
+</div>
+
+<div id="app" class="hide">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:8px">
+    <div><h1>◆ IT-041 KONSOL</h1><p class="sub" id="stamp">—</p></div>
+    <div><button onclick="loadAll()">⟳ Yenile</button></div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><h2>OTONOM DENEK (aktif)</h2><div id="subj">…</div></div>
+    <div class="card"><h2>MEZUN DENEKLER</h2><div id="grad">…</div></div>
+    <div class="card"><h2>KALICI SAKİNLER (roster)</h2><div id="roster">…</div></div>
+    <div class="card"><h2>YOLCU İZLERİ</h2><div class="big" id="traces">…</div><p class="muted">haritaya bırakılan iz sayısı</p></div>
+    <div class="card"><h2>SAYFA GÖRÜNTÜLENME</h2>
+      <p class="muted">hits.sh sayacı (toplam görüntülenme):</p>
+      <img src="https://hits.sh/lunarisbahal.github.io/the-mind-experiment.svg?style=flat-square&label=g%C3%B6r%C3%BCnt%C3%BCleme&color=9d8cc9" alt="hits">
+      <p class="muted" style="margin-top:8px">Repo trafiği (ziyaretçi/klon): <a href="https://github.com/lunarisbahal/the-mind-experiment/graphs/traffic" target="_blank">GitHub → Insights → Traffic</a></p>
+    </div>
+    <div class="card"><h2>OPERATÖR · KONSEY HAFIZASI</h2><div id="mem">…</div></div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h2>GİRİŞ / ÇIKIŞ & EYLEM İSTATİSTİĞİ <span class="pill">worker ucu gerekli</span></h2>
+    <p class="muted">Oyun her eylemi worker'ın <code>/activity</code> ucuna <b>yazıyor</b> ama şu an <b>okuma ucu yok</b> (GET 404). Giriş/çıkış sayıları ve eylem dökümünü burada göstermek için worker'a küçük bir salt-okunur uç (örn. <code>/stats</code>) eklemen yeterli — kodu paylaşınca bağlarım. O zamana kadar canlı giriş/çıkış için ntfy <b>gözcü</b> bildirimleri devrede.</p>
+  </div>
+
+  <p class="tag" style="margin-top:14px">Bu panel yalnız zaten herkese açık olan worker verilerini gösterir; gerçek isim içermez. Otomatik 60 sn'de bir yenilenir.</p>
+</div>
+
+<script>
+var KON='https://it041-konsey.lunarisbahal.workers.dev';
+var KEY='';
+function fmtDate(ms){try{var d=new Date(ms);return d.toLocaleString('tr-TR');}catch(e){return '—';}}
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+
+function unlock(){
+  var k=(document.getElementById('key').value||'').trim();
+  if(!k){document.getElementById('gerr').textContent='Anahtar boş olamaz.';return;}
+  KEY=k;
+  try{localStorage.setItem('it041_op_key',k);}catch(e){}
+  document.getElementById('gate').classList.add('hide');
+  document.getElementById('app').classList.remove('hide');
+  loadAll();
+}
+
+async function getJSON(path,op){
+  var h={};if(op&&KEY)h['x-operator-key']=KEY;
+  var r=await fetch(KON+path,{cache:'no-store',headers:h});
+  return r.json();
+}
+
+async function loadSubject(){
+  try{
+    var d=await getJSON('/subject?lang=tr');
+    var pct=Math.round((d.ch||0)/(d.max||49)*100);
+    var h='';
+    h+='<div class="row"><span class="k">İlerleme</span><span class="v">Bölüm '+(d.ch||0)+' / '+(d.max||49)+'</span></div>';
+    h+='<div class="bar"><i style="width:'+pct+'%"></i></div>';
+    h+='<div class="row"><span class="k">Diyar</span><span class="v">'+esc(d.realm)+'</span></div>';
+    if(d.topic)h+='<div class="row"><span class="k">Tema</span><span class="v">'+esc(d.topic)+'</span></div>';
+    h+='<div class="row"><span class="k">Yan görev / keşif</span><span class="v">'+(d.side||0)+' / '+(d.disc||0)+'</span></div>';
+    h+='<div class="row"><span class="k">Bilgi (know)</span><span class="v">%'+(d.know||0)+'</span></div>';
+    h+='<div class="row"><span class="k">Döngü (cycles)</span><span class="v">'+(d.cycles||0)+'×</span></div>';
+    h+='<div class="row"><span class="k">Kitap 2</span><span class="v">'+(d.book2?'açık':'kapalı')+'</span></div>';
+    if(d.stuck)h+='<div class="row"><span class="k">Takıldığı yer</span><span class="v" style="color:var(--warn)">'+esc(d.stuck)+'</span></div>';
+    if(d.born)h+='<div class="row"><span class="k">Doğuş</span><span class="v tag">'+fmtDate(d.born)+'</span></div>';
+    if(d.updated)h+='<div class="row"><span class="k">Son hareket</span><span class="v tag">'+fmtDate(d.updated)+'</span></div>';
+    document.getElementById('subj').innerHTML=h;
+    window.__roster=d.roster||[];
+  }catch(e){document.getElementById('subj').innerHTML='<span class="muted">okunamadı: '+esc(e.message)+'</span>';}
+}
+
+async function loadGrad(){
+  try{
+    var d=await getJSON('/graduates');
+    var g=(d&&d.graduates)||[];
+    var h='<div class="big">'+g.length+'</div><p class="muted">mezun denek</p>';
+    g.slice().reverse().forEach(function(x){
+      h+='<div class="row"><span class="v">'+esc(x.name||'—')+(x.cycles?(' ('+x.cycles+'×)'):'')+'</span><span class="k tag">'+(x.stories?x.stories.length:0)+' hikâye</span></div>';
+      if(x.genre)h+='<div class="tag" style="margin:-2px 0 4px">'+esc(x.genre)+'</div>';
+    });
+    document.getElementById('grad').innerHTML=h;
+  }catch(e){document.getElementById('grad').innerHTML='<span class="muted">okunamadı</span>';}
+}
+
+function loadRoster(){
+  var r=window.__roster||[];
+  if(!r.length){document.getElementById('roster').innerHTML='<span class="muted">—</span>';return;}
+  var h='';
+  r.forEach(function(x){h+='<div class="row"><span class="v">'+esc(x.name||'—')+'</span><span class="k tag">'+(x.cycles?(x.cycles+'×'):'')+'</span></div>';});
+  document.getElementById('roster').innerHTML=h;
+}
+
+async function loadTraces(){
+  try{var d=await getJSON('/traces');document.getElementById('traces').textContent=((d&&d.traces)||[]).length;}
+  catch(e){document.getElementById('traces').textContent='—';}
+}
+
+async function loadMem(){
+  try{
+    var d=await getJSON('/memory',true);
+    var t=(d&&d.text)||'';
+    document.getElementById('mem').innerHTML = t
+      ? '<div style="white-space:pre-wrap;font-size:12px;max-height:200px;overflow:auto;color:var(--moon)">'+esc(t)+'</div>'
+      : '<span class="muted">hafıza boş ya da anahtar bu uç için geçerli değil.</span>';
+  }catch(e){document.getElementById('mem').innerHTML='<span class="muted">okunamadı (anahtar gerekebilir)</span>';}
+}
+
+async function loadAll(){
+  document.getElementById('stamp').textContent='son güncelleme: '+new Date().toLocaleString('tr-TR');
+  await loadSubject();
+  loadRoster();
+  await Promise.all([loadGrad(),loadTraces(),loadMem()]);
+}
+
+// prefill key if already set in this origin's localStorage (same origin as the game)
+try{var pk=localStorage.getItem('it041_op_key');if(pk)document.getElementById('key').value=pk;}catch(e){}
+document.getElementById('key').addEventListener('keydown',function(e){if(e.key==='Enter')unlock();});
+setInterval(function(){if(!document.getElementById('app').classList.contains('hide'))loadAll();},60000);
+</script>
+</body></html>
