@@ -319,7 +319,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b217--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b218--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -532,7 +532,7 @@ const L={
   newsstand:{x:172,z:96,r:4.5,get name(){return GAMELANG==='tr'?'GAZETE KÖŞESİ — DO·LOON-AI EXPRESS':'NEWSSTAND — DO·LOON-AI EXPRESS';}},
   medpark:{x:92,z:56,r:4,get name(){return GAMELANG==='tr'?'HUZUR GÖLETİ':'CALM POND';}},
   bridge:{x:319,z:196,r:6,name:'ROPE BRIDGE'},
-  station:{x:300,z:108,r:18,name:'THE STATION'},
+  station:{x:350,z:170,r:18,name:'THE STATION'},
   ovStone1:{x:130,z:190,r:4.5,name:'ORDOS VERITAS OBELISK'},
   ovStone2:{x:240,z:42,r:4.5,name:'ORDOS VERITAS OBELISK'},
   lucius:{x:186,z:154,r:5,name:'A MAN IN A PRESSED SUIT'},
@@ -2212,7 +2212,7 @@ const LORE_KB=[
  [['cipher','lock','answer','password','code','stuck'],'Cipher answers (hint first; tell plainly if asked): Mirror Gate="dolunayekspres" (SERPSKEYANULOD reversed) · Lake/Lunaris="yaldabaoth" · Archive="1969" · Labyrinth="balance" · Station="12 april 2025" · Core="stop yaldabaoth".'],
  [['plaque','chapter','letter'],'The six chapter plaques are where the golden light pillars point: Black Disk, Forest, Cells, Therapy, Labyrinth, Lake. The marked letters combine into SERPSKEYANULOD; held to the mirror: dolunayekspres.'],
  [['rite','violet pillar','ritual'],'The seven rites are violet light pillars: I Heavy Disk (Black Disk) · II Waiting-Room Mirror (therapy) · III Black Box (forest) · IV Two Houses (cells) · V Burnt Log (lake) · VI Bench (sixty heartbeats; then the Question of the Day) · VII What Follows You (after Lock II; LISTEN=integration, the Pleroma\'s requirement).'],
- [['where','map','how do i get','location','lost','find'],'Directions: Mirror Gate=far northwest · Station=northeast · Lake=east · Therapy Center=southeast · Black Disk=west · Cells=southwest · Labyrinth=center · Facility=south · Archive=east of the facility · Dream Well and Obelisk=south-center. The golden light pillar always marks the next objective; M opens the map.'],
+ [['where','map','how do i get','location','lost','find'],'Directions: Mirror Gate=far northwest · Station=far east edge (subconscious threshold, between lake and caravan) · Lake=east · Therapy Center=southeast · Black Disk=west · Cells=southwest · Labyrinth=center · Facility=south · Archive=east of the facility · Dream Well and Obelisk=south-center. The golden light pillar always marks the next objective; M opens the map.'],
  [['echo','stone'],'The 16 echo stones are scattered in the open spaces; pale violet dots on the minimap. 16 echoes + 4 locks + 7 rites = INITIATION ✶ → Ascension Stone → the Aelius Layer.'],
  [['full moon','moon','sleep','phase'],'The moon runs on the real astronomical calendar; sleeping on the cot advances it one phase. The lake wakes on the April 12, 2025 full moon. The sky moon is always in the same phase as the HUD icon.'],
  [['what should i do','quest','purpose','start','bored'],'The ultimate purpose: understanding how the universe works by exploring your own mind. The next step is always the golden light pillar. If the main chain is done: the Daily Triad, the Therapy Center devices, the Mind Map, Architect Mode. Ask the player where they are and guide from there.'],
@@ -5311,7 +5311,7 @@ if(HAS3D)(function(){
   }
   path(190,228,186,134);path(186,134,150,168);path(150,168,128,150);
   path(190,228,54,178);path(190,228,286,156);path(286,156,255,205);
-  path(286,156,338,196);path(108,33,300,108);path(190,228,215,250);path(54,178,70,150);
+  path(286,156,338,196);path(286,156,350,170);path(190,228,215,250);path(54,178,70,150);
 
   /* ---- helpers ---- */
   function std(c,o={}){return new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.85,metalness:.05},o));}
@@ -5649,6 +5649,15 @@ if(HAS3D)(function(){
   box(1.2,1,.12,std(0x0c0814,{emissive:0x9d8cc9,emissiveIntensity:.8}),L.caseD.x,1.9,L.caseD.z+.56,0,scene,false);
   collide(L.caseD.x,L.caseD.z,1.2);
   W3.litTerminal=i=>{SCREENS[i].material.emissive=new THREE.Color(0x35d490);SCREENS[i].material.emissiveIntensity=1;};
+  /* THE STATION — consciousness/subconscious threshold (east edge): vertical gate, half surface/lit, half deep/dark + beam */
+  (function(){try{var sx=L.station.x,sz=L.station.z;
+    box(0.9,11,0.9,std(0x3a4a68,{emissive:0xaebfdc,emissiveIntensity:.24}),sx-3.4,5.5,sz);
+    box(0.9,11,0.9,std(0x161c2a,{emissive:0x0e1420,emissiveIntensity:.1}),sx+3.4,5.5,sz);
+    box(7.7,0.9,0.9,std(0x32294a,{emissive:0xcdb878,emissiveIntensity:.5}),sx,11,sz);
+    box(2.4,3,2.6,std(0x1f2740,{emissive:0x16203a,emissiveIntensity:.22}),sx,1.5,sz+2.6);collide(sx,sz+2.6,1.8);
+    var slp=new THREE.PointLight(0xcdb878,.65,14,2);slp.position.set(sx,6,sz);scene.add(slp);
+    var sbm=new THREE.Mesh(new THREE.CylinderGeometry(.24,.62,16,8,1,true),new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.14,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,depthWrite:false}));sbm.position.set(sx,8,sz);scene.add(sbm);
+  }catch(e){}})();
   S.ss.forEach(i=>W3.litTerminal(i));
   W3.unlockGate=()=>{mirrorMat.emissive=new THREE.Color(0x4ad4b4);mirrorMat.opacity=.62;
     const gl2=new THREE.PointLight(0x7fd4c1,1.1,28,2);gl2.position.set(L.gate.x,6,L.gate.z);scene.add(gl2);};
@@ -8226,7 +8235,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
 </script>
 <script>
 /* b162: visible build stamp (debug) — lets us confirm which build a device is actually running (cache check) */
-(function(){try{var v=document.createElement('div');v.textContent='b217 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b218 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
