@@ -104,6 +104,19 @@ async function loadSubject(){
     if(d.stuck)h+='<div class="row"><span class="k">Takıldığı yer</span><span class="v" style="color:var(--warn)">'+esc(d.stuck)+'</span></div>';
     if(d.born)h+='<div class="row"><span class="k">Doğuş</span><span class="v tag">'+fmtDate(d.born)+'</span></div>';
     if(d.updated)h+='<div class="row"><span class="k">Son hareket</span><span class="v tag">'+fmtDate(d.updated)+'</span></div>';
+    var sy=d.synthesis;
+    if(sy){
+      h+='<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px"><div class="tag" style="color:var(--violet);letter-spacing:.15em">◮ ZİHİN PROFİLİ · NEXUS · HARİTA (49 sonunda)</div>';
+      h+='<div class="row"><span class="k">Bütünleşme dengesi</span><span class="v">%'+(sy.balance||0)+'</span></div>';
+      h+='<div class="row"><span class="k">Baskın</span><span class="v">'+esc(sy.domName||sy.dominant||'')+'</span></div>';
+      h+='<div class="row"><span class="k">En zayıf</span><span class="v">'+esc(sy.weakName||sy.weakest||'')+'</span></div>';
+      if(sy.weights){var ks=Object.keys(sy.weights);h+='<div class="tag" style="margin:4px 0;line-height:1.7">'+ks.map(function(k){return k+' %'+sy.weights[k];}).join(' · ')+'</div>';}
+      if(sy.nexus)h+='<p class="muted" style="color:var(--moon);margin:6px 0 2px"><b style="color:var(--violet)">Nexus:</b> '+esc(sy.nexus)+'</p>';
+      if(sy.mindmap)h+='<p class="muted" style="color:var(--moon);margin:2px 0"><b style="color:var(--violet)">Zihin haritası:</b> '+esc(sy.mindmap)+'</p>';
+      h+='</div>';
+    } else if(d.book2){
+      h+='<p class="muted" style="margin-top:8px">◮ Zihin profili/nexus/harita: ilk /subject görüntülemede üretiliyor — birazdan burada görünecek.</p>';
+    }
     document.getElementById('subj').innerHTML=h;
     window.__roster=d.roster||[];
   }catch(e){document.getElementById('subj').innerHTML='<span class="muted">okunamadı: '+esc(e.message)+'</span>';}
