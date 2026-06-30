@@ -319,7 +319,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b237--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b238--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -574,6 +574,12 @@ const L={
   crackedDoor:{x:128,z:172,r:3.4,name:'THE CRACKED DOOR'},
   emptyDoor:{x:210,z:90,r:3.4,name:'THE EMPTY ROOM'},
   echoChamber:{x:90,z:150,r:3.8,name:'THE ECHO CHAMBER'},
+  /* menu systems brought into the world (b238) */
+  lucidaMirrorC:{x:230,z:42,r:3.4,get name(){return GAMELANG==='tr'?"LUCIDA'NIN AYNASI — YANSIMA":"LUCIDA'S MIRROR — REFLECTION";}},
+  dailyShrine:{x:104,z:40,r:3.6,get name(){return GAMELANG==='tr'?'GÜNLÜK ÜÇLEME SUNAĞI':'DAILY TRIAD SHRINE';}},
+  innerDesk:{x:80,z:48,r:3.6,get name(){return GAMELANG==='tr'?'İÇ ÇALIŞMA MASASI':'INNER WORK DESK';}},
+  nexusAltar:{x:132,z:228,r:3.8,get name(){return GAMELANG==='tr'?'ZAMANIN GÖZÜ — NEXUS':'THE EYE OF TIME — NEXUS';}},
+  mindStone:{x:262,z:100,r:3.6,get name(){return GAMELANG==='tr'?'ZİHİN HARİTASI DİKİLİTAŞI':'MIND MAP OBELISK';}},
 };
 const PLEROMA={x:44,z:256,r:22}; // the Institute's underground server hall
 const ZONES=[L.blackdisk,L.forest,L.prison,L.therapy,L.labyrinth,L.lake,L.institute,L.caravan,L.station];
@@ -1374,6 +1380,11 @@ function interactTarget(){
   if(near(L.crackedDoor))return['⟡ '+(GAMELANG==='tr'?'Yarık Kapı — eksikken geç':'The Cracked Door — cross while incomplete'),()=>{if(window.CrackedDoor)CrackedDoor.show();}];
   if(near(L.emptyDoor))return['▢ '+(GAMELANG==='tr'?'Boş Oda — içeri gir':'The Empty Room — step inside'),()=>{if(window.EmptyRoom)EmptyRoom.enter();}];
   if(near(L.echoChamber))return['◌ '+(GAMELANG==='tr'?'Yankı Odası’na gir':'Enter the Echo Chamber'),()=>{if(window.W3&&W3.Interior&&W3.Interior.enterEchoChamber)W3.Interior.enterEchoChamber();else if(window.EchoRoom)EchoRoom.show();}];
+  if(near(L.lucidaMirrorC))return['◑ '+(GAMELANG==='tr'?'Lucida’nın Aynası (yansıma) — bir kalıba tanık ol':'Lucida’s Mirror (reflection) — witness a pattern'),()=>{if(window.LucidaMirror)LucidaMirror.show();}];
+  if(near(L.dailyShrine))return['🜂 '+(GAMELANG==='tr'?'Günlük Üçleme — bugünün üç işi':'Daily Triad — today’s three'),()=>{if(window.Daily3)Daily3.show();}];
+  if(near(L.innerDesk))return['◇ '+(GAMELANG==='tr'?'İç Çalışma — bölümün üç yansıması':'Inner Work — the chapter’s three reflections'),()=>{if(window.Quest)Quest.show();}];
+  if(near(L.nexusAltar))return['⟁ '+(GAMELANG==='tr'?'Zamanın Gözü — Nexus & döngüyü kır':'The Eye of Time — Nexus & break the cycle'),()=>{if(window.NEXUS)NEXUS.show();}];
+  if(near(L.mindStone))return['🜨 '+(GAMELANG==='tr'?'Zihin Haritası — içindeki coğrafya':'Mind Map — your inner geography'),()=>{if(window.MindMap)MindMap.show();}];
   if(window.Journal&&Journal.desk&&near(L.journal))return['✍ '+(GAMELANG==='tr'?'Günlüğe otur — kendi kitabına yaz':'Sit at the desk — write your own book'),()=>{Journal.desk();}];
   if(W3.peerNear&&W3.peerNear())return['✉ Talk to the traveler',()=>Chat.open()];
   if(S.solved.s2&&S.rites.r7===undefined&&near(L.shadowSpot))return['◈ Face what follows you',doShadow];
@@ -5601,6 +5612,35 @@ if(HAS3D)(function(){
     for(var i=0;i<3;i++){var rg=new THREE.Mesh(new THREE.RingGeometry(3.6+i*1.1,3.75+i*1.1,40),new THREE.MeshBasicMaterial({color:0x9d8cc9,transparent:true,opacity:.12-i*0.03,side:THREE.DoubleSide}));rg.rotation.x=-Math.PI/2;rg.position.set(x,0.04,z);scene.add(rg);}
     var lp=new THREE.PointLight(0x9d8cc9,.6,12,2);lp.position.set(x,2.0,z+2);scene.add(lp);
   })();
+  /* ---- MENU SYSTEMS, WORLD-INTEGRATED (b238) ---- */
+  (function(){try{var x=L.lucidaMirrorC.x,z=L.lucidaMirrorC.z;
+    box(2.0,0.3,2.0,std(0x141c1a,{roughness:.85}),x,0.15,z);
+    box(1.3,2.7,0.16,std(0x243a36,{metalness:.6,roughness:.3,emissive:0x1e3a34,emissiveIntensity:.3}),x,1.55,z);
+    var mir=new THREE.Mesh(new THREE.PlaneGeometry(1.0,2.2),new THREE.MeshStandardMaterial({color:0x9fd0c8,metalness:.9,roughness:.08,emissive:0x163028,emissiveIntensity:.5}));mir.position.set(x,1.6,z+0.1);scene.add(mir);
+    var lp=new THREE.PointLight(0x9fd0c8,.6,9,2);lp.position.set(x,2.3,z+1);scene.add(lp);collide(x,z,1.2);
+    label((GAMELANG==='tr'?'◑ Lucida’nın Aynası (yansıma)':'◑ Lucida’s Mirror (reflection)'),x,z,2.4,.6);}catch(e){}})();
+  (function(){try{var x=L.dailyShrine.x,z=L.dailyShrine.z;
+    box(1.8,0.25,1.8,std(0x1c2030,{roughness:.9}),x,0.12,z);
+    [[0,-0.6,1.2],[0.55,0.35,1.0],[-0.55,0.35,0.85]].forEach(function(c){box(0.3,c[2],0.3,std(0x2a3450,{emissive:0xcdb878,emissiveIntensity:.25,roughness:.5}),x+c[0],c[2]/2,z+c[1]);});
+    var lp=new THREE.PointLight(0xcdb878,.55,8,2);lp.position.set(x,1.6,z);scene.add(lp);collide(x,z,1.1);
+    label((GAMELANG==='tr'?'🜂 Günlük Üçleme':'🜂 Daily Triad'),x,z,2.0,.6);}catch(e){}})();
+  (function(){try{var x=L.innerDesk.x,z=L.innerDesk.z;
+    box(1.6,0.9,0.9,std(0x241d2e,{roughness:.8}),x,0.45,z);
+    box(1.4,0.1,0.7,std(0x3a2f4e,{emissive:0x9d8cc9,emissiveIntensity:.3,roughness:.5}),x,0.95,z);
+    var pg=new THREE.Mesh(new THREE.PlaneGeometry(0.7,0.5),new THREE.MeshStandardMaterial({color:0xece6d6,emissive:0x9d8cc9,emissiveIntensity:.25,roughness:.9,side:THREE.DoubleSide}));pg.position.set(x,1.3,z);pg.rotation.x=-0.5;scene.add(pg);
+    var lp=new THREE.PointLight(0x9d8cc9,.5,8,2);lp.position.set(x,1.8,z+0.6);scene.add(lp);collide(x,z,1.1);
+    label((GAMELANG==='tr'?'◇ İç Çalışma':'◇ Inner Work'),x,z,2.0,.6);}catch(e){}})();
+  (function(){try{var x=L.nexusAltar.x,z=L.nexusAltar.z;
+    var ring=new THREE.Mesh(new THREE.TorusGeometry(1.3,0.16,10,28),new THREE.MeshStandardMaterial({color:0xb9a8e8,emissive:0x6a4fa0,emissiveIntensity:.6,roughness:.4}));ring.position.set(x,1.6,z);scene.add(ring);
+    var iris=new THREE.Mesh(new THREE.CircleGeometry(1.0,28),new THREE.MeshBasicMaterial({color:0x05060a,side:THREE.DoubleSide}));iris.position.set(x,1.6,z);scene.add(iris);
+    var pupil=new THREE.Mesh(new THREE.CircleGeometry(0.32,20),new THREE.MeshBasicMaterial({color:0xb9a8e8}));pupil.position.set(x,1.6,z+0.02);scene.add(pupil);
+    var lp=new THREE.PointLight(0x9d8cc9,.7,12,2);lp.position.set(x,2.2,z+1);scene.add(lp);collide(x,z,1.0);
+    label((GAMELANG==='tr'?'⟁ Zamanın Gözü — Nexus':'⟁ The Eye of Time — Nexus'),x,z,2.6,.6);}catch(e){}})();
+  (function(){try{var x=L.mindStone.x,z=L.mindStone.z;
+    box(0.7,3.2,0.7,std(0x1a2436,{metalness:.4,roughness:.5,emissive:0x223a55,emissiveIntensity:.25}),x,1.6,z);
+    var top=new THREE.Mesh(new THREE.OctahedronGeometry(0.5),new THREE.MeshStandardMaterial({color:0x7fd4c1,emissive:0x2f8c7a,emissiveIntensity:.5,roughness:.4}));top.position.set(x,3.5,z);scene.add(top);
+    var lp=new THREE.PointLight(0x7fd4c1,.55,10,2);lp.position.set(x,3.0,z+1);scene.add(lp);collide(x,z,0.9);
+    label((GAMELANG==='tr'?'🜨 Zihin Haritası':'🜨 Mind Map'),x,z,3.0,.6);}catch(e){}})();
   let ownMask=null;
   W3.rite_r2=(v)=>{ownMask=box(.8,1,.12,std(0x3a2f4e,{emissive:0x9d8cc9,emissiveIntensity:.7}),L.maskMirror.x+1.6,2.2,L.maskMirror.z+.4,0,scene,false);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:textTex(String(v).split('—')[0].trim(),512,64,24,'rgba(185,168,232,.9)'),transparent:true,depthWrite:false}));
@@ -8116,7 +8156,7 @@ function drawBigMap(){
   (window.__mmP||[]).forEach(p=>{ctx.strokeStyle='rgba(230,195,110,.8)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(FX(p.x),FY(p.z),6,0,7);ctx.stroke();if(p.n&&c.width>=520)lbl(p.n,FX(p.x),FY(p.z)-9,'rgba(235,200,120,.95)',9);});
   const wp=waypoint();
   if(wp){ctx.fillStyle='#cdb878';ctx.beginPath();ctx.arc(FX(wp.x),FY(wp.z),5,0,7);ctx.fill();lbl(tr?'◆ HEDEF':'◆ OBJECTIVE',FX(wp.x),FY(wp.z)+16,'#e3c878',9,true);}
-  [['echoChamber','◌',(tr?'Yankı Odası':'Echo Chamber'),'#b9a8e8'],['lucidaMirror','◑',(tr?'Lucida Aynası':'Lucida’s Mirror'),'#9fd0d8'],['crackedDoor','⟡',(tr?'Yarık Kapı':'Cracked Door'),'#b9a8e8'],['emptyDoor','▢',(tr?'Boş Oda':'Empty Room'),'#9aa6bd']].forEach(function(it){var Lp=L[it[0]];if(!Lp)return;var X=FX(Lp.x),Z=FY(Lp.z);ctx.fillStyle=it[3];ctx.font=(13*_fs|0)+'px monospace';ctx.textAlign='center';ctx.fillText(it[1],X,Z+4);if(c.width>=520)lbl(it[2],X,Z-9,it[3],9);});
+  [['echoChamber','◌',(tr?'Yankı Odası':'Echo Chamber'),'#b9a8e8'],['lucidaMirror','◑',(tr?'Lucida Aynası':'Lucida’s Mirror'),'#9fd0d8'],['crackedDoor','⟡',(tr?'Yarık Kapı':'Cracked Door'),'#b9a8e8'],['emptyDoor','▢',(tr?'Boş Oda':'Empty Room'),'#9aa6bd'],['lucidaMirrorC','◑',(tr?'Lucida Yansıma':'Lucida Refl.'),'#9fd0c8'],['dailyShrine','🜂',(tr?'Üçleme':'Triad'),'#cdb878'],['innerDesk','◇',(tr?'İç Çalışma':'Inner Work'),'#9d8cc9'],['nexusAltar','⟁',(tr?'Nexus':'Nexus'),'#b9a8e8'],['mindStone','🜨',(tr?'Zihin Hrt.':'Mind Map'),'#7fd4c1']].forEach(function(it){var Lp=L[it[0]];if(!Lp)return;var X=FX(Lp.x),Z=FY(Lp.z);ctx.fillStyle=it[3];ctx.font=(13*_fs|0)+'px monospace';ctx.textAlign='center';ctx.fillText(it[1],X,Z+4);if(c.width>=520)lbl(it[2],X,Z-9,it[3],9);});
   ctx.fillStyle='#e8e4d4';ctx.beginPath();ctx.arc(FX(S.px),FY(S.pz),5,0,7);ctx.fill();lbl(tr?'SEN':'YOU',FX(S.px),FY(S.pz)-10,'#7fd4c1',10,true);
   /* b62: lejant kaldirildi (harita sade) */
   ctx.textAlign='center';
@@ -8267,7 +8307,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
 </script>
 <script>
 /* b162: visible build stamp (debug) — lets us confirm which build a device is actually running (cache check) */
-(function(){try{var v=document.createElement('div');v.textContent='b236 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b238 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
