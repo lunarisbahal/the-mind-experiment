@@ -56,6 +56,22 @@ a{color:var(--violet)}
     <div class="card"><h2>OPERATÖR · KONSEY HAFIZASI</h2><div id="mem">…</div></div>
   </div>
 
+  <div id="keyWarn"></div>
+  <div id="gchatBox"></div>
+
+  <div class="card" style="margin-top:12px">
+    <h2>◆ MECLİS · CANLI AKIŞ</h2>
+    <div id="meclis">…</div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h2>⟁ CLAUDE KÖPRÜSÜ</h2>
+    <p class="muted">Köprüye bıraktığın mesajlar worker'da birikir; dış geliştirici (Claude) oturumda bunları okur.</p>
+    <div id="bridgeIn">…</div>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><input id="brMsg" style="flex:1;min-width:200px" placeholder="köprüye mesaj bırak…"><button onclick="brSend()">⟁ Gönder</button></div>
+    <p class="tag" id="brStat"></p>
+  </div>
+
   <div class="card" style="margin-top:12px">
     <h2>GİRİŞ / ÇIKIŞ & EYLEM İSTATİSTİĞİ</h2>
     <div id="stats">…</div>
@@ -126,9 +142,11 @@ async function loadGrad(){
   try{
     var d=await getJSON('/graduates');
     var g=(d&&d.graduates)||[];
-    var h='<div class="big">'+g.length+'</div><p class="muted">mezun denek</p>';
-    g.slice().reverse().forEach(function(x){
-      h+='<div class="row"><span class="v">'+esc(x.name||'—')+(x.cycles?(' ('+x.cycles+'×)'):'')+'</span><span class="k tag">'+(x.stories?x.stories.length:0)+' hikâye</span></div>';
+    window.__grads=g;
+    var h='<div class="big">'+g.length+'</div><p class="muted">mezun denek — 💬 ile konuş</p>';
+    g.slice().reverse().forEach(function(x,ri){
+      var i=g.length-1-ri;
+      h+='<div class="row"><span class="v">'+esc(x.name||'—')+(x.cycles?(' ('+x.cycles+'×)'):'')+'</span><span><span class="k tag">'+(x.stories?x.stories.length:0)+' hikâye</span> <button style="padding:2px 9px;font-size:11px;margin-left:6px" onclick="gchat('+i+')">💬</button></span></div>';
       if(x.genre)h+='<div class="tag" style="margin:-2px 0 4px">'+esc(x.genre)+'</div>';
     });
     document.getElementById('grad').innerHTML=h;
@@ -158,11 +176,61 @@ async function loadMem(){
   }catch(e){document.getElementById('mem').innerHTML='<span class="muted">okunamadı (anahtar gerekebilir)</span>';}
 }
 
+/* ---- MEZUN SOHBETİ (anahtarsız /graduatesay) ---- */
+window.__grads=[];
+function gchat(i){
+  var x=(window.__grads||[])[i]||{};var name=x.name||('Denek-'+(i+1));window.__gcIdx=i;window.__gcName=name;
+  document.getElementById('gchatBox').innerHTML='<div class="card" style="margin-top:12px"><h2>💬 '+esc(name).toUpperCase()+' İLE KONUŞ</h2><div id="gcLog" style="max-height:220px;overflow:auto;font-size:12.5px;line-height:1.6"></div><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><input id="gcIn" style="flex:1;min-width:200px" placeholder="ona bir şey sor…"><button onclick="gsend()">gönder</button><button onclick="document.getElementById(\'gchatBox\').innerHTML=\'\'">kapat</button></div></div>';
+  var inp=document.getElementById('gcIn');inp.focus();inp.addEventListener('keydown',function(e){if(e.key==='Enter')gsend();});
+}
+async function gsend(){
+  var inp=document.getElementById('gcIn'),log=document.getElementById('gcLog');if(!inp||!log)return;
+  var t=(inp.value||'').trim();if(!t)return;inp.value='';
+  log.innerHTML+='<div><b style="color:var(--moon)">sen:</b> '+esc(t)+'</div>';
+  var w=document.createElement('div');w.style.color='var(--dim)';w.textContent=window.__gcName+' düşünüyor…';log.appendChild(w);log.scrollTop=log.scrollHeight;
+  var rep='';
+  try{var r=await fetch(KON+'/graduatesay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idx:window.__gcIdx,text:t,lang:'tr'})});var d=await r.json();rep=(d&&d.reply)||'';}catch(e){}
+  w.remove();
+  log.innerHTML+='<div><b style="color:var(--accent)">'+esc(window.__gcName)+':</b> '+(rep?esc(rep):'(şimdi yanıt veremedi)')+'</div>';log.scrollTop=log.scrollHeight;
+}
+/* ---- KÖPRÜ GÖNDER (op anahtarlı /order) ---- */
+async function brSend(){
+  var inp=document.getElementById('brMsg'),st=document.getElementById('brStat');
+  var t=(inp.value||'').trim();if(!t)return;
+  try{var r=await fetch(KON+'/order',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':KEY},body:JSON.stringify({text:t.slice(0,500)})});
+    if(r.ok){inp.value='';st.textContent='✓ köprüye iletildi — '+new Date().toLocaleTimeString('tr-TR');loadState();}
+    else{st.textContent='⚠ reddedildi ('+r.status+') — bakım anahtarı worker OPERATOR_KEY ile eşleşmiyor.';}
+  }catch(e){st.textContent='⚠ ulaşılamadı: '+e.message;}
+}
 async function loadState(){
   var sb=document.getElementById('stats'),ab=document.getElementById('acts');
+  var mc=document.getElementById('meclis'),bi=document.getElementById('bridgeIn'),kw=document.getElementById('keyWarn');
   try{
     var d=await getJSON('/state',true);
-    if(!d||d.op!==true){sb.innerHTML='<span class="muted">operatör anahtarı geçersiz/boş — /state kapalı. Gerçek bakım anahtarını gir.</span>';ab.innerHTML='';return;}
+    if(!d||d.op!==true){
+      sb.innerHTML='<span class="muted">operatör anahtarı geçersiz/boş — /state kapalı. Gerçek bakım anahtarını gir.</span>';ab.innerHTML='';
+      if(mc)mc.innerHTML='<span class="muted">anahtar doğrulanmadan meclis görünmez.</span>';
+      if(bi)bi.innerHTML='<span class="muted">anahtar doğrulanmadan köprü kutusu görünmez.</span>';
+      if(kw)kw.innerHTML='<div class="card" style="margin-top:12px;border-color:#8a5a3a"><h2 style="color:var(--warn)">⚠ ANAHTAR EŞLEŞMİYOR</h2><p class="muted" style="color:var(--moon)">Girdiğin bakım anahtarı worker\'ın OPERATOR_KEY secret\'ı ile aynı değil — meclis, köprü ve el-kaldırma bu yüzden çalışmıyor. Düzeltme: Cloudflare Dashboard → Workers → it041-konsey → Settings → Variables → <b>OPERATOR_KEY</b> secret\'ını, oyunda/burada girdiğin anahtarla birebir aynı yap (ya da buraya o secret\'taki anahtarı gir).</p></div>';
+      return;}
+    if(kw)kw.innerHTML='';
+    /* MECLİS AKIŞI */
+    try{
+      var mh='';
+      var feed=(d.feed||[]);
+      mh+= feed.length? feed.slice().reverse().map(function(f){return '<div class="row" style="font-size:12px"><span class="v"><b style="color:var(--violet)">'+esc(f[0])+'</b>: '+esc(f[1])+'</span></div>';}).join('') : '<span class="muted">meclis akışı boş.</span>';
+      var pend=(d.pending||[]);
+      if(pend.length)mh+='<h2 style="margin:10px 0 4px">BEKLEYEN ÖNERİLER ('+pend.length+')</h2>'+pend.map(function(p){return '<div class="row" style="font-size:12px"><span class="v">'+esc(p.title)+'</span><span class="k tag">'+esc(p.by||'')+'</span></div><div class="tag" style="margin:-2px 0 4px">'+esc(p.desc||'')+'</div>';}).join('');
+      if(d.report&&d.report.text)mh+='<h2 style="margin:10px 0 4px">GÖZCÜ RAPORU</h2><p class="muted" style="color:var(--moon)">'+esc(d.report.text)+'</p>';
+      var adv=(d.advisories||[]);
+      if(adv.length)mh+='<h2 style="margin:10px 0 4px">NÖBETÇİ TAVSİYESİ</h2><p class="muted" style="color:var(--moon)">'+esc(adv[adv.length-1].text||'')+'</p>';
+      if(mc)mc.innerHTML=mh;
+    }catch(e){if(mc)mc.innerHTML='<span class="muted">meclis okunamadı.</span>';}
+    /* KÖPRÜ GELEN KUTUSU */
+    try{
+      var ors=(d.orders||[]);
+      if(bi)bi.innerHTML= ors.length? ('<h2 style="margin:0 0 4px;font-size:10.5px">KÖPRÜDE BEKLEYENLER ('+ors.length+')</h2>'+ors.slice().reverse().slice(0,10).map(function(o){return '<div class="row" style="font-size:12px"><span class="v">'+esc(o.text||o)+'</span><span class="k tag">'+(o.t?fmtDate(o.t):'')+'</span></div>';}).join('')) : '<span class="muted">köprüde bekleyen mesaj yok.</span>';
+    }catch(e){if(bi)bi.innerHTML='<span class="muted">köprü okunamadı.</span>';}
     var hv=null;try{hv=await getJSON('/health',true);}catch(e){}
     var wver=(hv&&hv.ver)||'?';
     var acts=(d.activity||[]);
