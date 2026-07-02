@@ -319,7 +319,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b258--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b259--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -3067,7 +3067,8 @@ const Architect={
       (ch?'<button class="btn ghost" onclick="Architect.exportBook()">Compile your book (.txt)</button>':'')+
       '<button class="btn v" onclick="UI.closeDoc();Genesis.start()">🜨 THE UNIVERSE SEED — '+(Genesis.get()?'see your universe: '+esc(Genesis.get().name):'seed your own universe')+'</button>'+
       '<button class="btn v" onclick="UI.closeDoc();Architect.designRite()">◈ Design your own rite</button>'+
-      (this.myRites().length?'<button class="btn ghost" onclick="UI.closeDoc();Architect.doMyRite()">◈ Practice your own rite</button>':''));},
+      (this.myRites().length?'<button class="btn ghost" onclick="UI.closeDoc();Architect.doMyRite()">◈ Practice your own rite</button>':'')+
+      ((S.flags&&S.flags.councilApproved)?'<button class="btn v" onclick="UI.closeDoc();if(window.ArchMeclis)ArchMeclis.show()">⟁ Architects’ Assembly — think with the founder</button>':((S.flags&&S.flags.councilPending)?'<p style="color:var(--dim);font-size:11px">⟁ Your Council application is under review — the Assembly opens when the Architect admits you.</p>':'')));},
   stars(){try{return JSON.parse(localStorage.getItem('it041_stars'))||[]}catch(e){return[]}},
   story(){try{return JSON.parse(localStorage.getItem('it041_story'))||[]}catch(e){return[]}},
   myRites(){try{return JSON.parse(localStorage.getItem('it041_myrites'))||[]}catch(e){return[]}},
@@ -3077,7 +3078,7 @@ const Architect={
       '<textarea id="starT" rows="2" maxlength="90" placeholder="e.g. here I stopped being afraid…"></textarea>'+
       '<button class="btn v" onclick="Architect.saveStar()">Ignite the star</button><button class="btn ghost" onclick="Rite.closeOnly()">Cancel</button>';
     UI.show('riteModal');Game.setModal(true);},
-  submitToOwner:function(kind,text){try{var who=((typeof plName==='function'&&plName())||'IT-041');var _t=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');fetch('https://it041-konsey.lunarisbahal.workers.dev/forum',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'thread',by:who,title:(_t?'◈ MİMAR BAŞVURUSU — ':'◈ ARCHITECT SUBMISSION — ')+kind,text:String(text||'').slice(0,500)})}).then(function(r){try{if(r&&r.ok){UI.toast(_t?'✦ Talebin Mimar\'a iletildi — onaylanınca ortak Dolunay Ekspres evrenine katılır. Kendi evreninde şimdiden duruyor.':'✦ Sent to the Architect for review — once approved it joins the shared universe. It already stands in your own.',7000);}else{UI.toast(_t?'⚠ Mimar\'a şu an ulaşılamadı — eserin kendi evreninde güvende; bağlantı gelince yeniden gönderebilirsin.':'⚠ Could not reach the Architect right now — your work is safe in your own universe; you can resend when the line returns.',7000);}}catch(e){}}).catch(function(){try{UI.toast(_t?'⚠ Mimar\'a şu an ulaşılamadı — eserin kendi evreninde güvende; bağlantı gelince yeniden gönderebilirsin.':'⚠ Could not reach the Architect right now — your work is safe in your own universe; you can resend when the line returns.',7000);}catch(e){}});}catch(e){}},
+  submitToOwner:function(kind,text){try{var who=((typeof plName==='function'&&plName())||'IT-041');var _t=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');fetch('https://it041-konsey.lunarisbahal.workers.dev/archsubmit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind:kind,by:who,text:String(text||'').slice(0,500)})}).then(function(r){try{if(r&&r.ok){UI.toast(_t?'✦ Eserin Mimar\'ın ONAYINA sunuldu — kabul edilirse ortak Dolunay Ekspres evrenine katılır. Kendi evreninde şimdiden duruyor.':'✦ Your work was submitted for the Architect\'s APPROVAL — if accepted it joins the shared universe. It already stands in your own.',7000);}else{UI.toast(_t?'⚠ Mimar\'a şu an ulaşılamadı — eserin kendi evreninde güvende; bağlantı gelince yeniden gönderebilirsin.':'⚠ Could not reach the Architect right now — your work is safe in your own universe; you can resend when the line returns.',7000);}}catch(e){}}).catch(function(){try{UI.toast(_t?'⚠ Mimar\'a şu an ulaşılamadı — eserin kendi evreninde güvende; bağlantı gelince yeniden gönderebilirsin.':'⚠ Could not reach the Architect right now — your work is safe in your own universe; you can resend when the line returns.',7000);}catch(e){}});}catch(e){}},
   saveStar(){
     const t=UI.el('starT').value.trim();if(!t){UI.toast('One sentence is enough.');return;}
     const l=this.stars();l.push({x:Math.round(S.px),z:Math.round(S.pz),t:t.slice(0,90)});
@@ -4643,10 +4644,12 @@ const Pulse={KEY:'it041_pulse_day',
     try{UI.doc(tr?'◈ TEK SORU':'◈ ONE QUESTION',
       '<p style="line-height:1.65;color:var(--ink)">'+(tr?'Bugün bu evren sana ne hissettirdi? Neyi geliştirmemizi istersin?':'What did this universe make you feel today? What should we improve?')+'</p>'+
       '<p style="color:var(--dim);font-size:11px">'+(tr?'Tamamen isteğe bağlı. Gönderirsen yalnız Mimar okur; adın maskenle kalır. Ayna konuşmaların hiçbir zaman paylaşılmaz.':'Entirely optional. If you send it, only the Architect reads it; your name stays masked. Mirror conversations are never shared.')+'</p>'+
+      '<div id="pulseStars" style="margin:2px 0 6px">'+[1,2,3,4,5].map(function(n){return '<button class="btn ghost" style="padding:2px 9px;font-size:15px;color:var(--dim)" onclick="Pulse.star('+n+')">★</button>';}).join('')+' <span style="color:var(--dim);font-size:10.5px">'+(tr?'(isteğe bağlı puan)':'(optional rating)')+'</span></div>'+
       '<textarea id="pulseIn" rows="3" maxlength="400" placeholder="'+(tr?'birkaç cümle yeter…':'a few sentences…')+'" style="width:100%;background:#0a0c14;border:1px solid var(--line);color:var(--ink);padding:8px;font-family:inherit;font-size:12.5px;border-radius:6px"></textarea>'+
       '<div style="margin-top:8px"><button class="btn v" onclick="Pulse.send()">'+(tr?'gönder':'send')+'</button> <button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(tr?'geç':'skip')+'</button></div>');}catch(e){}},
-  send(){var tr=(GAMELANG==='tr');var v=((document.getElementById('pulseIn')||{}).value||'').trim();if(!v){if(UI.closeDoc)UI.closeDoc();return;}
-    try{fetch('https://it041-konsey.lunarisbahal.workers.dev/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mask:(typeof travelerName==='function'?travelerName():'Bir yolcu'),text:v.slice(0,400),ch:(window.S&&S.stage)||0})}).catch(function(){});}catch(e){}
+  star(n){this._st=n;try{var el=document.getElementById('pulseStars');if(el){var bs=el.querySelectorAll('button');for(var i=0;i<bs.length;i++)bs[i].style.color=(i<n)?'#cdb878':'var(--dim)';}}catch(e){}},
+  send(){var tr=(GAMELANG==='tr');var v=((document.getElementById('pulseIn')||{}).value||'').trim();if(!v&&!this._st){if(UI.closeDoc)UI.closeDoc();return;}
+    try{fetch('https://it041-konsey.lunarisbahal.workers.dev/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mask:(typeof travelerName==='function'?travelerName():'Bir yolcu'),text:(v||'(yalnız puan)').slice(0,400),stars:this._st||0,ch:(window.S&&S.stage)||0})}).catch(function(){});}catch(e){}
     if(UI.closeDoc)UI.closeDoc();try{UI.toast(tr?'✦ Teşekkürler — sesin Mimar\'a ulaştı.':'✦ Thank you — your voice reached the Architect.',4500);}catch(e){}}
 };
 if(typeof window!=='undefined'){window.Pulse=Pulse;setTimeout(function(){try{if(window.Game&&!Game.modal&&Pulse.due())Pulse.ask();}catch(e){}},600000);}
@@ -4657,6 +4660,23 @@ const Dwell={z:{},t0:Date.now(),
   flush(){try{var dur=Math.round((Date.now()-this.t0)/60000);if(dur<1)return;var payload=JSON.stringify({mask:(typeof travelerName==='function'?travelerName():'Bir yolcu'),dur:dur,zones:this.z,op:(typeof Mirror!=='undefined'&&Mirror.isOp&&Mirror.isOp())});navigator.sendBeacon('https://it041-konsey.lunarisbahal.workers.dev/session',new Blob([payload],{type:'application/json'}));}catch(e){}}
 };
 if(typeof window!=='undefined'){window.Dwell=Dwell;setInterval(function(){Dwell.tick();},6000);addEventListener('pagehide',function(){Dwell.flush();});}
+/* ---- MİMARLAR MECLİSİ: Konsey kabulü (operatör onaylı) + onaylı mimarların kurucuyla ortak fikir alanı ---- */
+const ArchMeclis={KON:'https://it041-konsey.lunarisbahal.workers.dev',
+  async poll(){try{if(!(window.S&&S.flags&&S.flags.councilPending)||S.flags.councilApproved)return;var m=(typeof travelerName==='function'?travelerName():'');if(!m)return;var d=await fetch(this.KON+'/councilroster',{cache:'no-store'}).then(r=>r.json());if(d&&Array.isArray(d.members)&&d.members.indexOf(m)>=0){S.flags.councilApproved=true;try{save();}catch(e){}try{UI.toast(GAMELANG==='tr'?'✶ KONSEY SENİ KABUL ETTİ — Mimarlar Meclisi açıldı (Mimar Modu menüsünde).':'✶ THE COUNCIL ACCEPTED YOU — the Architects’ Assembly is open (in the Architect Mode menu).',9000);}catch(e){}}}catch(e){}},
+  async show(){var tr=(GAMELANG==='tr');var m=(typeof travelerName==='function'?travelerName():'');
+    UI.doc('⟁ '+(tr?'MİMARLAR MECLİSİ':'ARCHITECTS’ ASSEMBLY'),'<p style="color:var(--dim)">'+(tr?'Yükleniyor…':'Loading…')+'</p>');
+    var d=null;try{d=await fetch(this.KON+'/arch?mask='+encodeURIComponent(m),{cache:'no-store'}).then(r=>r.json());}catch(e){}
+    if(!d||d.error){UI.doc('⟁ '+(tr?'MİMARLAR MECLİSİ':'ARCHITECTS’ ASSEMBLY'),'<p style="color:var(--dim)">'+(tr?'Meclise şu an ulaşılamadı ya da kabulün henüz işlenmedi.':'Could not reach the assembly, or your admission is not processed yet.')+'</p><button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(tr?'kapat':'close')+'</button>');return;}
+    var h='<p style="color:var(--dim);font-size:11.5px">'+(tr?'Burada yalnız kabul edilmiş mimarlar ve ◆ Mimar (kurucu) konuşur — evreni birlikte geliştirmek için.':'Only admitted architects and ◆ the Architect (founder) speak here — to build the universe together.')+'</p>';
+    h+='<div id="amLog" style="max-height:240px;overflow:auto;font-size:12.5px;line-height:1.6">'+((d.talk||[]).map(function(x){return '<div style="margin:3px 0"><b style="color:'+(x.op?'var(--warn)':'var(--accent)')+'">'+esc(x.by)+':</b> '+esc(x.text)+'</div>';}).join('')||('<span style="color:var(--dim)">'+(tr?'İlk sözü sen söyle.':'Say the first word.')+'</span>'))+'</div>';
+    h+='<textarea id="amIn" rows="2" maxlength="500" style="width:100%;background:#070910;border:1px solid var(--line);color:var(--ink);padding:8px;font-family:inherit;font-size:12.5px;border-radius:6px" placeholder="'+(tr?'fikrini bırak…':'leave your idea…')+'"></textarea><br><button class="btn v" style="margin-top:4px" onclick="ArchMeclis.say()">'+(tr?'gönder':'send')+'</button> <button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(tr?'kapat':'close')+'</button>';
+    UI.doc('⟁ '+(tr?'MİMARLAR MECLİSİ':'ARCHITECTS’ ASSEMBLY'),h);
+    var inp=document.getElementById('amIn');if(inp)inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();ev.stopPropagation();ArchMeclis.say();}});},
+  async say(){var tr=(GAMELANG==='tr');var inp=document.getElementById('amIn');var t=(inp&&inp.value||'').trim();if(!t)return;var m=(typeof travelerName==='function'?travelerName():'');
+    try{if(window.Safe&&Safe.scan(t)>=2){Safe.trigger(2,t);return;}}catch(e){}
+    try{var r=await fetch(this.KON+'/arch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mask:m,text:t})});if(r.ok){this.show();}else{UI.toast(tr?'⚠ Gönderilemedi ('+r.status+').':'⚠ Could not send ('+r.status+').');}}catch(e){UI.toast(tr?'⚠ Ulaşılamadı.':'⚠ Unreachable.');}}
+};
+if(typeof window!=='undefined'){window.ArchMeclis=ArchMeclis;setTimeout(function(){ArchMeclis.poll();},9000);setInterval(function(){ArchMeclis.poll();},300000);}
 
 /* ============ v8.1 — AUTONOMOUS SUBJECT: an independent AI consciousness ============
    Born from the connected mirror (WebLLM/endpoint). Drives IT-019's body,
@@ -8121,6 +8141,7 @@ var Pleroma={
     try{S.flags=S.flags||{};S.flags.collectiveConsent='keep';S.flags.councilPending=true;S.flags.graduated=true;}catch(e){}
     try{if(window.Cloud&&Cloud.push)Cloud.push();}catch(e){}
     try{if(typeof track==='function')track('konsey basvurusu gonderildi (izin verdi)');}catch(e){}
+    try{fetch('https://it041-konsey.lunarisbahal.workers.dev/counciljoin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mask:(typeof travelerName==='function'?travelerName():'Bir yolcu'),note:'mezuniyet başvurusu'})}).catch(function(){});}catch(e){}
     try{if(typeof save==='function')save();}catch(e){} try{if(window.refreshHud)refreshHud();}catch(e){}
     try{this.flare();}catch(e){}
     var msg=TR?'Ba\u015fvurun g\u00f6nderildi. Sonu\u00e7lar inceleniyor; uygun g\u00f6r\u00fcld\u00fc\u011f\u00fcnde Konsey\u2019e kabul edileceksin. Mimar Modu sana a\u00e7\u0131ld\u0131.':'Your application is submitted. Your results are being reviewed; you will be admitted to the Council accordingly. Architect Mode is now open to you.';
@@ -8294,13 +8315,13 @@ window.Forum=(function(){
       var t=(F._threads||[]).slice().reverse(),i;
       if(!t.length&&!err)h+='<p style="opacity:.55">'+(TR()?'Henüz başlık yok — ilkini sen aç.':'No threads yet — open the first.')+'</p>';
       for(i=0;i<t.length;i++){var th=t[i];
-        h+='<div onclick="Forum.thread(\''+th.id+'\')" style="cursor:pointer;border:1px solid rgba(150,170,210,.18);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:#0e111b"><b style="color:#e9f0fb">'+esc(th.title)+'</b><br><span style="opacity:.55;font-size:12px">'+esc(th.by)+' · '+((th.posts&&th.posts.length)||1)+' '+(TR()?'yanıt':'posts')+' · '+when(th.t)+'</span></div>';}
+        h+='<div onclick="Forum.thread(\''+th.id+'\')" style="cursor:pointer;border:1px solid rgba(150,170,210,.18);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:#0e111b"><b style="color:#e9f0fc">'+(th.op?'<span style="color:#cdb878">◆ </span>':'')+esc(th.title)+'</b><br><span style="opacity:.55;font-size:12px">'+(th.op?'◆ ':'')+esc(th.by)+' · '+((th.posts&&th.posts.length)||1)+' '+(TR()?'yanıt':'posts')+' · '+when(th.t)+'</span></div>';}
       setH(h);},
     thread:function(id){var th=null,i;for(i=0;i<F._threads.length;i++)if(F._threads[i].id===id)th=F._threads[i];if(!th){F.show();return;}
       openM();var h='<button style="'+BTN+'" onclick="Forum.show()">↩ '+(TR()?'başlıklar':'threads')+'</button>';
       h+='<h3 style="margin:12px 0 6px;color:#eef3fc">'+esc(th.title)+'</h3>';
       var p=th.posts||[],j;
-      for(j=0;j<p.length;j++){h+='<div style="border-top:1px solid rgba(150,170,210,.12);padding:9px 0"><span style="opacity:.55;font-size:12px">'+esc(p[j].by)+' · '+when(p[j].t)+'</span><br><span style="line-height:1.55">'+esc(p[j].text).replace(/\n/g,'<br>')+'</span></div>';}
+      for(j=0;j<p.length;j++){h+='<div style="border-top:1px solid rgba(150,170,210,.12);padding:9px 0"><span style="opacity:.55;font-size:12px">'+(p[j].op?'<span style="color:#cdb878;opacity:1">◆ '+(TR()?'Mimar':'Architect')+' · </span>':'')+esc(p[j].by)+' · '+when(p[j].t)+'</span><br><span style="line-height:1.55">'+esc(p[j].text).replace(/\n/g,'<br>')+'</span></div>';}
       h+='<div style="margin-top:14px"><div style="'+INP+'opacity:.85">'+esc(who())+' <span style="opacity:.5;font-size:11px">· '+(TR()?'oyundaki adın':'your in-game name')+'</span></div>';
       h+='<textarea id="fRTxt" rows="3" placeholder="'+(TR()?'yanıtın…':'your reply…')+'" style="'+INP+'"></textarea>';
       h+='<button style="'+BTN+'" onclick="Forum.send(\'reply\',\''+th.id+'\')">'+(TR()?'gönder':'send')+'</button></div>';
@@ -8361,7 +8382,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
 </script>
 <script>
 /* b162: visible build stamp (debug) — lets us confirm which build a device is actually running (cache check) */
-(function(){try{var v=document.createElement('div');v.textContent='b258 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b259 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>

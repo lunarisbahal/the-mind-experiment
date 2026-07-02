@@ -76,6 +76,27 @@ a{color:var(--violet)}
   </div>
 
   <div class="card" style="margin-top:12px">
+    <h2>◈ MİMAR BAŞVURULARI — onayın bekleniyor</h2>
+    <div id="archSubBox">…</div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h2>✶ KONSEY BAŞVURULARI — kabul onayın</h2>
+    <div id="councilBox">…</div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h2>⟁ MİMARLAR MECLİSİ — onaylı mimarlarla fikir alanı</h2>
+    <div id="archTalkBox">…</div>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><input id="atMsg" style="flex:1;min-width:200px" placeholder="◆ Mimar olarak yaz…"><button onclick="atSend()">gönder</button></div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h2>🕊 HAFTALIK NABIZ MEKTUBU</h2>
+    <div id="letterBox">…</div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
     <h2>🗂 FORUM YÖNETİMİ</h2>
     <div id="forumBox">…</div>
   </div>
@@ -231,6 +252,21 @@ async function forumDel(id,pi){
     if(r.ok){loadForumAdmin();}else{alert('Silinemedi ('+r.status+') — v11.1 worker deploy edilmiş ve anahtar eşleşmiş olmalı.');}
   }catch(e){alert('Ulaşılamadı: '+e.message);}
 }
+/* ---- MİMAR/KONSEY KARARLARI + MECLİS (op anahtarlı) ---- */
+async function archDecide(id,action){
+  try{var r=await fetch(KON+'/archdecide',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':KEY},body:JSON.stringify({id:id,action:action})});
+    if(r.ok){loadState();}else{alert('Karar işlenemedi ('+r.status+').');}}catch(e){alert('Ulaşılamadı: '+e.message);}
+}
+async function councilDecide(mask,action){
+  if(action==='k'&&!confirm('"'+mask+'" Konsey Meclisi\'ne kabul edilsin mi? (Mimarlar Meclisi\'ne erişir)'))return;
+  try{var r=await fetch(KON+'/councildecide',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':KEY},body:JSON.stringify({mask:mask,action:action})});
+    if(r.ok){loadState();}else{alert('Karar işlenemedi ('+r.status+').');}}catch(e){alert('Ulaşılamadı: '+e.message);}
+}
+async function atSend(){
+  var inp=document.getElementById('atMsg');var t=(inp&&inp.value||'').trim();if(!t)return;
+  try{var r=await fetch(KON+'/arch',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':KEY},body:JSON.stringify({text:t})});
+    if(r.ok){inp.value='';loadState();}else{alert('Gönderilemedi ('+r.status+').');}}catch(e){alert('Ulaşılamadı: '+e.message);}
+}
 /* ---- KÖPRÜ GÖNDER (op anahtarlı /order) ---- */
 async function brSend(){
   var inp=document.getElementById('brMsg'),st=document.getElementById('brStat');
@@ -278,6 +314,28 @@ async function loadState(){
       if(dw)dw.innerHTML= ks.length? ks.slice(0,14).map(function(k){var pc=Math.round((dd[k].sec||0)/tot*100);return '<div class="row" style="font-size:12px"><span class="v">'+esc(k)+'</span><span class="k">'+Math.round((dd[k].sec||0)/60)+' dk · %'+pc+' · '+(dd[k].n||0)+' oturum</span></div><div class="bar"><i style="width:'+pc+'%"></i></div>';}).join('') : '<span class="muted">henüz veri yok.</span>';
       var ses=(d.sessions||[]);
       if(dw&&ses.length){dw.innerHTML+='<h2 style="margin:10px 0 4px">SON OTURUMLAR</h2>'+ses.slice().reverse().slice(0,8).map(function(x){var zz=Object.keys(x.zones||{}).sort(function(a,b){return x.zones[b]-x.zones[a];}).slice(0,3).map(function(k){return k+' '+Math.round(x.zones[k]/60)+'dk';}).join(' · ');return '<div class="row" style="font-size:12px"><span class="v">'+esc(x.mask)+' — '+x.dur+' dk</span><span class="k tag">'+esc(zz)+'</span></div>';}).join('');}
+    }catch(e){}
+    /* MİMAR BAŞVURULARI */
+    try{
+      var ab=document.getElementById('archSubBox');var as=(d.archSub||[]);
+      if(ab)ab.innerHTML= as.length? as.slice().reverse().map(function(x){return '<div style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0"><div class="row"><span class="v"><b style="color:var(--violet)">'+esc(x.by)+'</b> · '+esc(x.kind)+'</span><span class="k tag">'+fmtDate(x.t)+'</span></div><p style="color:var(--moon);font-size:12.5px;margin:4px 0">'+esc(x.text)+'</p><button style="color:var(--accent)" onclick="archDecide(\''+esc(x.id)+'\',\'k\')">✓ Onayla (kanona al)</button> <button style="color:#e88" onclick="archDecide(\''+esc(x.id)+'\',\'r\')">✗ Reddet</button></div>';}).join('') : '<span class="muted">bekleyen mimar eseri yok.</span>';
+    }catch(e){}
+    /* KONSEY BAŞVURULARI */
+    try{
+      var cb=document.getElementById('councilBox');var ca=(d.councilApps||[]);var cm=(d.councilMembers||[]);
+      var ch2= ca.length? ca.slice().reverse().map(function(x){return '<div class="row"><span class="v"><b style="color:var(--violet)">'+esc(x.mask)+'</b>'+(x.note?(' <span class="tag">· '+esc(x.note)+'</span>'):'')+'</span><span><button style="color:var(--accent);padding:2px 8px;font-size:11px" onclick="councilDecide(\''+esc(x.mask)+'\',\'k\')">✓ Kabul</button> <button style="color:#e88;padding:2px 8px;font-size:11px" onclick="councilDecide(\''+esc(x.mask)+'\',\'r\')">✗</button></span></div>';}).join('') : '<span class="muted">bekleyen başvuru yok.</span>';
+      ch2+='<p class="tag" style="margin-top:6px">Kabul edilenler ('+cm.length+'): '+ (cm.length?cm.map(esc).join(' · '):'—')+'</p>';
+      if(cb)cb.innerHTML=ch2;
+    }catch(e){}
+    /* MİMARLAR MECLİSİ */
+    try{
+      var at=document.getElementById('archTalkBox');var tk=(d.archTalk||[]);
+      if(at)at.innerHTML= tk.length? tk.map(function(x){return '<div class="row" style="font-size:12px"><span class="v"><b style="color:'+(x.op?'var(--warn)':'var(--accent)')+'">'+esc(x.by)+':</b> '+esc(x.text)+'</span><span class="k tag">'+fmtDate(x.t)+'</span></div>';}).join('') : '<span class="muted">meclis sessiz — ilk sözü sen söyle.</span>';
+    }catch(e){}
+    /* HAFTALIK MEKTUP */
+    try{
+      var lb=document.getElementById('letterBox');
+      if(lb)lb.innerHTML= (d.pulseLetter&&d.pulseLetter.text)? ('<p style="color:var(--moon);font-size:12.5px;line-height:1.65;white-space:pre-wrap">'+esc(d.pulseLetter.text)+'</p><p class="tag">'+fmtDate(d.pulseLetter.t)+'</p>') : '<span class="muted">ilk mektup, v11.2 deploy + bir cron turu sonrası burada.</span>';
     }catch(e){}
     /* FORUM YÖNETİMİ */
     try{ loadForumAdmin(); }catch(e){}
