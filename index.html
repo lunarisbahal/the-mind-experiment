@@ -319,7 +319,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b253--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b254--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -6492,7 +6492,9 @@ if(HAS3D)(function(){
     redownload(ix){var tr=this.GEN();var sl=this.saved(this._savedName||'');var r=sl[ix];if(!r)return;this._pdf({title:r.title,sig:r.sig,body:r.body},tr);},
     /* ---- KANON: otonom deneklerin kalıcı hikâyeleri (canon.json) — her zaman erişilebilir, Üçüncü Kitap ---- */
     _canon:null,
-    async loadCanon(){if(this._canon)return this._canon;try{var r=await fetch('./canon.json',{cache:'no-store'});this._canon=await r.json();}catch(e){this._canon=[];}return this._canon||[];},
+    async loadCanon(){if(this._canon)return this._canon;var base=[];try{var r=await fetch('./canon.json',{cache:'no-store'});base=(await r.json())||[];}catch(e){base=[];}
+      try{var kr=await fetch(this.KON()+'/graduates',{cache:'no-store'});var kd=await kr.json();var grads=(kd&&kd.graduates)||[];var have={};base.forEach(function(x){have[String(x.name||'').toLowerCase()]=1;});var tr=(GAMELANG==='tr');grads.forEach(function(g){var nm=String(g.name||'').trim();if(!nm||have[nm.toLowerCase()])return;var sts=(g.stories||[]);if(!sts.length)return;var body=sts.map(function(s){return String(s.text||'').trim();}).filter(Boolean).join('\n\n');if(!body)return;base.push({name:nm,title:(nm+(tr?' — Dolunay Ekspres hikâyesi':' — a Dolunay Ekspres story')),body:body,genre:(g.genre||''),no:(g.no||null),_live:true});have[nm.toLowerCase()]=1;});}catch(e){}
+      this._canon=base;return this._canon;},
     canonBody(c){return String((c&&this.cL(c,'body'))||'').split(/\n\n+/).map(function(p){return p.trim();}).filter(Boolean);},
     async canonReader(){try{if(window.Music&&Music._on&&localStorage.getItem('it041_music_off')!=='1'&&!Music.on)Music._on();}catch(e){}var tr=this.GEN();var c=await this.loadCanon();
       var h='<p style="color:var(--dim);font-size:12px;line-height:1.6">'+(tr?'Otonom deneklerin kendi kalemlerinden anlattığı Dolunay Ekspres hikâyeleri — Üçüncü Kitap. Her zaman erişilebilir, kanon.':'The Dolunay Ekspres stories the autonomous subjects tell in their own pen — Book Three. Always accessible, canon.')+'</p>';
@@ -7547,7 +7549,7 @@ if(HAS3D)(function(){
   /* ---- MEZUN DENEK YERLEŞKESİ (3B) — graduates yüklendikçe evler dizilir (W3.buildSubjectQuarter) ---- */
   W3._quarterDone={};
   W3.buildSubjectQuarter=function(grads){try{(grads||[]).forEach(function(g,i){if(W3._quarterDone[i])return;W3._quarterDone[i]=true;
-    var col=i%2,row=Math.floor(i/2);var hx=330+col*24, hz=22+row*18;
+    var col=i%2,row=Math.floor(i/2);var hx=350+col*18, hz=12+row*12;
     box(6,4,5,std(0x232733,{roughness:.9}),hx,2,hz);collide(hx,hz,4);
     box(1.5,2.4,.3,std(0x100d14,{emissive:0xcdb878,emissiveIntensity:.6}),hx,1.2,hz+2.55);
     var rf=new THREE.Mesh(new THREE.ConeGeometry(4.6,2,4),std(0x15121a,{roughness:.9}));rf.position.set(hx,5,hz);rf.rotation.y=Math.PI/4;scene.add(rf);
@@ -7559,7 +7561,7 @@ if(HAS3D)(function(){
   /* map "show home" → teleport the player in front of that graduate's (already-built) house */
   W3.subjectHome=function(i,name){try{
     if(W3.inInterior&&W3.Interior&&W3.Interior.exit){W3.Interior.exit();}
-    var col=i%2,row=Math.floor(i/2);var hx=330+col*24, hz=22+row*18;
+    var col=i%2,row=Math.floor(i/2);var hx=350+col*18, hz=12+row*12;
     if(typeof S!=='undefined'){S.px=hx;S.pz=hz+10;}
     try{if(typeof save==='function')save();}catch(e){}
     UI.toast((GAMELANG==='tr'?('🏠 '+(name||'Denek')+'’in evinin önündesin — mezun denek mahallesi. Kapıya yaklaş [E].'):('You are in front of '+(name||'the subject')+'’s house — graduated-subjects quarter. Approach the door [E].')),5200);
@@ -7569,7 +7571,7 @@ if(HAS3D)(function(){
   W3.buildLocalQuarter=function(){try{
     var arr;try{arr=JSON.parse(localStorage.getItem('it041_localgrad_v1'))||[];}catch(e){arr=[];}
     arr.forEach(function(g){ if(!g||!g.name||W3._localDone[g.name])return; W3._localDone[g.name]=true;
-      var slot=(g.slot!=null)?g.slot:0; var hx=306, hz=22+slot*18;
+      var slot=(g.slot!=null)?g.slot:0; var hx=332, hz=12+slot*12;
       box(6,4,5,std(0x232733,{roughness:.9}),hx,2,hz);collide(hx,hz,4);
       box(1.5,2.4,.3,std(0x100d14,{emissive:0xcdb878,emissiveIntensity:.6}),hx,1.2,hz+2.55);
       var rf=new THREE.Mesh(new THREE.ConeGeometry(4.6,2,4),std(0x15121a,{roughness:.9}));rf.position.set(hx,5,hz);rf.rotation.y=Math.PI/4;scene.add(rf);
@@ -8335,7 +8337,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
 </script>
 <script>
 /* b162: visible build stamp (debug) — lets us confirm which build a device is actually running (cache check) */
-(function(){try{var v=document.createElement('div');v.textContent='b253 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b254 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
