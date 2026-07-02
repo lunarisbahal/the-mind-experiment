@@ -319,7 +319,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b252--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b253--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -531,7 +531,7 @@ const L={
   caravan:{x:338,z:196,r:13,name:"SILVANUS'S CARAVAN"},
   medbench:{x:338,z:184,r:4,get name(){return GAMELANG==='tr'?'MEDİTASYON BANKI':'MEDITATION BENCH';}},
   newsstand:{x:172,z:96,r:4.5,get name(){return GAMELANG==='tr'?'GAZETE KÖŞESİ — DO·LOON-AI EXPRESS':'NEWSSTAND — DO·LOON-AI EXPRESS';}},
-  medpark:{x:150,z:92,r:4,get name(){return GAMELANG==='tr'?'HUZUR GÖLETİ':'CALM POND';}},
+  medpark:{x:92,z:56,r:4,get name(){return GAMELANG==='tr'?'HUZUR GÖLETİ':'CALM POND';}},
   bridge:{x:319,z:196,r:6,name:'ROPE BRIDGE'},
   station:{x:295,z:106,r:18,name:'THE STATION'},
   ovStone1:{x:130,z:190,r:4.5,name:'ORDOS VERITAS OBELISK'},
@@ -8138,6 +8138,8 @@ function drawMini(){
   const wp=waypoint();
   if(wp){mctx.fillStyle='#cdb878';mctx.beginPath();mctx.arc(FXm(wp.x),FYm(wp.z),3,0,7);mctx.fill();}
   try{var RSYM={lunaris:'L',bahal:'B',lucida:'LU',lucius:'LC',noct:'N',silvanus:'S',aelius:'A'};mctx.font='bold 8px monospace';mctx.textAlign='center';mctx.textBaseline='middle';((window.W3&&W3.PORTALS)||[]).forEach(function(pg){if(!pg.house)return;var integ=S.flags&&S.flags[pg.k+'Integrated'];mctx.fillStyle=integ?'rgba(127,212,193,.95)':'rgba(205,184,120,.95)';mctx.fillText(RSYM[pg.k]||'?',FXm(pg.x),FYm(pg.z));});mctx.textAlign='left';mctx.textBaseline='alphabetic';}catch(e){}
+  try{((window.W3&&W3.PORTALS)||[]).forEach(function(p){if(!p.subjHome)return;mctx.fillStyle='rgba(205,184,120,.92)';mctx.fillRect(FXm(p.x)-1.6,FYm(p.z)-1.6,3.2,3.2);});}catch(e){}
+  try{if(L.medpark){mctx.fillStyle='rgba(111,168,216,.95)';mctx.beginPath();mctx.arc(FXm(L.medpark.x),FYm(L.medpark.z),2.6,0,7);mctx.fill();}}catch(e){}
   mctx.save();mctx.translate(FXm(S.px),FYm(S.pz));mctx.rotate(S.heading);
   mctx.fillStyle='#e8e4d4';
   mctx.beginPath();mctx.moveTo(0,-5);mctx.lineTo(3.5,4);mctx.lineTo(-3.5,4);mctx.closePath();mctx.fill();
@@ -8172,6 +8174,8 @@ function drawBigMap(){
   if(W3.noctPos)lbl('NOCTORNUS',FX(W3.noctPos.x),FY(W3.noctPos.z)-7,'#7fd4c1');
   if(lunarisMoon()&&!S.solved.s2)lbl('LUNARIS ☽',FX(L.lunaris.x),FY(L.lunaris.z)-7,'#7fd4c1');
   (window.W3&&W3.PORTALS||[]).forEach(function(p){if(!p.house)return;var X=FX(p.x),Z=FY(p.z);var integ=S.flags&&S.flags[p.k+'Integrated'];var col=integ?'#7fd4c1':'#cdb878';ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(X,Z,7,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(X,Z-4);ctx.lineTo(X+3.5,Z+3);ctx.lineTo(X-3.5,Z+3);ctx.closePath();ctx.fill();var nm=(function(){var R=(window.REALMS||[]).find(function(x){return x.k===p.k;});return R&&window.Realms?Realms.T(R.n):((window.House&&House.NAMES[p.k])||p.k);})();lbl((integ?'✓ ':'☽ ')+nm,X,Z-10,col,9);});
+  try{((window.W3&&W3.PORTALS)||[]).forEach(function(p){if(!p.subjHome)return;var X=FX(p.x),Y=FY(p.z);ctx.fillStyle='#cdb878';ctx.beginPath();ctx.arc(X,Y,4,0,7);ctx.fill();lbl('◍ '+(p.sname||p.name||(tr?'denek':'subject')),X,Y-8,'#cdb878',8);});}catch(e){}
+  try{if(L.medpark){var mX=FX(L.medpark.x),mY=FY(L.medpark.z);ctx.fillStyle='#6fa8d8';ctx.beginPath();ctx.arc(mX,mY,4,0,7);ctx.fill();lbl(tr?'❀ HUZUR GÖLETİ':'❀ CALM POND',mX,mY-8,'#6fa8d8',9);}}catch(e){}
   ctx.fillStyle='rgba(157,140,201,.95)';RITE_SITES.forEach((k,i)=>{if(S.rites['r'+(i+1)]===undefined){const X=FX(L[k].x),Z=FY(L[k].z);ctx.beginPath();ctx.moveTo(X,Z-6);ctx.lineTo(X+6,Z);ctx.lineTo(X,Z+6);ctx.lineTo(X-6,Z);ctx.closePath();ctx.fill();}});
   ctx.fillStyle='rgba(110,210,220,.95)';(window.__mmA||[]).forEach(a=>{ctx.beginPath();ctx.arc(FX(a.x),FY(a.z),4.5,0,7);ctx.fill();});
   /* b62: harita sadelestirildi — ajan isim etiketleri kaldirildi (kim nerede icin Roster) */
@@ -8331,7 +8335,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
 </script>
 <script>
 /* b162: visible build stamp (debug) — lets us confirm which build a device is actually running (cache check) */
-(function(){try{var v=document.createElement('div');v.textContent='b252 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b253 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
