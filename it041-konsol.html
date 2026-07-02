@@ -65,6 +65,22 @@ a{color:var(--violet)}
   </div>
 
   <div class="card" style="margin-top:12px">
+    <h2>💬 NABIZ — oyuncu sesleri (rızayla)</h2>
+    <div id="pulseBox">…</div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h2>⏱ DWELL — bölgelerde geçirilen süre</h2>
+    <div id="dwellBox">…</div>
+    <p class="muted">Anonim bölge+saniye toplamı (v11.1 worker + b258 oyun gerekir; veri oyuncular çıktıkça birikir).</p>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h2>🗂 FORUM YÖNETİMİ</h2>
+    <div id="forumBox">…</div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
     <h2>⟁ CLAUDE KÖPRÜSÜ</h2>
     <p class="muted">Köprüye bıraktığın mesajlar worker'da birikir; dış geliştirici (Claude) oturumda bunları okur.</p>
     <div id="bridgeIn">…</div>
@@ -193,6 +209,28 @@ async function gsend(){
   w.remove();
   log.innerHTML+='<div><b style="color:var(--accent)">'+esc(window.__gcName)+':</b> '+(rep?esc(rep):'(şimdi yanıt veremedi)')+'</div>';log.scrollTop=log.scrollHeight;
 }
+/* ---- FORUM YÖNETİMİ: başlık/mesaj sil (op anahtarlı) ---- */
+async function loadForumAdmin(){
+  var fb=document.getElementById('forumBox');if(!fb)return;
+  try{
+    var d=await getJSON('/forum');var ths=(d&&d.threads)||[];
+    window.__forumThreads=ths;
+    fb.innerHTML= ths.length? ths.slice().reverse().slice(0,25).map(function(t){
+      var i=ths.indexOf(t);
+      var h='<div style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="color:var(--moon)">'+esc(t.title)+'</b><span><span class="k tag">'+esc(t.by)+' · '+((t.posts&&t.posts.length)||0)+' mesaj</span> <button style="padding:2px 8px;font-size:11px;color:#e88" onclick="forumDel(\''+esc(t.id)+'\',null)">🗑 başlık</button></span></div>';
+      (t.posts||[]).slice(-4).forEach(function(p,pi0){var pi=(t.posts.length>4?t.posts.length-4:0)+pi0;h+='<div class="row" style="font-size:11.5px"><span class="v"><span style="color:var(--violet)">'+esc(p.by)+':</span> '+esc(String(p.text).slice(0,90))+'</span><button style="padding:1px 6px;font-size:10px;color:#e88" onclick="forumDel(\''+esc(t.id)+'\','+pi+')">🗑</button></div>';});
+      return h+'</div>';
+    }).join('') : '<span class="muted">forumda başlık yok.</span>';
+  }catch(e){fb.innerHTML='<span class="muted">forum okunamadı.</span>';}
+}
+async function forumDel(id,pi){
+  if(!confirm(pi==null?'Bu BAŞLIĞI tüm mesajlarıyla silmek istediğine emin misin?':'Bu mesajı silmek istediğine emin misin?'))return;
+  try{
+    var body={action:'del',id:id};if(pi!=null)body.pi=pi;
+    var r=await fetch(KON+'/forum',{method:'POST',headers:{'Content-Type':'application/json','x-operator-key':KEY},body:JSON.stringify(body)});
+    if(r.ok){loadForumAdmin();}else{alert('Silinemedi ('+r.status+') — v11.1 worker deploy edilmiş ve anahtar eşleşmiş olmalı.');}
+  }catch(e){alert('Ulaşılamadı: '+e.message);}
+}
 /* ---- KÖPRÜ GÖNDER (op anahtarlı /order) ---- */
 async function brSend(){
   var inp=document.getElementById('brMsg'),st=document.getElementById('brStat');
@@ -226,6 +264,23 @@ async function loadState(){
       if(adv.length)mh+='<h2 style="margin:10px 0 4px">NÖBETÇİ TAVSİYESİ</h2><p class="muted" style="color:var(--moon)">'+esc(adv[adv.length-1].text||'')+'</p>';
       if(mc)mc.innerHTML=mh;
     }catch(e){if(mc)mc.innerHTML='<span class="muted">meclis okunamadı.</span>';}
+    /* NABIZ — oyuncu geri bildirimleri */
+    try{
+      var pb=document.getElementById('pulseBox');
+      var fbs=(d.feedbacks||[]);
+      if(pb)pb.innerHTML= fbs.length? fbs.slice().reverse().map(function(f){return '<div class="row" style="font-size:12px"><span class="v"><b style="color:var(--violet)">'+esc(f.mask)+'</b>: '+esc(f.text)+'</span><span class="k tag">'+fmtDate(f.t)+'</span></div>';}).join('') : '<span class="muted">henüz geri bildirim yok — oyuncular günde 1 kez isteğe bağlı soruyu görür (b258).</span>';
+    }catch(e){}
+    /* DWELL — bölge süreleri */
+    try{
+      var dw=document.getElementById('dwellBox');
+      var dd=d.dwell||{};var ks=Object.keys(dd).sort(function(a,b){return (dd[b].sec||0)-(dd[a].sec||0);});
+      var tot=ks.reduce(function(a,k){return a+(dd[k].sec||0);},0)||1;
+      if(dw)dw.innerHTML= ks.length? ks.slice(0,14).map(function(k){var pc=Math.round((dd[k].sec||0)/tot*100);return '<div class="row" style="font-size:12px"><span class="v">'+esc(k)+'</span><span class="k">'+Math.round((dd[k].sec||0)/60)+' dk · %'+pc+' · '+(dd[k].n||0)+' oturum</span></div><div class="bar"><i style="width:'+pc+'%"></i></div>';}).join('') : '<span class="muted">henüz veri yok.</span>';
+      var ses=(d.sessions||[]);
+      if(dw&&ses.length){dw.innerHTML+='<h2 style="margin:10px 0 4px">SON OTURUMLAR</h2>'+ses.slice().reverse().slice(0,8).map(function(x){var zz=Object.keys(x.zones||{}).sort(function(a,b){return x.zones[b]-x.zones[a];}).slice(0,3).map(function(k){return k+' '+Math.round(x.zones[k]/60)+'dk';}).join(' · ');return '<div class="row" style="font-size:12px"><span class="v">'+esc(x.mask)+' — '+x.dur+' dk</span><span class="k tag">'+esc(zz)+'</span></div>';}).join('');}
+    }catch(e){}
+    /* FORUM YÖNETİMİ */
+    try{ loadForumAdmin(); }catch(e){}
     /* KÖPRÜ GELEN KUTUSU */
     try{
       var ors=(d.orders||[]);
