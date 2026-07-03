@@ -51,7 +51,7 @@
   @media (pointer:coarse){#hudTL{max-width:58vw;}#hudTL .chip{font-size:10px;padding:4px 7px;line-height:1.25;}#hudBL{font-size:10px;}#hudBL .bar{height:6px;}}
   #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;margin-left:auto;transition:opacity .3s;}
   /* v8.6 mobile: minimap small + translucent; fully hideable from the menu */
-  @media (pointer:coarse){#minimap{width:122px;height:94px;opacity:.9;}}
+  @media (pointer:coarse){#minimap{width:146px;height:112px;opacity:.9;}}
   body.mmHide #minimap{display:none;}
   #moonchip{margin-left:auto;display:inline-block;}
   /* mobil: roster satırı ana ekranda yer kaplamasın — Menü → Evrende Kimler Var'dan açılır; harita sağda kalsın */
@@ -319,7 +319,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b277--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b278--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -2903,6 +2903,7 @@ const CBT={
     window.Daily3&&Daily3.mark('cbt');
     const blind=Object.keys(this.wrong).sort((a,b)=>this.wrong[b]-this.wrong[a])[0];
     Rite.closeOnly();
+    try{xpGift({spark:5,luc:12,daily:'cbthunt',tTR:'Çarpıtma Avcısı tamamlandı',tEN:'Distortion Hunter complete',fTR:'Skorun envantere ve final analizine işlendi.',fEN:'Your score feeds the inventory and final analysis.'});}catch(e){}
     UI.doc('HUNT RESULT — '+this.score+'/6',
       '<p>'+(this.score>=5?'Sharp eye. Yaldabaoth\'s fuel tank drains fast around you.':this.score>=3?'Good start. Distortions only lose power once they are named.':'The machine is a master of this game — but now you know its rules. Come back.')+'</p>'+
       (blind?'<p style="color:var(--violet)">Your blind spot: <b>'+this.D[blind]+'</b>. Each time you catch this pattern in real life, you open one more lock.</p>':'<p style="color:var(--accent)">No blind spot — full vision.</p>')+
@@ -2974,6 +2975,7 @@ const Bilat={
     const dd=this.before-after;
     S.insight+=4;S.lucidity=Math.min(100,S.lucidity+18);teachUnlock('bilat');save();refreshHud();
     window.Daily3&&Daily3.mark('bilat');Rite.closeOnly();
+    try{xpGift({spark:5,luc:12,daily:'bilat2',tTR:'Çift Işık çalışması tamamlandı',tEN:'Dual Light work complete',fTR:'Notun envantere ve final analizine işlendi.',fEN:'Your note feeds the inventory and final analysis.'});}catch(e){}
     UI.doc('TWIN LIGHT — RECORD',
       '<p>'+(dd>0?'Tension '+this.before+' → '+after+'. The swinging gaze loosened the lock by '+dd+' teeth.':dd===0?'Unchanged — that is data too. Some knots loosen on the second visit.':'It rose. That can happen; sit by the stone a while, breathe deep. If it intensifies, tell a human.')+'</p>'+
       '<p style="color:var(--dim);font-size:12px">Etched into your mind map. It also counts toward your daily triad.</p>');}
@@ -3010,6 +3012,7 @@ const Arch={
     S.inv.arch={sc:this.sc,dom,d:Date.now()};
     S.insight+=6;S.lucidity=Math.min(100,S.lucidity+12);teachUnlock('arch');save();refreshHud();
     Rite.closeOnly();
+    try{xpGift({spark:5,luc:12,daily:'archm',tTR:'Arketip Aynası tamamlandı',tEN:'Archetype Mirror complete',fTR:'Profilin Vaka D olarak final analizine işlendi.',fEN:'Your profile feeds the final analysis as Case D.'});}catch(e){}
     UI.doc('THE FOUR FACES — DOMINANT: '+N[dom],
       '<p>'+['p','g','a','s'].map(k=>N[k]+': '+'◆'.repeat(this.sc[k])+'◇'.repeat(8-this.sc[k])).join('<br>')+'</p>'+
       '<p>'+C[dom]+'</p><p style="color:var(--dim);font-size:12px">Etched into your mind map — you will see its cosmic counterpart there.</p>');}
@@ -8671,7 +8674,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b277 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b278 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
