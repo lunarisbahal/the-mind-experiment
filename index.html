@@ -319,7 +319,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b268--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b269--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -2697,6 +2697,42 @@ const MemDoor={BASE:{lunaris:0,bahal:7,lucida:14,lucius:21,silvanus:28,noct:35,a
     try{if(window.Echo)Echo.push({realm:it.realm,ch:this._ab,q:(L==='tr'?'Hafıza Kapısı — kendi sahnen':'Memory Door — your scene'),a:v});}catch(e){}
     try{if(typeof xpGift==='function')xpGift({spark:5,luc:14,daily:'memdoor',tTR:'Bir Hafıza Kapısı geçildi',tEN:'A Memory Door crossed',fTR:'Sahnen kayıp günlüğe dipnot olarak, sesin final analizine işlendi.',fEN:'Your scene is now a footnote in the lost diary; your voice feeds the final analysis.'});}catch(e){}}};
 if(typeof window!=='undefined')window.MemDoor=MemDoor;
+/* ✦ 2D LIGHT GAME (b269): optional canvas mode for story games — a light dot dodges shadow wisps and collects orbs; classic choice mode stays intact */
+const Game2D={_raf:0,_els:null,_st:null,
+  start(scenes,r){var tr=(GAMELANG==='tr');this.stop(true);var old=document.getElementById('g2dOv');if(old)old.remove();
+    var sc=(scenes||[]).slice(0,4);if(!sc.length)return;
+    var ov=document.createElement('div');ov.id='g2dOv';ov.style.cssText='position:fixed;inset:0;z-index:460;background:#04060c;display:flex;flex-direction:column';
+    ov.innerHTML='<div id="g2dTxt" style="padding:10px 14px;color:#a9e8c4;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;line-height:1.6;min-height:44px;border-bottom:1px solid #1c2740"></div><canvas id="g2dCv" style="flex:1;touch-action:none"></canvas><div style="padding:8px 14px;display:flex;justify-content:space-between;align-items:center;color:#8fa;font-size:12px"><span id="g2dSc"></span><button class="btn ghost" onclick="Game2D.quit()">✕ '+(tr?'çık':'quit')+'</button></div>';
+    document.body.appendChild(ov);
+    var cv=ov.querySelector('#g2dCv'),ctx=cv.getContext('2d');var W=0,H=0;var fit=function(){W=cv.width=cv.clientWidth||innerWidth;H=cv.height=cv.clientHeight||Math.max(200,innerHeight-120);};fit();
+    var st={r:r,sc:sc,wave:0,score:0,max:sc.length*3,hits:0,px:0.5,py:0.85,tx:0.5,ty:0.85,orbs:[],wisps:[],done:false};this._st=st;
+    var mv=function(e){var t=(e.touches&&e.touches[0])||e;var b=cv.getBoundingClientRect();st.tx=(t.clientX-b.left)/b.width;st.ty=(t.clientY-b.top)/b.height;if(e.touches)e.preventDefault();};
+    cv.addEventListener('mousemove',mv);cv.addEventListener('touchmove',mv,{passive:false});cv.addEventListener('touchstart',mv,{passive:false});
+    this._els={ov:ov,cv:cv,mv:mv};
+    var setWave=function(){var s=sc[st.wave];var a=(s&&(tr?s.tr:s.en))||[];ov.querySelector('#g2dTxt').textContent=(st.wave+1)+'/'+sc.length+' — '+(a[0]||'');
+      st.orbs=[];st.wisps=[];for(var i=0;i<3;i++)st.orbs.push({x:0.15+Math.random()*0.7,y:0.12+Math.random()*0.5});
+      for(var j=0;j<2+st.wave;j++)st.wisps.push({x:Math.random(),y:0.1+Math.random()*0.6,a:Math.random()*6.28,sp:0.0016+Math.random()*0.0022});};
+    setWave();
+    var loop=function(){if(st.done)return;fit();
+      st.px+=(st.tx-st.px)*0.09;st.py+=(st.ty-st.py)*0.09;
+      ctx.fillStyle='#04060c';ctx.fillRect(0,0,W,H);
+      st.wisps.forEach(function(w){w.a+=0.02;w.x+=Math.cos(w.a)*w.sp+(st.px-w.x)*0.0011;w.y+=Math.sin(w.a*0.8)*w.sp+(st.py-w.y)*0.0011;
+        ctx.beginPath();ctx.arc(w.x*W,w.y*H,14,0,6.28);ctx.fillStyle='rgba(80,60,120,.45)';ctx.fill();
+        if(Math.hypot((w.x-st.px)*W,(w.y-st.py)*H)<20){st.hits++;w.x=Math.random();w.y=0.1;var e2=ov.querySelector('#g2dSc');if(e2){e2.style.color='#e88';setTimeout(function(){if(e2)e2.style.color='#8fa';},300);}}});
+      st.orbs=st.orbs.filter(function(o){var d=Math.hypot((o.x-st.px)*W,(o.y-st.py)*H);if(d<18){st.score++;return false;}
+        ctx.beginPath();ctx.arc(o.x*W,o.y*H,8,0,6.28);ctx.fillStyle='#cdb878';ctx.shadowColor='#cdb878';ctx.shadowBlur=14;ctx.fill();ctx.shadowBlur=0;return true;});
+      ctx.beginPath();ctx.arc(st.px*W,st.py*H,10,0,6.28);ctx.fillStyle='#eaf2ff';ctx.shadowColor='#9db8ff';ctx.shadowBlur=18;ctx.fill();ctx.shadowBlur=0;
+      var sb=ov.querySelector('#g2dSc');if(sb)sb.textContent='✦ '+st.score+'/'+st.max+(tr?'  ·  gölge dokunuşu: ':'  ·  shadow touches: ')+st.hits;
+      if(!st.orbs.length){st.wave++;if(st.wave>=sc.length){return Game2D.finish();}setWave();}
+      Game2D._raf=requestAnimationFrame(loop);};
+    this._raf=requestAnimationFrame(loop);},
+  finish(){var st=this._st;if(!st||!st.sc)return;st.done=true;this.stop(true);var tr=(GAMELANG==='tr');
+    var net=Math.max(0,st.score-st.hits);var pct=st.max?Math.round(net/st.max*100):0;
+    var verdict=pct>=70?(tr?'Işığı taşıdın — gölgeler dokunmadan geçtin sayılır.':'You carried the light — the shadows barely touched you.'):(tr?'Gölgeler payını aldı; istersen yeniden dene — bu kez daha yavaş, daha dikkatli.':'The shadows took their share; try again — slower, more attentive.');
+    UI.doc('✦ '+esc(String((st.r&&st.r.title)||''))+(tr?' — 2B Oyun Sonu':' — 2D Game End'),'<p style="color:var(--accent)">'+(tr?'Işık':'Light')+': '+st.score+'/'+st.max+' · '+(tr?'gölge':'shadow')+': '+st.hits+' · %'+pct+'</p><p style="line-height:1.7;color:var(--ink)">'+verdict+'</p><div style="margin-top:8px"><input id="sgNote" maxlength="200" placeholder="'+(tr?'bu hikâyeden sende ne kaldı? (tek cümle — final analizine işler)':'what did this story leave in you? (one line — feeds your final analysis)')+'" style="width:96%;background:#070910;border:1px solid var(--line);color:var(--ink);padding:7px 9px;font-family:inherit;font-size:12px;border-radius:6px"><br><button class="btn ghost" style="font-size:11px;margin-top:4px" onclick="SubjStory._gameNote()">✦ '+(tr?'bırak — analizine işlesin':'leave it — weave it in')+'</button></div>');},
+  quit(){this.stop(true);},
+  stop(rm){try{cancelAnimationFrame(this._raf);}catch(e){}if(this._st)this._st.done=true;if(rm&&this._els){try{this._els.cv.removeEventListener('mousemove',this._els.mv);this._els.cv.removeEventListener('touchmove',this._els.mv);this._els.cv.removeEventListener('touchstart',this._els.mv);}catch(e){}try{this._els.ov.remove();}catch(e){}this._els=null;}}};
+if(typeof window!=='undefined')window.Game2D=Game2D;
 const DAILYQ=[
  'Which mask did you wear longest today? What remained when you took it off?',
  'What tired you most today — the work, or the feeling around the work?',
@@ -6673,7 +6709,11 @@ if(HAS3D)(function(){
       if(r&&r._dg&&r._dg.length)return this._launch(r._dg,r);
       UI.toast(tr?'✦ Hikâyeden oyun dokunuyor…':'✦ Weaving a game from the story…',3200);
       this.deriveGame(r,function(sc){try{r._dg=sc;}catch(e){}self._launch(sc,r);});},
-    _launch:function(scenes,r){this._last=r;if(window.W3&&W3.Interior&&W3.Interior.storyGame){try{W3.Interior.storyGame(scenes,{title:r.title||'',sig:r.sig||r.name||''});return;}catch(e){}}this._game={r:r,i:0,score:0,scenes:scenes};this._gameStep();},
+    _launch:function(scenes,r){this._last=r;
+      if(window.Game2D){var tr=this.GEN();this._pend={scenes:scenes,r:r};UI.doc('✦ '+esc(String(r.title||'')),'<p style="color:var(--violet);line-height:1.6">'+(tr?'Nasıl oynamak istersin?':'How do you want to play?')+'</p><button class="btn v" onclick="SubjStory._launch2(0)">◆ '+(tr?'Seçimlerle (klasik)':'Choices (classic)')+'</button> <button class="btn v" onclick="SubjStory._launch2(1)">✦ '+(tr?'2B ışık oyunu':'2D light game')+'</button>');return;}
+      this._launchGo(scenes,r);},
+    _launch2:function(m){var p=this._pend;if(!p)return;try{UI.closeDoc();}catch(e){}if(m===1&&window.Game2D){Game2D.start(p.scenes,p.r);return;}this._launchGo(p.scenes,p.r);},
+    _launchGo:function(scenes,r){this._last=r;if(window.W3&&W3.Interior&&W3.Interior.storyGame){try{W3.Interior.storyGame(scenes,{title:r.title||'',sig:r.sig||r.name||''});return;}catch(e){}}this._game={r:r,i:0,score:0,scenes:scenes};this._gameStep();},
     playGame(){var r=this._last;if(!r){UI.toast(this.GEN()?'Önce hikâyeyi yazdır.':'Write the story first.');return;}this._play(r);},
     playSaved(ix){var sl=this.saved(this._savedName||'');var r=sl[ix];if(!r)return;this._play(r);},
     _gameNote:function(){var tr=this.GEN();var e=document.getElementById('sgNote');var v=(e&&e.value||'').trim();if(!v){UI.toast(tr?'Kısa da olsa yaz.':'Write something, even short.');return;}
@@ -8544,7 +8584,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
 </script>
 <script>
 /* b162: visible build stamp (debug) — lets us confirm which build a device is actually running (cache check) */
-(function(){try{var v=document.createElement('div');v.textContent='b268 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b269 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
