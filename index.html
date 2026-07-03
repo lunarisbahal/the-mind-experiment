@@ -52,6 +52,13 @@
   #minimap{border:1px solid var(--line);border-radius:3px;background:rgba(5,6,10,.85);display:block;margin-left:auto;transition:opacity .3s;}
   /* v8.6 mobile: minimap small + translucent; fully hideable from the menu */
   @media (pointer:coarse){#minimap{width:146px;height:112px;opacity:.9;}}
+  /* b279 mobile top strip: right column stacks vertically — moon/date/online/map no longer overlap; date sits right above the menu */
+  @media (pointer:coarse){
+    #hudTR{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+    #hudTR>*{position:static!important;margin-left:auto;}
+    #onlineChip{max-width:46vw;}
+    #hudTL{max-width:48vw;}
+  }
   body.mmHide #minimap{display:none;}
   #moonchip{margin-left:auto;display:inline-block;}
   /* mobil: roster satırı ana ekranda yer kaplamasın — Menü → Evrende Kimler Var'dan açılır; harita sağda kalsın */
@@ -319,7 +326,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b278--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b279--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -2825,6 +2832,7 @@ const Daily={
     d.last=t;(d.log=d.log||[]).push({d:t,q:this.q(),a:String(ans).slice(0,300)});
     d.log=d.log.slice(-60);this.set(d);
     S.insight+=3;save();refreshHud();
+    try{xpGift({spark:3,luc:8,daily:'dailyq2',tTR:'Günün sorusu yanıtlandı',tEN:'Question of the day answered',fTR:'Cevabın final analizine işlendi; seri büyüyor.',fEN:'Your answer feeds the final analysis; the streak grows.'});}catch(e){}
     window.Daily3&&Daily3.mark('daily');
     UI.toast('🜂 Question of the day complete — streak: '+d.streak+' days');
   }
@@ -3129,6 +3137,7 @@ const MindMap={
   show(){
     UI.doc('🜨 MIND MAP — microcosm ↔ macrocosm',
       '<canvas id="mmapC" width="740" height="1050" style="width:100%;border:1px solid var(--line);border-radius:4px;background:#04050a"></canvas>'+
+      '<div style="margin:6px 0"><button class="btn ghost" style="font-size:11px" onclick="UI.closeDoc();NEXUS.show()">⟁ Go to NEXUS — this map, figure by figure</button></div>'+
       '<button class="btn v" onclick="MindMap.download()">Download PNG — the map is yours</button>'+
       '<p style="color:var(--dim);font-size:12px"><b style="color:var(--moon)">Your living chart.</b> Every chapter you pass, every rite and every lock you open ignites a new star here — the map literally grows as you do. The world you walk above is mirrored in the sky below: <i>microcosm ↔ macrocosm</i>. It is yours to keep — download it anytime.</p>');
     setTimeout(()=>this.draw(),50);},
@@ -3427,7 +3436,7 @@ const NEXUS={
     return f;},
   show(){
     UI.doc('⟁ NEXUS — THE INNER CONSTELLATION',
-      '<p style="color:var(--dim);font-size:12.5px"><b style="color:var(--moon)">What is this?</b> NEXUS is a living map of <i>your</i> inner cast — the figures, drives and shadows your choices have revealed — drawn as one connected web. Bright nodes are integrated parts; <b style="color:var(--violet)">dark nodes are your shadow</b>. <b>Tap a node</b> to sit with it (you do not delete the dark — you give it a seat). The same pattern echoes in the characters you meet and the stars above: <i style="color:var(--moon)">as above, so below</i>. Use <b>name the unnamed</b> to give words to a wordless node, and <b>the eye of time</b> to see the loop you keep repeating.</p>'+
+      '<p style="color:var(--dim);font-size:12.5px"><b style="color:var(--moon)">What is this?</b> NEXUS is a living map of <i>your</i> inner cast — the figures, drives and shadows your choices have revealed — drawn as one connected web. Three maps are three scales of the same mind: the <b>Universe Map</b> is it unfolded into realms, the <b>🜨 Mind Map</b> its macro drawing, and <b>NEXUS</b> its inner cast figure by figure. Bright nodes are integrated parts; <b style="color:var(--violet)">dark nodes are your shadow</b>. <b>Tap a node</b> to sit with it (you do not delete the dark — you give it a seat). The same pattern echoes in the characters you meet and the stars above: <i style="color:var(--moon)">as above, so below</i>. Use <b>name the unnamed</b> to give words to a wordless node, and <b>the eye of time</b> to see the loop you keep repeating.</p>'+
       '<canvas id="nexC" width="740" height="760" style="width:100%;max-height:50vh;border:1px solid var(--line);border-radius:4px;background:#04050a;cursor:pointer"></canvas>'+
       '<div style="margin-top:10px">'+
       '<button class="btn v" style="background:var(--accent);color:#0a0d14" onclick="if(window.UI&&UI.closeDoc)UI.closeDoc();">✕ '+(GAMELANG==='tr'?'HARİTADAN ÇIK':'LEAVE THE MAP')+'</button>'+
@@ -5326,6 +5335,7 @@ const Dreams={
   list(){try{return JSON.parse(localStorage.getItem(this.KEY))||[]}catch(e){return[]}},
   add(t){const l=this.list();l.push({d:new Date().toDateString(),t:String(t).slice(0,400)});
     try{localStorage.setItem(this.KEY,JSON.stringify(l.slice(-40)))}catch(e){}
+    try{xpGift({spark:3,luc:8,daily:'dream',tTR:'Rüya kuyuya bırakıldı',tEN:'A dream left in the well',fTR:'Rüyan final analizine işlendi.',fEN:'Your dream feeds the final analysis.'});}catch(e){}
     window.Daily3&&Daily3.mark('dream');}
 };
 function dreamCorpus(){
@@ -8674,7 +8684,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b278 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b279 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
