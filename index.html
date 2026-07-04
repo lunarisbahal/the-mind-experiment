@@ -329,7 +329,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b281--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b282--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -3031,6 +3031,45 @@ const Arch={
       '<p>'+['p','g','a','s'].map(k=>N[k]+': '+'◆'.repeat(this.sc[k])+'◇'.repeat(8-this.sc[k])).join('<br>')+'</p>'+
       '<p>'+C[dom]+'</p><p style="color:var(--dim);font-size:12px">Etched into your mind map — you will see its cosmic counterpart there.</p>');}
 };
+/* 🎡 DUYGU ÇARKI (b282) — duyguyu adlandır → nüans → şiddet → bedende bul (somatik) → ihtiyacını dinle. Zihin Oyunları'na eklenir. */
+const Emotion={
+  CORE:[
+    {k:'ofke',tr:'Öfke',en:'Anger',st:['kızgınlık','hınç','kıskançlık','hayal kırıklığı'],se:['irritation','resentment','jealousy','disappointment']},
+    {k:'korku',tr:'Korku',en:'Fear',st:['kaygı','endişe','panik','çekingenlik'],se:['anxiety','worry','panic','timidity']},
+    {k:'uzuntu',tr:'Üzüntü',en:'Sadness',st:['keder','yalnızlık','umutsuzluk','boşluk'],se:['grief','loneliness','hopelessness','emptiness']},
+    {k:'sevinc',tr:'Sevinç',en:'Joy',st:['huzur','minnet','heyecan','gurur'],se:['peace','gratitude','excitement','pride']},
+    {k:'utanc',tr:'Utanç',en:'Shame',st:['mahcubiyet','suçluluk','değersizlik','kırılganlık'],se:['embarrassment','guilt','worthlessness','vulnerability']},
+    {k:'sasme',tr:'Şaşkınlık',en:'Surprise',st:['şaşkınlık','tiksinti','hoşnutsuzluk','merak'],se:['astonishment','disgust','displeasure','curiosity']}],
+  BT:['Baş / kafa','Boğaz','Göğüs / kalp','Mide / karın','Omuz / boyun','Eller / kollar','Bacaklar','Tüm beden'],
+  BE:['Head','Throat','Chest / heart','Stomach / belly','Shoulders / neck','Hands / arms','Legs','Whole body'],
+  _st:null,
+  open(){var tr=(GAMELANG==='tr');this._st={};
+    var h='<p style="color:var(--dim);font-size:12px;line-height:1.6">'+(tr?'Duygu Çarkı: adını koyduğun duygu küçülür. Sırayla — çekirdeği seç, nüansına in, şiddetini ver, bedeninde bul, sonra dinle. Bu bir farkındalık oyunudur; teşhis değildir.':'Emotion Wheel: a feeling you name grows smaller. In turn — pick the core, refine the nuance, rate the intensity, find it in the body, then listen. An awareness game, not a diagnosis.')+'</p>'
+      +'<p style="color:var(--violet);line-height:1.6">'+(tr?'Şu an en baskın duyguna en yakın çekirdek hangisi?':'Which core is closest to your strongest feeling right now?')+'</p>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:6px">'+this.CORE.map(function(c,i){return '<button class="btn ghost" style="font-size:12.5px" onclick="Emotion._core('+i+')">'+esc(tr?c.tr:c.en)+'</button>';}).join('')+'</div>';
+    UI.doc('🎡 '+(tr?'DUYGU ÇARKI':'EMOTION WHEEL'),h);},
+  _core(i){var tr=(GAMELANG==='tr');var c=this.CORE[i];this._st.core=c;var subs=tr?c.st:c.se;
+    var h='<p style="color:var(--moon)">'+(tr?'Çekirdek: ':'Core: ')+'<b>'+esc(tr?c.tr:c.en)+'</b></p><p style="color:var(--violet);line-height:1.6">'+(tr?'Daha yakınına in — hangisi tam oturuyor?':'Refine — which one fits best?')+'</p><div style="display:flex;flex-wrap:wrap;gap:6px">'+subs.map(function(s,j){return '<button class="btn ghost" style="font-size:12.5px" onclick="Emotion._sub('+j+')">'+esc(s)+'</button>';}).join('')+'</div>';
+    UI.doc('🎡 '+(tr?'DUYGU ÇARKI':'EMOTION WHEEL'),h);},
+  _sub(j){var tr=(GAMELANG==='tr');this._st.sub=(tr?this._st.core.st:this._st.core.se)[j];
+    var h='<p style="color:var(--moon)">'+esc(this._st.sub)+'</p><p style="color:var(--violet);line-height:1.6">'+(tr?'Şiddeti ne kadar?':'How intense is it?')+'</p><div style="display:flex;flex-wrap:wrap;gap:6px">'+[20,40,60,80,100].map(function(n){return '<button class="btn ghost" onclick="Emotion._int('+n+')">'+n+'</button>';}).join('')+'</div>';
+    UI.doc('🎡 '+(tr?'DUYGU ÇARKI':'EMOTION WHEEL'),h);},
+  _int(n){var tr=(GAMELANG==='tr');this._st.intensity=n;var body=tr?this.BT:this.BE;
+    var h='<p style="color:var(--violet);line-height:1.6">'+(tr?'Bedeninin neresinde hissediyorsun?':'Where in your body do you feel it?')+'</p><div style="display:flex;flex-wrap:wrap;gap:6px">'+body.map(function(b,k){return '<button class="btn ghost" style="font-size:12px" onclick="Emotion._body('+k+')">'+esc(b)+'</button>';}).join('')+'</div>';
+    UI.doc('🎡 '+(tr?'DUYGU ÇARKI':'EMOTION WHEEL'),h);},
+  _body(k){var tr=(GAMELANG==='tr');this._st.body=(tr?this.BT:this.BE)[k];
+    var h='<p style="color:var(--moon);line-height:1.6">'+esc(this._st.sub)+' · '+this._st.intensity+' · '+esc(this._st.body)+'</p><p style="color:var(--violet);line-height:1.6">'+(tr?'Bu duygu sana ne söylüyor ya da neye ihtiyacı var? Tek cümle.':'What is this emotion telling you, or what does it need? One sentence.')+'</p><textarea id="emoIn" rows="2" maxlength="240" placeholder="..."></textarea><p style="color:var(--dim);font-size:11px">'+(tr?'Kimse okumaz; bu cihazda kalır — final analizine işler.':'No one reads it; it stays on this device — it feeds your final analysis.')+'</p><button class="btn v" onclick="Emotion._done()">'+(tr?'tamam':'done')+'</button>';
+    UI.doc('🎡 '+(tr?'DUYGU ÇARKI':'EMOTION WHEEL'),h);},
+  _done(){var tr=(GAMELANG==='tr');var v=((document.getElementById('emoIn')||{}).value||'').trim();if(!v){UI.toast(tr?'Kısa da olsa yaz.':'Write something, even short.');return;}
+    try{if(window.House&&House._lowEffort&&House._lowEffort(v)){House._effToast();return;}}catch(e){}
+    var s=this._st;
+    try{S.inv=S.inv||{};(S.inv.emotion=S.inv.emotion||[]).push({core:(tr?s.core.tr:s.core.en),sub:s.sub,intensity:s.intensity,body:s.body,note:v.slice(0,180),d:Date.now()});if(S.inv.emotion.length>20)S.inv.emotion=S.inv.emotion.slice(-20);}catch(e){}
+    try{if(window.Echo)Echo.push({realm:'',ch:0,q:(tr?'Duygu Çarkı — '+s.sub+' ('+s.body+')':'Emotion Wheel — '+s.sub+' ('+s.body+')'),a:v});}catch(e){}
+    try{if(typeof xpGift==='function')xpGift({spark:4,luc:10,daily:'emotionwheel',tTR:'Duygu Çarkı — '+s.sub,tEN:'Emotion Wheel — '+s.sub,fTR:'Duygunu adlandırdın ve bedende buldun; envantere ve final analizine işlendi.',fEN:'You named the feeling and found it in the body; it feeds the inventory and final analysis.'});}catch(e){}
+    var tip=tr?'Adını koyduğun, yerini bulduğun duygu artık seni yöneten değil, seninle konuşan bir şey. İhtiyacını gördün — küçük bir adımla ona cevap verebilirsin.':'A feeling you have named and located no longer runs you; it speaks with you. You saw its need — you can answer it with one small step.';
+    UI.doc('🎡 '+(tr?'DUYGU ÇARKI — KAYIT':'EMOTION WHEEL — RECORD'),'<p style="color:var(--accent);line-height:1.7">'+esc(s.sub)+' · '+(tr?'şiddet ':'intensity ')+s.intensity+' · '+esc(s.body)+'</p><p style="line-height:1.7;color:var(--ink)">'+tip+'</p><button class="btn v" onclick="try{UI.closeDoc();}catch(e){}if(window.Therapy)Therapy.show();">'+(tr?'kapat':'close')+'</button>');}
+};
+if(typeof window!=='undefined')window.Emotion=Emotion;
 /* ============ 📰 GAZETE — DO·LOON-AI EXPRESS (Noctornus haberi + klip linki) ============ */
 const News={
   YT:'https://www.youtube.com/watch?v=vQXSCVnvvwk',
@@ -4666,6 +4705,7 @@ const Therapy={
     rows+='<div style="border-top:1px solid var(--line);margin:8px 0 2px"></div><div style="font-size:9px;letter-spacing:.2em;color:var(--violet);opacity:.72;margin:4px 2px 2px">◭ '+(L==='tr'?'ZİHİN OYUNLARI — skora göre kıvılcım':'MIND GAMES — sparks by score')+'</div>';
     rows+='<button class="btn v" style="display:block;width:100%;text-align:left;margin:5px 0;font-size:12.5px" onclick="try{UI.closeDoc();}catch(e){}if(window.CBT)CBT.open();">◭ '+(L==='tr'?'Çarpıtma Avcısı — çarpıtmayı yakala (0–6)':'Distortion Hunter — catch the distortion (0–6)')+'</button>';
     rows+='<button class="btn v" style="display:block;width:100%;text-align:left;margin:5px 0;font-size:12.5px" onclick="try{UI.closeDoc();}catch(e){}if(window.Arch)Arch.open();">◮ '+(L==='tr'?'Arketip Aynası — dört yüzün envanteri':'Archetype Mirror — inventory of the four faces')+'</button>';
+    rows+='<button class="btn v" style="display:block;width:100%;text-align:left;margin:5px 0;font-size:12.5px" onclick="try{UI.closeDoc();}catch(e){}if(window.Emotion)Emotion.open();">🎡 '+(L==='tr'?'Duygu Çarkı — adını koy, bedende bul':'Emotion Wheel — name it, find it in the body')+'</button>';
     var _bilOK=false;try{_bilOK=!!(window.Skills&&(Skills.has('cbt')||Skills.has('emdr')||Skills.has('breath')||Skills.has('meditation'))&&(S.flags&&S.flags.aeliusIntegrated));}catch(e){}
     if(_bilOK)rows+='<button class="btn v" style="display:block;width:100%;text-align:left;margin:5px 0;font-size:12.5px" onclick="try{UI.closeDoc();}catch(e){}if(window.Bilat)Bilat.open();">◬ '+(L==='tr'?'Çift Işık Taşı — ikili odak':'Twin Light Stone — dual focus')+'</button>';
     else rows+='<div class="btn ghost" style="display:block;text-align:left;margin:5px 0;opacity:.5;cursor:default;font-size:12px">🔒 '+(L==='tr'?'Çift Işık Taşı — Aelius seviyesinde açılır':'Twin Light Stone — opens at Aelius level')+'</div>';
@@ -8697,7 +8737,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b281 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b282 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
