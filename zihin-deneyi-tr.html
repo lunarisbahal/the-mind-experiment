@@ -18,8 +18,9 @@
     background:linear-gradient(155deg,rgba(150,110,55,.40) 0%,transparent 40%,transparent 58%,rgba(22,46,82,.50) 100%);}
   body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:33;background:radial-gradient(ellipse at 50% 45%,transparent 54%,rgba(0,0,0,.5) 100%);}
   #prompt{animation:promptPulse 1.7s ease-in-out infinite;}
-  #cassette{position:fixed;right:14px;bottom:120px;width:74px;height:30px;border-radius:5px;background:rgba(12,14,22,.62);border:1px solid rgba(127,212,193,.28);display:none;align-items:center;justify-content:space-around;padding:0 9px;z-index:40;pointer-events:none}
+  #cassette{position:fixed;right:14px;top:70px;width:74px;height:30px;border-radius:5px;background:rgba(12,14,22,.62);border:1px solid rgba(127,212,193,.28);display:none;align-items:center;justify-content:space-around;padding:0 9px;z-index:40;pointer-events:none}
   #cassette.on{display:flex}
+  #cassette::before{content:'\25C9 KAYIT';position:absolute;top:-13px;left:1px;font-size:8px;letter-spacing:.12em;color:rgba(190,168,232,.82);white-space:nowrap}
   #cassette .reel{width:16px;height:16px;border-radius:50%;border:2px solid rgba(190,168,232,.85);position:relative}
   #cassette .reel::before{content:'';position:absolute;left:50%;top:50%;width:2px;height:7px;background:rgba(190,168,232,.85);transform-origin:1px 0;transform:translate(-1px,0)}
   #cassette.on .reel{animation:reelSpin 1.1s linear infinite}
@@ -322,7 +323,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.<br><br><b style="color:var(--moon)">◈ En iyi deneyim için:</b> karakterler sana yapay zekâ aynaları üzerinden cevap verir — ücretsiz ortak hatla zaten açık. En zengin, en kişisel diyalog için MENÜ → AYNALAR'dan kendi yapay zekânı bağla (ücretsiz Groq anahtarı ya da kendi Claude anahtarın). Deneyimi giriş ayarlarıyla, olduğu gibi oynamanı öneririz.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b293--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b294--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -7029,10 +7030,10 @@ if(HAS3D)(function(){
   }
 
   /* ---- waypoint beacon ---- */
-  const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.9,1.6,70,12,1,true),
+  const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.9,1.4,42,12,1,true),
     new THREE.MeshBasicMaterial({color:0xcdb878,transparent:true,opacity:.2,
       blending:THREE.AdditiveBlending,side:THREE.DoubleSide,depthWrite:false}));
-  beacon.position.y=35;scene.add(beacon);
+  beacon.position.y=21;scene.add(beacon);
 
   /* ---- mist + fireflies ---- */
   const mists=[];
@@ -8388,7 +8389,7 @@ if(HAS3D)(function(){
     /* beacon */
     const wp=Game.running?waypoint():null;
     beacon.visible=!!wp;
-    if(wp){beacon.position.set(wp.x,35,wp.z);
+    if(wp){beacon.position.set(wp.x,21,wp.z);
       beacon.material.opacity=.15+Math.abs(Math.sin(t*2))*.1;}
 
     /* HUD */
@@ -8734,7 +8735,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b293 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b294 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
