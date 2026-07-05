@@ -323,7 +323,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.<br><br><b style="color:var(--moon)">◈ En iyi deneyim için:</b> karakterler sana yapay zekâ aynaları üzerinden cevap verir — ücretsiz ortak hatla zaten açık. En zengin, en kişisel diyalog için MENÜ → AYNALAR'dan kendi yapay zekânı bağla (ücretsiz Groq anahtarı ya da kendi Claude anahtarın). Deneyimi giriş ayarlarıyla, olduğu gibi oynamanı öneririz.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b300--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b301--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -3475,7 +3475,7 @@ const Journal={
       +'<div style="margin:6px 0">'+list+'</div>'
       +'<div style="margin-top:6px"><button class="btn ghost" style="font-size:11.5px" onclick="Journal.write()">✍ '+(TR?'bu bölüme yaz':'write this chapter')+'</button></div>'
       +'<hr style="border-color:var(--line);margin:12px 0">'
-      +'<button class="btn v" onclick="Journal.compile()">📚 '+(TR?'Sayfaları birleştir — kitabımı oluştur':'Merge pages — build my book')+'</button>');},
+      +'<button class="btn v" onclick="Journal.compile()">📚 '+(TR?'Sayfaları birleştir — kitabımı oluştur':'Merge pages — build my book')+'</button>'+'<hr style="border-color:var(--line);margin:12px 0"><div style="font-size:8.5px;letter-spacing:.2em;color:var(--violet);opacity:.7;text-transform:uppercase;margin-bottom:5px">☾ '+(TR?'oyun yolculuğumun hikâyesi':'the story of my journey')+'</div><p style="color:var(--dim);font-size:11.5px;line-height:1.55;margin:0 0 6px">'+(TR?'Cevaplarından ve geldiğin aşamadan örülen, Dolunay-Ekspres tarzı kişisel shadow-work hikâyen. Ham günlük · oyun hikâyen · ikisinin birleşimi.':'Your Dolunay-Ekspres-style shadow-work story, woven from your answers and your stage. Raw journal · game story · both merged.')+'</p><button class="btn v" onclick="Saga.show()">☾ '+(TR?'İç Ses Hikâyeme git':'Go to my Inner-Voice Story')+'</button>');},
   compile(){var TR=(GAMELANG==='tr');var d=this.data();var ks=this._list(d);
     var _arch=[];try{_arch=(window.Architect&&Architect.story)?Architect.story():[];}catch(e){}
     if(!ks.length&&!(_arch&&_arch.length)){UI.toast(TR?'Önce birkaç sayfa yaz.':'Write a few pages first.');return;}
@@ -3522,6 +3522,107 @@ const Journal={
     try{var b=new Blob([txt],{type:'text/plain;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='benim-kitabim.txt';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();},500);}catch(e){UI.toast('indirilemedi');}}
 };
 if(typeof window!=='undefined')window.Journal=Journal;
+
+/* ☾ İÇ SES HİKÂYEM + FirstTip (b301): oyun yolculuğunu Dolunay-Ekspres tarzı shadow-work hikâyesine dönüştürür (nerede olduğun, gölgeyle yüzleşmen, cevaplardan çıkarım); 3 çıktı, tür sorma, paylaşım, 100-kıvılcım baştan yaz, ilk-tıklama bilgi ekranı. Mevcut "Kitabım"ı bozmaz. */
+const FirstTip={
+  seen(k){try{return !!localStorage.getItem('it041_tip_'+k);}catch(e){return true;}},
+  mark(k){try{localStorage.setItem('it041_tip_'+k,'1');}catch(e){}},
+  _cb:null,_k:null,
+  show(k,title,bodyHtml,cb){if(this.seen(k)){if(cb)cb();return;}this._k=k;this._cb=cb||null;var L=GAMELANG;
+    UI.doc('❖ '+esc(title),'<div style="line-height:1.65;color:var(--ink)">'+bodyHtml+'</div><div style="margin-top:12px"><button class="btn v" onclick="FirstTip.go()">'+(L==='tr'?'anladım — devam':'got it — continue')+'</button></div>');},
+  go(){var cb=this._cb;this._cb=null;try{if(this._k)this.mark(this._k);}catch(e){}try{UI.closeDoc();}catch(e){}if(cb)cb();}
+};
+if(typeof window!=='undefined')window.FirstTip=FirstTip;
+const Saga={
+  SUB:'https://www.reddit.com/r/doloonaiexpress/',_genre:'',_last:null,
+  _echo(){try{return (window.Echo?Echo.all():[]).filter(function(x){return x&&x.a&&String(x.a).length>3;});}catch(e){return [];}},
+  status(){var d={ch:0,realm:'',dom:'',weak:'',bal:0,echo:0};
+    try{var st=(typeof stageNow==='function')?stageNow():{};d.ch=st.ch||0;d.realm=st.realm||'';}catch(e){}
+    try{if(window.Profile){d.dom=Profile.T(Profile.NAMES[Profile.dominant()]);d.weak=Profile.T(Profile.NAMES[Profile.weakest()]);d.bal=Math.round(Profile.balance());}}catch(e){}
+    d.echo=this._echo().length;return d;},
+  statusHtml(){var tr=(GAMELANG==='tr');var d=this.status();
+    return '<div style="border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:rgba(157,140,201,.06);font-size:12px;line-height:1.6;color:var(--moon)">'
+    +(tr?('◈ Yolculuğunda şu an: <b>Bölüm '+(d.ch||'?')+'/49</b>'+(d.realm?(' · '+esc(d.realm)):'')+'.<br>Baskın iç ses: <b>'+esc(d.dom||'—')+'</b> · en az beslenen: '+esc(d.weak||'—')+' · denge %'+d.bal+'.<br>Biriken iç ses: '+d.echo+' parça — hikâyenin ham maddesi.')
+    :('◈ Where you are: <b>Chapter '+(d.ch||'?')+'/49</b>'+(d.realm?(' · '+esc(d.realm)):'')+'.<br>Dominant voice: <b>'+esc(d.dom||'—')+'</b> · least-fed: '+esc(d.weak||'—')+' · balance '+d.bal+'%.<br>Gathered inner voice: '+d.echo+' fragments — the raw material of the story.'))+'</div>';},
+  show(){var self=this;var tr=(GAMELANG==='tr');
+    FirstTip.show('saga',(tr?'İÇ SES HİKÂYEM nedir?':'MY INNER-VOICE STORY'),
+      (tr?'<p>Bu oyun bir zihin kutusu (mind box) — ve sen onu oynarken kendi gölge-çalışması hikâyeni yaşıyorsun. Burada o yolculuğu <b>Dolunay-Ekspres tarzı</b> (bilimkurgu · psikolojik gerilim · distopya) kozmik, derin bir hikâyeye dönüştürürüz.</p><p>Verdiğin cevaplar, geldiğin aşama, gölgeyle yüzleşmen — hepsi hikâyeye örülür. İlerledikçe uzar ve derinleşir; en sonunda gurur duyacağın bir kitap olur.</p><p>Üç çıktı: <b>ham günlüğün</b> (kendi yazdıkların, dokunulmadan), <b>oyun hikâyen</b> (cevaplarından örülen anlatı), <b>ikisinin birleşimi</b>. Paylaşabilir, 100 kıvılcımla baştan yazdırabilirsin.</p>'
+      :'<p>This game is a mind box — and as you play it, you live your own shadow-work story. Here we turn that journey into a <b>Dolunay-Ekspres-style</b> (sci-fi · psychological thriller · dystopia) cosmic, deep story.</p><p>Your answers, your stage, your facing of the shadow — all woven in. It grows and deepens as you progress; by the end it becomes a book you are proud of.</p><p>Three outputs: your <b>raw journal</b> (your own words, untouched), your <b>game story</b> (woven from your answers), and <b>the two merged</b>. Share it, or rewrite from scratch for 100 sparks.</p>'),
+      function(){self.panel();});},
+  panel(){var tr=(GAMELANG==='tr');
+    var chips=(tr?['Bilimkurgu','Distopya','Psikolojik Gerilim','Kozmik','Masal','Noir']:['Sci-fi','Dystopia','Psych-thriller','Cosmic','Fable','Noir']).map(function(x){return '<button class="btn ghost" style="font-size:10.5px;padding:3px 9px" onclick="Saga.setG(this)">'+x+'</button>';}).join('');
+    var h=this.statusHtml()
+     +'<p style="color:var(--dim);font-size:12px;line-height:1.6;margin-top:8px">'+(tr?'Sabit tür: bilimkurgu · psikolojik gerilim · distopya. Aşağıya kendi sevdiğin türü ekle — ikisi harmanlanır.':'Base genre: sci-fi · psychological thriller · dystopia. Add your favorite below — they blend.')+'</p>'
+     +'<div style="margin:4px 0"><input id="sagaGenre" maxlength="50" value="'+esc(this._genre||'')+'" placeholder="'+(tr?'sevdiğin tür (opsiyonel)…':'your favorite genre (optional)…')+'" style="width:min(320px,92%);background:#070910;border:1px solid var(--line);color:var(--ink);padding:7px 9px;font-size:12.5px;border-radius:6px"></div>'
+     +'<div style="margin:2px 0 10px;display:flex;gap:5px;flex-wrap:wrap">'+chips+'</div>'
+     +'<div style="display:flex;gap:7px;flex-wrap:wrap">'
+     +'<button class="btn ghost" onclick="Saga.raw()">① 📓 '+(tr?'Ham günlüğüm':'Raw journal')+'</button>'
+     +'<button class="btn v" onclick="Saga.story()">② ☾ '+(tr?'Oyun hikâyem':'My game story')+'</button>'
+     +'<button class="btn v" onclick="Saga.merged()">③ 📖 '+(tr?'İkisini birleştir':'Merge both')+'</button>'
+     +'</div><div id="sagaScreen" style="margin-top:10px"></div>';
+    UI.doc('☾ '+(tr?'İÇ SES HİKÂYEM':'MY INNER-VOICE STORY'),'<div style="max-width:560px">'+h+'</div>');},
+  setG(el){try{var i=document.getElementById('sagaGenre');if(i){i.value=el.textContent;}this._genre=el.textContent;}catch(e){}},
+  _g(){try{var i=document.getElementById('sagaGenre');this._genre=(i&&i.value||'').trim();}catch(e){}return this._genre||'';},
+  raw(){var tr=(GAMELANG==='tr');try{if(window.Journal&&Journal.compile){Journal.compile();return;}}catch(e){}UI.toast(tr?'Günlük derlenemedi.':'Could not compile journal.');},
+  async story(){var tr=(GAMELANG==='tr');var self=this;var scr=document.getElementById('sagaScreen');if(!scr)return;var g=this._g();
+    scr.innerHTML='<div style="background:#04070d;border:1px solid #1c2740;border-radius:8px;padding:14px 16px;color:#a9e8c4;font-family:ui-monospace,Menlo,monospace;font-size:12px">'+(tr?'oyun hikâyen yazılıyor — geldiğin aşamaya göre örülüyor… (biraz sürebilir) ▍':'writing your game story, woven to your current stage… ▍')+'</div>';
+    var body=null;try{body=await self._gen(g,tr);}catch(e){body=null;}
+    if(!body){try{body=(window.SubjStory&&SubjStory.compose)?SubjStory.compose([],null,tr):null;}catch(e){}}
+    if(!body)body=[tr?'(Hikâye şu an üretilemedi. En zengin sonuç için MENÜ → AYNALAR’dan yapay zekânı bağla, sonra tekrar dene.)':'(Could not generate now. Connect your AI in MENU → MIRRORS for the richest result, then retry.)'];
+    self._last={body:body};self._render(body,tr);},
+  async merged(){var tr=(GAMELANG==='tr');var self=this;var scr=document.getElementById('sagaScreen');if(!scr)return;var g=this._g();
+    scr.innerHTML='<div style="background:#04070d;border:1px solid #1c2740;border-radius:8px;padding:14px 16px;color:#a9e8c4;font-family:ui-monospace,Menlo,monospace;font-size:12px">'+(tr?'oyun hikâyen + kendi günlüğün tek kitapta harmanlanıyor… ▍':'blending your game story + your own journal into one book… ▍')+'</div>';
+    var story=null;try{story=await self._gen(g,tr);}catch(e){story=null;}
+    if(!story)story=[tr?'(Hikâye üretilemedi — AYNALAR bağlıysa tekrar dene.)':'(Story could not be generated.)'];
+    var jr=[];try{var d=Journal.data();var ks=Journal._list(d);jr=ks.map(function(c){return (window.chLabel?chLabel(c):((tr?'Bölüm ':'Ch ')+c))+'\n'+String(d.entries[c]||'');});}catch(e){}
+    var body=story.slice();
+    if(jr.length){body.push(tr?'— — —  KENDİ GÜNLÜĞÜMDEN  — — —':'— — —  FROM MY OWN JOURNAL  — — —');body=body.concat(jr);}
+    self._last={body:body};self._render(body,tr);},
+  _render(body,tr){var scr=document.getElementById('sagaScreen');if(!scr)return;
+    scr.innerHTML='<div style="background:#04070d;border:1px solid #1c2740;border-radius:8px;padding:14px 16px;max-height:300px;overflow-y:auto"><div style="white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.78;font-size:12.5px;color:#a9e8c4">'+body.map(function(p){return esc(p);}).join('\n\n')+'</div></div>'
+     +'<div style="margin-top:8px"><input id="sagaTitle" maxlength="80" placeholder="'+(tr?'hikâyene bir ad ver…':'name your story…')+'" style="width:min(340px,94%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:7px 9px;font-size:12.5px;border-radius:6px;margin:3px 0"></div>'
+     +'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:4px">'
+     +'<button class="btn v" onclick="Saga.pdf()">📄 '+(tr?'PDF indir':'Download PDF')+'</button>'
+     +'<button class="btn ghost" onclick="Saga.rewrite()">↻ '+(tr?'baştan yaz (100 ◇)':'rewrite (100 ◇)')+'</button>'
+     +'<button class="btn ghost" onclick="Saga.share(\'tw\')">𝕏 '+(tr?'paylaş':'share')+'</button>'
+     +'<button class="btn ghost" onclick="Saga.share(\'rd\')">▲ Reddit</button>'
+     +'<button class="btn ghost" onclick="Saga.share(\'sub\')">↗ r/doloonaiexpress</button>'
+     +'</div>';},
+  pdf(){var tr=(GAMELANG==='tr');var r=this._last;if(!r){UI.toast(tr?'Önce bir hikâye oluştur.':'Generate a story first.');return;}
+    var title=(((document.getElementById('sagaTitle')||{}).value)||'').trim()||(tr?'İÇ SES HİKÂYEM':'MY INNER-VOICE STORY');
+    var sig=(window.SubjStory&&SubjStory._pbName)?SubjStory._pbName():'';
+    try{SubjStory._pdf({title:title,sig:sig,body:r.body},tr);if(SubjStory._pbStore)SubjStory._pbStore({title:title,sig:sig,body:r.body,ts:Date.now()});}catch(e){UI.toast(tr?'PDF üretilemedi.':'PDF failed.');}},
+  rewrite(){var tr=(GAMELANG==='tr');
+    try{if((S.insight||0)<100){UI.toast(tr?('Baştan yazmak 100 kıvılcım ister — elinde '+(S.insight||0)+'. Yan görev · ritüel · keşifle topla.'):('Rewriting needs 100 sparks — you have '+(S.insight||0)+'.'),5200);return;}
+      S.insight-=100;try{save();}catch(e){}try{refreshHud();}catch(e){}UI.toast(tr?'🔥 100 kıvılcım — hikâye baştan yazılıyor.':'🔥 100 sparks — rewriting.',3200);}catch(e){}
+    this.story();},
+  share(kind){var tr=(GAMELANG==='tr');
+    var title=(((document.getElementById('sagaTitle')||{}).value)||'').trim()||(tr?'İç Ses Hikâyem':'My Inner-Voice Story');
+    var teaser=(tr?('DO·LOON·AI EXPRESS — kendi gölge-çalışması hikâyemi yazdım: “'+title+'”. Bir zihin kutusunun içindeki yolculuğum.'):('DO·LOON·AI EXPRESS — I wrote my own shadow-work story: “'+title+'”. My journey inside a mind box.'));
+    var url='https://lunarisbahal.github.io/the-mind-experiment/';
+    try{
+      if(kind==='tw'){window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(teaser+' #DoLoonAiExpress')+'&url='+encodeURIComponent(url),'_blank','noopener');}
+      else if(kind==='rd'){window.open('https://www.reddit.com/r/doloonaiexpress/submit?title='+encodeURIComponent(title)+'&text='+encodeURIComponent(teaser+'\n\n'+(tr?'(Hikâyenin tamamını PDF olarak indirip ekleyebilirsin.)':'(You can download the full story as a PDF and attach it.)')),'_blank','noopener');}
+      else{window.open(this.SUB,'_blank','noopener');}
+      UI.toast(tr?'Paylaşım penceresi açıldı — göndermeden önce gözden geçir.':'Share window opened — review before posting.',4200);
+    }catch(e){}},
+  async _gen(genre,tr){
+    if(!(window.Mirror&&Mirror.generate&&Mirror.ready&&Mirror.ready()))return null;
+    var d=this.status();var es=this._echo();
+    var frag=es.slice(-16).map(function(x){return '“'+String(x.a).slice(0,150)+'”';}).join(' ');
+    var gb=(tr?'bilimkurgu, psikolojik gerilim ve distopya':'sci-fi, psychological thriller and dystopia');
+    var gn=genre?(tr?(' Bunu şu türle harmanla: '+genre+'.'):(' Blend it with: '+genre+'.')):'';
+    var stt=(tr?('Yolcunun şu anki durumu — Bölüm '+(d.ch||1)+'/49'+(d.realm?(', '+d.realm+' diyarında'):'')+'; baskın iç ses '+(d.dom||'?')+', en az beslenen '+(d.weak||'?')+', denge %'+d.bal+'.')
+      :('The traveler right now — Chapter '+(d.ch||1)+'/49'+(d.realm?(', in the '+d.realm+' realm'):'')+'; dominant voice '+(d.dom||'?')+', least-fed '+(d.weak||'?')+', balance '+d.bal+'%.'));
+    var sys=(tr?('Sen usta bir anlatıcısın. DO·LOON·AI EXPRESS adlı zihin-kutusu oyununu OYNAYAN insanın ağzından, BİRİNCİ tekil şahıs, kozmik ve derin bir SHADOW-WORK hikâyesi yaz — özet değil, sahnelenmiş; güçlü bir hook’la başla. Bu, oyuncunun bu oyunu oynarken yaşadığı iç yolculuğun hikâyesidir; oyun evreni (yedi diyar, bilinç/bilinçaltı haritası, gölgeler, Nexus, zihin haritası) anlatıya örülebilir. Türler: '+gb+'.'+gn+' '+stt+' Oyuncunun kendi cümlelerini hikâyeye ANLAMLI biçimde dokur; bunlardan gerçek-hayatına dair ince, şefkatli çıkarımlar yap ama teşhis koyma. GİRİŞ-GELİŞME-SONUÇ olan, bir yere bağlanan; heyecanlı, gizemli, aksiyonlu bir bölüm yaz. İhtiyaç duyduğu kadar uzun — kısaltma. BAŞLIK/İMZA EKLEME, sadece hikâye gövdesi. Oyuncunun cümleleri: '+frag)
+      :('You are a master narrator. Write a cosmic, deep SHADOW-WORK story in the FIRST person, in the voice of the human PLAYING the mind-box game DO·LOON·AI EXPRESS — scenes, not a summary; open with a strong hook. This is the story of the inner journey the player lives while playing; the game universe (seven realms, the consciousness/subconscious map, the shadows, the Nexus, the mind map) may be woven in. Genres: '+gb+'.'+gn+' '+stt+' Weave the player’s own sentences MEANINGFULLY into the story; draw gentle, caring inferences about their real life but do NOT diagnose. Write a chapter with a BEGINNING-MIDDLE-END that lands somewhere; thrilling, mysterious, with action. As long as it needs — do not shorten. NO title/signature, story body only. The player’s sentences: '+frag));
+    var out='';try{out=await Mirror.generate([{role:'system',content:sys},{role:'user',content:(tr?'Hikâyemi yaz.':'Write my story.')}],4000);}catch(e){return null;}
+    if(!out||String(out).length<150)return null;
+    var b=String(out).replace(/\r/g,'').split(/\n\n+/).map(function(s){return s.trim();}).filter(Boolean);
+    return b.length?b:null;}
+};
+if(typeof window!=='undefined')window.Saga=Saga;
+
 const NEXUS={
   load(){try{return JSON.parse(localStorage.getItem('it041_nexus'))||{}}catch(e){return{}}},
   store(o){try{localStorage.setItem('it041_nexus',JSON.stringify(o));}catch(e){}},
@@ -4271,7 +4372,7 @@ const Library={
     if(open){return '<div class="jentry"><h4 style="color:var(--accent)">'+(i===0?'✦ ':'📖 ')+esc(title)+'</h4>'+(where?'<div style="font-size:10.5px;color:var(--violet);margin-bottom:3px">◎ '+esc(where)+'</div>':'')+(text?'<button class="btn ghost" style="font-size:11px" onclick="Library.read('+i+')">oku</button> ':'')+(pdf?'<a class="btn ghost" style="font-size:11px;text-decoration:none" href="'+esc(pdf)+'" target="_blank" rel="noopener">PDF</a> ':'')+(audio?'<button class="btn ghost" style="font-size:11px" onclick="Library.play('+i+')">🔊 dinle</button> ':'')+((text||pdf)?'<button class="btn ghost" style="font-size:11px" onclick="Library.ai(\'chapter\','+i+')">✦ AI özet · sana göre</button>':'')+((!text&&!pdf&&!audio)?'<span style="color:var(--dim);font-size:11px">yakında burada açılır</span>':'')+'</div>';}
     return '<div class="jentry" style="opacity:.55"><h4 style="color:var(--dim)">🔒 Bölüm '+i+'</h4><span style="font-size:11px;color:var(--dim)">kilitli — ilerledikçe açılır</span></div>';},
   async show(){await this.load();const u=this.bookOpen();let h='<div style="text-align:center;margin:2px 0 12px">'+(window.coverHTML?coverHTML(140,''):'')+'</div><p style="color:var(--dim);font-size:12.5px">Bu, kendi zihninde kaybolan psikolog Lunaris Bahal adlı kişinin kayıp günlüğü. Attığın her gölge-çalışması adımı seni ona yaklaştırır. Bölümleri açtıkça dağılmış günlükler anlam kazanır — ve içindeki bütünleşme tamamlandığında Lunaris Bahal hepimizin içinde yeniden bulunur. ◎ her bölümün dünyada nerede olduğunu gösterir.</p>';
-    h+='<button class="btn v" style="font-size:11.5px" onclick="Library.ai(\'progress\',0)">✦ Yolculuğumu özetle</button> <button class="btn v" style="font-size:11.5px" onclick="SubjStory.playerBook()">✍ '+(GAMELANG==='tr'?'Kendi kitabımı yaz':'Write my own book')+'</button> <button class="btn v" style="font-size:11.5px" onclick="InnerVoice.show()">☾ '+(GAMELANG==='tr'?'Günlük İç Ses':'Daily Inner Voice')+'</button> <button class="btn ghost" style="font-size:11.5px" onclick="SubjStory.canonReader()">◉ '+(GAMELANG==='tr'?'Denek hikâyeleri — Dolunay Ekspres 3':'Subject stories — Dolunay Ekspres 3')+'</button>'+this.emberBar()+'<div id="bookAI" style="margin:8px 0"></div>';
+    h+='<button class="btn v" style="font-size:11.5px" onclick="Library.ai(\'progress\',0)">✦ Yolculuğumu özetle</button> <button class="btn v" style="font-size:11.5px" onclick="SubjStory.playerBook()">✍ '+(GAMELANG==='tr'?'Kendi kitabımı yaz':'Write my own book')+'</button> <button class="btn v" style="font-size:11.5px" onclick="Saga.show()">☾ '+(GAMELANG==='tr'?'İç Ses Hikâyem':'My Inner-Voice Story')+'</button> <button class="btn ghost" style="font-size:11.5px" onclick="SubjStory.canonReader()">◉ '+(GAMELANG==='tr'?'Denek hikâyeleri — Dolunay Ekspres 3':'Subject stories — Dolunay Ekspres 3')+'</button>'+this.emberBar()+'<div id="bookAI" style="margin:8px 0"></div>';
     if(this.intro)h+=this.row(0,true);
     for(let i=1;i<=49;i++){h+=this.row(i, i<=u);}
     h+='<div id="bookAudio" style="margin-top:8px"></div>';
@@ -8837,7 +8938,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b300 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b301 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
