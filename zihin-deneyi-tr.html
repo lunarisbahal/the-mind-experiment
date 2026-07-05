@@ -323,7 +323,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.<br><br><b style="color:var(--moon)">◈ En iyi deneyim için:</b> karakterler sana yapay zekâ aynaları üzerinden cevap verir — ücretsiz ortak hatla zaten açık. En zengin, en kişisel diyalog için MENÜ → AYNALAR'dan kendi yapay zekânı bağla (ücretsiz Groq anahtarı ya da kendi Claude anahtarın). Deneyimi giriş ayarlarıyla, olduğu gibi oynamanı öneririz.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b295--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b296--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -1389,7 +1389,7 @@ function interactTarget(){
   if(near(L.twoHouses))return['◈ İki evin arasında dur',()=>Rite.open('r4')];
   if(near(L.prison,-14)){if(S.plaques&&!S.plaques.includes(2)&&Math.hypot(S.px-PLAQUES[2].x,S.pz-PLAQUES[2].z)<6)return['Bölüm plaketi',()=>doPlaque(2)];return['☾ '+(GAMELANG==='tr'?'Yeniay hücreleri — içeride kim var?':'New Moon Cells — who is inside?'),doNewMoonCells];}
   if(near(L.burntTree))return['◈ Yanık kütük',()=>Rite.open('r5')];
-  if(near(L.bench))return[S.rites.r6!==undefined?(Daily.doneToday()?'Günün sorusu (tamam ✓)':'🜂 Günün sorusu'):'◈ Banka otur',S.rites.r6!==undefined?doDaily:()=>Rite.open('r6')];
+  if(near(L.bench))return['◈ '+(GAMELANG==='tr'?'Banka otur':'Sit on the bench'),benchSit];
   if(near(L.dreamWell))return['◯ Rüya kuyusu',doDreamWell];
   if(near(L.traceStone))return['◈ İz Anıtı — kalıcı iz bırak',()=>Iz.show()];
   if(near(L.lucidaMirror))return['◑ '+(GAMELANG==='tr'?'Lucida’nın Aynası — bir kalıba tanık ol':'Lucida’s Mirror — witness a pattern'),()=>{if(window.LucidaMirror)LucidaMirror.show();}];
@@ -2696,6 +2696,79 @@ const MemDoor={BASE:{lunaris:0,bahal:7,lucida:14,lucius:21,silvanus:28,noct:35,a
     try{if(window.Echo)Echo.push({realm:it.realm,ch:this._ab,q:(L==='tr'?'Hafıza Kapısı — kendi sahnen':'Memory Door — your scene'),a:v});}catch(e){}
     try{if(typeof xpGift==='function')xpGift({spark:5,luc:14,daily:'memdoor',tTR:'Bir Hafıza Kapısı geçildi',tEN:'A Memory Door crossed',fTR:'Sahnen kayıp günlüğe dipnot olarak, sesin final analizine işlendi.',fEN:'Your scene is now a footnote in the lost diary; your voice feeds the final analysis.'});}catch(e){}try{UI.closeDoc();}catch(e){}}};
 if(typeof window!=='undefined')window.MemDoor=MemDoor;
+
+/* ☽ İÇ SORGULAMA (b296): bankta oyuncunun DENEYİMİ iç sesiyle sorgulaması — neredeyim/neden buradayım/nereye. Doğru-yanlış yok; her şık bir arketibi besler → zihin profili + Nexus (S.youSaid) + Echo(final analiz). Bankta hatırlanır ve kişiselleşir. */
+const BenchInquiry={
+  Q:{tr:[
+    {q:'Neden buradayım? Şu an, bu deneyimin içinde.',o:[
+      {t:'Kendimi anlamak, içimdeki karanlığa bakabilmek için.',w:{lunaris:2}},
+      {t:'Bir şeyi kımıldatmak, harekete geçmek için — durmak bana göre değil.',w:{bahal:2}},
+      {t:'Merak. Bu tuhaf şeyin dibinde ne olduğunu görmek istiyorum.',w:{noct:2}},
+      {t:'Emin değilim — belki bir düzen, bir yön arıyorum.',w:{lucius:1,silv:1}}]},
+    {q:'Bu deneyim yarın hayatımda neye yol açabilir?',o:[
+      {t:'Biraz daha dürüst, biraz daha uyanık olabilirim.',w:{lunaris:2}},
+      {t:'Ertelediğim bir şeye nihayet başlayabilirim.',w:{bahal:2}},
+      {t:'İçimdeki bir sesi susturmak yerine dinleyebilirim.',w:{lucida:2}},
+      {t:'Belki hiçbir şey — ve bunu kabul etmeyi öğrenirim.',w:{silv:2}}]},
+    {q:'Bunu neden yapıyorum? Gerçekten.',o:[
+      {t:'Çünkü kaçtığım şeyle yüzleşmem gerektiğini biliyorum.',w:{lunaris:1,noct:1}},
+      {t:'Çünkü bir şeyi anlamlandırmak, yerli yerine koymak istiyorum.',w:{lucius:2}},
+      {t:'Çünkü içimde susmak bilmeyen bir merak var.',w:{noct:2}},
+      {t:'Çünkü bir bütünlük, bir sükûnet arıyorum.',w:{aelius:2,silv:1}}]}
+  ],en:[
+    {q:'Why am I here? Right now, inside this experience.',o:[
+      {t:'To understand myself, to look at the darkness inside.',w:{lunaris:2}},
+      {t:'To move something, to act — standing still is not for me.',w:{bahal:2}},
+      {t:'Curiosity. I want to see what lies at the bottom of this strange thing.',w:{noct:2}},
+      {t:'I am not sure — maybe I am looking for order, a direction.',w:{lucius:1,silv:1}}]},
+    {q:'What might this experience lead to in my life tomorrow?',o:[
+      {t:'I might be a little more honest, a little more awake.',w:{lunaris:2}},
+      {t:'I might finally begin something I keep postponing.',w:{bahal:2}},
+      {t:'I might listen to a voice inside instead of silencing it.',w:{lucida:2}},
+      {t:'Maybe nothing — and I learn to accept that.',w:{silv:2}}]},
+    {q:'Why am I doing this? Really.',o:[
+      {t:'Because I know I must face what I flee.',w:{lunaris:1,noct:1}},
+      {t:'Because I want to make sense of things, to put them in place.',w:{lucius:2}},
+      {t:'Because there is a curiosity in me that will not go quiet.',w:{noct:2}},
+      {t:'Because I am seeking a wholeness, a stillness.',w:{aelius:2,silv:1}}]}
+  ]},
+  NM:{lunaris:['farkındalık','awareness'],bahal:['diriliğin','vitality'],lucida:['berraklık','clarity'],noct:['dürüstlük','honesty'],lucius:['düzen','order'],silv:['kabul','acceptance'],aelius:['perspektif','perspective']},
+  _realm(){try{var st=(typeof stageNow==='function')?stageNow():null;return (st&&st.realm)||'';}catch(e){return '';}},
+  _ch(){try{return (stageNow&&stageNow().ch)||0;}catch(e){return 0;}},
+  open(){var L=GAMELANG;S.benchInq=S.benchInq||[];this._picks={};this._i=0;
+    var realm=this._realm();var prior=S.benchInq.length?S.benchInq[S.benchInq.length-1]:null;
+    var intro=(L==='tr'?('Bankta oturuyorsun; her neredeysen bir an duruyor. '+(realm?('Şu an '+realm+' içindesin. '):'')+'İçindeki ses sana birkaç şey soracak. Doğru cevap yok — yalnızca şu an sana en dürüst geleni seç.'):('You sit on the bench; wherever you are pauses for a moment. '+(realm?('You are in '+realm+' now. '):'')+'The voice inside will ask you a few things. No right answer — just choose what feels most honest right now.'));
+    var cb=(prior?('<p style="color:var(--moon);font-size:11.5px;font-style:italic;border-left:2px solid var(--violet);padding-left:9px;line-height:1.5">'+(L==='tr'?'Geçen sefer şöyle demiştin: “':'Last time you said: “')+esc(String(prior.a).slice(0,90))+'”. '+(L==='tr'?'Peki ya şimdi?':'And now?')+'</p>'):'');
+    UI.doc('☽ '+(L==='tr'?'İÇ SORGULAMA':'INNER INQUIRY'),'<p style="color:var(--dim);line-height:1.65">'+esc(intro)+'</p>'+cb+'<button class="btn v" onclick="BenchInquiry.ask()">'+(L==='tr'?'başla':'begin')+'</button>');},
+  ask(){var L=GAMELANG;var qs=(L==='tr'?this.Q.tr:this.Q.en);var st=qs[this._i];if(!st)return this.done();
+    var h='<p style="color:var(--dim);font-size:11px">'+(this._i+1)+'/'+qs.length+'</p><p style="color:var(--violet);line-height:1.6">'+esc(st.q)+'</p>';
+    h+='<div style="margin:2px 0 9px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:rgba(157,140,201,.06);color:var(--dim);font-size:11px;line-height:1.5">'+(L==='tr'?'İç sesinle yanıtla — bu seçim zihin haritana ve yolun sonundaki analize işlenir. Hiçbir şık yanlış değil; her biri içindeki başka bir sesi gösterir.':'Answer in your inner voice — this feeds your mind map and the final analysis. No option is wrong; each shows a different voice inside you.')+'</div>';
+    st.o.forEach(function(o,i){h+='<button class="btn ghost" style="display:block;margin:5px 0;font-size:12px;text-align:left" onclick="BenchInquiry.pick('+i+')">'+esc(o.t)+'</button>';});
+    UI.doc('☽ '+(L==='tr'?'İÇ SORGULAMA':'INNER INQUIRY'),h);},
+  pick(i){var L=GAMELANG;var qs=(L==='tr'?this.Q.tr:this.Q.en);var st=qs[this._i];var o=st&&st.o[i];if(!o)return;
+    try{if(window.Profile){Profile.seedCaseD&&Profile.seedCaseD();Profile.add(o.w);}}catch(e){}
+    var self=this;for(var k in o.w){this._picks[k]=(this._picks[k]||0)+o.w[k];}
+    var realm=this._realm(),ch=this._ch();
+    try{S.benchInq.push({q:st.q,a:o.t,w:o.w,realm:realm,ch:ch,t:Date.now()});if(S.benchInq.length>60)S.benchInq=S.benchInq.slice(-60);}catch(e){}
+    try{if(window.Echo)Echo.push({realm:(realm||'bench'),ch:ch,q:st.q,a:o.t});}catch(e){}
+    try{S.youSaid=S.youSaid||[];S.youSaid.push({q:st.q,a:o.t,t:Date.now()});if(S.youSaid.length>80)S.youSaid=S.youSaid.slice(-80);}catch(e){}
+    this._i++;this.ask();},
+  done(){var L=GAMELANG;var dom='',dv=-1;for(var k in this._picks){if(this._picks[k]>dv){dv=this._picks[k];dom=k;}}
+    var nm=this.NM[dom]?(L==='tr'?this.NM[dom][0]:this.NM[dom][1]):'';
+    S._benchVisits=(S._benchVisits||0)+1;try{save();}catch(e){}
+    var refl=(L==='tr'?('Bu sorgulamada içinden en çok <b>'+nm+'</b> konuştu. Bu, zihin haritana işlendi — yol boyunca aynı sesi besledikçe terazinde belirginleşir, ve yolun sonundaki analizde senin şu anki halin olarak yankılanır. Sonraki bankta bunu hatırlayacağım.'):('In this inquiry, <b>'+nm+'</b> spoke most within you. It is now on your mind map — as you feed the same voice along the road it grows on your scale, and echoes in the final analysis as who you are right now. I will remember this at the next bench.'));
+    try{if(typeof xpGift==='function')xpGift({spark:5,luc:12,daily:'benchinq',tTR:'İç sorgulama tamamlandı',tEN:'Inner inquiry complete',fTR:'Neredesin, neden buradasın — sesin zihin haritana ve final analizine işlendi.',fEN:'Where you are, why you are here — your voice is on your mind map and in the final analysis.'});}catch(e){}
+    UI.doc('☽ '+(L==='tr'?'İÇ SORGULAMA':'INNER INQUIRY'),'<p style="color:var(--moon);line-height:1.7">'+refl+'</p><button class="btn v" onclick="try{UI.closeDoc()}catch(e){}">'+(L==='tr'?'kalk ve devam et':'rise and continue')+'</button> <button class="btn ghost" onclick="try{UI.closeDoc()}catch(e){};if(window.Profile)Profile.show()">⚖ '+(L==='tr'?'zihin profilini gör':'see mind profile')+'</button>');}
+};
+if(typeof window!=='undefined')window.BenchInquiry=BenchInquiry;
+function benchSit(){var L=GAMELANG;var hasRite=(S.rites&&S.rites.r6!==undefined);
+  UI.doc('◈ '+(L==='tr'?'GÖZLEMCİNİN BANKI':'THE OBSERVER’S BENCH'),
+    '<p style="color:var(--dim);line-height:1.65">'+(L==='tr'?'Otur. Nefes al. Bir an, hiçbir yere gitmen gerekmiyor. Ne yapmak istersin?':'Sit. Breathe. For a moment, you need to go nowhere. What would you like to do?')+'</p>'
+    +'<button class="btn v" onclick="try{UI.closeDoc()}catch(e){};BenchInquiry.open()">☽ '+(L==='tr'?'İç sorgulama — neredeyim, neden buradayım?':'Inner inquiry — where am I, why am I here?')+'</button> '
+    +(hasRite?'<button class="btn ghost" onclick="try{UI.closeDoc()}catch(e){};doDaily()">🜂 '+(L==='tr'?'Günün sorusu':'The daily question')+'</button>':'<button class="btn ghost" onclick="try{UI.closeDoc()}catch(e){};Rite.open(\'r6\')">🜂 '+(L==='tr'?'İzleyiş ritüeli':'The Watching rite')+'</button>'));
+}
+if(typeof window!=='undefined')window.benchSit=benchSit;
+
 /* ✦ 2B IŞIK OYUNU (b269): hikâye oyunlarına isteğe bağlı canvas modu — ışık noktası gölge sislerinden kaçıp küre toplar; klasik seçim modu aynen durur */
 const Game2D={_raf:0,_els:null,_st:null,
   start(scenes,r){var tr=(GAMELANG==='tr');this.stop(true);var old=document.getElementById('g2dOv');if(old)old.remove();
@@ -8735,7 +8808,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b295 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b296 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
