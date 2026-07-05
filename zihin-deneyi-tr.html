@@ -322,7 +322,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.<br><br><b style="color:var(--moon)">◈ En iyi deneyim için:</b> karakterler sana yapay zekâ aynaları üzerinden cevap verir — ücretsiz ortak hatla zaten açık. En zengin, en kişisel diyalog için MENÜ → AYNALAR'dan kendi yapay zekânı bağla (ücretsiz Groq anahtarı ya da kendi Claude anahtarın). Deneyimi giriş ayarlarıyla, olduğu gibi oynamanı öneririz.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b286--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b287--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -2195,7 +2195,7 @@ function doEcho(i){
   var _day=Math.floor(Date.now()/864e5);var _rq=ECHOES[(_day+i*7)%ECHOES.length];
   UI.doc('YANKI TAŞI — '+e.s,'<p style="font-style:italic;color:var(--moon)">'+e.q+'</p>'+
     '<div style="margin:10px 0;padding-top:8px;border-top:1px solid var(--line)"><div style="color:var(--violet);font-size:10.5px;letter-spacing:.06em">BUGÜNÜN YANKISI</div><p style="font-style:italic;color:var(--dim);font-size:12px;line-height:1.55">'+_rq.q+' <span style="opacity:.7">— '+_rq.s+'</span></p></div>'+
-    (function(){try{if(typeof PLAQUE_RES==='undefined')return '';var _fl=[].concat.apply([],PLAQUE_RES);if(!_fl.length)return '';S.eRes=S.eRes||{};var _ek=(S.eRes[i]||0);S.eRes[i]=_ek+1;var _ln=_fl[(_ek*7+i*3)%_fl.length];return '<div style="margin:8px 0;padding-top:7px;border-top:1px dashed var(--line)"><div style="color:var(--accent);font-size:10.5px;letter-spacing:.06em">KİTAPTAN YANKI</div><p style="font-style:italic;color:var(--dim);font-size:12px;line-height:1.55">'+_ln+'</p></div>';}catch(e){return '';}})()+
+    (function(){try{try{if(window.Library&&Library.load&&!Library.loaded)Library.load();}catch(e){}var _fl=(typeof PLAQUE_RES!=='undefined')?[].concat.apply([],PLAQUE_RES):[];S.eRes=S.eRes||{};var _ek=(S.eRes[i]||0);S.eRes[i]=_ek+1;var _bl='';try{if(window.bookEchoLine&&Math.random()<0.6)_bl=bookEchoLine();}catch(e){}if(!_bl&&!_fl.length)return '';var _ln=_bl||_fl[(_ek*7+i*3)%_fl.length];var _hd=_bl?'KİTAPTAN — KAYIP GÜNLÜK':'KİTAPTAN YANKI';return '<div style="margin:8px 0;padding-top:7px;border-top:1px dashed var(--line)"><div style="color:var(--accent);font-size:10.5px;letter-spacing:.06em">'+_hd+'</div><p style="font-style:italic;color:var(--dim);font-size:12px;line-height:1.55">'+esc(_ln)+'</p></div>';}catch(e){return '';}})()+
     (echoCount()>=16?'<p style="color:var(--violet)">On altı yankının tamamı sende. Taşlar sustu — artık kitap senin içinden yankılanıyor.</p>':'<p style="color:var(--dim)">Boşluklarda '+(16-echoCount())+' yankı daha var. Yolcular birbirine denk gelir; yankılar yolcuya.</p>')+
     '<p class="mfoot">Hayatına taşı → '+LIFE_HINTS[i%LIFE_HINTS.length]+'</p>');
   checkInitiation();
@@ -4199,6 +4199,20 @@ const Library={
     }catch(e){if(box)box.innerHTML='<p style="color:var(--warn);font-size:12px">Ayna meşgul — birazdan tekrar dene.</p>';}}
 };
 if(typeof window!=='undefined')window.Library=Library;
+/* b287: KİTAPTAN YANKI için gerçek Book-1 alıntısı — oyuncunun AÇTIĞI bölümlerden (spoiler yok), son ilerlemeye yakın seç (aşamaya uygun), temiz cümle döndür; yoksa '' → PLAQUE_RES fallback */
+function bookEchoLine(){try{
+  if(!(window.Library&&Library.book&&Library.book.length))return '';
+  var open=1;try{open=Math.max(1,Math.min(Library.book.length,(Library.bookOpen&&Library.bookOpen())||1));}catch(e){open=Math.min(7,Library.book.length);}
+  /* açılan son ~6 bölümden birini seç — aşamaya yakın, geçmişe de açık */
+  var lo=Math.max(0,open-6),hi=open-1;var idx=lo+Math.floor(Math.random()*(hi-lo+1));
+  var c=Library.book[idx];if(!c)return '';
+  var tx=String(Library.L(c,'text')||'').replace(/<[^>]+>/g,'').replace(/\s+/g,' ');
+  var parts=tx.replace(/([.!?…])\s+/g,'$1').split('');
+  var good=parts.map(function(s){return s.trim();}).filter(function(s){return s.length>=48&&s.length<=170&&!/^["“'\-–—•\d]/.test(s)&&!/[<>]/.test(s);});
+  if(!good.length)return '';
+  return good[Math.floor(Math.random()*good.length)];
+}catch(e){return '';}}
+if(typeof window!=='undefined')window.bookEchoLine=bookEchoLine;
 
 const Quest={
   authored:{
@@ -8708,7 +8722,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b286 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b287 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
