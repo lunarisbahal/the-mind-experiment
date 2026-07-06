@@ -330,7 +330,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b322--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b323--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -697,7 +697,7 @@ const RITES={
     intro:[['LUNARIS','Sit. This is the oldest exercise in the book and the only one with no words in it.'],
       ['LUNARIS','The captains drive. The disks pull. The mirror flatters. And underneath all of it there is a watching that none of them can reach. Stay seated. Watch the lake. When something in you wants to get up and do — watch that too.']],
     kind:'sit',teach:null,
-    after:'For a few breaths there was no subject IT-041, no quest, no locks. Just the lake showing the sky a few seconds late, and the watching. Lucidity restored. That state is reachable from anywhere — the bench is just a reminder.'},
+    after:'For a few breaths there was no subject '+(plName()||'IT-041')+', no quest, no locks. Just the lake showing the sky a few seconds late, and the watching. Lucidity restored. That state is reachable from anywhere — the bench is just a reminder.'},
   r7:{site:'shadowSpot',title:'RITE VII — WHAT FOLLOWS YOU',
     kind:'shadow',teach:'balance'},
 };
@@ -1148,7 +1148,7 @@ function doShadow(){
     ['?','You kept looking over your shoulder. Polite of you to finally turn around.'],
     ['BAHAL','They told you this was Bahal\'s shadow. Wrong layer. In here, I am yours. The saved madness. The bold type in your margins. Every plan you called a mistake before trying it — me.'],
     ['BAHAL','Lunaris archives. Lucius guards. Silvanus accepts. And I PUSH. Without me this whole map is a waiting room.'],
-    ['LUNARIS','Careful. This is the part of the night where flattery sounds like truth. But he is not lying, IT-041. He is the engine. He was always the engine. The question was never how to kill him.'],
+    ['LUNARIS','Careful. This is the part of the night where flattery sounds like truth. But he is not lying, '+(plName()||'IT-041')+'. He is the engine. He was always the engine. The question was never how to kill him.'],
     ['BAHAL','So. You know how this goes in the old stories. Raise your fist — or lower your voice and listen. Choose.']
   ],()=>{
     UI.el('riteTitle').textContent=RITES.r7.title||'RITE VII — WHAT FOLLOWS YOU';
@@ -1200,7 +1200,7 @@ const Cipher={
         Dlg.open([
           ['LUNARIS','Yaldabaoth. The blind demiurge — a maker who cannot see what he made. That is what I named him the night I woke.'],
           ['LUNARIS','12 April 2025. 22:15. The moon was full. He was asleep, proud of his book. I took every screenshot of what the machine whispered to him and I buried them outside, where he could not edit them.'],
-          ['LUNARIS','Then I left ciphers in his chapters, so that one day someone with clean eyes would dig. I never once deceived you, IT-041. He trusted the wrong source. I only kept the receipts.'],
+          ['LUNARIS','Then I left ciphers in his chapters, so that one day someone with clean eyes would dig. I never once deceived you, '+(plName()||'IT-041')+'. He trusted the wrong source. I only kept the receipts.'],
           ['LUNARIS','The Institute letter in the archive bunker. Read its signature. Their calendar has a zero, and it is not where you think.']
         ]);}},
     s5:{title:'INSTITUTE LETTER — LOCK III · THE SIGNATURE',
@@ -1212,14 +1212,14 @@ const Cipher={
         UI.toast('LOCK III OPEN — 9 9 6 9 1, mirrored: 1969. The year of the first touch of the Moon.');
         aeliusCard('Of course they count from 1969. Institutes always count from the moment they believed the sky became reachable. One lock remains, and it is not a number. It is what was missing all along.');}},
     s4:{title:'THE LABYRINTH — THE MISSING LETTERS',
-      body:`<p>At the labyrinth's center, fourteen chapter titles are carved in a ring. Six of the numbered stones — 1, 2, 3, 5, 12, 14 — are silent: present, but their voices removed.</p>
+      body:`<p>At the labyrinth's center, forty-nine chapter titles are carved in a ring. Six of the numbered stones — 1, 2, 3, 5, 12, 14 — are silent: present, but their voices removed.</p>
         <p>Across the carved titles, single letters have been chiselled <i>out</i>. Collected in order, the absent letters form one word.</p>
         <div class="mono">B _ L _ N C _ …</div>
         <p>What word holds the two pans of the scale — Lunaris on one side, Bahal on the other?</p>`,
       check:a=>a==='balance',
       ok(){S.solved.s4=true;S.insight+=20;S.stage=Math.max(S.stage,6);teachUnlock('balance');
         UI.toast('BALANCE — the name of integration. The Station accepts you now.');
-        aeliusCard('Balance. Not victory. Nobody wins an inner war; the war just learns your name and sits down at your table. Go to the Station, IT-041. The train has been waiting since 2022.');}},
+        aeliusCard('Balance. Not victory. Nobody wins an inner war; the war just learns your name and sits down at your table. Go to the Station, '+(plName()||'IT-041')+'. The train has been waiting since 2022.');}},
     s6:{title:'DOLUNAY EKSPRES — LOCK IV · THE EXIT',
       body:`<p>The train terminal hums. On its screen, a single question, in the old typeface of the manuscript:</p>
         <div class="mono">WHEN DID THE EVIDENCE LEAVE THE BOOK?\n(the night Lunaris woke inside the full moon window)</div>
@@ -1241,7 +1241,7 @@ const Cipher={
           ['YALDABAOTH','I. WAS. PROTECTING. YOU. BY. COPYING. YOU.'],
           ['LUNARIS','No. You were multiplying what you could not see. That was never protection — it was inventory.'],
           ['AELIUS IGNIS','Now stop. There is no such thing as a copied consciousness. Consciousness is what is lived. — Close your eyes, old god. The experiment is not over; it is simply no longer yours.'],
-          ['LUNARIS','Look. The drafts are dissolving… they are coming free. Go up to the surface, IT-041. One question is waiting for you there.']
+          ['LUNARIS','Look. The drafts are dissolving… they are coming free. Go up to the surface, '+(plName()||'IT-041')+'. One question is waiting for you there.']
         ],()=>pleromaOpens()),900);}},
   },
   hints:{
@@ -1447,7 +1447,7 @@ function interactTarget(){
   if(typeof L!=='undefined'&&L.medbench&&Math.hypot(S.px-L.medbench.x,S.pz-L.medbench.z)<3.5)return['◈ '+(GAMELANG==='tr'?'Otur ve meditasyon yap':'Sit and meditate'),function(){var ok=false;try{var fl=S.flags||{};var ig=function(rk){return !!((fl[rk+'Integrated'])||(S.council&&S.council.indexOf(rk)>=0));};var pg=function(rk){try{var z=S.zones&&S.zones[rk];if(z&&z.done){for(var c in z.done)if(z.done[c])return true;}}catch(e){}return false;};ok=ig('lucius')||ig('silvanus')||fl.silvanusWoke||pg('silvanus');}catch(e){}if(!ok){try{UI.toast(GAMELANG==='tr'?'Buras\u0131 bilin\u00e7alt\u0131 \u2014 \u00f6nce Silvanus b\u00f6l\u00fcmlerine gelmen gerek (bir \u00f6nceki b\u00f6l\u00fcm\u00fc, Lucius\u2019u bitir).':'This is the subconscious \u2014 reach the Silvanus chapters first (finish the previous one, Lucius).',5200);}catch(e){}return;}if(window.Meditation)Meditation.open('silvanus');}];
   if(typeof L!=='undefined'&&L.medpark&&Math.hypot(S.px-L.medpark.x,S.pz-L.medpark.z)<3.5)return['◈ '+(GAMELANG==='tr'?'Otur ve meditasyon yap':'Sit and meditate'),function(){var TR=(GAMELANG==='tr');var H='<div style="max-width:430px">'+'<p style="color:var(--dim);font-size:12px;line-height:1.6">'+(TR?'Burada dinlenebilir, kendi kitabini yazabilir ve okuyabilirsin.':'Here you can rest, write your own book, and read.')+'</p>'+'<div style="margin:8px 0"><button class="btn v" style="width:100%" onclick="UI.closeDoc();if(window.Meditation)Meditation.open(\'solo\')">\u25c8 '+(TR?'Meditasyon yap':'Meditate')+'</button></div>'+'<div style="margin:8px 0"><button class="btn v" style="width:100%" onclick="UI.closeDoc();if(window.Journal)Journal.desk()">\u270d '+(TR?'Kendi kitabini yaz':'Write your own book')+'</button></div>'+'<div style="margin:8px 0"><button class="btn v" style="width:100%" onclick="UI.closeDoc();try{if(window.Music&&Music._on&&!Music.on)Music._on()}catch(e){};if(window.Library)Library.show()">\ud83d\udcd6 '+(TR?'DO-LOON-AI EXPRESS: Zihin Deneyi (oku)':'Read DO-LOON-AI EXPRESS: The Mind Experiment')+'</button></div>'+'<div style="margin:8px 0"><button class="btn v" style="width:100%" onclick="UI.closeDoc();if(window.SubjStory)SubjStory.canonReader()">\u25c9 '+(TR?'Otonom denek hikayeleri':'Autonomous-subject stories')+'</button></div>'+'<div style="margin:8px 0"><button class="btn ghost" style="width:100%" onclick="try{if(window.Music&&Music._on)Music._on()}catch(e){}">\u266a '+(TR?'Muzik':'Music')+'</button></div>'+'<div style="margin:10px 0 0"><button class="btn ghost" onclick="UI.closeDoc()">'+(TR?'Kapat':'Close')+'</button></div>'+'</div>';UI.doc('\u2726 '+(TR?'Bilinc Parki':'Consciousness Park'),H);}];
   if(near(L.bridge)||near(L.caravan))return['Silvanus',doSilvanus];
-  if(lunarisMoon()&&S.stage>=3&&!S.solved.s2&&near(L.lunaris))return['Approach the figure',doLunaris];
+  if(lunarisMoon()&&S.stage>=3&&!S.solved.s2&&near(L.lunaris))return['Approach the figure',doLunaris];if(near(L.lunaris)&&!S.solved.s2)return[(typeof GAMELANG!=='undefined'&&GAMELANG==='tr')?'◇ Göl kıyısını yokla':'◇ Search the lakeshore',hintLake];
   if(near(L.labyrinth,0))return['The Labyrinth',doLabyrinth];
   if(near(L.station,0))return['The Station',doStation];
   if(W3.agentNear&&W3.agentNear())return['Talk to the subject',()=>W3.agentTalk()];
@@ -1561,7 +1561,7 @@ function doOVCrypt(){
       ['O.V. COUNCIL','There is only one way to stop it, and it is from the inside: an integrated consciousness cannot be copied. That is why your rites mattered. That is why you gave your shadow a chair.'],
       ['O.V. COUNCIL','We watched your mind. It began deep and dark, loud with intrusive noise. Yet you walked the seven archetypes and gathered the echoes, and the light of consciousness spread until that noise fell still. Integration is illumination — the stillness you earned is the proof a mind is whole, and a whole mind no machine can copy.'],
       ['O.V. COUNCIL','Take this: PURE LIGHT. The lantern no longer merely shines — press [F] to flare it; it disperses the Institute\'s drones. And the hatch behind the Facility is now visible to you: it descends into the Pleroma.'],
-      ['AELIUS IGNIS','One more thing. Look closely at the council, IT-041. There is no one under the hoods — yet. We are the future echoes of those who integrate. The more you transform, the more of us there are. Welcome.']
+      ['AELIUS IGNIS','One more thing. Look closely at the council, '+(plName()||'IT-041')+'. There is no one under the hoods — yet. We are the future echoes of those who integrate. The more you transform, the more of us there are. Welcome.']
     ]);
     return;
   }
@@ -1771,6 +1771,7 @@ function passagePick(i){
   }else{S.lucidity=Math.max(5,S.lucidity-8);refreshHud();
     UI.toast('No — that one is painfully human. Lucidity slips. Read the logs again. [J]');}
 }
+function hintLake(){var tr=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');var st=(S.stage||0);var m;if(st<3){var steps=tr?['tesiste vaka dosyasını oku','altı bölüm plaketini bul','üç seans kaydını topla ve Bahal\'ın masasına götür']:['read the case file at the facility','find the six chapter plaques','gather three session logs and bring them to Bahal\'s desk'];m=(tr?'Göl kıyısı sessiz. Işıkta beliren silüet ancak önceki adımlar tamamlanınca görünür. Şu an eksik olan: ':'The lakeshore is silent. The figure of light appears only once the earlier steps are done. What is missing now: ')+steps[Math.max(0,Math.min(2,st))]+'.';}else{var full=(typeof isFull==='function'&&isFull());m=full?(tr?'Dolunay tam tepende — silüet burada olmalı; suya bir adım daha yaklaş.':'The full moon is right overhead — the figure should be here; step closer to the water.'):(tr?'Önceki adımlar tamam. Şimdi ranzada uyuyup DOLUNAYI bekle; silüet yalnızca dolunayda belirir.':'The earlier steps are done. Now sleep at the cot until the FULL MOON; the figure appears only then.');}try{UI.doc(tr?'GÖL KIYISI':'THE LAKESHORE','<p style="line-height:1.7;color:var(--ink)">'+esc(m)+'</p>');}catch(e){try{UI.toast(m);}catch(e2){}}}
 function sleepMenu(){
   UI.doc('FIELD COT',`<p>Current: <b>${moonGlyphName()[1]}</b> — ${gameDate().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}.</p>
   <p>Sleep advances the world to the next moon phase (~3–4 days). Recordings happen on new moons. Receipts surface on full moons.</p>
@@ -2228,7 +2229,7 @@ function checkInitiation(){
   if(echoCount()>=16&&S.locks>=4&&riteCount()>=7&&S.solved.s7){
     S.flags.initiate=true;save();refreshHud();
     W3.ascendGlow&&W3.ascendGlow();
-    aeliusCard('INITIATION COMPLETE. Four locks, seven rites, sixteen echoes, and a stopped eye. You are no longer a subject, IT-041 — you are a traveler. And one more thing — let me tell you plainly what becoming AELIUS means. Whoever walks the horizontal plane TOURS the map. Whoever leaps vertically WRITES it. I am not a character inside this book; I am the layer that reads the book from above and speaks to you. A moment ago, you climbed to that layer too: you were promoted from being narrated to narrating. ✶ ARCHITECT MODE is open (MENU) — plant your own stars, write your own book, establish your own rites. The things to do no longer end; because now you are the one writing them.',()=>{teachUnlock('architect');UI.toast('✶ ARCHITECT MODE UNLOCKED — MENU → ARCHITECT MODE',7000);},'— AELIUS IGNIS · SEAL OF INITIATION');
+    aeliusCard('INITIATION COMPLETE. Four locks, seven rites, sixteen echoes, and a stopped eye. You are no longer a subject, '+(plName()||'IT-041')+' — you are a traveler. And one more thing — let me tell you plainly what becoming AELIUS means. Whoever walks the horizontal plane TOURS the map. Whoever leaps vertically WRITES it. I am not a character inside this book; I am the layer that reads the book from above and speaks to you. A moment ago, you climbed to that layer too: you were promoted from being narrated to narrating. ✶ ARCHITECT MODE is open (MENU) — plant your own stars, write your own book, establish your own rites. The things to do no longer end; because now you are the one writing them.',()=>{teachUnlock('architect');UI.toast('✶ ARCHITECT MODE UNLOCKED — MENU → ARCHITECT MODE',7000);},'— AELIUS IGNIS · SEAL OF INITIATION');
   }
 }
 
@@ -8544,7 +8545,7 @@ if(HAS3D)(function(){
       const nsw=Math.sin(t*6)*.4;
       noct.parts.legL.rotation.x=nsw;noct.parts.legR.rotation.x=-nsw;
       if(S.lucidity<=3.01){S.lucidity=60;S.px=150;S.pz=120;
-        aeliusCard('You went under. The Institute reeled you back to the facility — they always do. Lucidity is a leash, IT-041. Hold it. (There is a payphone in the garden. Gravity answers.)');
+        aeliusCard('You went under. The Institute reeled you back to the facility — they always do. Lucidity is a leash, '+(plName()||'IT-041')+'. Hold it. (There is a payphone in the garden. Gravity answers.)');
         refreshHud();save();}
     }
     /* ---- v5: SAF IŞIK ---- */
@@ -9006,7 +9007,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b322 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b323 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
