@@ -331,7 +331,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b338--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b339--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -1863,7 +1863,7 @@ const Game={
     if(!cont&&!this._introShown&&window.Cinematic){this._introShown=true;Cinematic.intro(function(){Game.start(cont);});return;}
     if(!cont){try{localStorage.removeItem(SAVEKEY);}catch(e){}}
     else load();
-    UI.hide('intro');this.running=true;try{if(window.Cam)window.Cam.fp=true;}catch(e){}track('evrene girdi');
+    UI.hide('intro');this.running=true;try{if(window.Cam){var _v=localStorage.getItem('it041_view');if(_v==='far'){Cam.fp=false;Cam.dist=10;Cam.pitch=.55;}else if(_v==='char'){Cam.fp=false;Cam.dist=4;}else Cam.fp=true;}}catch(e){}try{if(S.flags&&S.flags.caseRead&&!S.flags.caseHook&&!S.flags.trainBoarded){S.flags.caseHook=true;if(typeof save==='function')save();setTimeout(function(){try{Dlg.open([['AELIUS IGNIS',(GAMELANG==='tr'?('Dönmüşsün. Gitmeden söyleyemedim: vaka dosyasının son sayfasına biri sonradan tek satır eklemiş — “'+(plName()||'IT-041')+'”. Mürekkep taze. Ben yazmadım. Enstitü yazmaz. Kim yazdı — henüz bilmiyorum.'):('You came back. I could not say it before: someone added a single line to the last page of the case file — “'+(plName()||'IT-041')+'”. The ink is fresh. I did not write it. The Institute would not. Who did — I do not know yet.'))]]);}catch(e){}},9000);}}catch(e){}track('evrene girdi');
     refreshHud();save();
     if(HAS3D)W3.applyMoon&&W3.applyMoon();
     if(!cont)setTimeout(()=>Dlg.open([
@@ -2774,7 +2774,7 @@ const BenchInquiry={
   _ch(){try{return (stageNow&&stageNow().ch)||0;}catch(e){return 0;}},
   open(){var L=GAMELANG;S.benchInq=S.benchInq||[];this._picks={};this._i=0;
     var realm=this._realm();var prior=S.benchInq.length?S.benchInq[S.benchInq.length-1]:null;
-    var intro=(L==='tr'?('Bankta oturuyorsun; her neredeysen bir an duruyor. '+(realm?('Şu an '+realm+' içindesin. '):'')+'İçindeki ses sana birkaç şey soracak. Doğru cevap yok — yalnızca şu an sana en dürüst geleni seç.'):('You sit on the bench; wherever you are pauses for a moment. '+(realm?('You are in '+realm+' now. '):'')+'The voice inside will ask you a few things. No right answer — just choose what feels most honest right now.'));
+    var intro=(L==='tr'?('Bankta oturuyorsun. Dünya bir nefeslik yavaşlıyor: rüzgâr, uzak sesler, göğsündeki ritim. Burası bir iç sorgulama yeri — kimse izlemiyor, hiçbir cevap yanlış değil. İçindeki ses birkaç şey soracak; şu an sana en dürüst geleni seç.'):('You sit on the bench. The world slows for a breath: the wind, distant sounds, the rhythm in your chest. This is a place for inner inquiry — no one is watching, and no answer is wrong. The voice inside will ask a few things; choose what feels most honest right now.'));
     var cb=(prior?('<p style="color:var(--moon);font-size:11.5px;font-style:italic;border-left:2px solid var(--violet);padding-left:9px;line-height:1.5">'+(L==='tr'?'Geçen sefer şöyle demiştin: “':'Last time you said: “')+esc(String(prior.a).slice(0,90))+'”. '+(L==='tr'?'Peki ya şimdi?':'And now?')+'</p>'):'');
     UI.doc('☽ '+(L==='tr'?'İÇ SORGULAMA':'INNER INQUIRY'),'<p style="color:var(--dim);line-height:1.65">'+esc(intro)+'</p>'+cb+'<button class="btn v" onclick="BenchInquiry.ask()">'+(L==='tr'?'başla':'begin')+'</button>');},
   ask(){var L=GAMELANG;var qs=(L==='tr'?this.Q.tr:this.Q.en);var st=qs[this._i];if(!st)return this.done();
@@ -8266,7 +8266,7 @@ if(HAS3D)(function(){
   addEventListener('mousemove',e=>{
     if(document.pointerLockElement===renderer.domElement){
       Cam.yaw-=e.movementX*.011;Cam.pitch=Math.max(-.48,Math.min(.95,Cam.pitch+e.movementY*.0095));}});
-  addEventListener('wheel',e=>{Cam.dist=Math.max(1.6,Math.min(13,Cam.dist+e.deltaY*.005));});
+  addEventListener('wheel',e=>{if(window.Game&&Game.modal)return;Cam.dist=Math.max(1.6,Math.min(13,Cam.dist+e.deltaY*.005));});
   let lookId=null,lx=0,ly=0,lookMoved=false;
   addEventListener('touchstart',e=>{for(const t of e.changedTouches){
     const tg=t.target; /* taps on UI must not engage look */
@@ -9027,7 +9027,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b338 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b339 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
