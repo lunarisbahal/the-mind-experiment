@@ -20,6 +20,7 @@
   #prompt{animation:promptPulse 1.7s ease-in-out infinite;}
   #cassette{position:fixed;right:14px;top:70px;width:74px;height:30px;border-radius:5px;background:rgba(12,14,22,.62);border:1px solid rgba(127,212,193,.28);display:none;align-items:center;justify-content:space-around;padding:0 9px;z-index:40;pointer-events:none}
   #cassette.on{display:flex}
+  @media (pointer:coarse){#cassette{top:186px;right:6px;}}
   #cassette::before{content:'\25C9 KAYIT';position:absolute;top:-13px;left:1px;font-size:8px;letter-spacing:.12em;color:rgba(190,168,232,.82);white-space:nowrap}
   #cassette .reel{width:16px;height:16px;border-radius:50%;border:2px solid rgba(190,168,232,.85);position:relative}
   #cassette .reel::before{content:'';position:absolute;left:50%;top:50%;width:2px;height:7px;background:rgba(190,168,232,.85);transform-origin:1px 0;transform:translate(-1px,0)}
@@ -323,7 +324,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
   <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.<br><br><b style="color:var(--moon)">◈ En iyi deneyim için:</b> karakterler sana yapay zekâ aynaları üzerinden cevap verir — ücretsiz ortak hatla zaten açık. En zengin, en kişisel diyalog için MENÜ → AYNALAR'dan kendi yapay zekânı bağla (ücretsiz Groq anahtarı ya da kendi Claude anahtarın). Deneyimi giriş ayarlarıyla, olduğu gibi oynamanı öneririz.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b333--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b334--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -2059,11 +2060,7 @@ const Snd={
     if(i>=0){
       const t=this.ensureTape(i);if(!t)return;try{var _cl=(typeof S!=='undefined'&&S.pz!=null&&S.pz<110);if(t.lp)t.lp.frequency.value=_cl?9000:3200;if(t.hp)t.hp.frequency.value=_cl?90:280;}catch(e){}
       try{if(ac.state==='suspended')ac.resume();}catch(e){}
-      try{t.el.play().catch(()=>{});
-        const n=ac.currentTime;
-        t.g.gain.cancelScheduledValues(n);
-        t.g.gain.setValueAtTime(t.g.gain.value,n);
-        t.g.gain.linearRampToValueAtTime(.42,n+2.2);}catch(e){}
+      try{var _rampIn=function(){try{const n2=ac.currentTime;t.g.gain.cancelScheduledValues(n2);t.g.gain.setValueAtTime(Math.min(t.g.gain.value,0.02),n2);t.g.gain.linearRampToValueAtTime(.42,n2+2.2);}catch(e){}};if(t.el.readyState>=3)_rampIn();else{t.g.gain.value=0;t.el.addEventListener('playing',_rampIn,{once:true});}t.el.play().catch(()=>{});}catch(e){}
       UI.toast('▸ '+this.TAPE_NAME[i],2600);
     }
     /* kayıp ses kaydı hissi: hafif cızırtı/telsiz, kayıtla birlikte fade in/out */
@@ -6831,7 +6828,7 @@ if(HAS3D)(function(){
             sp.scale.set(5,1.25,1);sp.position.y=2.8;f.g.add(sp);
             this.peers[id]={f,last:performance.now()};}
           const p=this.peers[id];
-          p.tx=d.x;p.tz=d.z;p.ry=d.h||0;p.nm=String(d.n||'yolcu').slice(0,14);p.last=performance.now();});
+          p.tx=d.x;p.tz=d.z;p.ry=d.h||0;p.inn=d.i?1:0;p.nm=String(d.n||'yolcu').slice(0,14);p.last=performance.now();});
         this.room.onPeerLeave(id=>{if(this.peers[id]){scene.remove(this.peers[id].f.g);delete this.peers[id];}});
         this.on=true;UI.el('mpBtn').textContent='EŞZAMANLI: AÇIK';
         UI.toast('⟁ Eşzamanlı mod açık — aynı evrendeki diğer denekler görünür.',5000);
@@ -8267,7 +8264,7 @@ if(HAS3D)(function(){
     /* b151 PERF: minimap snapshots only consumed by throttled drawMini + on-demand map; rebuild ~10fps not per-frame to cut GC churn */
     W3._mmT=(W3._mmT||0)+dt;if(W3._mmT>0.1||window.__mmA===undefined){W3._mmT=0;
     window.__mmA=AGENTS.map(a=>({x:a.f.g.position.x,z:a.f.g.position.z,nm:a.nm}));
-    window.__mmP=window.MP&&MP.on?Object.values(MP.peers).filter(p=>p.tx!==undefined).map(p=>({x:p.tx,z:p.tz,n:p.nm||'yolcu'})):[];}
+    window.__mmP=window.MP&&MP.on?Object.values(MP.peers).filter(p=>p.tx!==undefined&&(performance.now()-(p.last||0))<12000).map(p=>({x:p.tx,z:p.tz,n:(p.nm||'yolcu')+(p.inn?' ⌂':'')})):[];}
 
     let mx=0,mz=0,running=false;
     const P=(W3.inInterior&&W3.IP)?W3.IP:S;
@@ -8582,11 +8579,11 @@ if(HAS3D)(function(){
         if(_hd<6.0){W3._hookT=0;_ag.wait=Math.max(_ag.wait||0,10);_ag.f.g.rotation.y=Math.atan2(S.px-_ag.f.g.position.x,S.pz-_ag.f.g.position.z);var _hk=AG_HOOKS[(W3._hookI=((W3._hookI||0)+1))%AG_HOOKS.length];_ag._thrown=_hk;_ag._thrownT=performance.now();try{Dlg.open([[_ag.nm,_hk]]);}catch(e){}break;}}}}
     /* ---- v5: eşzamanlı mod ---- */
     if(MP.on&&MP.send){mpT+=dt;
-      if(mpT>.15){mpT=0;try{MP.send({x:S.px,z:S.pz,h:meshAng,n:travelerName()+(S.solved.s7?'·⟁':'')});}catch(e){}}
+      if(mpT>.15){mpT=0;try{MP.send({x:S.px,z:S.pz,h:meshAng,i:((window.W3&&W3.inInterior)?1:0),n:travelerName()+(S.solved.s7?'·⟁':'')});}catch(e){}}
       for(const id in MP.peers){const p=MP.peers[id];
         if(p.tx!==undefined){p.f.g.position.x+=(p.tx-p.f.g.position.x)*Math.min(1,dt*8);
           p.f.g.position.z+=(p.tz-p.f.g.position.z)*Math.min(1,dt*8);
-          p.f.g.rotation.y=p.ry||0;}}
+          p.f.g.rotation.y=p.ry||0;var _stl=(performance.now()-(p.last||0))>12000;p.f.g.visible=!(_stl||p.inn);}}
     }
     /* radyo yakınlık sesi */
     Snd.setProx&&Snd.setProx(Math.hypot(S.px-L.radio.x,S.pz-L.radio.z));
@@ -8729,7 +8726,7 @@ if(typeof window!=='undefined')window.Pleroma=Pleroma;
 })();
 
 /* ---------------- Minimap ---------------- */
-const MM=document.getElementById('minimap'),mctx=MM.getContext('2d');
+const MM=document.getElementById('minimap'),mctx=MM.getContext('2d');try{var _mdpr=Math.min(2,(window.devicePixelRatio||1));if(_mdpr>1&&!MM._dpr){var _mcs=(window.matchMedia&&matchMedia('(pointer:coarse)').matches);MM.style.width=(_mcs?146:164)+'px';MM.style.height=(_mcs?112:126)+'px';MM.width=Math.round(MM.width*_mdpr);MM.height=Math.round(MM.height*_mdpr);MM._dpr=_mdpr;}}catch(e){}
 function drawMiniBase(ctx,w,h){
   (function(){try{var _clr=(window.W3&&W3._clear)||0;var wl=h*0.20,wr=h-wl,cx=w*0.5;var sky=ctx.createLinearGradient(0,0,0,wl);sky.addColorStop(0,'#b6c5d4');sky.addColorStop(1,'#7fa8d0');ctx.fillStyle=sky;ctx.fillRect(0,0,w,wl);var _bot=_clr>0.55?'#06182c':'#01030a';var _mid=_clr>0.55?'#0c3358':'#08233d';var wat=ctx.createLinearGradient(0,wl,0,h);wat.addColorStop(0,'#35699f');wat.addColorStop(0.3,'#163f6e');wat.addColorStop(0.58,_mid);wat.addColorStop(0.82,_bot);wat.addColorStop(1,'#000000');ctx.fillStyle=wat;ctx.fillRect(0,wl,w,wr);ctx.beginPath();ctx.moveTo(cx-0.26*w,wl);ctx.quadraticCurveTo(cx,0.03*h,cx+0.26*w,wl);ctx.bezierCurveTo(cx+0.40*w,wl+0.18*wr,cx+0.38*w,wl+0.60*wr,cx+0.30*w,wl+0.88*wr);ctx.bezierCurveTo(cx+0.18*w,wl+1.0*wr,cx-0.18*w,wl+1.0*wr,cx-0.30*w,wl+0.88*wr);ctx.bezierCurveTo(cx-0.38*w,wl+0.60*wr,cx-0.40*w,wl+0.18*wr,cx-0.26*w,wl);ctx.closePath();var berg=ctx.createLinearGradient(0,0,0,h);berg.addColorStop(0,'#e8f2fb');berg.addColorStop(0.20,'#bcccdd');berg.addColorStop(0.40,'#7d93ac');berg.addColorStop(0.58,'#3f5570');berg.addColorStop(0.74,'#1a2532');berg.addColorStop(0.88,'#0a0f17');berg.addColorStop(1,'#000000');ctx.fillStyle=berg;ctx.fill();var _dk=ctx.createLinearGradient(0,0,0,h);_dk.addColorStop(0,'rgba(0,0,0,0)');_dk.addColorStop(0.42,'rgba(0,0,0,0.10)');_dk.addColorStop(0.66,'rgba(0,0,0,0.44)');_dk.addColorStop(0.85,'rgba(0,0,0,0.80)');_dk.addColorStop(1,'rgba(0,0,0,0.98)');ctx.fillStyle=_dk;ctx.fillRect(0,0,w,h);var _PZ=(window.S&&typeof S.pz==='number')?S.pz:0;var _df=Math.max(0,Math.min(1,(_PZ-90)/200));if(_df>0){ctx.fillStyle='rgba(2,3,8,'+(_df*0.6).toFixed(3)+')';ctx.fillRect(0,0,w,h);}ctx.strokeStyle='rgba(13,51,88,0.55)';ctx.lineWidth=Math.max(1,h*0.01);ctx.beginPath();ctx.moveTo(0,wl);ctx.lineTo(w,wl);ctx.stroke();if(w>200){var _tr=(typeof GAMELANG!=='undefined'&&GAMELANG==='tr');ctx.textAlign='left';ctx.fillStyle='#16242f';ctx.font='bold '+Math.round(w*0.030)+'px sans-serif';ctx.fillText(_tr?'BİLİNÇ':'CONSCIOUS',6,wl*0.62);ctx.fillStyle='#dfe9f4';ctx.fillText(_tr?'BİLİNÇALTI':'UNCONSCIOUS',6,h*0.95);}}catch(e){ctx.fillStyle='rgba(5,6,10,.9)';ctx.fillRect(0,0,w,h);}})();
   const sx=w/WX,sz=h/WZ;
@@ -8749,7 +8746,7 @@ function drawMiniBase(ctx,w,h){
       ctx.fillText(String(p.n).slice(0,10),p.x*sx,p.z*sz-4);ctx.textAlign='left';}});
 }
 function drawMini(){
-  const w=MM.width,h=MM.height,sx=w/WX,sz=h/WZ;function FXm(x){return w/2+(x-190)*sx*0.55;}function FYm(z){return z<=110?(0.12*h+(z/110)*(0.20-0.12)*h):(0.20*h+((z-110)/182)*(0.95-0.20)*h);}
+  const _md=MM._dpr||1;mctx.setTransform(_md,0,0,_md,0,0);const w=MM.width/_md,h=MM.height/_md,sx=w/WX,sz=h/WZ;function FXm(x){return w/2+(x-190)*sx*0.55;}function FYm(z){return z<=110?(0.12*h+(z/110)*(0.20-0.12)*h):(0.20*h+((z-110)/182)*(0.95-0.20)*h);}
   drawMiniBase(mctx,w,h);
   const wp=waypoint();
   if(wp){mctx.fillStyle='#cdb878';mctx.beginPath();mctx.arc(FXm(wp.x),FYm(wp.z),3,0,7);mctx.fill();}
@@ -8971,7 +8968,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b333 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b334 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
