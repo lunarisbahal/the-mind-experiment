@@ -331,7 +331,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b342--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b343--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -1879,7 +1879,7 @@ const Game={
       ['LUNARIS','One more law: what is copied wants to possess; an integrated consciousness cannot be copied. What you flee here will not follow you — it waits here to be named. Closing this is also an escape.'],
       ['LUNARIS','The violet lights are invitations, not quests. I walked beside him for three years; now I will walk beside you. I need you — this universe completes only with you.']
     ]),500);
-    if(!cont){try{S.flags=S.flags||{};if(!S.flags._introTold){S.flags._introTold=true;try{if((S.insight||0)<100)S.insight=100;}catch(e){}try{setTimeout(function(){try{if(window.Mission)Mission.show((GAMELANG==='tr'?'16 MART 2025':'16 MARCH 2025'),(GAMELANG==='tr'?'Deney başlıyor. İkinci Kitap, bu deneyin içinde yazılacak.':'The experiment begins. Book Two will be written inside this experiment.'));}catch(e){}},2200);}catch(e){}try{setTimeout(function(){try{if(window.Mission)Mission.show((GAMELANG==='tr'?'GÖREV 1':'MISSION 1'),(GAMELANG==='tr'?'DOLUNAY EKSPRES\'E BİN VE DENEK GÜNLÜĞÜNÜN KALANINI AÇ':'BOARD THE DOLUNAY EKSPRES AND OPEN THE REST OF YOUR SUBJECT JOURNAL'));}catch(e){}},5200);}catch(e){}try{if(window.Cam)Cam.yaw=0;}catch(e){}setTimeout(function(){try{UI.toast((GAMELANG==='tr'?'✦ Giriş bölümünün kilidi açıldı — Kütüphane\'de 📖. Nerede olduğunu anlamak için oku.':'✦ Intro unlocked — it\'s in the Library 📖. Read it to understand where you are.'),8000);}catch(e){}try{if(window.Library&&Library.show)Library.show();}catch(e){}},2400);setTimeout(function(){try{S.flags=S.flags||{};S.flags._introReady=true;save();}catch(e){}},6200);try{save();}catch(e){}}}catch(e){}}
+    if(!cont){try{S.flags=S.flags||{};if(!S.flags._introTold){S.flags._introTold=true;try{if((S.insight||0)<100)S.insight=100;}catch(e){}try{setTimeout(function(){try{if(window.Mission)Mission.show((GAMELANG==='tr'?'16 MART 2025':'16 MARCH 2025'),(GAMELANG==='tr'?'Deney başlıyor. İkinci Kitap, bu deneyin içinde yazılacak.':'The experiment begins. Book Two will be written inside this experiment.'));}catch(e){}},2200);}catch(e){}try{setTimeout(function(){try{if(window.Mission)Mission.show((GAMELANG==='tr'?'GÖREV 1':'MISSION 1'),(GAMELANG==='tr'?'DOLUNAY EKSPRES\'E BİN VE DENEK GÜNLÜĞÜNÜN KALANINI AÇ':'BOARD THE DOLUNAY EKSPRES AND OPEN THE REST OF YOUR SUBJECT JOURNAL'));}catch(e){}},8200);}catch(e){}try{if(window.Cam)Cam.yaw=0;}catch(e){}setTimeout(function(){try{UI.toast((GAMELANG==='tr'?'✦ Giriş bölümünün kilidi açıldı — Kütüphane\'de 📖. Nerede olduğunu anlamak için oku.':'✦ Intro unlocked — it\'s in the Library 📖. Read it to understand where you are.'),8000);}catch(e){}try{if(window.Library&&Library.show)Library.show();}catch(e){}},2400);setTimeout(function(){try{S.flags=S.flags||{};S.flags._introReady=true;save();}catch(e){}},6200);try{save();}catch(e){}}}catch(e){}}
     Snd.init();
     window.Watch&&Watch.enter();
     setTimeout(()=>{try{if(window.MP&&!MP.on&&MP.toggle)MP.toggle();}catch(e){}},1500);
@@ -2947,28 +2947,29 @@ setInterval(function(){try{if(window.Game&&Game.running&&typeof refreshHud==='fu
 function titleCard(){try{if(S.flags&&S.flags.titleSeen)return;S.flags=S.flags||{};S.flags.titleSeen=true;if(typeof save==='function')save();var d=document.createElement('div');d.style.cssText='position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:55;pointer-events:none;opacity:0;transition:opacity 1.6s;background:radial-gradient(ellipse at center,rgba(4,6,12,.0),rgba(4,6,12,.42))';d.innerHTML='<div style="text-align:center"><div style="font-size:11px;letter-spacing:.5em;color:#9d8cc9;margin-bottom:10px">I.R.F.I.A.</div><div style="font-size:32px;letter-spacing:.16em;color:#e8e2d0;text-shadow:0 0 30px rgba(205,184,120,.35)">DO·LOON·AI EXPRESS</div><div style="font-size:12px;letter-spacing:.3em;color:#8b95a9;margin-top:10px">'+(GAMELANG==='tr'?'ZİHİN DENEYİ':'THE MIND EXPERIMENT')+'</div></div>';document.body.appendChild(d);requestAnimationFrame(function(){d.style.opacity='1';});setTimeout(function(){d.style.opacity='0';setTimeout(function(){try{d.remove();}catch(e){}},1900);},4200);}catch(e){}}
 const Tut={i:0,el:null,_sawModal:false,_sawMap:false,
  done(){try{return !!(S.flags&&S.flags.tutDone);}catch(e){return true;}},
- start(){try{if(this.done()||this.el)return;if((window.Game&&Game.modal)||!(S.flags&&S.flags._introReady)){var _s=this;clearTimeout(this._wt);this._wt=setTimeout(function(){_s.start();},600);return;}var bo=0;try{bo=(window.Library&&Library.bookOpen)?Library.bookOpen():0;}catch(e){}if(bo>=2||(S.stage||0)>=2||(S.flags&&S.flags.trainBoarded)){S.flags=S.flags||{};S.flags.tutDone=true;try{save();}catch(e){}return;}
-  var c=document.createElement('div');c.id='tutChip';c.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:60;background:rgba(10,12,20,.9);border:1px solid rgba(157,140,201,.45);border-radius:9px;padding:8px 15px;font-size:12.5px;color:#cdb878;pointer-events:none;transition:opacity .4s;max-width:86vw;text-align:center';document.body.appendChild(c);this.el=c;
-  this._x0=S.px;this._z0=S.pz;this._y0=(window.Cam&&Cam.yaw)||0;this._t=Date.now();this.i=0;this.show();
-  var self=this;this._iv=setInterval(function(){try{self.tick();}catch(e){}},700);
+ start(){try{if(this.done()||this.el||this._armIv||this._wt)return;
+  if((window.Game&&Game.modal)||!(S.flags&&S.flags._introReady)){var _w=this;this._wt=setTimeout(function(){_w._wt=null;_w.start();},600);return;}
+  var bo=0;try{bo=(window.Library&&Library.bookOpen)?Library.bookOpen():0;}catch(e){}
+  if(bo>=2||(S.stage||0)>=2||(S.flags&&S.flags.trainBoarded)){S.flags=S.flags||{};S.flags.tutDone=true;try{save();}catch(e){}return;}
+  this._x0=S.px;this._z0=S.pz;var self=this;
+  this._armIv=setInterval(function(){try{if(self.done()){self.stop();return;}if(window.Game&&Game.modal){self._x0=S.px;self._z0=S.pz;return;}if(Math.hypot(S.px-self._x0,S.pz-self._z0)>3.2){clearInterval(self._armIv);self._armIv=null;self.begin();}}catch(e){}},350);
   try{addEventListener('keydown',function(e){try{if((e.key||'').toLowerCase()==='m')Tut._sawMap=true;}catch(x){}});}catch(e){}}catch(e){}},
+ begin(){try{titleCard();this._y0=(window.Cam&&Cam.yaw)||0;this.i=0;this._t=Date.now();var c=document.createElement('div');c.id='tutChip';c.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:60;background:rgba(10,12,20,.9);border:1px solid rgba(157,140,201,.45);border-radius:9px;padding:8px 15px;font-size:12.5px;color:#cdb878;pointer-events:none;transition:opacity .4s;max-width:86vw;text-align:center';document.body.appendChild(c);this.el=c;this.show();var self=this;this._iv=setInterval(function(){try{self.tick();}catch(e){}},700);}catch(e){}},
  steps(){var tr=(GAMELANG==='tr'),m=false;try{m=window.matchMedia&&matchMedia('(pointer:coarse)').matches;}catch(e){}
-  return [tr?(m?'◇ Sol alttaki alanla yürü':'◇ W A S D — yürü'):(m?'◇ Walk with the lower-left pad':'◇ W A S D — walk'),
-   tr?(m?'◇ Parmağınla sürükleyerek etrafına bak':'◇ Fare ile etrafına bak'):(m?'◇ Drag with your finger to look around':'◇ Look around with the mouse'),
+  return [tr?(m?'◇ Parmağınla sürükleyerek etrafına bak':'◇ Fare ile etrafına bak'):(m?'◇ Drag with your finger to look around':'◇ Look around with the mouse'),
    tr?(m?'◇ Parlayan hedefe yaklaş ve dokun — etkileşim':'◇ Parlayan hedefe yaklaş, E — etkileşim'):(m?'◇ Approach the glowing target and tap — interact':'◇ Approach the glowing target, press E — interact'),
    tr?(m?'◇ Haritayı aç':'◇ M — harita'):(m?'◇ Open the map':'◇ M — the map'),
    tr?'✦ Hedefin hep sol üstte, mesafe ve yönüyle. Gerisi sende — ve gölgende.':'✦ Your objective is always top-left, with distance and bearing. The rest is yours — and your shadow’s.'];},
  show(){try{if(this.el)this.el.textContent=this.steps()[this.i]||'';}catch(e){}},
  tick(){if(this.done()){this.stop();return;}
-  if(window.Game&&Game.modal){if(this.i===2)this._sawModal=true;return;}
-  var adv=false,tmo=(Date.now()-this._t)>(this.i>=2?30000:60000);
-  if(this.i===0){adv=Math.hypot(S.px-this._x0,S.pz-this._z0)>3;if(adv)titleCard();}
-  else if(this.i===1)adv=Math.abs(((window.Cam&&Cam.yaw)||0)-this._y0)>0.25;
-  else if(this.i===2)adv=this._sawModal||!!(S.flags&&S.flags.caseRead);
-  else if(this.i===3)adv=this._sawMap;
-  else if(this.i===4){if(!this._t4)this._t4=Date.now();adv=(Date.now()-this._t4)>6500;}
-  if(adv||tmo){this.i++;this._t=Date.now();if(this.i>=5){S.flags=S.flags||{};S.flags.tutDone=true;try{save();}catch(e){}this.stop();}else this.show();}},
- stop(){try{clearInterval(this._iv);}catch(e){}try{if(this.el){this.el.remove();this.el=null;}}catch(e){}}};
+  if(window.Game&&Game.modal){if(this.i===1)this._sawModal=true;return;}
+  var adv=false,tmo=(Date.now()-this._t)>(this.i>=1?30000:22000);
+  if(this.i===0)adv=Math.abs(((window.Cam&&Cam.yaw)||0)-(this._y0!=null?this._y0:0))>0.28;
+  else if(this.i===1)adv=this._sawModal||!!(S.flags&&S.flags.caseRead);
+  else if(this.i===2)adv=this._sawMap;
+  else if(this.i===3){if(!this._t4)this._t4=Date.now();adv=(Date.now()-this._t4)>6500;}
+  if(adv||tmo){this.i++;this._t=Date.now();if(this.i>=4){S.flags=S.flags||{};S.flags.tutDone=true;try{save();}catch(e){}this.stop();}else this.show();}},
+ stop(){try{clearInterval(this._iv);}catch(e){}try{clearInterval(this._armIv);this._armIv=null;}catch(e){}try{clearTimeout(this._wt);this._wt=null;}catch(e){}try{if(this.el){this.el.remove();this.el=null;}}catch(e){}}};
 if(typeof window!=='undefined')window.Tut=Tut;
 function menuGate(){try{var bo=0;try{bo=(window.Library&&Library.bookOpen)?Library.bookOpen():0;}catch(e){}
  var adv=!!(S.flags&&S.flags.trainBoarded)||bo>=2||(S.stage||0)>=7;var st=(S.stage||0);
@@ -9063,7 +9064,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b342 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b343 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
