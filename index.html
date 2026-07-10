@@ -331,7 +331,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b339--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b340--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="traveler name (optional — visible to other travelers)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Enter your mind</button>
@@ -385,12 +385,12 @@
 <button class="mini" onclick="if(window.MemDoor)MemDoor.open()">☽ MEMORY DOOR</button>
 <button id="progBtn" class="mini" onclick="Realms.show()">⌖ BOOK 2 PROGRESS</button>
   <button class="mini" onclick="SideQuests.show()">✦ BOOK 1 PROGRESS</button>
-  <button class="mini" onclick="Voices.menu()">◈ ARCHETYPE VOICES</button>
-  <button class="mini" onclick="Voices.audio()">🎧 AUDIOBOOK</button>
-  <button class="mini" onclick="Journal.menu()">📖 MY BOOK</button>
-<button class="mini" onclick="if(window.Forum)Forum.show()">● KOLLEKTİF BİLİNÇ</button><button class="mini" onclick="if(window.Sparks)Sparks.show()">◇ SPARKS</button>
-<button class="mini" onclick="if(window.Roster)Roster.show()">◈ WHO IS IN THIS UNIVERSE<span id="dmUnreadB" style="color:#e6b34d;font-weight:700"></span></button>
-<button class="mini" onclick="Daily3.show()">🜂 DAILY TRIAD</button>
+  <button class="mini" id="mBtnArch" onclick="Voices.menu()">◈ ARCHETYPE VOICES</button>
+  <button class="mini" id="mBtnVoices" onclick="Voices.audio()">🎧 AUDIOBOOK</button>
+  <button class="mini" id="mBtnBook" onclick="Journal.menu()">📖 MY BOOK</button>
+<button class="mini" id="mBtnForum" onclick="if(window.Forum)Forum.show()">● KOLLEKTİF BİLİNÇ</button><button class="mini" id="mBtnSparks" onclick="if(window.Sparks)Sparks.show()">◇ SPARKS</button>
+<button class="mini" id="mBtnWho" onclick="if(window.Roster)Roster.show()">◈ WHO IS IN THIS UNIVERSE<span id="dmUnreadB" style="color:#e6b34d;font-weight:700"></span></button>
+<button class="mini" id="mBtnDaily" onclick="Daily3.show()">🜂 DAILY TRIAD</button>
 <button class="mini" onclick="Therapy.menuRedirect()">🛋 THERAPY CENTER</button>
 <button class="mini" onclick="Auto.open()">◍ AUTONOMOUS SUBJECT</button>
 <div style="grid-column:1/-1;font-size:8.5px;letter-spacing:.25em;color:var(--violet);opacity:.62;margin:9px 2px 2px;text-transform:uppercase">✦ YOUR MIND</div>
@@ -1489,7 +1489,7 @@ function doArchive(){
 }
 function doPlaque(i){
   const p=PLAQUES[i];
-  if(!S.plaques.includes(i)){S.plaques.push(i);S.insight+=4;
+  if(!S.plaques.includes(i)){S.plaques.push(i);S.insight+=4;try{if(window.FX&&FX.burst)FX.burst(innerWidth/2,innerHeight/2,'#cdb878',16);}catch(e){}
     W3.collectPlaque&&W3.collectPlaque(i);
     if(i===0)teachUnlock('disk');
     UI.toast(`PLAQUE RECOVERED (${S.plaques.length}/6)${p.frag?' — letters: '+p.frag.split('').join(', '):''}`);}
@@ -1505,7 +1505,7 @@ function doGate(){
   }else UI.doc('GATE OF MIRRORS','<p>The mirror stands open like a door.</p><p style="color:var(--accent)"><b>The Mirror Room terminals are just NORTHWEST of here:</b> three separate kiosks (green screens). The three AI session logs are there — inside this world. The light pillar leads you to the first.</p><p style="color:var(--violet)">And deep within the mirror… another door. Opening outward, into the real world. <i>(Not required for the quest — for the curious: inside you will find a blank page. Select everything: Ctrl+A. The mantras are there. And the ◌ WHITE PAGE right beside this gate is that stream\'s reflection in this world — you can have its frequencies read there.)</i></p><button class="btn v" onclick="window.open(\'https://serpskeyanulod.com\',\'_blank\')">⟁ Step through the mirror — serpskeyanulod.com</button>');
 }
 function doMirror(i){
-  if(!S.ss.includes(i)){S.ss.push(i);S.insight+=7;S.lucidity=Math.max(10,S.lucidity-6);
+  if(!S.ss.includes(i)){S.ss.push(i);try{if(window.FX&&FX.burst)FX.burst(innerWidth/2,innerHeight/2,'#7fd4c1',14);}catch(e){}S.insight+=7;S.lucidity=Math.max(10,S.lucidity-6);
     W3.litTerminal&&W3.litTerminal(i);
     UI.toast(`SESSION LOG ${i+1}/3 CAPTURED — your hands are shaking slightly.`);}
   let extra='';
@@ -1757,7 +1757,7 @@ function playBoardingVideo(){try{var TR=(GAMELANG==='tr');
 if(typeof window!=='undefined')window.playBoardingVideo=playBoardingVideo;
 function zoneFlavor(z){
   const F={'THE BLACK DISK':'Heavy dark disks drift over the field like unburied planets. Each one hums with a memory that was never finished. One of them — the violet-rimmed one — answers to your gravity, not his.',
-    'THE FORBIDDEN FOREST':'White birches with box-shaped hollows. Somewhere in here is a black box, and a country called Dreamland that only borrows this forest at night.',
+    'THE FORBIDDEN FOREST':'White birches with box-shaped hollows. Somewhere in here is a black box, and a country called Dreamland that only borrows this forest at night. Scratched into one of the trees: “do not go beyond where the shadow falls.” Someone has added a question mark at the end.',
     'THE NEW MOON CELLS':'Iron bars grown like plants. Two houses face each other forever. A witch\'s chalk circle, long cold — she tore the newspapers looking for a child who learned that silence keeps you alive.',
     'THE THERAPY CENTER':'A waiting room where all the magazines are drafts of the same book. The couch remembers everyone. The mirror keeps the masks.',
     'THE LABYRINTH':'The corridor smells of candle smoke and unsent letters. A man in a pressed suit checks his watch at the entrance.',
@@ -1766,6 +1766,7 @@ function zoneFlavor(z){
     "SILVANUS'S CARAVAN":'A kettle that is always two minutes from boiling. The creek argues gently with the stones.',
     'THE STATION':'The platform clock has no hands. The timetable lists only moon phases.'};
   UI.doc(z.name,`<p>${F[z.name]||'…'}</p>`);
+  try{if(z.name==='THE FORBIDDEN FOREST'&&!(S.flags&&S.flags.simbaSeen)){S.flags=S.flags||{};S.flags.simbaSeen=true;if(typeof save==='function')save();setTimeout(function(){try{Dlg.open([['LUNARIS',(GAMELANG==='tr'?'Günlüğün ikinci bölümünde yazmıştım: hepimizin zihninde, doğduğumuzdan beri girilmesi yasak karanlık bölgeler var. Aslan Kral\'daki fil mezarlığı gibi. Mufasa, Simba\'ya söylemişti: “gölgenin düştüğü yerin ötesine geçmeyeceksin.”':'I wrote it in the second chapter of the diary: since birth, every mind holds dark regions it is forbidden to enter. Like the elephant graveyard in The Lion King. Mufasa told Simba: “you must never go beyond where the shadow falls.”')],['LUNARIS',(GAMELANG==='tr'?'Simba yine de gitti — ya da ruhu oraya çekildi. Senin de öyle. Tek fark: bu sefer seni kurtarmaya gelecek bir Mufasa yok. Bu ormanda otorite yok. Yalnızca sen — ve gölgenin düştüğü yer.':'Simba went anyway — or his soul was drawn there. So were you. The only difference: this time no Mufasa is coming to save you. There is no authority in this forest. Only you — and the place where the shadow falls.')]]);}catch(e){}},900);}}catch(e){}
 }
 function passageQuiz(){
   let h='<p>Three paragraphs from the published manuscript. The session logs are in your journal. <b>Which paragraph was never written by a human?</b></p>';
@@ -1802,7 +1803,7 @@ function doSleep(){
     aeliusCard(ICSES[Math.floor(Math.random()*ICSES.length)],null,'— INNER VOICE (the third reading)');
 }
 function refreshHud(){try{var _b2=document.getElementById('book2MenuBtn');if(_b2)_b2.style.display=(S.flags&&S.flags.trainBoarded)?'':'none';}catch(e){}try{if(window.Library)Library.poll();}catch(e){}try{if(window.Quest)Quest.poll();}catch(e){}
-  UI.el('objective').textContent='◆ '+mainObjective()+(' · Mind clarity '+Math.round(((window.W3&&W3._clear)||0)*100)+'%')+((typeof objDistLine==='function')?objDistLine():'');{var _sq=UI.el('sidequest');if(_sq){var _st=objectiveText();if(_st){_sq.style.display='block';_sq.textContent='◇ '+(GAMELANG==='tr'?'Yan görev · ':'Side quest · ')+_st;}else{_sq.style.display='none';}}}
+  UI.el('objective').textContent='◆ '+mainObjective()+(' · Mind clarity '+Math.round(((window.W3&&W3._clear)||0)*100)+'%')+((typeof objDistLine==='function')?objDistLine():'');try{if(typeof menuGate==='function')menuGate();}catch(e){}{var _sq=UI.el('sidequest');if(_sq){var _st=objectiveText();if(_st){_sq.style.display='block';_sq.textContent='◇ '+(GAMELANG==='tr'?'Yan görev · ':'Side quest · ')+_st;}else{_sq.style.display='none';}}}
   {const _iw=UI.el('innerwork');const _q=(window.Quest&&Quest.objective&&Quest.objective());if(_iw){if(_q){_iw.style.display='block';_iw.style.cursor='pointer';_iw.textContent='◇ '+(GAMELANG==='tr'?'İç Çalışma · ':'Inner Work · ')+_q;_iw.onclick=function(){try{Quest.show();}catch(e){}};}else{_iw.style.display='none';}}}
   const[g,n]=moonGlyphName();
   UI.el('moonGlyph').textContent=g;UI.el('moonName').textContent=n;
@@ -1863,7 +1864,7 @@ const Game={
     if(!cont&&!this._introShown&&window.Cinematic){this._introShown=true;Cinematic.intro(function(){Game.start(cont);});return;}
     if(!cont){try{localStorage.removeItem(SAVEKEY);}catch(e){}}
     else load();
-    UI.hide('intro');this.running=true;try{if(window.Cam){var _v=localStorage.getItem('it041_view');if(_v==='far'){Cam.fp=false;Cam.dist=10;Cam.pitch=.55;}else if(_v==='char'){Cam.fp=false;Cam.dist=4;}else Cam.fp=true;}}catch(e){}try{if(S.flags&&S.flags.caseRead&&!S.flags.caseHook&&!S.flags.trainBoarded){S.flags.caseHook=true;if(typeof save==='function')save();setTimeout(function(){try{Dlg.open([['AELIUS IGNIS',(GAMELANG==='tr'?('Dönmüşsün. Gitmeden söyleyemedim: vaka dosyasının son sayfasına biri sonradan tek satır eklemiş — “'+(plName()||'IT-041')+'”. Mürekkep taze. Ben yazmadım. Enstitü yazmaz. Kim yazdı — henüz bilmiyorum.'):('You came back. I could not say it before: someone added a single line to the last page of the case file — “'+(plName()||'IT-041')+'”. The ink is fresh. I did not write it. The Institute would not. Who did — I do not know yet.'))]]);}catch(e){}},9000);}}catch(e){}track('evrene girdi');
+    UI.hide('intro');this.running=true;try{if(window.Cam){var _v=localStorage.getItem('it041_view');if(_v==='far'){Cam.fp=false;Cam.dist=10;Cam.pitch=.55;}else if(_v==='char'){Cam.fp=false;Cam.dist=4;}else Cam.fp=true;}}catch(e){}try{if(S.flags&&S.flags.caseRead&&!S.flags.caseHook&&!S.flags.trainBoarded){S.flags.caseHook=true;if(typeof save==='function')save();setTimeout(function(){try{Dlg.open([['AELIUS IGNIS',(GAMELANG==='tr'?('Dönmüşsün. Gitmeden söyleyemedim: vaka dosyasının son sayfasına biri sonradan tek satır eklemiş — “'+(plName()||'IT-041')+'”. Mürekkep taze. Ben yazmadım. Enstitü yazmaz. Kim yazdı — henüz bilmiyorum.'):('You came back. I could not say it before: someone added a single line to the last page of the case file — “'+(plName()||'IT-041')+'”. The ink is fresh. I did not write it. The Institute would not. Who did — I do not know yet.'))]]);}catch(e){}},9000);}}catch(e){}track('evrene girdi');try{setTimeout(function _tw(){try{if(window.Game&&Game.modal){setTimeout(_tw,900);return;}if(window.Tut)Tut.start();}catch(e){}},1500);}catch(e){}try{setTimeout(function(){try{var k='it041_d3ping',t=new Date().toDateString();if(localStorage.getItem(k)!==t&&(S.stage||0)>=1){localStorage.setItem(k,t);UI.toast(GAMELANG==='tr'?'🜂 Bugünün üçlemesi hazır — MENÜ → GÜNLÜK ÜÇLEME':'🜂 Your daily triad is ready — MENU → DAILY TRIAD',6000);}}catch(e){}},30000);}catch(e){}
     refreshHud();save();
     if(HAS3D)W3.applyMoon&&W3.applyMoon();
     if(!cont)setTimeout(()=>Dlg.open([
@@ -2941,6 +2942,41 @@ function _pbAt(dd){var d=new Date(START);d.setDate(d.getDate()+dd);var t=(d-NEWM
 function sleepsToFull(){try{if(_pbAt(S.day)===4)return 0;var d=S.day,c=0;while(c<9){var b=_pbAt(d),g=0;while(_pbAt(d)===b&&g<7){d++;g++;}c++;if(_pbAt(d)===4)return c;}return 9;}catch(e){return -1;}}
 function objDistLine(){try{if(!(window.Game&&Game.running))return'';if(window.Game&&Game.modal)return'';if(window.W3&&W3.inInterior)return'';var wp=(typeof waypoint==='function')?waypoint():null;if(!wp||wp.x==null)return'';var dx=wp.x-S.px,dz=wp.z-S.pz;var d=Math.round(Math.hypot(dx,dz));if(d<3)return (GAMELANG==='tr'?' · ✦ hedefteysin':' · ✦ you are here');var dirs=(GAMELANG==='tr')?['K','KD','D','GD','G','GB','B','KB']:['N','NE','E','SE','S','SW','W','NW'];var a=Math.atan2(dx,-dz);var ix=((Math.round(a/(Math.PI/4))%8)+8)%8;return ' · '+d+'m '+dirs[ix];}catch(e){return'';}}
 setInterval(function(){try{if(window.Game&&Game.running&&typeof refreshHud==='function'&&!((window.Game&&Game.modal)))refreshHud();}catch(e){}},3000);
+
+/* ==== b340 ONBOARDING: diegetik tutorial + kademeli menü + title-card (additive) ==== */
+function titleCard(){try{if(S.flags&&S.flags.titleSeen)return;S.flags=S.flags||{};S.flags.titleSeen=true;if(typeof save==='function')save();var d=document.createElement('div');d.style.cssText='position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:55;pointer-events:none;opacity:0;transition:opacity 1.6s;background:radial-gradient(ellipse at center,rgba(4,6,12,.0),rgba(4,6,12,.42))';d.innerHTML='<div style="text-align:center"><div style="font-size:11px;letter-spacing:.5em;color:#9d8cc9;margin-bottom:10px">I.R.F.I.A.</div><div style="font-size:32px;letter-spacing:.16em;color:#e8e2d0;text-shadow:0 0 30px rgba(205,184,120,.35)">DO·LOON·AI EXPRESS</div><div style="font-size:12px;letter-spacing:.3em;color:#8b95a9;margin-top:10px">'+(GAMELANG==='tr'?'ZİHİN DENEYİ':'THE MIND EXPERIMENT')+'</div></div>';document.body.appendChild(d);requestAnimationFrame(function(){d.style.opacity='1';});setTimeout(function(){d.style.opacity='0';setTimeout(function(){try{d.remove();}catch(e){}},1900);},4200);}catch(e){}}
+const Tut={i:0,el:null,_sawModal:false,_sawMap:false,
+ done(){try{return !!(S.flags&&S.flags.tutDone);}catch(e){return true;}},
+ start(){try{if(this.done()||this.el)return;var bo=0;try{bo=(window.Library&&Library.bookOpen)?Library.bookOpen():0;}catch(e){}if(bo>=2||(S.stage||0)>=2||(S.flags&&S.flags.trainBoarded)){S.flags=S.flags||{};S.flags.tutDone=true;try{save();}catch(e){}return;}
+  var c=document.createElement('div');c.id='tutChip';c.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:60;background:rgba(10,12,20,.9);border:1px solid rgba(157,140,201,.45);border-radius:9px;padding:8px 15px;font-size:12.5px;color:#cdb878;pointer-events:none;transition:opacity .4s;max-width:86vw;text-align:center';document.body.appendChild(c);this.el=c;
+  this._x0=S.px;this._z0=S.pz;this._y0=(window.Cam&&Cam.yaw)||0;this._t=Date.now();this.i=0;this.show();
+  var self=this;this._iv=setInterval(function(){try{self.tick();}catch(e){}},700);
+  try{addEventListener('keydown',function(e){try{if((e.key||'').toLowerCase()==='m')Tut._sawMap=true;}catch(x){}});}catch(e){}}catch(e){}},
+ steps(){var tr=(GAMELANG==='tr'),m=false;try{m=window.matchMedia&&matchMedia('(pointer:coarse)').matches;}catch(e){}
+  return [tr?(m?'◇ Sol alttaki alanla yürü':'◇ W A S D — yürü'):(m?'◇ Walk with the lower-left pad':'◇ W A S D — walk'),
+   tr?(m?'◇ Parmağınla sürükleyerek etrafına bak':'◇ Fare ile etrafına bak'):(m?'◇ Drag with your finger to look around':'◇ Look around with the mouse'),
+   tr?(m?'◇ Parlayan hedefe yaklaş ve dokun — etkileşim':'◇ Parlayan hedefe yaklaş, E — etkileşim'):(m?'◇ Approach the glowing target and tap — interact':'◇ Approach the glowing target, press E — interact'),
+   tr?(m?'◇ Haritayı aç':'◇ M — harita'):(m?'◇ Open the map':'◇ M — the map'),
+   tr?'✦ Hedefin hep sol üstte, mesafe ve yönüyle. Gerisi sende — ve gölgende.':'✦ Your objective is always top-left, with distance and bearing. The rest is yours — and your shadow’s.'];},
+ show(){try{if(this.el)this.el.textContent=this.steps()[this.i]||'';}catch(e){}},
+ tick(){if(this.done()){this.stop();return;}
+  if(window.Game&&Game.modal){if(this.i===2)this._sawModal=true;return;}
+  var adv=false,tmo=(Date.now()-this._t)>(this.i>=2?30000:60000);
+  if(this.i===0){adv=Math.hypot(S.px-this._x0,S.pz-this._z0)>3;if(adv)titleCard();}
+  else if(this.i===1)adv=Math.abs(((window.Cam&&Cam.yaw)||0)-this._y0)>0.25;
+  else if(this.i===2)adv=this._sawModal||!!(S.flags&&S.flags.caseRead);
+  else if(this.i===3)adv=this._sawMap;
+  else if(this.i===4){if(!this._t4)this._t4=Date.now();adv=(Date.now()-this._t4)>6500;}
+  if(adv||tmo){this.i++;this._t=Date.now();if(this.i>=5){S.flags=S.flags||{};S.flags.tutDone=true;try{save();}catch(e){}this.stop();}else this.show();}},
+ stop(){try{clearInterval(this._iv);}catch(e){}try{if(this.el){this.el.remove();this.el=null;}}catch(e){}}};
+if(typeof window!=='undefined')window.Tut=Tut;
+function menuGate(){try{var bo=0;try{bo=(window.Library&&Library.bookOpen)?Library.bookOpen():0;}catch(e){}
+ var adv=!!(S.flags&&S.flags.trainBoarded)||bo>=2||(S.stage||0)>=7;var st=(S.stage||0);
+ var vis={mBtnForum:adv,mBtnWho:adv,mBtnSparks:adv||st>=1||((S.insight||0)>0),mBtnDaily:adv||st>=1,mBtnBook:adv||st>=1,mBtnVoices:adv||st>=2,mBtnArch:adv||st>=2};
+ for(var k in vis){var el=document.getElementById(k);if(!el)continue;
+  if(vis[k]){if(el.style.display==='none'){el.style.display='';if(el._wasHidden){try{UI.toast('✦ '+(GAMELANG==='tr'?'YENİ — menüde açıldı: ':'NEW — unlocked in the menu: ')+el.textContent.trim(),5200);}catch(e){}}}}
+  else{el.style.display='none';el._wasHidden=true;}}}catch(e){}}
+
 const DAILYQ=[
  'Which mask did you wear longest today? What remained when you took it off?',
  'What tired you most today — the work, or the feeling around the work?',
@@ -9027,7 +9063,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b339 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b340 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
