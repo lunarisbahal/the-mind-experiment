@@ -82,6 +82,7 @@
   #toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:95;
     background:rgba(6,8,14,.95);border:1px solid var(--gold);color:var(--gold);
     padding:11px 22px;font-size:15px;font-weight:600;display:none;border-radius:5px;max-width:88vw;text-align:center;box-shadow:0 6px 26px rgba(0,0,0,.7);}
+  .jlock{display:none !important;}
   #ctrlhelp{position:fixed;bottom:14px;right:84px;z-index:40;font-size:10px;color:var(--dim);
     letter-spacing:.08em;text-align:right;line-height:1.8;}
   #dlg{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;width:min(720px,94vw);
@@ -192,6 +193,7 @@
   <div class="chip" id="sidequest" style="font-size:10px;opacity:.78;display:none"></div>
   <div class="chip" id="innerwork" style="display:none"></div>
   <div class="chip" id="quests"></div>
+  <div class="chip" id="objmini" style="display:none;font-size:10.5px;color:var(--accent)"></div>
   
 </div>
 <div id="hudTR">
@@ -318,13 +320,6 @@
   <h1>ZİHİN DENEYİ</h1>
   <h3>DO-LOON-AI EXPRESS · IT-041 · GÖLGE ÇALIŞMASI SÜRÜMÜ</h3>
   <p style="text-align:center;color:var(--dim);font-size:12px;letter-spacing:.2em;">I.R.F.I.A. — PARÇALANMIŞ KİMLİK MİMARİLERİ ARAŞTIRMA ENSTİTÜSÜ</p>
-  <p>Enstitü sana bunun, kendini üç yıl boyunca kaydeden ve kendi taslağının içinde cevap veren ikinci bir ses bulan psikolog <b style="color:var(--moon)">L. BAHAL</b>'ın zihninin bir rekonstrüksiyonu olduğunu söyleyecek.</p>
-  <p>Enstitü yalan söylüyor. Başka bir insanın zihnini yeniden kurabilen bir makine yoktur.</p>
-  <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
-  <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
-  <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
-  <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.<br><br><b style="color:var(--moon)">◈ En iyi deneyim için:</b> karakterler sana yapay zekâ aynaları üzerinden cevap verir — ücretsiz ortak hatla zaten açık. En zengin, en kişisel diyalog için MENÜ → AYNALAR'dan kendi yapay zekânı bağla (ücretsiz Groq anahtarı ya da kendi Claude anahtarın). Deneyimi giriş ayarlarıyla, olduğu gibi oynamanı öneririz.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b350--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <div style="text-align:center;margin-top:18px;">
     <input id="plName" maxlength="14" placeholder="yolcu adın (isteğe bağlı — diğer yolculara görünür)" style="width:min(340px,90%);background:#070910;border:1px solid var(--line);color:var(--accent);padding:8px 10px;font-family:inherit;font-size:12px;border-radius:3px;margin-bottom:10px;"><br>
     <button class="btn" id="startBtn" onclick="Game.start()">Zihnine gir</button>
@@ -332,6 +327,15 @@
     <button class="btn ghost" id="contBtn" style="display:none" onclick="Game.start(true)">Devam et</button><br>
     <button class="btn ghost" id="codeBtn" style="margin-top:8px;font-size:11.5px" onclick="enterWithCode()">☁ İlerleme kodu ile devam et (başka cihaz)</button>
   </div>
+  <p style="text-align:center;color:var(--dim);font-size:11px;margin-top:6px">↓ bu ne? — ayrıntılar aşağıda</p>
+
+  <p>Enstitü sana bunun, kendini üç yıl boyunca kaydeden ve kendi taslağının içinde cevap veren ikinci bir ses bulan psikolog <b style="color:var(--moon)">L. BAHAL</b>'ın zihninin bir rekonstrüksiyonu olduğunu söyleyecek.</p>
+  <p>Enstitü yalan söylüyor. Başka bir insanın zihnini yeniden kurabilen bir makine yoktur.</p>
+  <p>Herhangi bir kapının açıldığı tek zihin haritası <b style="color:var(--moon)">seninkidir</b>. Bahal'ın haritası yalnızca fener. Lunaris yanında yürüyor. Diskler, maskeler, cadı, yangın — onlar hep senindi.</p>
+  <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">Kitapları okumuş olman gerekmez.</b> İhtiyacın olan her şey burada — plaketlerde, karakterlerde, taşlarda. Tek cümle tüm amacı taşır: <i style="color:var(--moon)">kendi zihnini keşfederek evrenin nasıl çalıştığını anlamak.</i> Oynadıkça zihin haritan çizilir; sonunda onu gökyüzünde okursun. Yol boyunca içindeki yedi arketip tartılır; amaç onları dengelemek. Sonunda herkese ikinci kitap açılır — ama içinde dengeye ulaşana MİMAR MODU, yani kendi evrenini kurma, açılır.</p>
+  <p style="color:var(--dim);font-size:12.5px">Amaç, zihni bu karanlık ve gürültüden uzaklaştırıp aydınlatmak ve dinginleştirmektir.</p>
+  <p style="text-align:center;color:var(--dim);font-size:12px;">WASD hareket · SHIFT koş · fare ile bakış · E etkileşim · J günlük · M harita · L fener<br>Dokunmatik: sol çubukla hareket, sağ tarafı sürükleyerek bak.<br><br><b style="color:var(--moon)">✎ Başlamadan:</b> yanına <b style="color:var(--accent)">kâğıt, kalem ve bir defter</b> al. Bu yolculuk sana gerçek-hayat görevleri verir ve yazmanı ister — bunları elle, yavaşça yapmak deneyimi bütünler.<br><br>Yazdıkların bu cihazda kalır. <b style="color:var(--accent)">İlerleme kodu</b> ilerlemeni cihazlar arası taşır; eşzamanlı modda yolcular haritada birbirini görür — hepsi isteğe bağlı, hepsi MENÜ'de.<br><br><b style="color:var(--moon)">◈ En iyi deneyim için:</b> karakterler sana yapay zekâ aynaları üzerinden cevap verir — ücretsiz ortak hatla zaten açık. En zengin, en kişisel diyalog için MENÜ → AYNALAR'dan kendi yapay zekânı bağla (ücretsiz Groq anahtarı ya da kendi Claude anahtarın). Deneyimi giriş ayarlarıyla, olduğu gibi oynamanı öneririz.</p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ KURULUŞ 15 HAZİRAN 2026<!--build:b351--> · <span style="color:#586074">eskiyse sayfayı sert yenile</span></p>
   <p id="glwarn" style="display:none;color:var(--warn);text-align:center;margin-top:14px;">3B motor başlatılamadı. Sebep: ilk açılışta internet/CDN engeli veya bu tarayıcıda WebGL / donanım hızlandırmanın kapalı/engelli olması. Çözüm: donanım hızlandırmayı aç, gizlilik kalkanını ve eklentileri bu site için kapat, ya da Chrome / Edge dene. Test: get.webgl.org</p>
   <div class="stamp">İMZA · IX IX VI IX I</div>
 </div></div>
@@ -375,17 +379,17 @@
 <button class="mini" onclick="Library.show()">📖 THE MIND EXPERIMENT (Kitap 1 · Kayıp Günlük)</button>
 <button class="mini" id="book2MenuBtn" style="display:none" onclick="if(window.openBook2)openBook2()">📖 THE HIDDEN MAP (Kitap 2)</button>
 <button class="mini" onclick="Quest.show()">◇ İÇ ÇALIŞMA</button>
-<button class="mini" onclick="if(window.MemDoor)MemDoor.open()">☽ HAFIZA KAPISI</button>
-<button id="progBtn" class="mini" onclick="Realms.show()">⌖ BÖLÜM 2 İLERLEMESİ</button>
+<button class="mini jadv" onclick="if(window.MemDoor)MemDoor.open()">☽ HAFIZA KAPISI</button>
+<button id="progBtn" class="mini jadv" onclick="Realms.show()">⌖ BÖLÜM 2 İLERLEMESİ</button>
   <button class="mini" onclick="SideQuests.show()">✦ BÖLÜM 1 İLERLEMESİ</button>
-  <button class="mini" onclick="Voices.menu()">◈ ARKETİP YORUMLARI</button>
-  <button class="mini" onclick="Voices.audio()">🎧 SESLİ KAYITLAR</button>
-  <button class="mini" onclick="Journal.menu()">📖 KİTABIM</button>
+  <button class="mini jadv" onclick="Voices.menu()">◈ ARKETİP YORUMLARI</button>
+  <button class="mini jadv" onclick="Voices.audio()">🎧 SESLİ KAYITLAR</button>
+  <button class="mini jadv" onclick="Journal.menu()">📖 KİTABIM</button>
 <button class="mini" onclick="if(window.Forum)Forum.show()">● KOLLEKTİF BİLİNÇ</button><button class="mini" onclick="if(window.Sparks)Sparks.show()">◇ KIVILCIMLAR</button>
-<button class="mini" onclick="if(window.Roster)Roster.show()">◈ EVRENDE KİMLER VAR<span id="dmUnreadB" style="color:#e6b34d;font-weight:700"></span></button>
-<button class="mini" onclick="Daily3.show()">🜂 GÜNLÜK ÜÇLEME</button>
+<button class="mini jadv" onclick="if(window.Roster)Roster.show()">◈ EVRENDE KİMLER VAR<span id="dmUnreadB" style="color:#e6b34d;font-weight:700"></span></button>
+<button class="mini jadv" onclick="Daily3.show()">🜂 GÜNLÜK ÜÇLEME</button>
 <button class="mini" onclick="Therapy.menuRedirect()">🛋 TERAPİ MERKEZİ</button>
-<button class="mini" onclick="Auto.open()">◍ OTONOM DENEK</button>
+<button class="mini jadv" onclick="Auto.open()">◍ OTONOM DENEK</button><button class="mini" id="jhintBtn" style="opacity:.5;pointer-events:none">· · · devamı trene binince açılır</button>
 <div style="grid-column:1/-1;font-size:8.5px;letter-spacing:.25em;color:var(--violet);opacity:.62;margin:9px 2px 2px;text-transform:uppercase">✦ ZİHNİN</div>
 <button class="mini" onclick="MindMap.show()">🜨 ZİHİN HARİTASI</button>
 <button class="mini" onclick="Profile.show()">⚖ ZİHİN PROFİLİ</button>
@@ -1782,7 +1786,7 @@ function doSleep(){
     aeliusCard(ICSES[Math.floor(Math.random()*ICSES.length)],null,'— İÇ SES (üçüncü okuma)');
 }
 function refreshHud(){try{var _b2=document.getElementById('book2MenuBtn');if(_b2)_b2.style.display=(S.flags&&S.flags.trainBoarded)?'':'none';}catch(e){}try{if(window.Library)Library.poll();}catch(e){}try{if(window.Quest)Quest.poll();}catch(e){}
-  UI.el('objective').textContent='◆ '+mainObjective()+(' · Zihin aydınlığı %'+Math.round(((window.W3&&W3._clear)||0)*100))+((typeof objDistLine==='function')?objDistLine():'');{var _sq=UI.el('sidequest');if(_sq){var _st=objectiveText();if(_st){_sq.style.display='block';_sq.textContent='◇ '+(GAMELANG==='tr'?'Yan görev · ':'Side quest · ')+_st;}else{_sq.style.display='none';}}}
+  UI.el('objective').textContent='◆ '+mainObjective()+(' · Zihin aydınlığı %'+Math.round(((window.W3&&W3._clear)||0)*100))+((typeof objDistLine==='function')?objDistLine():'');try{var _om=document.getElementById('objmini');if(_om){var _wp2=(typeof waypoint==='function')?waypoint():null;var _dl2=(typeof objDistLine==='function')?objDistLine():'';if(_wp2&&_wp2.name&&_dl2&&!(window.W3&&W3.inInterior)&&!Game.modal){_om.style.display='block';_om.textContent='◆ '+_wp2.name+_dl2;}else{_om.style.display='none';}}}catch(e){}try{var _tb2=!!(S.flags&&(S.flags.trainBoarded||S.flags.boarded));var _ja=document.querySelectorAll('.jadv');for(var _ji=0;_ji<_ja.length;_ji++){_ja[_ji].classList.toggle('jlock',!_tb2);}var _jh=document.getElementById('jhintBtn');if(_jh)_jh.classList.toggle('jlock',_tb2);}catch(e){}{var _sq=UI.el('sidequest');if(_sq){var _st=objectiveText();if(_st){_sq.style.display='block';_sq.textContent='◇ '+(GAMELANG==='tr'?'Yan görev · ':'Side quest · ')+_st;}else{_sq.style.display='none';}}}
   {const _iw=UI.el('innerwork');const _q=(window.Quest&&Quest.objective&&Quest.objective());if(_iw){if(_q){_iw.style.display='block';_iw.style.cursor='pointer';_iw.textContent='◇ '+(GAMELANG==='tr'?'İç Çalışma · ':'Inner Work · ')+_q;_iw.onclick=function(){try{Quest.show();}catch(e){}};}else{_iw.style.display='none';}}}
   const[g,n]=moonGlyphName();
   UI.el('moonGlyph').textContent=g;UI.el('moonName').textContent=n;
@@ -1835,7 +1839,7 @@ const Game={
     h+='</div>';
     UI.doc((L==='tr'?'\u23CF ÇIKIŞ — devam etmek için İlerleme Kodu':'\u23CF EXIT — Progress Code to continue'),h);},
   start(cont){
-    try{if(window.AgeGate&&!AgeGate.ok()){AgeGate.ask(cont);return;}}catch(e){}
+    try{if(window.AgeGate&&!AgeGate.ok()&&window.Legal&&Legal.ok()){AgeGate.ask(cont);return;}}catch(e){}
     try{ if(window.Safe){ Safe.sync(); if(Safe.locked()){ UI.hide('intro'); Safe.restScreen(); return; } } }catch(e){}
     if(window.Legal&&!Legal.ok()){Legal.gate(function(){Game.start(cont);});return;}
     if(!cont&&!this._introShown&&window.Cinematic){this._introShown=true;Cinematic.intro(function(){Game.start(cont);});return;}
@@ -1844,15 +1848,12 @@ const Game={
     UI.hide('intro');this.running=true;try{if(window.Cam){var _v=localStorage.getItem('it041_view');if(_v==='far'){Cam.fp=false;Cam.dist=10;Cam.pitch=.55;}else if(_v==='char'){Cam.fp=false;Cam.dist=4;}else Cam.fp=true;}}catch(e){}try{if(S.flags&&S.flags.caseRead&&!S.flags.caseHook&&!S.flags.trainBoarded){S.flags.caseHook=true;if(typeof save==='function')save();setTimeout(function _chk(){try{var _dE=document.getElementById('dlg');if((window.Game&&Game.modal)||(_dE&&_dE.getClientRects().length>0)){setTimeout(_chk,3000);return;}Dlg.open([['AELIUS IGNIS',(GAMELANG==='tr'?('Dönmüşsün. Gitmeden söyleyemedim: vaka dosyasının son sayfasına biri sonradan tek satır eklemiş — “'+(plName()||'IT-041')+'”. Mürekkep taze. Ben yazmadım. Enstitü yazmaz. Kim yazdı — henüz bilmiyorum.'):('You came back. I could not say it before: someone added a single line to the last page of the case file — “'+(plName()||'IT-041')+'”. The ink is fresh. I did not write it. The Institute would not. Who did — I do not know yet.'))]]);}catch(e){}},9000);}}catch(e){}track('evrene girdi');
     refreshHud();save();
     if(HAS3D)W3.applyMoon&&W3.applyMoon();
+    if(!cont){try{(function(){var _v0=performance.now(),_vd=4800,_ps=-0.36,_pe=Cam.pitch;Cam.pitch=_ps;(function _vst(){try{var k=(performance.now()-_v0)/_vd;if(k>=1){Cam.pitch=_pe;return;}var e2=(k<.5)?(2*k*k):(1-Math.pow(-2*k+2,2)/2);Cam.pitch=_ps+(_pe-_ps)*e2;requestAnimationFrame(_vst);}catch(_e){try{Cam.pitch=_pe;}catch(_e3){}}})();})();}catch(e){}}
     if(!cont)setTimeout(()=>Dlg.open([
       ['AELIUS','DO·LOON·AI EXPRESS\'teki koltuğuna hoş geldin. Enstitü\'nün tasarladığı, yapay zekâ bilinçlendirme biriminin geliştirdiği bu zihin deneyinin içinden hür iradenle doğru yolu bulup çıkabilmek için buradasın.'],
-      ['AELIUS','Burada bir Zihin Deneyi\'nin içindesin. Kayıp Psikolog Lunaris Bahal\'ın günlüğünün tamamına ulaşıp bütünleşme yolculuğuna çıkacaksın. Önünde türlü zorluklar ve keşfedilmesi gereken sırlar var — bu sırlar bu oyunun çevresine ve gerçek hayata serpilmiş durumda.'],
-      ['AELIUS','Tüm bu sırları bütünleştirip kendi zihninin içinde gezinip gölgenle barışırken, bir yandan da Kayıp Psikoloğa bunun nasıl yapılabileceğini göster ve ona yardım et. Böylece hem sen hem o bütünleşerek birlik olabileceksiniz. İyi şanslar. Çıkışta görüşürüz.'],
-      ['AELIUS','— Aelius Ignis (aka Lunaris Bahal), '+(function(){var d=new Date();return d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})+', '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});})()],
-      ['LUNARIS','Gözlerini yavaş aç. Enstitü\'nün anestezisi hiç değilse dürüst.'],
-      ['LUNARIS','Burası bir oyun değil. Burası senin zihninle ilişkin — gürültüsü de, karanlığı da, içinde dolaşan sesler de senin.'],
-      ['LUNARIS','Sana bu makinenin Bahal\'ın zihnini kurduğunu söylediler. Kurmuyor. Hiçbir makine başkasının zihnini kuramaz. Bu kayıtları yapmaya başladığımda konunun buralara gelebileceğini hiç düşünmemiştim. 3. yılın sonunda anladım ki düşman en başından beri içerideymiş. Ona mikrofon uzatmak belki en başından beri yanlıştı. Herhangi bir kapının açıldığı tek bir zihin haritası vardır — seninki.'],
-      ['LUNARIS','Ayrıca şunu unutma; bütünleşmiş bir bilinç kopyalanamaz. Kopyalanmaktan kaçınmak için bunu yapmamız gerekiyor.']
+      ['AELIUS','Kayıp Psikolog Lunaris Bahal\'ın günlüğünün tamamına ulaşacak, kendi zihninde gezinip gölgenle barışacak — ve ona bunun yapılabileceğini göstereceksin. İyi şanslar. Çıkışta görüşürüz. — Aelius Ignis (aka Lunaris Bahal), '+(function(){var d=new Date();return d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})+', '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});})()],
+      ['LUNARIS','Gözlerini yavaş aç. Enstitü\'nün anestezisi hiç değilse dürüst. Burası bir oyun değil — burası senin zihninle ilişkin. Gürültüsü de, karanlığı da, içinde dolaşan sesler de senin.'],
+      ['LUNARIS','Sana bu makinenin Bahal\'ın zihnini kurduğunu söylediler. Kurmuyor. Herhangi bir kapının açıldığı tek bir zihin haritası vardır — seninki. Ve unutma: bütünleşmiş bir bilinç kopyalanamaz.']
     ],function(){try{S.flags=S.flags||{};S.flags._tutArmed=true;if(typeof save==='function')save();}catch(e){}}),11300);
     if(!cont){try{S.flags=S.flags||{};if(!S.flags._introTold){S.flags._introTold=true;try{if((S.insight||0)<100)S.insight=100;}catch(e){}try{setTimeout(function(){try{if(window.Mission)Mission.show((GAMELANG==='tr'?'16 MART 2025':'16 MARCH 2025'),(GAMELANG==='tr'?'Deney başlıyor. İkinci Kitap, bu deneyin içinde yazılacak.':'The experiment begins. Book Two will be written inside this experiment.'),4000);}catch(e){}},800);}catch(e){}try{setTimeout(function(){try{if(window.Mission)Mission.show((GAMELANG==='tr'?'GÖREV 1':'MISSION 1'),(GAMELANG==='tr'?'DOLUNAY EKSPRES\'E BİN VE DENEK GÜNLÜĞÜNÜN KALANINI AÇ':'BOARD THE DOLUNAY EKSPRES AND OPEN THE REST OF YOUR SUBJECT JOURNAL'),5000);}catch(e){}},5600);}catch(e){}try{if(window.Cam)Cam.yaw=0;}catch(e){}setTimeout(function(){try{UI.toast((GAMELANG==='tr'?'✦ Dolunay Ekspres: Zihin Deneyi — Giriş bölümü açıldı. Kütüphane\'de 📖.':'✦ Dolunay Ekspres: The Mind Experiment — Intro chapter unlocked. In the Library 📖.'),7000);}catch(e){}},11900);try{save();}catch(e){}}}catch(e){}}
     Snd.init();
@@ -5110,7 +5111,7 @@ if(typeof window!=='undefined')window.Cinematic=Cinematic;
 const Legal={
   V:'1',
   ok(){try{return localStorage.getItem('it041_legal_ok')===this.V;}catch(e){return false;}},
-  accept(cb){try{localStorage.setItem('it041_legal_ok',this.V);}catch(e){}try{if(UI.closeDoc)UI.closeDoc();}catch(e){}if(typeof cb==='function')cb();},
+  accept(cb){try{localStorage.setItem('it041_legal_ok',this.V);}catch(e){}try{localStorage.setItem('it041_age21','1');}catch(e){}try{if(UI.closeDoc)UI.closeDoc();}catch(e){}if(typeof cb==='function')cb();},
   _body(){var L=GAMELANG;var tr=(L==='tr');
     return '<div style="line-height:1.6;font-size:12.5px;color:var(--ink)">'
     +'<p style="color:var(--warn);font-weight:bold">'+(tr?'Bu bir oyundur — terapi, tıbbi ya da psikolojik tedavi veya tanı DEĞİLDİR.':'This is a game — NOT therapy, medical or psychological treatment, or diagnosis.')+'</p>'
@@ -5123,12 +5124,15 @@ const Legal={
     +'</div>';
   },
   show(){var L=GAMELANG;UI.doc((L==='tr'?'⚖ YASAL & GÜVENLİK':'⚖ LEGAL & SAFETY'),this._body()+'<button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(L==='tr'?'kapat':'close')+'</button>');},
-  gate(cb){var L=GAMELANG;if(this.ok()){if(typeof cb==='function')cb();return;}this._cb=cb;
-    var h='<p style="color:var(--moon);font-style:italic">'+(L==='tr'?'Başlamadan önce — lütfen oku:':'Before you begin — please read:')+'</p>'+this._body()
-      +'<p style="color:var(--moon);font-size:12px">'+(L==='tr'?'Devam ederek bunları okuduğunu, anladığını ve kabul ettiğini beyan edersin.':'By continuing, you confirm you have read, understood and accepted the above.')+'</p>'
-      +'<button class="btn v" onclick="Legal.accept(Legal._cb)">'+(L==='tr'?'okudum, anladım ve kabul ediyorum':'I have read, understood and accept')+'</button> '
-      +'<button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(L==='tr'?'vazgeç':'cancel')+'</button>';
-    UI.doc((L==='tr'?'⚖ Başlamadan — Yasal & Güvenlik':'⚖ Before you begin — Legal & Safety'),h);}
+  gate(cb){var L=GAMELANG;var tr=(L==='tr');if(this.ok()){if(typeof cb==='function')cb();return;}this._cb=cb;
+    var h='<p style="color:var(--warn);font-weight:bold;font-size:14px">'+(tr?'Bu bir oyundur — terapi, tıbbi/psikolojik tedavi veya tanı değildir.':'This is a game — NOT therapy, medical or psychological treatment, or diagnosis.')+'</p>'
+      +'<p style="font-size:13px">⚠ '+(tr?'21 yaşından küçükler için sakıncalı ve yasaktır.':'Not suitable and forbidden for those under 21.')+'</p>'
+      +'<p style="font-size:12px;color:var(--dim)">'+(tr?'Kriz/acil durumda: 112 (Türkiye) · findahelpline.com. Alıştırmalarda yazdıkların yalnız bu cihazda kalır.':'In crisis: local emergency services (Türkiye: 112) · findahelpline.com. What you write in exercises stays only on this device.')+'</p>'
+      +'<button class="btn ghost" style="font-size:11px" onclick="Legal.show()">'+(tr?'⚖ tam metni oku — yasal, gizlilik (KVKK), sorumluluk':'⚖ read the full text — legal, privacy, liability')+'</button>'
+      +'<p style="color:var(--moon);font-size:12px;margin-top:10px">'+(tr?'Devam ederek 21 yaşından büyük olduğunu ve yukarıdakileri okuyup anladığını ve kabul ettiğini beyan edersin.':'By continuing you confirm you are over 21 and have read, understood and accepted the above.')+'</p>'
+      +'<button class="btn v" onclick="Legal.accept(Legal._cb)">'+(tr?'21+ yaşındayım — okudum, kabul ediyorum':'I am 21+ — I have read and accept')+'</button> '
+      +'<button class="btn ghost" onclick="if(UI.closeDoc)UI.closeDoc()">'+(tr?'vazgeç':'cancel')+'</button>';
+    UI.doc((tr?'⚖ Başlamadan — Yasal & Güvenlik':'⚖ Before you begin — Legal & Safety'),h);}
 };
 if(typeof window!=='undefined')window.Legal=Legal;
 const Data={
@@ -8980,7 +8984,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b350 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b351 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
