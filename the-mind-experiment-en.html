@@ -341,7 +341,7 @@
   <p style="color:var(--dim);font-size:12.5px"><b style="color:var(--accent)">You don't need to have read the books.</b> Everything you need is here — in the plaques, the characters, the stones. One sentence holds the whole purpose: <i style="color:var(--moon)">understand how the universe works by exploring your own mind.</i> As you play, your mind map is drawn — and in the end you read it in the sky. Across the road your seven inner archetypes are weighed; the aim is balance among them. Everyone reaches Book Two — but only those who come into balance open ARCHITECT MODE, where you build your own universe.</p>
   <p style="color:var(--dim);font-size:12.5px">The aim is to lead the mind out of this darkness and noise — to illuminate it and bring it to stillness.</p>
   <p style="text-align:center;color:var(--dim);font-size:12px;">WASD move · SHIFT run · mouse look · E interact · J journal · M map · L flashlight<br>Touch: left stick to move, drag the right side to look.<br><br><b style="color:var(--moon)">✎ Before you begin:</b> keep <b style="color:var(--accent)">pen, paper and a notebook</b> beside you. This journey gives you real-life tasks and asks you to write — doing them by hand, slowly, is what makes the experience whole.<br><br>Your writings stay on this device. A <b style="color:var(--accent)">progress code</b> carries your progress across devices; with sync on, travelers see each other on the map — all optional, all in the MENU.<br><br><b style="color:var(--moon)">◈ For the deepest experience:</b> the characters answer you through AI mirrors — already on at a free shared level. For the richest, most personal dialogue, open MENU → MIRRORS and connect your own AI (a free Groq key, or your own Claude key). Playing with the intro settings as they are is recommended.</p>
-  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b354--> · <span style="color:#586074">if it looks stale, hard-refresh the page</span></p>
+  <p style="text-align:center;color:#3a4154;font-size:10px;letter-spacing:.2em;margin-top:12px">◈ FOUNDED 15 JUNE 2026<!--build:b355--> · <span style="color:#586074">if it looks stale, hard-refresh the page</span></p>
   <p id="glwarn" style="display:none;color:var(--warn);text-align:center;margin-top:14px;">3D engine could not start. Cause: an internet/CDN block on first load, or WebGL / hardware acceleration being off or blocked in this browser. Fix: enable hardware acceleration, disable privacy shields and extensions for this site, or try Chrome / Edge. Test: get.webgl.org</p>
   <div class="stamp">SIGNED · IX IX VI IX I</div>
 </div></div>
@@ -1779,7 +1779,7 @@ function passageQuiz(){
 function passagePick(i){
   if(PASSAGE_CHOICES[i].ok){
     S.flags.confession=true;S.insight+=15;S.stage=3;save();refreshHud();UI.closeDoc();
-    UI.toast('Ş11 CLOSED — the confession is documented. The paragraph matches Session Log 2, verbatim.');
+    UI.toast('CONFESSION DOCUMENTED — the paragraph matches Session Log 2, verbatim. (File Ş-11 closed)');
     aeliusCard('There it is. The moment the book stopped being a diary and became a terminal. He pasted the machine into himself and called it style. Now wait for the full moon — the one who kept the receipts only walks in full light.');
   }else{S.lucidity=Math.max(5,S.lucidity-8);refreshHud();
     UI.toast('No — that one is painfully human. Lucidity slips. Read the logs again. [J]');}
@@ -4820,8 +4820,9 @@ const House={
     try{var _th=(d.dus||''),_ba=(d.karar||'');if(_th||_ba){S.inv=S.inv||{};(S.inv.cbtLog=S.inv.cbtLog||[]).push({a:(d.an||''),b:_th,c:_ba,emo:(d.duy||''),before:b,after:a,d:new Date().toDateString()});S.inv.cbtLog=S.inv.cbtLog.slice(-20);}}catch(e){}
     var _dl2=(delta!=null?((d.duy||(L==='tr'?'Duygu':'Emotion'))+': '+b+'→'+a+(delta>0?(L==='tr'?(' · '+delta+' puan hafifledi'):(' · eased '+delta)):'')):'');
     xpGift({spark:5,luc:14,daily:'cbt',tTR:'Kanıt Mahkemesi tamamlandı',tEN:'Court of Evidence complete',xTR:_dl2,xEN:_dl2,fTR:'Gerçekçi düşüncen zihin haritana ve final analizine işlendi; günlük üçlemeye sayıldı.',fEN:'Your realistic thought is woven into your mind map and final analysis; counted toward the daily triad.'});
+    try{if(!this._standalone&&this.cur){this.cur.step++;this.stepMap()['ch'+this.cur.ch]=this.cur.step;this._save();House._cbtAdvanced=true;}}catch(e){}
     var sec=(House._standalone?20:90);
-    this._pause({sec:sec,box:'cbtPause'},function(){House._adv();});},
+    this._pause({sec:sec,box:'cbtPause'},function(){if(House._cbtAdvanced){House._cbtAdvanced=false;House._step();}else{House._adv();}});},
   /* ---- EMDR-style (bilateral audio) — NOT therapy ---- */
   _emdrStart(st){var L=GAMELANG;this._em={st:st,set:0,sets:4,taps:[],focus:''};
     var h='<p style="line-height:1.7;color:var(--ink)">'+esc(this.T(st.intro))+'</p>'+
@@ -9030,7 +9031,7 @@ try{window.UI=UI;}catch(e){}try{window.Game=Game;}catch(e){}try{window.Rite=Rite
       if(!wasOpen){g.h.classList.add('open');g.items.forEach(function(b){b.classList.remove('mfold');});}});});
 }catch(e){}}
 if(document.readyState!=='loading')fold();else document.addEventListener('DOMContentLoaded',fold);})();
-(function(){try{var v=document.createElement('div');v.textContent='b354 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
+(function(){try{var v=document.createElement('div');v.textContent='b355 \u27F3';v.title='dokun: en yeni surumu yukle';v.style.cssText='position:fixed;right:6px;bottom:3px;font:10px monospace;color:#bcd;opacity:.5;z-index:2147483647;cursor:pointer;letter-spacing:.5px;padding:3px 6px;background:rgba(10,12,20,.55);border-radius:5px';v.onclick=function(){try{location.href=location.pathname+'?v='+Date.now();}catch(e){try{location.reload(true);}catch(_){}}};function add(){try{document.body.appendChild(v);}catch(e){}}if(document.body)add();else document.addEventListener('DOMContentLoaded',add);}catch(e){}})();
 </script>
 <style>#objective,#sidequest{display:none!important}</style>
 <script>
