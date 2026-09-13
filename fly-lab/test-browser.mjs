@@ -48,6 +48,29 @@ try{
   const j=JSON.parse(await readFile(out+'/trajectory-subset.json','utf8'));assert(j.records.length>=8);assert.equal(j.neurons,668);assert(j.records.every(r=>r.activity.every(Number.isFinite)));return {steps:j.records.length,neurons:j.neurons};
  });
  await page.screenshot({path:out+'/subset-gameplay.png',fullPage:true});
+ await check('live monitor receives actual activity',async()=>{assert.equal(await page.locator('#brain-view').getAttribute('data-samples'),'128');assert(Number(await page.locator('#traces').getAttribute('data-updates'))>=8);return true;});
+ await check('human feedback updates a specific action once',async()=>{
+  await page.locator('#good').click();await page.waitForFunction(()=>document.querySelector('#learning').textContent.includes('Geri bildirim: 1'));
+  assert(await page.locator('#good').isDisabled());assert(await page.locator('#stop').isDisabled());return await page.locator('#feedback-target').innerText();
+ });
+ await check('teacher demonstration trains the policy',async()=>{
+  await page.locator('#teacher').check();assert(await page.locator('#start').isDisabled());
+  await page.locator('[data-teach="0"]').click();await page.waitForFunction(()=>document.querySelector('#learning').textContent.includes('Öğretim: 1'));
+  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('flywire-policy-v1:subset:flywire:41')));
+  assert.equal(saved.teachCount,1);assert.equal(saved.feedbackCount,1);assert(saved.policy.flat().every(Number.isFinite));
+  await writeFile(out+'/model-subset.json',JSON.stringify(saved));await page.locator('#teacher').uncheck();return {demonstrations:saved.teachCount,feedback:saved.feedbackCount};
+ });
+ await check('model import validates atomically and restores weights',async()=>{
+  const before=await page.evaluate(()=>localStorage.getItem('flywire-policy-v1:subset:flywire:41'));
+  await page.locator('#import-model').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{"format":"wrong"}')});
+  await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('uyumsuz'));
+  assert.equal(await page.evaluate(()=>localStorage.getItem('flywire-policy-v1:subset:flywire:41')),before);
+  await page.locator('#import-model').setInputFiles(out+'/model-subset.json');
+  await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('karar katmanı yüklendi'));
+  const event=page.waitForEvent('download');await page.locator('#save-model').click();const d=await event;await d.saveAs(out+'/model-export.json');
+  assert.deepEqual(JSON.parse(await readFile(out+'/model-export.json','utf8')),JSON.parse(before));return true;
+ });
+
  await check('text puzzles pause the agent',async()=>{
   await game.evaluate(()=>{Cipher.open('s1');});await page.locator('#start').click();await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('Metin / şifre'));assert(await page.locator('#stop').isDisabled());return true;
  });
@@ -62,6 +85,25 @@ try{
   const j=JSON.parse(await readFile(out+'/trajectory-full.json','utf8'));assert.equal(j.neurons,139255);assert(j.records.length>=8);assert(j.records.every(r=>r.activity.every(Number.isFinite)));
   const moved=j.records.some((r,i)=>i&&Math.hypot(r.x-j.records[i-1].x,r.z-j.records[i-1].z)>.05);assert(moved,'No movement while full network controlled game');
   return {neurons:j.neurons,edges:j.edges,steps:j.records.length,moved};
+ });
+ await check('policy survives page reload separately from game storage',async()=>{
+  // Save subset as last configuration; reopening must auto-load it without a load click.
+  await page.locator('#network').selectOption('subset');await page.locator('#load').click();
+  await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('karar katmanı yüklendi'));
+  await game.evaluate(()=>{S.px=150;S.pz=121;S.flags.flyTestMarker='retained';});
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('flywire-game-v1'))?.state?.flags?.flyTestMarker==='retained');
+  await page.reload();
+  await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('karar katmanı yüklendi'),null,{timeout:30000});
+  const label=await page.locator('#learning').innerText();assert(label.includes('Öğretim: 1')&&label.includes('Geri bildirim: 1'));
+  assert.equal(await page.evaluate(()=>localStorage.getItem('fly-e2e-owner-save')),'original');
+  const newGame=page.frames().find(f=>f!==page.mainFrame());
+  await newGame.waitForFunction(()=>!!window.FlyGame);
+  const state=await newGame.evaluate(()=>JSON.parse(localStorage.getItem('it041_sw_v1')));
+  assert.equal(state.flags.flyTestMarker,'retained');assert.equal(state.px,150);assert.equal(state.pz,121);
+  // Complete a synthetic entry fixture; production gates remain untouched.
+  await newGame.evaluate(()=>{Object.assign(S,JSON.parse(localStorage.getItem('it041_sw_v1')));document.getElementById('intro').style.display='none';Game.running=true;Game.setModal(false);});
+  await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('Keşfediyor'),null,{timeout:30000});await page.locator('#stop').click();
+  return {label,gameRestored:true,autoStarted:true};
  });
  evidence.success=true;
 }catch(e){evidence.success=false;evidence.failure=e.stack;console.error(e.stack);if(page)await page.screenshot({path:out+'/failure.png',fullPage:true}).catch(()=>{});process.exitCode=1;

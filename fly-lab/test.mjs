@@ -14,3 +14,14 @@ const buf=new ArrayBuffer(26),dv=new DataView(buf);dv.setUint32(0,2,true);dv.set
 const bin=parseBinary(buf);assert.equal(bin.n,2);assert.equal(bin.weight[0],-3);assert.equal(bin.post[0],1);
 assert.throws(()=>new Brain({...g,post:Uint32Array.from(g.post,()=>999999)}));
 console.log('PASS: real-data load, determinism, finite dynamics, connectivity contribution, shuffled control, learning, binary validation.');
+const teacher=new Brain(g);const f=teacher.features(input),prob=teacher.probabilities(f)[2];
+for(let i=0;i<20;i++)teacher.teach(input,2);
+assert(teacher.probabilities(f)[2]>prob,'Demonstrations should increase target likelihood');
+const chosen=teacher.step(input,0,false),sample=teacher.history.get(chosen.steps),old=teacher.probabilities(sample.f)[chosen.action];
+teacher.feedback(chosen.steps,1);assert(teacher.probabilities(sample.f)[chosen.action]>old);assert.throws(()=>teacher.feedback(chosen.steps,-1));
+const chosen2=teacher.step(input,0,false),sample2=teacher.history.get(chosen2.steps),old2=teacher.probabilities(sample2.f)[chosen2.action];
+teacher.feedback(chosen2.steps,-1);assert(teacher.probabilities(sample2.f)[chosen2.action]<old2);
+const checkpoint=JSON.parse(JSON.stringify(teacher.checkpoint())),restored=new Brain(g);restored.restore(checkpoint);assert.deepEqual(restored.checkpoint(),checkpoint);
+for(const bad of [{...checkpoint,signature:'other'},{...checkpoint,policy:[[NaN]]},{...checkpoint,steps:-1}]){assert.throws(()=>restored.restore(bad));assert.deepEqual(restored.checkpoint(),checkpoint);}
+assert.throws(()=>new Brain(g,42).restore(checkpoint));assert.throws(()=>new Brain(g,41,'random').teach(input,0));
+console.log('PASS: demonstrations increase likelihood; targeted feedback, single grading, portable policy roundtrip and atomic validation.');
