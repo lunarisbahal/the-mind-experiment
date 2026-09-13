@@ -1,0 +1,21 @@
+import {readFileSync} from 'node:fs';import vm from 'node:vm';import assert from 'node:assert/strict';
+const listeners={},events=[],timers=new Map();let t=0;
+const elements={};const window={Game:{running:true,modal:false},S:{px:190,pz:120},W3:{},addEventListener:(k,f)=>listeners[k]=f,dispatchEvent:e=>events.push(e)};
+const document={getElementById:id=>elements[id]||null,createElement:()=>({getContext:()=>({drawImage(){},getImageData:()=>({data:new Uint8Array(256)})})})};
+vm.runInNewContext(readFileSync(new URL('./bridge.js',import.meta.url),'utf8'),{window,document,KeyboardEvent:class{constructor(type,o){Object.assign(this,{type},o);}},setTimeout:f=>{timers.set(++t,f);return t;},clearTimeout:i=>timers.delete(i)});
+const g=window.FlyGame;assert.equal(g.observe().features.length,68);assert.equal(g.observe().x,190);
+assert(g.act(0));assert.equal(events.at(-1).key,'w');assert.equal(events.at(-1).type,'keydown');g.release();assert.equal(events.at(-1).type,'keyup');assert.equal(timers.size,0);
+g.act(1);g.act(2);assert.equal(events.at(-2).type,'keyup');assert.equal(events.at(-2).key,'a');assert.equal(events.at(-1).key,'s');
+window.Game.modal=true;g.act(5);assert.equal(events.at(-1).key,'Escape');
+elements.cipherModal={getClientRects:()=>[1],innerText:'Cipher'};const count=events.length;assert.equal(g.act(4),false);assert.equal(events.length,count);assert.equal(g.observe().needsText,true);
+window.Game.running=false;assert.equal(g.act(0),false);
+// Exercise the exact isolation prelude from lab.mjs in a separate VM.
+const lab=readFileSync(new URL('./lab.mjs',import.meta.url),'utf8');const code=lab.match(/const isolation=`([\s\S]*?)`;/)[1];
+const real=new Map([['user-save','untouched']]);const win={localStorage:real,sessionStorage:real,fetch:async()=>({ok:true})};const nav={};
+vm.runInNewContext(code,{window:win,navigator:nav,document:{baseURI:'http://localhost/game/'},URL,Map,Proxy,Object,Promise,Error});
+assert.equal(win.localStorage.getItem('user-save'),null);win.localStorage.setItem('user-save','test');assert.equal(real.get('user-save'),'untouched');
+assert.throws(()=>new win.WebSocket('wss://example.com'));
+await assert.rejects(win.fetch('https://example.com/api'));
+await assert.rejects(win.fetch('http://localhost/api',{method:'POST'}));
+assert.equal((await win.fetch('http://localhost/game/book.json')).ok,true);
+console.log('PASS: 68-channel observation, press/release, stop cleanup, modal/text guards, isolated saves and network controls.');
