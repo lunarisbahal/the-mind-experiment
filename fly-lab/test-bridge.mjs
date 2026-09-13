@@ -19,3 +19,11 @@ await assert.rejects(win.fetch('https://example.com/api'));
 await assert.rejects(win.fetch('http://localhost/api',{method:'POST'}));
 assert.equal((await win.fetch('http://localhost/game/book.json')).ok,true);
 console.log('PASS: 68-channel observation, press/release, stop cleanup, modal/text guards, isolated saves and network controls.');
+
+// Mirror chat must halt instead of consuming endless ineffective actions.
+window.Game.running=true;delete elements.cipherModal;let closeClicks=0;
+elements.mirrorModal={getClientRects:()=>[1],innerText:'Speak / Step back',querySelector:()=>({click(){closeClicks++;delete elements.mirrorModal;}})};
+assert.equal(g.observe().needsText,true);assert.equal(g.observe().mirror,true);assert(g.observe().text.includes('Speak'));
+const beforeMirror=events.length;assert.equal(g.act(4),false);assert.equal(events.length,beforeMirror);
+assert(g.closeMirror());assert.equal(closeClicks,1);assert.equal(g.observe().mirror,false);assert.equal(g.closeMirror(),false);
+console.log('PASS: mirror text guard stops ghost actions; explicit close uses the real UI button.');

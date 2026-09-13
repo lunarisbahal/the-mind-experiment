@@ -9,6 +9,7 @@ function log(t){$('log').textContent=(t+'\n'+$('log').textContent).slice(0,2500)
 const names=['ileri','sol','geri','sağ','etkileşim','bekle / kapat'];
 const storageKey=()=>`flywire-policy-v1:${identity.network}:${identity.mode}:41`;
 function controls(){
+ $('exit-mirror').disabled=!frame.contentWindow?.FlyGame?.observe().mirror;
  const usable=ready&&!restoring&&!pending;
  $('start').disabled=!usable||active||$('teacher').checked;
  $('teacher').disabled=!ready||restoring;
@@ -118,8 +119,9 @@ $('load').onclick=async()=>{
 };
 $('start').onclick=()=>{if(!worker||!ready||active||restoring||$('teacher').checked)return;autoWaiting=false;active=true;monitor.setRunning(true);run++;$('start').disabled=true;$('stop').disabled=false;status('Keşfediyor · karar katmanı öğreniyor');cycle(run);};
 $('stop').onclick=()=>{autoWaiting=false;stop();status('Duraklatıldı.');};
-$('export').onclick=()=>{const u=URL.createObjectURL(new Blob([JSON.stringify({experiment:'do-loon-ai-flywire-v0.4',...identity,records},null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='flywire-deney-'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);};
+$('export').onclick=()=>{const u=URL.createObjectURL(new Blob([JSON.stringify({experiment:'do-loon-ai-flywire-v0.4.1',...identity,records},null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='flywire-deney-'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);};
+$('exit-mirror').onclick=()=>{autoWaiting=false;stop();if(frame.contentWindow?.FlyGame?.closeMirror())status('Ayna kapatıldı. Keşfe devam etmek için Başlat.');controls();};
 $('auto-resume').onchange=()=>{if(!$('auto-resume').checked)autoWaiting=false;try{localStorage.setItem('flywire-last-config',JSON.stringify({network:identity.network||$('network').value,mode:identity.mode||$('mode').value,auto:$('auto-resume').checked}));}catch{}};
-setInterval(()=>{if(document.hidden)return;saveGame();if(autoWaiting&&ready&&!pending&&!restoring&&!$('teacher').checked&&frame.contentWindow?.FlyGame?.observe().ready){autoWaiting=false;$('start').click();}},2000);
+setInterval(()=>{if(document.hidden)return;saveGame();controls();if(autoWaiting&&ready&&!pending&&!restoring&&!$('teacher').checked&&frame.contentWindow?.FlyGame?.observe().ready){autoWaiting=false;$('start').click();}},2000);
 window.addEventListener('pagehide',stop);document.addEventListener('visibilitychange',()=>{if(document.hidden){if(active&&$('auto-resume').checked)autoWaiting=true;stop();status('Sekme gizlendi; deney duraklatıldı.');}});
 loadGame().catch(e=>status(e.message));
