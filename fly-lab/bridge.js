@@ -32,7 +32,7 @@
    if(now.panel==='dlg')buttons.push(document.getElementById('dlgNext'));
    if(now.panel==='aelius')buttons.push(root);
    const target=buttons[decision.button];if(!target)return false;
-   release();target.click();return true;
+   release();if(now.panel==='dlg'){document.activeElement?.blur();event('keydown','e');event('keyup','e');}else target.click();return true;
   },
   checkpoint(){
    if(!window.Game?.running)return null;

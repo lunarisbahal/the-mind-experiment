@@ -35,7 +35,7 @@ try{
  await page.locator('#pace').selectOption('750');await page.locator('#language').uncheck();await page.locator('#start').click();
  await page.waitForFunction(()=>document.querySelectorAll('#action-history li').length===10,null,{timeout:45000});
  await check('last ten actions stay attached to their feedback IDs',async()=>{
-  await page.locator('#history-freeze').check();const rows=await page.locator('#action-history li').getAttribute('data-action-id').catch(()=>null);
+  await page.locator('#history-freeze').check();
   const chosen=page.locator('#action-history li').nth(4);const id=await chosen.getAttribute('data-action-id');const text=await chosen.locator('div').innerText();
   const before=await page.locator('#stats').innerText();await page.waitForTimeout(3500);assert.notEqual(await page.locator('#stats').innerText(),before);assert.equal(await chosen.locator('div').innerText(),text);
   await chosen.getByRole('button',{name:`Eylem ${id}: İyi`,exact:true}).click();await page.waitForFunction(()=>document.querySelector('#learning').textContent.includes('Geri bildirim: 1'));
@@ -48,6 +48,11 @@ try{
   await page.locator('#teacher').uncheck();assert(await page.locator('#start').isDisabled());return {moved:true,resumed:true};
  });
  await page.locator('#stop').click();await page.locator('#language').check();
+ await check('native narration advances through its keyboard control',async()=>{
+  await game.evaluate(()=>{Dlg.open([['TEST','Read this first line.'],['TEST','The next line is visible.']]);});await page.locator('#start').click();
+  await game.waitForFunction(()=>document.getElementById('dlgText').innerText.includes('next line'),null,{timeout:30000});await page.locator('#stop').click();
+  await game.evaluate(()=>{document.getElementById('dlg').style.display='none';Game.setModal(false);});return true;
+ });
  await check('text decisions fill and submit a native rite without manual restart',async()=>{
   await game.evaluate(()=>{const id=Object.keys(RITES).find(k=>RITES[k].kind==='text'&&S.rites[k]===undefined);window.__testRite=id;Rite.form(id);Rite.cur=id;});
   await page.locator('#start').click();await page.waitForFunction(()=>{const g=document.querySelector('#game').contentWindow;return g.S.rites[g.__testRite]!==undefined;},null,{timeout:35000});

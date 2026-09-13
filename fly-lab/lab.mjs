@@ -42,7 +42,7 @@ async function grade(id,value){
  }catch(e){row.grade=null;log(e.message);}
  const ids=Array.from($('action-history').children).map(el=>Number(el.dataset.actionId));renderHistory($('action-history'),ids.map(id=>history.entries.find(r=>r.id===id)).filter(Boolean),grade);
 }
-function addAction(data){const row=history.add(data);records.push({...row});if(records.length>5000)records.shift();refreshHistory();$('stats').textContent=`Adım: ${history.next-1} · Keşfedilen hücre: ${seen.size}\nEylem: ${row.label} · ${row.source}`;controls();saveGame();return row;}
+function addAction(data){const row=history.add(data);records.push(row);if(records.length>5000)records.shift();refreshHistory();$('stats').textContent=`Adım: ${history.next-1} · Keşfedilen hücre: ${seen.size}\nEylem: ${row.label} · ${row.source}`;controls();saveGame();return row;}
 function rpc(message,transfer=[]){return new Promise((resolve,reject)=>{
  if(!worker)return reject(Error('Ağ hazır değil'));
  const id=++requestId,timeout=setTimeout(()=>{pending.delete(id);reject(Error('Ağ yanıt zaman aşımı'));},90000);pending.set(id,{resolve,reject,timeout});worker.postMessage({...message,requestId:id},transfer);
@@ -83,7 +83,7 @@ async function tick(token){
   if(previous)stuck=Math.hypot(o.x-previous.x,o.z-previous.z)<.03?stuck+1:0;
   if(stuck>=12&&!macro&&$('language').checked&&Date.now()-lastPlannerAt>30000){
    lastPlannerAt=Date.now();plannerAbort=new AbortController();status('İlerleme için hareket planlıyor · Dil modeli');
-   const d=await decide(relay,view,memory,[...textRecent.slice(-3),{stuck,position:[o.x,o.z]}],plannerAbort.signal);
+   const d=await decide(relay,view,memory,[...textRecent.slice(-3),...languageExamples.slice(-3),{stuck,position:[o.x,o.z]}],plannerAbort.signal);
    if(!wanted||token!==run)return;if(d.kind==='move'){macro={action:d.direction,left:d.repeat};memory=d.memory||memory;remember();}stuck=0;
   }
   const cell=[o.interior,Math.floor(o.x/5),Math.floor(o.z/5)].join(':');let reward=previous?(seen.has(cell)?-.01:1):0;if(previous&&stuck)reward-=.02;seen.add(cell);previous=o;
@@ -93,7 +93,7 @@ async function tick(token){
   if(!wanted||token!==run)return;
   const now=g.observe();if(!now.ready||now.modal||g.describe().panel){worker.postMessage({type:'forget-transition'});schedule(token,500);return;}
   if(g.act(result.action)){
-   monitor.update(result.activity,result.action);addAction({label:names[result.action],source,brainStep:result.steps,action:result.action,x:o.x,z:o.z,activity:result.activity,probabilities:result.probabilities,detail:`x ${o.x.toFixed(1)} · z ${o.z.toFixed(1)} · ödül ${reward.toFixed(2)}`});
+   monitor.update(result.activity,result.action);addAction({label:names[result.action],source,brainStep:result.steps,action:result.action,x:o.x,z:o.z,activity:result.activity,probabilities:result.probabilities,context:view.text,decision:source==='Dil modeli'?{kind:'move',direction:result.action}:undefined,detail:`x ${o.x.toFixed(1)} · z ${o.z.toFixed(1)} · ödül ${reward.toFixed(2)}`});
   }
   status('Keşfediyor · karar katmanı öğreniyor');
  }catch(e){if(token!==run||!wanted)return;status(e.message+' · 15 saniye sonra yeniden deneyecek.');log(e.message);delay=15000;}
