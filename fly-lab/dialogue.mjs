@@ -1,26 +1,27 @@
 // Text planning is performed by a language model, never attributed to the connectome.
 export const RELAYS=['https://it041-konsey.lunarisbahal.workers.dev/mirror','https://it041-mirror.lunarisbahal.workers.dev'];
 export class Relay {
- constructor({fetcher=fetch,storage=localStorage,report=()=>{}}={}){this.fetcher=fetcher;this.storage=storage;this.report=report;this.tail=Promise.resolve();}
+ constructor({fetcher=fetch,storage=localStorage,report=()=>{},credentials=()=>null}={}){this.credentials=credentials;this.fetcher=fetcher;this.storage=storage;this.report=report;this.tail=Promise.resolve();}
  generate(messages,maxTokens=400,signal){
   const task=()=>this.request(messages,maxTokens,signal);const result=this.tail.then(task,task);this.tail=result.catch(()=>{});return result;
  }
  async request(messages,maxTokens,signal){
   if(signal?.aborted)throw Error('İstek iptal edildi');
+  const key=this.credentials();
   let q;try{q=JSON.parse(this.storage.getItem('it041_relay_q'))||{};}catch{q={};}
   const today=new Date().toDateString();if(q.d!==today)q={d:today,n:0};
-  if(q.n>=80)throw Error('Ortak hattın günlük 80 mesaj sınırına ulaşıldı. Oturum saklandı.');
+  if(!key&&q.n>=80)throw Error('Ortak hattın günlük 80 mesaj sınırına ulaşıldı. Oturum saklandı.');
   let error='Ortak AI hattına erişilemiyor';
-  for(const url of RELAYS){
+  for(const url of (key?['https://api.groq.com/openai/v1/chat/completions']:RELAYS)){
    if(signal?.aborted)throw Error('İstek iptal edildi');
    try{
     this.report('AI hattına bağlanıyor…');
     const timeout=AbortSignal.timeout(25000),combined=signal?AbortSignal.any([signal,timeout]):timeout;
-    const response=await this.fetcher(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages,max_tokens:Math.min(400,maxTokens),temperature:.3}),signal:combined});
+    const response=await this.fetcher(url,{method:'POST',headers:{'Content-Type':'application/json',...(key?{Authorization:'Bearer '+key}:{})},body:JSON.stringify({...(key?{model:'llama-3.3-70b-versatile'}:{}),messages,max_tokens:Math.min(400,maxTokens),temperature:.3}),signal:combined});
     if(!response.ok){error='AI hattı HTTP '+response.status;if(response.status===429){error='AI hattı kota / hız sınırında (429). Otomatik yeniden denenecek.';break;}continue;}
     const j=await response.json(),content=j.choices?.[0]?.message?.content;
     if(typeof content!=='string'||!content.trim())throw Error('AI hattı boş yanıt verdi');
-    q.n++;this.storage.setItem('it041_relay_q',JSON.stringify(q));this.report('AI hattı açık · '+q.n+'/80');return content;
+    if(!key){q.n++;this.storage.setItem('it041_relay_q',JSON.stringify(q));}this.report(key?'Kendi Groq hattın yanıt verdi.':'AI hattı açık · '+q.n+'/80');return content;
    }catch(e){if(signal?.aborted)throw e;error=e.name==='TimeoutError'?'AI hattı 25 saniyede yanıt vermedi':e.message;}
   }
   this.report(error);throw Error(error);

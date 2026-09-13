@@ -14,7 +14,10 @@ const status=t=>$('status').textContent=t;
 const log=t=>$('log').textContent=(t+'\n'+$('log').textContent).slice(0,5000);
 const game=()=>frame.contentWindow?.FlyGame;
 const storageKey=()=>`flywire-policy-v1:${identity.network}:${identity.mode}:41`;
-const relay=new Relay({report:t=>$('ai-status').textContent=t});window.LabRelay=relay;
+let ownKey='';try{ownKey=sessionStorage.getItem('flywire-groq-key')||'';}catch{}
+$('groq-key').value=ownKey;
+const relay=new Relay({credentials:()=>ownKey||null,report:t=>$('ai-status').textContent=t});
+$('use-key').onclick=()=>{const key=$('groq-key').value.trim();if(key&&!key.startsWith('gsk_')){status('Groq anahtarını kontrol et.');return;}ownKey=key;try{if(key)sessionStorage.setItem('flywire-groq-key',key);else sessionStorage.removeItem('flywire-groq-key');}catch{}$('ai-status').textContent=key?'Kendi Groq hattın seçildi. Bağlantıyı test edebilirsin.':'Ortak hat seçildi.';};window.LabRelay=relay;
 try{const m=JSON.parse(localStorage.getItem('flywire-language-v1'));memory=m?.memory||'';textRecent=m?.recent||[];languageExamples=m?.examples||[];}catch{}
 function remember(){try{localStorage.setItem('flywire-language-v1',JSON.stringify({memory,recent:textRecent.slice(-20),examples:languageExamples.slice(-50)}));}catch{log('Dil belleği kaydedilemedi.');}}
 function saveGame(){try{const g=game()?.checkpoint();if(g){localStorage.setItem('flywire-game-v1',JSON.stringify(g));$('game-save-status').textContent='Deney ilerlemesi kaydedildi'+(g.interior?' · yeniden açılış dış kapıdan.':'.');}}catch{$('game-save-status').textContent='Oyun ilerlemesi kaydedilemedi.';}}

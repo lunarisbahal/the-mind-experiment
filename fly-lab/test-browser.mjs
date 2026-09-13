@@ -32,17 +32,18 @@ try{
  });
  await game.evaluate(()=>{document.getElementById('intro').style.display='none';Game.running=true;Game.setModal(false);S.flags._tutDone=true;S.flags._tutArmed=false;window.__obDone=true;});
  await page.locator('#network').selectOption('subset');await page.locator('#load').click();await page.waitForFunction(()=>!document.querySelector('#start').disabled);
- await page.locator('#pace').selectOption('750');await page.locator('#language').uncheck();await page.locator('#start').click();
+ await page.locator('#pace').selectOption('750');await page.locator('#language').check();await page.locator('#start').click();
  await page.waitForFunction(()=>document.querySelectorAll('#action-history li').length===10,null,{timeout:45000});
  await check('last ten actions stay attached to their feedback IDs',async()=>{
   await page.locator('#history-freeze').check();
-  const chosen=page.locator('#action-history li').nth(4);const id=await chosen.getAttribute('data-action-id');const text=await chosen.locator('div').innerText();
+  const chosen=page.locator('#action-history li').filter({hasText:'FlyWire'}).first();const id=await chosen.getAttribute('data-action-id');const text=await chosen.locator('div').innerText();
   const before=await page.locator('#stats').innerText();await page.waitForTimeout(3500);assert.notEqual(await page.locator('#stats').innerText(),before);assert.equal(await chosen.locator('div').innerText(),text);
   await chosen.getByRole('button',{name:`Eylem ${id}: İyi`,exact:true}).click();await page.waitForFunction(()=>document.querySelector('#learning').textContent.includes('Geri bildirim: 1'));
   assert(await page.locator('#start').isDisabled(),'Feedback must not pause the agent');assert(await chosen.getByRole('button',{name:`Eylem ${id}: İyi`,exact:true}).isDisabled());return {gradedId:id,frozen:true,stillRunning:true};
  });
  await check('teacher movement is learned and autonomy resumes',async()=>{
   await page.locator('#teacher').check();assert(await page.locator('#start').isDisabled());
+  await game.evaluate(()=>{['riteModal','cipherModal','mirrorModal','docModal','dlg','aelius'].forEach(id=>document.getElementById(id).style.display='none');Game.setModal(false);});
   const before=await game.evaluate(()=>({x:S.px,z:S.pz}));await page.locator('[data-teach="0"]').click();await page.waitForFunction(()=>document.querySelector('#learning').textContent.includes('Öğretim: 1'));await page.waitForTimeout(650);
   const after=await game.evaluate(()=>({x:S.px,z:S.pz}));assert(Math.hypot(after.x-before.x,after.z-before.z)>.05);
   await page.locator('#teacher').uncheck();assert(await page.locator('#start').isDisabled());return {moved:true,resumed:true};
@@ -71,7 +72,7 @@ try{
   assert(await game.evaluate(()=>S.flags.flyTeacherChoice));await page.locator('#teacher').uncheck();return true;
  });
  await check('full connectome still generates actual game movement',async()=>{
-  await page.locator('#language').uncheck();await page.locator('#network').selectOption('full');await page.locator('#load').click();await page.waitForFunction(()=>document.querySelector('#scope').textContent.includes('139.255')&&!document.querySelector('#start').disabled,null,{timeout:150000});
+  await page.locator('#language').check();await page.locator('#network').selectOption('full');await page.locator('#load').click();await page.waitForFunction(()=>document.querySelector('#scope').textContent.includes('139.255')&&!document.querySelector('#start').disabled,null,{timeout:150000});
   await page.locator('#start').click();await page.waitForFunction(()=>/Adım: (?:[8-9]|\d{2,})/.test(document.querySelector('#stats').textContent),null,{timeout:90000});await page.locator('#stop').click();
   const event=page.waitForEvent('download');await page.locator('#export').click();const d=await event;await d.saveAs(out+'/trajectory.json');const j=JSON.parse(await readFile(out+'/trajectory.json','utf8'));
   assert(j.records.some((r,i)=>i&&Math.hypot(r.x-j.records[i-1].x,r.z-j.records[i-1].z)>.05));assert.equal(j.neurons,139255);return {neurons:j.neurons,steps:j.records.length};
