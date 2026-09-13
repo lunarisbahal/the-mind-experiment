@@ -62,7 +62,7 @@ export class Brain {
   const f=this.features(obs),p=this.probabilities(f);
   let u=this.rng(),a=5;for(let i=0;i<6;i++){u-=p[i];if(u<=0){a=i;break;}}
   if(this.mode==='random')a=Math.floor(this.rng()*6);
-  this.last={f,p,a};this.steps++;this.history.set(this.steps,{f,p,a});if(this.history.size>32)this.history.delete(this.history.keys().next().value);
+  this.last={f,p,a};this.steps++;this.history.set(this.steps,{f,p,a});if(this.history.size>200)this.history.delete(this.history.keys().next().value);
   return {action:a,probabilities:p,activity:f.slice(1),steps:this.steps,neurons:this.n,edges:this.m};
  }
 }

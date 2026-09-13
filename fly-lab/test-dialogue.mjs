@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {Relay,parseDecision} from './dialogue.mjs';
+import {ActionHistory} from './history.mjs';
+const map=new Map(),storage={getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,v)};
+let calls=0;const relay=new Relay({storage,fetcher:async()=>{calls++;return {ok:true,json:async()=>({choices:[{message:{content:'LINE_OK'}}]})};}});
+assert.equal(await relay.generate([{role:'user',content:'test'}]),'LINE_OK');assert.equal(calls,1);
+assert.equal(JSON.parse(map.get('it041_relay_q')).n,1);
+map.set('it041_relay_q',JSON.stringify({d:new Date().toDateString(),n:80}));await assert.rejects(relay.generate([]),/80/);assert.equal(calls,1);
+const fail=new Relay({storage:{getItem:()=>null,setItem(){}},fetcher:async()=>({ok:false,status:403})});await assert.rejects(fail.generate([]),/403/);
+const view={panel:'riteModal',field:{maxLength:20},buttons:[{id:0,label:'Submit'}]};
+assert.equal(parseDecision('{"kind":"write","button":0,"text":"I am a simulated agent."}',view).text.length,20);
+assert.throws(()=>parseDecision('{"kind":"click","button":9}',view));assert.throws(()=>parseDecision('{"kind":"move","direction":0}',view));assert.throws(()=>parseDecision('{"kind":"write","button":0,"text":""}',view));
+const history=new ActionHistory();for(let i=0;i<30;i++)history.add({label:'step '+i});const id=history.recent()[5].id;history.add({label:'newer'});history.grade(id,1);assert.equal(history.entries.find(x=>x.id===id).grade,1);assert.equal(history.recent()[0].grade,null);assert.throws(()=>history.grade(id,-1));
+console.log('PASS: actual relay payload parsing, persistent shared quota, explicit errors, valid text/button actions, stable feedback IDs.');
