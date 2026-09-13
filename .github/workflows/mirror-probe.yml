@@ -1,0 +1,23 @@
+name: Mirror live connection probe
+on:
+  push:
+    branches: [codex/flywire-stable-dialogue]
+    paths: ['.github/workflows/mirror-probe.yml']
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verify both published AI relays
+        shell: python
+        run: |
+          import json, urllib.request, urllib.error
+          for url in ['https://it041-konsey.lunarisbahal.workers.dev/mirror','https://it041-mirror.lunarisbahal.workers.dev']:
+            data=json.dumps({'messages':[{'role':'user','content':'Connectivity test for IT-041. Reply only LINE_OK.'}],'max_tokens':16}).encode()
+            req=urllib.request.Request(url,data=data,headers={'Content-Type':'application/json','Origin':'https://lunarisbahal.github.io'})
+            try:
+              with urllib.request.urlopen(req,timeout=30) as r: print(json.dumps({'url':url,'status':r.status,'cors':r.headers.get('Access-Control-Allow-Origin'),'body':r.read(1200).decode()}))
+            except urllib.error.HTTPError as e: print(json.dumps({'url':url,'status':e.code,'body':e.read(1200).decode()}))
+            except Exception as e: print(json.dumps({'url':url,'error':str(e)}))
