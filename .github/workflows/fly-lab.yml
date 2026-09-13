@@ -1,0 +1,38 @@
+name: FlyWire browser validation
+on:
+  push:
+    branches: [codex/flywire-exploration-lab]
+    paths: ['fly-lab/**', 'index.html', '.github/workflows/fly-lab.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: fly-lab-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test measured circuit and bridge
+        run: |
+          node fly-lab/test.mjs
+          node fly-lab/test-bridge.mjs
+      - name: Install pinned browser test dependency
+        run: |
+          npm install --prefix fly-lab --no-save --no-package-lock --ignore-scripts playwright@1.62.1
+          npx --prefix fly-lab playwright install --with-deps chromium
+      - name: Exercise real game and full connectome
+        run: node fly-lab/test-browser.mjs
+      - name: Preserve screenshots and test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fly-lab-browser-evidence
+          path: fly-lab/test-results/
+          if-no-files-found: warn
+          retention-days: 14

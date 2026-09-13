@@ -1,0 +1,17 @@
+DO-LOON-AI EXPRESS / FLYWIRE — İLK DENEY SÜRÜMÜ
+
+1. ZIP içindeki fly-lab klasörünü mevcut the-mind-experiment deposunun köküne koy.
+   index.html ile fly-lab aynı seviyede olmalı. Ana oyun dosyalarını değiştirmez.
+2. Depo klasöründe: python -m http.server 8000
+3. Tarayıcıda: http://localhost:8000/fly-lab/
+4. Oyunun girişini tamamla. Sağdan ağı yükle, sonra Başlat'a bas.
+
+İçerik: Gerçek FlyWire alt devresi (668 nöron / 18.968 bağlantı),
+139.255 nöronlu veri aktarımı yükleyicisi, çevrimiçi öğrenen karar katmanı,
+oyuna klavye bağlantısı, izleme paneli, deney kaydı indirme ve kontrol modelleri.
+
+DURUM: Model ve bağlantı testleri ile gerçek Chromium testi geçti. Tam ağ
+139.255 nöron / 2.698.236 bağlantıyla yüklendi ve oyun eylemleri üretti. Şifre veya yazılı cevap isteyen yerde
+ajan durur. Bu bir keşif prototipidir; tüm oyunu bitiren eğitilmiş ajan değildir.
+
+Bu pakette yer alan veri ticari olmayan kullanım içindir; DATA_LICENSE.md'ye bak.
