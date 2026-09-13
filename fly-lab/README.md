@@ -1,4 +1,4 @@
-# DO·LOON·AI EXPRESS × FlyWire — experimental player v0.1
+# DO·LOON·AI EXPRESS × FlyWire — experimental player v0.2
 
 This adds an opt-in laboratory at `fly-lab/index.html`. It loads the repository's
 existing English game into a temporary iframe and connects a measured fly circuit
@@ -92,9 +92,24 @@ features, shuffled-target degree preservation, and readout updates. Binary
 format validation uses a small fixture. Bridge tests cover observations, key
 release, pause guards, and storage/network isolation in a Node VM.
 
-**Not yet validated:** full binary download in a browser; end-to-end rendered
-3D gameplay; mobile performance; improved exploration against controls.
-The development environment's Cloud Browser rejected localhost access and its
-local Playwright installation had no browser executable. These are test
-limitations, not evidence of successful gameplay. Keep this PR in draft until
-browser smoke testing is completed.
+**Browser validation now runs in GitHub Actions**, with pinned Playwright 1.62.1
+and real Chromium. The first run loaded the actual game renderer, moved the
+character through its normal collision loop, verified stop/key release and
+separate storage, exported a trajectory, and paused at a real cipher dialog.
+The full binary loaded **139,255 neurons and 2,698,236 directed connections**
+and produced game actions. Screenshots and structured evidence are attached to:
+https://github.com/lunarisbahal/the-mind-experiment/actions/runs/34788187138
+
+The browser test uses a synthetic, disposable game-session fixture. It does not
+accept legal terms for the user; actual human entry gates remain in the product.
+Run locally after installing Playwright and Chromium:
+
+```sh
+npm install --prefix fly-lab --no-save --no-package-lock playwright@1.62.1
+npx --prefix fly-lab playwright install chromium
+node fly-lab/test-browser.mjs
+```
+
+Still unvalidated: mobile performance, long-duration stability, improved
+exploration against controls, and whole-game completion. Screenshots are evidence
+of software operation, not evidence of biological fidelity or consciousness.

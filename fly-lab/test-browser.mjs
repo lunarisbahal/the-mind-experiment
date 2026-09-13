@@ -16,7 +16,7 @@ try{
  page=await browser.newPage({viewport:{width:1440,height:1000},acceptDownloads:true});
  page.on('pageerror',e=>evidence.errors.push(e.message));
  await page.goto('http://127.0.0.1:8765/fly-lab/',{waitUntil:'domcontentloaded'});
- await page.waitForFunction(()=>document.querySelector('#game').contentWindow?.FlyGame&&document.querySelector('#game').contentWindow?.Game,{timeout:60000});
+ await page.waitForFunction(()=>document.querySelector('#game').contentWindow?.FlyGame&&document.querySelector('#game').contentWindow?.Game,null,{timeout:60000});
  const game=page.frames().find(f=>f!==page.mainFrame());assert(game);
  await check('real 3D game initializes',async()=>{
   const state=await game.evaluate(()=>({three:!!window.THREE,canvas:!!document.querySelector('#gl canvas'),running:Game.running,ready:!!window.FlyGame}));
@@ -30,14 +30,14 @@ try{
  });
  // Initialize a synthetic test session directly; do not accept an agreement for a real user.
  await game.evaluate(()=>{document.getElementById('intro').style.display='none';Game.running=true;Game.setModal(false);S.flags._tutDone=true;window.__obDone=true;});
- await page.locator('#load').click();await page.waitForFunction(()=>document.querySelector('#scope').textContent.includes('668'));
+ await page.locator('#network').selectOption('subset');await page.locator('#load').click();await page.waitForFunction(()=>document.querySelector('#scope').textContent.includes('668'));
  await check('bundled real circuit starts',()=>page.locator('#scope').innerText());
  await check('existing game collision loop responds to agent keys',async()=>{
   await game.evaluate(()=>{window.__flyTestBefore={x:S.px,z:S.pz};FlyGame.act(0);});
   await page.waitForTimeout(800);
   const moved=await game.evaluate(()=>Math.hypot(S.px-window.__flyTestBefore.x,S.pz-window.__flyTestBefore.z));assert(moved>.1,'No 3D movement from key action');return {distance:moved};
  });
- await page.locator('#start').click();await page.waitForFunction(()=>/Adım: (?:[8-9]|\d{2,})/.test(document.querySelector('#stats').textContent),{timeout:30000});
+ await page.locator('#start').click();await page.waitForFunction(()=>/Adım: (?:[8-9]|\d{2,})/.test(document.querySelector('#stats').textContent),null,{timeout:30000});
  await page.locator('#stop').click();
  await check('pause releases keys and stops decisions',async()=>{
   const before=await page.locator('#stats').innerText();const at=await game.evaluate(()=>({x:S.px,z:S.pz}));await page.waitForTimeout(1000);
@@ -53,11 +53,16 @@ try{
  });
  await game.evaluate(()=>{document.getElementById('cipherModal').style.display='none';Game.setModal(false);});
  await page.locator('#network').selectOption('full');await page.locator('#load').click();
- await page.waitForFunction(()=>document.querySelector('#scope').textContent.includes('139.255'),{timeout:150000});
+ await page.waitForFunction(()=>document.querySelector('#scope').textContent.includes('139.255'),null,{timeout:150000});
  await check('complete neuron set loads in worker',()=>page.locator('#scope').innerText());
- await page.locator('#start').click();await page.waitForFunction(()=>/Adım: [3-9]/.test(document.querySelector('#stats').textContent),{timeout:60000});await page.locator('#stop').click();
+ await page.locator('#start').click();await page.waitForFunction(()=>/Adım: (?:[8-9]|\d{2,})/.test(document.querySelector('#stats').textContent),null,{timeout:90000});await page.locator('#stop').click();
  await page.screenshot({path:out+'/full-gameplay.png',fullPage:true});
- await check('full network produces game actions',()=>page.locator('#stats').innerText());
+ await check('full network produces movement and exportable trajectory',async()=>{
+  const download=page.waitForEvent('download');await page.locator('#export').click();const d=await download;await d.saveAs(out+'/trajectory-full.json');
+  const j=JSON.parse(await readFile(out+'/trajectory-full.json','utf8'));assert.equal(j.neurons,139255);assert(j.records.length>=8);assert(j.records.every(r=>r.activity.every(Number.isFinite)));
+  const moved=j.records.some((r,i)=>i&&Math.hypot(r.x-j.records[i-1].x,r.z-j.records[i-1].z)>.05);assert(moved,'No movement while full network controlled game');
+  return {neurons:j.neurons,edges:j.edges,steps:j.records.length,moved};
+ });
  evidence.success=true;
 }catch(e){evidence.success=false;evidence.failure=e.stack;console.error(e.stack);if(page)await page.screenshot({path:out+'/failure.png',fullPage:true}).catch(()=>{});process.exitCode=1;
 }finally{await writeFile(out+'/evidence.json',JSON.stringify(evidence,null,2));if(browser)await browser.close();server.kill();}

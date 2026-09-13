@@ -1,8 +1,8 @@
 const $=id=>document.getElementById(id),frame=$('game');
 const FULL='https://raw.githubusercontent.com/snedea/flybrain/9191824d17871b7851645782d53d23f213ddb938/data/connectome.bin.gz';
-let worker,active=false,pending=false,run=0,records=[],seen=new Set(),previous=null,stepTimer,lastObservation,identity={};
+let worker,ready=false,active=false,pending=false,run=0,records=[],seen=new Set(),previous=null,stepTimer,lastObservation,identity={};
 const status=t=>$('status').textContent=t;
-function stop(){active=false;run++;clearTimeout(stepTimer);frame.contentWindow?.FlyGame?.release();$('start').disabled=!worker;$('stop').disabled=true;}
+function stop(){active=false;run++;clearTimeout(stepTimer);frame.contentWindow?.FlyGame?.release();previous=null;if(ready)worker?.postMessage({type:'forget-transition'});$('start').disabled=!ready;$('stop').disabled=true;}
 function log(t){$('log').textContent=(t+'\n'+$('log').textContent).slice(0,2500);}
 // All game storage is scoped to this iframe's lifetime; no existing player save is read.
 // Disable social/API traffic in the lab, while permitting same-origin static assets.
@@ -27,18 +27,22 @@ function cycle(token){
  worker.postMessage({type:'step',obs:o.features,reward,learn:identity.mode!=='random',token});
 }
 $('load').onclick=async()=>{
- stop();worker?.terminate();worker=null;pending=false;$('load').disabled=true;$('start').disabled=true;
+ stop();worker?.terminate();worker=null;ready=false;pending=false;$('load').disabled=true;$('start').disabled=true;
  records=[];seen=new Set();previous=null;$('export').disabled=true;
+ $('scope').textContent='Ağ yüklenmedi';$('stats').textContent='Henüz adım yok.';
+ $('activity').getContext('2d').clearRect(0,0,$('activity').width,$('activity').height);
  try{
   const network=$('network').value,mode=$('mode').value;identity={network,mode,seed:41,startedAt:new Date().toISOString(),source:network==='full'?FULL:'DesktopFly circuit 10a7d0726571881e77e93e33bd7a23d900025e49'};
   let buffer;if(network==='full'){status('139.255 nöronluk veri indiriliyor…');const r=await fetch(FULL,{signal:AbortSignal.timeout(60000)});if(!r.ok)throw Error('Tam veri indirilemedi: '+r.status);buffer=await r.arrayBuffer();}
   status('Ağ hazırlanıyor…');worker=new Worker('./worker.mjs',{type:'module'});
-  worker.onerror=e=>{stop();worker?.terminate();worker=null;$('start').disabled=true;$('load').disabled=false;status('Model hatası: '+e.message);};
+  worker.onerror=e=>{stop();worker?.terminate();worker=null;ready=false;$('start').disabled=true;$('load').disabled=false;status('Model hatası: '+e.message);};
   worker.onmessage=({data:d})=>{
-   if(d.type==='error'){stop();worker?.terminate();worker=null;$('start').disabled=true;$('load').disabled=false;status('Hata: '+d.message);return;}
-   if(d.type==='ready'){identity={...identity,neurons:d.neurons,edges:d.edges};$('scope').textContent=d.neurons.toLocaleString('tr')+' nöron · '+d.edges.toLocaleString('tr')+' bağlantı';$('start').disabled=false;$('load').disabled=false;status('Ağ hazır. Girişi tamamladıysan başlat.');return;}
+   if(d.type==='error'){stop();worker?.terminate();worker=null;ready=false;$('start').disabled=true;$('load').disabled=false;status('Hata: '+d.message);return;}
+   if(d.type==='ready'){ready=true;identity={...identity,neurons:d.neurons,edges:d.edges};$('scope').textContent=d.neurons.toLocaleString('tr')+' nöron · '+d.edges.toLocaleString('tr')+' bağlantı';$('start').disabled=false;$('load').disabled=false;status('Ağ hazır. Girişi tamamladıysan başlat.');return;}
    if(d.type==='step'){
     pending=false;if(!active||d.token!==run)return;
+    const current=frame.contentWindow.FlyGame.observe();
+    if(!current.ready||current.needsText){stop();status(current.needsText?'Metin / şifre gerekiyor. Elle devam edip ajanı yeniden başlatabilirsin.':'Oyun durakladı.');return;}
     frame.contentWindow.FlyGame.act(d.action);
     records.push({...lastObservation,step:d.steps,action:d.action,probabilities:d.probabilities,activity:d.activity});
     $('export').disabled=false;$('stats').textContent='Adım: '+d.steps+' · Keşfedilen hücre: '+seen.size+'\nEylem: '+['ileri','sol','geri','sağ','etkileşim','bekle / kapat'][d.action];
@@ -48,10 +52,10 @@ $('load').onclick=async()=>{
    }
   };
   worker.postMessage({type:'init',seed:41,mode,buffer},buffer?[buffer]:[]);
- }catch(e){worker?.terminate();worker=null;status(e.message+' — alt devreyi seçerek tekrar deneyebilirsin.');$('load').disabled=false;$('start').disabled=true;}
+ }catch(e){worker?.terminate();worker=null;ready=false;status(e.message+' — alt devreyi seçerek tekrar deneyebilirsin.');$('load').disabled=false;$('start').disabled=true;}
 };
-$('start').onclick=()=>{if(!worker||active)return;active=true;run++;$('start').disabled=true;$('stop').disabled=false;status('Keşfediyor · karar katmanı öğreniyor');cycle(run);};
+$('start').onclick=()=>{if(!worker||!ready||active)return;active=true;run++;$('start').disabled=true;$('stop').disabled=false;status('Keşfediyor · karar katmanı öğreniyor');cycle(run);};
 $('stop').onclick=()=>{stop();status('Duraklatıldı.');};
-$('export').onclick=()=>{const u=URL.createObjectURL(new Blob([JSON.stringify({experiment:'do-loon-ai-flywire-v0.1',...identity,records},null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='flywire-deney-'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);};
+$('export').onclick=()=>{const u=URL.createObjectURL(new Blob([JSON.stringify({experiment:'do-loon-ai-flywire-v0.2',...identity,records},null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='flywire-deney-'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);};
 window.addEventListener('pagehide',stop);document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();status('Sekme gizlendi; deney duraklatıldı.');}});
 loadGame().catch(e=>status(e.message));
