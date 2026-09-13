@@ -15,3 +15,15 @@ DURUM: Model ve bağlantı testleri ile gerçek Chromium testi geçti. Tam ağ
 ajan durur. Bu bir keşif prototipidir; tüm oyunu bitiren eğitilmiş ajan değildir.
 
 Bu pakette yer alan veri ticari olmayan kullanım içindir; DATA_LICENSE.md'ye bak.
+
+ÖĞRETME (v0.3): Ağı yükledikten sonra Öğretmen modu seçeneğini aç.
+Hareket düğmeleriyle örnek göster. Klavyeyle serbest oynayış eğitim örneği değildir.
+Ajanın son hareketini İyi / Kötü düğmeleriyle değerlendir; sonra Başlat ile sürdür.
+Model aynı tarayıcıda otomatik saklanır. Yeniden açınca aynı ağı yükle.
+Başka cihazda sürdürmek için Modeli indir ve model dosyası alanından yükle.
+Deney ilerlemesi ayrıca otomatik kaydedilir; iç mekanlardan dış kapıya dönülür.
+Tarayıcı verilerini silmek kayıtları da siler. Son ağı otomatik yükleme açıksa
+oyun girişi tamamlandıktan sonra ajan devam eder. Kapalı tarayıcıda çalışmaz.
+
+CANLI İZLEME (v0.4): Beyni sürükleyerek döndür. Renkler ve çizgiler gerçek
+model çıktılarıdır; nöron konumları ve sinek görünümü şematiktir.

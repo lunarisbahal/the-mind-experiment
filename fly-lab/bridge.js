@@ -7,6 +7,12 @@
  const canvas=document.createElement('canvas');canvas.width=8;canvas.height=8;const ctx=canvas.getContext('2d',{willReadFrequently:true});
  window.FlyGame={
   release,
+  checkpoint(){
+   if(!window.Game?.running)return null;
+   // Preserve the native save schema. Interior sessions resume at their outdoor entry.
+   return {format:'flywire-game-v1',state:JSON.parse(JSON.stringify(window.S)),savedAt:new Date().toISOString(),interior:!!window.W3?.inInterior};
+  },
+  resume(){if(window.Game&&!window.Game.running)window.Game.start(true);},
   observe(){
    const s=window.S||{},w=window.W3||{},p=w.inInterior&&w.IP?w.IP:s;
    const minimap=document.getElementById('minimap'),pixels=new Array(64).fill(0);
