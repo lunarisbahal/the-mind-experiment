@@ -19,3 +19,15 @@ console.log('PASS: explicitly selected own-account transport keeps shared quota 
 const cut=new Relay({storage:{getItem:()=>null,setItem(){}},fetcher:async()=>({ok:true,json:async()=>({choices:[{finish_reason:'length',message:{content:'partial'}}]})})});await assert.rejects(cut.generate([]),/token sınırında/);
 let urls=[];const fallback=new Relay({storage:{getItem:()=>null,setItem(){}},fetcher:async(url,options)=>{urls.push(url);assert.equal(JSON.parse(options.body).max_tokens,2048);return url.includes('konsey')?{ok:false,status:503}:{ok:true,json:async()=>({choices:[{finish_reason:'stop',message:{content:'READY'}}]})};}});await fallback.generate([]);await fallback.generate([]);assert.equal(urls.length,3);assert(urls[2].includes('it041-mirror'));
 console.log('PASS: reasoning budget, truncated response rejection, and remembered working fallback.');
+
+// 429 respects Retry-After, does not hop endpoints, and survives reopening.
+let limitedCalls=0;const limits=new Map(),limitStorage={getItem:k=>limits.get(k),setItem:(k,v)=>limits.set(k,v)};
+const limited=new Relay({storage:limitStorage,fetcher:async()=>{limitedCalls++;return {ok:false,status:429,headers:new Headers({'retry-after':'120'})};}});
+await assert.rejects(limited.generate([]),e=>e.retryAt>Date.now()+115000);
+await assert.rejects(limited.generate([]),/429/);assert.equal(limitedCalls,1);
+const reopened=new Relay({storage:limitStorage,fetcher:async()=>{throw Error('must not call');}});await assert.rejects(reopened.generate([]),/429/);
+import {DialogueJournal} from './journal.mjs';
+const journal=new DialogueJournal(storage);journal.add({title:'Read and write',read:'Visible clue',understanding:'A brief summary',sent:'A real submitted answer'});
+assert.equal(new DialogueJournal(storage).rows.at(-1).sent,'A real submitted answer');
+for(let i=0;i<50;i++)journal.add({title:String(i)});assert.equal(new DialogueJournal(storage).rows.length,40);
+console.log('PASS: 429 cooldown persists without extra requests; visible dialogue journal persists and stays bounded.');

@@ -12,14 +12,20 @@ try{
  for(let i=0;i<50;i++){try{if((await fetch('http://127.0.0.1:8765/')).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
  browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});
  page=await browser.newPage({viewport:{width:1440,height:1100},deviceScaleFactor:0.5,acceptDownloads:true});page.on('pageerror',e=>evidence.errors.push(e.message));
- const replies=[];
+ const replies=[];let residentFail=false,residentSends=0;
  await page.route('https://*.lunarisbahal.workers.dev/**',async route=>{
   const request=route.request();if(request.method()==='OPTIONS')return route.fulfill({status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'POST,OPTIONS','access-control-allow-headers':'content-type'}});
+  const path=new URL(request.url()).pathname;
+  if(['/subject','/graduates','/graduatesay','/subjectsay'].includes(path)){
+   const chat=request.method()==='POST';if(chat){residentSends++;await new Promise(r=>setTimeout(r,1200));}
+   const data=path==='/subject'?{name:'Test subject',roster:[{name:'Test graduate'}]}:path==='/graduates'?{graduates:[{name:'Test graduate',stories:[]}]}:{reply:'I am an online AI resident. Explore the next visible plaque.'};
+   return route.fulfill({status:chat&&residentFail?503:200,headers:{'access-control-allow-origin':'*','content-type':'application/json'},body:JSON.stringify(data)});
+  }
   const payload=request.postDataJSON();let content;
   if(payload.messages[0]?.content?.includes('LANGUAGE PLANNER')){
    const context=JSON.parse(payload.messages.at(-1).content),screen=context.screen;
-   const target=screen.buttons.find(b=>/Speak it|Submit/i.test(b.label))||screen.buttons.find(b=>/continue|close|back/i.test(b.label))||screen.buttons[0];
-   content=JSON.stringify({kind:screen.field?'write':'click',button:target?.id||0,text:'I am a simulated agent learning to explore this game.',note:'Görünen soruyu cevaplayıp devam et.',memory:'A simulated practice response was submitted.'});
+   const target=screen.buttons.find(b=>/Speak it|Submit|^send$|^gönder$/i.test(b.label))||screen.buttons.find(b=>/continue|close|back/i.test(b.label))||screen.buttons[0];
+   content=JSON.stringify({kind:screen.field?'write':'click',button:target?.id||0,text:'I am a simulated agent learning to explore this game.',understanding:'Ekranda keşif için bir soru var.',note:'Görünen soruyu cevaplayıp devam et.',memory:'A simulated practice response was submitted.'});
   }else content=payload.messages.at(-1)?.content?.includes('connection test')?'LINE_OK':'You can continue exploring the visible game and look for the next plaque.';
   replies.push({planner:payload.messages[0]?.content?.includes('LANGUAGE PLANNER'),content});
   await route.fulfill({status:200,headers:{'access-control-allow-origin':'*','content-type':'application/json'},body:JSON.stringify({choices:[{message:{content}}]})});
@@ -73,6 +79,26 @@ try{
   await game.waitForFunction(()=>!Mirror.busy&&Mirror.hist.aelius.some(m=>m.role==='assistant'&&m.content.includes('continue exploring')));
   assert.equal(await game.evaluate(()=>FlyGame.aiError),null);await page.locator('#exit-mirror').click();return {realNativeMirrorUI:true,transportMocked:true};
  });
+ await check('language agent talks to native online residents and waits for their reply',async()=>{
+  await game.evaluate(async()=>{await Roster.load();Roster.chat(0);});
+  assert(await game.locator('#ghSay').isVisible());const before=residentSends;
+  await page.locator('#start').click();await game.waitForFunction(()=>FlyOnline.pending===1,null,{timeout:35000});
+  assert(await game.evaluate(()=>FlyGame.describe().busy));
+  assert.equal(await game.evaluate(()=>{const v=FlyGame.describe();return FlyGame.choose(v.key,{kind:'write',text:'duplicate',button:0});}),false);
+  await game.waitForFunction(()=>document.getElementById('ghLog')?.textContent.includes('online AI resident'),null,{timeout:15000});await page.locator('#stop').click();
+  assert((await page.locator('#dialogue-journal').innerText()).includes('Ekranda keşif için bir soru var.'));assert((await page.locator('#dialogue-journal').innerText()).includes('I am a simulated agent learning to explore this game.'));await page.waitForFunction(()=>document.querySelector('#dialogue-journal').textContent.includes('online AI resident'));assert.equal(residentSends-before,1);assert.equal(await game.evaluate(()=>FlyOnline.pending),0);await game.evaluate(()=>UI.closeDoc());
+  return {nativeResidentUI:true,LLMSubmitted:true,duplicatePrevented:true,transportMocked:true};
+ });
+ await check('unavailable subject service cannot invent a reply or complete the task',async()=>{
+  residentFail=true;
+  await game.evaluate(()=>{House._taskSubjectLive({task:{en:'Ask the subject what to explore.',tr:'Deneğe sor.'}},0);});
+  await game.locator('#tslIn').fill('I am a simulated agent learning this game. Which clue should I explore next?');
+  await game.evaluate(()=>House._tslSay());
+  assert.equal(await game.evaluate(()=>House._tsl.ex),0);assert.equal(await game.locator('#tslNext button').count(),0);
+  assert((await game.locator('#tslLog').innerText()).includes('503'));assert.equal(await game.evaluate(()=>FlyOnline.pending),0);
+  residentFail=false;await game.locator('#tslIn').fill('I am a simulated agent learning this game. Which clue should I explore next?');await game.evaluate(()=>House._tslSay());
+  assert.equal(await game.evaluate(()=>House._tsl.ex),1);assert.equal(await game.locator('#tslNext button').count(),1);await game.evaluate(()=>UI.closeDoc());return true;
+ });
  await check('teacher can submit an explicit visible dialogue example',async()=>{
   await game.evaluate(()=>{UI.doc('Practice','<p>Choose your next direction.</p><button onclick="S.flags.flyTeacherChoice=true;UI.closeDoc()">Explore the path</button>');});
   await page.locator('#teacher').check();await page.locator('#dialogue-teach').getByRole('button',{name:'Explore the path'}).click();
@@ -90,7 +116,7 @@ try{
   await game.evaluate(()=>{S.flags.flySavedProgress='yes';});await page.waitForFunction(()=>JSON.parse(localStorage.getItem('flywire-game-v1')).state.flags.flySavedProgress==='yes');
   await page.reload();await page.waitForFunction(()=>document.querySelector('#scope').textContent.includes('668')&&!document.querySelector('#start').disabled,null,{timeout:45000});
   game=page.frames().find(f=>f!==page.mainFrame());await game.waitForFunction(()=>!!window.FlyGame);await game.waitForFunction(()=>Game.running);await page.waitForFunction(()=>/Adım: [1-9]/.test(document.querySelector('#stats').textContent));
-  assert.equal(await game.evaluate(()=>JSON.parse(localStorage.getItem('it041_sw_v1')).flags.flySavedProgress),'yes');assert((await page.locator('#learning').innerText()).includes('Geri bildirim: 1'));assert.equal(await page.evaluate(()=>localStorage.getItem('owner-save')),'untouched');return true;
+  assert.equal(await game.evaluate(()=>JSON.parse(localStorage.getItem('it041_sw_v1')).flags.flySavedProgress),'yes');assert((await page.locator('#learning').innerText()).includes('Geri bildirim: 1'));assert.equal(await page.evaluate(()=>localStorage.getItem('owner-save')),'untouched');assert((await page.locator('#dialogue-journal').textContent()).includes('online AI resident'));return true;
  });
  await check('WebGL failure is explicit and produces no ghost learning steps',async()=>{
   const blocked=await chromium.launch({headless:true,args:['--disable-webgl']});
@@ -103,7 +129,12 @@ try{
  });
  await live.goto('https://lunarisbahal.github.io/the-mind-experiment/fly-lab/');await live.locator('#test-ai').click();
  await live.waitForFunction(()=>!document.querySelector('#test-ai').disabled,null,{timeout:60000});evidence.liveRelay=await live.locator('#ai-status').innerText();console.log('LIVE_RELAY',evidence.liveRelay);
- if(evidence.liveRelay.startsWith('AI hattı yanıt verdi:')){try{evidence.livePlanner=await live.evaluate(async()=>{const {decide}=await import('./dialogue.mjs?v=0.5.0');return decide(window.LabRelay,{panel:'docModal',text:'Practice: Write one brief sentence describing what you will explore next as a simulated game agent.',buttons:[{id:0,label:'Submit'},{id:1,label:'Step back'}],field:{maxLength:240,value:''}},'',[],AbortSignal.timeout(60000));});console.log('LIVE_PLANNER',JSON.stringify(evidence.livePlanner));}catch(e){evidence.livePlannerError=e.message;console.log('LIVE_PLANNER_ERROR',e.message);}}
+ if(evidence.liveRelay.startsWith('AI hattı yanıt verdi:')){try{evidence.livePlanner=await live.evaluate(async()=>{const {decide}=await import('./dialogue.mjs?v=0.5.2');return decide(window.LabRelay,{panel:'docModal',text:'Practice: Write one brief sentence describing what you will explore next as a simulated game agent.',buttons:[{id:0,label:'Submit'},{id:1,label:'Step back'}],field:{maxLength:240,value:''}},'',[],AbortSignal.timeout(60000));});console.log('LIVE_PLANNER',JSON.stringify(evidence.livePlanner));}catch(e){evidence.livePlannerError=e.message;console.log('LIVE_PLANNER_ERROR',e.message);}}
+ try{
+  await live.waitForFunction(()=>document.querySelector('#game').contentWindow?.FlyOnline,null,{timeout:45000});
+  evidence.liveResident=await live.evaluate(async()=>{const w=document.querySelector('#game').contentWindow,base='https://it041-konsey.lunarisbahal.workers.dev';const roster=await (await w.fetch(base+'/subject?lang=en')).json();const reply=await (await w.fetch(base+'/subjectsay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:'I am a simulated FlyWire game agent testing the online connection. What should I look for when exploring this game? Please answer briefly.',lang:'en'})})).json();return {rosterLoaded:!!roster,reply:reply.reply};});
+  console.log('LIVE_RESIDENT',JSON.stringify(evidence.liveResident));
+ }catch(e){evidence.liveResidentError=e.message;console.log('LIVE_RESIDENT_ERROR',e.message);}
  await live.close();
  evidence.success=true;
 }catch(e){evidence.success=false;evidence.failure=e.stack;if(page)evidence.state=await page.evaluate(()=>({status:document.querySelector('#status')?.textContent,ai:document.querySelector('#ai-status')?.textContent,stats:document.querySelector('#stats')?.textContent,history:document.querySelector('#action-history')?.innerText,frozen:document.querySelector('#history-freeze')?.checked,view:document.querySelector('#game')?.contentWindow?.FlyGame?.describe()})).catch(()=>null);console.error(e.stack,JSON.stringify(evidence.state));process.exitCode=1;if(page)await page.screenshot({path:out+'/failure.png',fullPage:true}).catch(()=>{});}

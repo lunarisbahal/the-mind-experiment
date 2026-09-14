@@ -11,13 +11,33 @@ elements.cipherModal={getClientRects:()=>[1],innerText:'Cipher'};const count=eve
 window.Game.running=false;assert.equal(g.act(0),false);
 // Exercise the exact isolation prelude from lab.mjs in a separate VM.
 const lab=readFileSync(new URL('./lab.mjs',import.meta.url),'utf8');const code=lab.match(/const isolation=`([\s\S]*?)`;/)[1];
-const real=new Map([['user-save','untouched']]);const win={localStorage:real,sessionStorage:real,fetch:async()=>({ok:true})};const nav={};
-vm.runInNewContext(code,{window:win,navigator:nav,document:{baseURI:'http://localhost/game/'},URL,Map,Proxy,Object,Promise,Error});
+const real=new Map([['user-save','untouched']]);const win={localStorage:real,sessionStorage:real,fetch:async(u,o)=>{o?.signal?.throwIfAborted();return new Response(JSON.stringify({reply:'Live resident reply'}));}};const nav={};
+vm.runInNewContext(code,{window:win,navigator:nav,document:{baseURI:'http://localhost/game/'},URL,Map,Proxy,Object,Promise,Error,AbortSignal,Response});
 assert.equal(win.localStorage.getItem('user-save'),null);win.localStorage.setItem('user-save','test');assert.equal(real.get('user-save'),'untouched');
 assert.throws(()=>new win.WebSocket('wss://example.com'));
 await assert.rejects(win.fetch('https://example.com/api'));
 await assert.rejects(win.fetch('http://localhost/api',{method:'POST'}));
 assert.equal((await win.fetch('http://localhost/game/book.json')).ok,true);
+const base='https://it041-konsey.lunarisbahal.workers.dev';
+for(const path of ['/subject?lang=en','/graduates'])assert.equal((await win.fetch(base+path)).ok,true);
+for(const path of ['/subjectsay','/graduatesay'])assert.equal((await win.fetch(base+path,{method:'POST'})).ok,true);
+for(const path of ['/dm','/subjectbook','/graduates','/story'])await assert.rejects(win.fetch(base+path,{method:'POST'}));
+assert.equal(win.FlyOnline.pending,0);
+await assert.rejects(win.fetch(base+'/graduatesay',{method:'POST',signal:AbortSignal.abort()}));
+// A slow or failed resident must release its busy lock and never allow duplicate sends.
+let finish;const slow={fetch:()=>new Promise(resolve=>{finish=resolve;})};
+vm.runInNewContext(code,{window:slow,navigator:{},document:{baseURI:'http://localhost/game/'},URL,Map,Proxy,Object,Promise,Error,AbortSignal,Response});
+const waiting=slow.fetch(base+'/graduatesay',{method:'POST'});
+assert.equal(slow.FlyOnline.pending,1);
+await assert.rejects(slow.fetch(base+'/graduatesay',{method:'POST'}));
+finish(new Response('{"reply":"Actual server reply"}'));await waiting;
+assert.equal(slow.FlyOnline.pending,0);
+const failed=slow.fetch(base+'/subjectsay',{method:'POST'});
+finish(new Response('{}',{status:503}));await assert.rejects(failed,/503/);
+assert.equal(slow.FlyOnline.pending,0);assert(slow.FlyOnline.error.includes('503'));
+const empty=slow.fetch(base+'/subjectsay',{method:'POST'});
+finish(new Response('{"reply":""}'));await assert.rejects(empty,/boş/);
+assert.equal(slow.FlyOnline.pending,0);
 console.log('PASS: 68-channel observation, press/release, stop cleanup, modal/text guards, isolated saves and network controls.');
 
 // Mirror chat must halt instead of consuming endless ineffective actions.

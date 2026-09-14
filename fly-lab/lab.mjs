@@ -1,6 +1,7 @@
-import {createMonitor} from './visual.mjs?v=0.5.1';
-import {Relay,decide} from './dialogue.mjs?v=0.5.1';
-import {ActionHistory,renderHistory} from './history.mjs?v=0.5.1';
+import {DialogueJournal,renderJournal} from './journal.mjs?v=0.5.2';
+import {createMonitor} from './visual.mjs?v=0.5.2';
+import {Relay,decide} from './dialogue.mjs?v=0.5.2';
+import {ActionHistory,renderHistory} from './history.mjs?v=0.5.2';
 const $=id=>document.getElementById(id),frame=$('game');
 const FULL='https://raw.githubusercontent.com/snedea/flybrain/9191824d17871b7851645782d53d23f213ddb938/data/connectome.bin.gz';
 const monitor=createMonitor($('brain-view'),$('fly-view'),$('traces'));
@@ -14,6 +15,11 @@ const status=t=>$('status').textContent=t;
 const log=t=>$('log').textContent=(t+'\n'+$('log').textContent).slice(0,5000);
 const game=()=>frame.contentWindow?.FlyGame;
 const storageKey=()=>`flywire-policy-v1:${identity.network}:${identity.mode}:41`;
+const journal=new DialogueJournal(localStorage);
+function journalEntry(row){journal.add(row);renderJournal($('dialogue-journal'),journal.rows);}
+renderJournal($('dialogue-journal'),journal.rows);
+window.LabDialogue=journalEntry;
+let aiRetryAt=0;
 let ownKey='';try{ownKey=sessionStorage.getItem('flywire-groq-key')||'';}catch{}
 $('groq-key').value=ownKey;
 const relay=new Relay({credentials:()=>ownKey||null,report:t=>$('ai-status').textContent=t});
@@ -59,6 +65,7 @@ async function start(){
  if(wanted||starting||$('teacher').checked)return;
  starting=true;controls();
  try{
+  if(game()?.startup().blocked){status(game().startup().message);return;}
   if(!ready)await $('load').onclick();
   if(!ready)return;
   const boot=game()?.startup();
@@ -69,6 +76,7 @@ async function start(){
 }
 async function textStep(view,token){
  if(!$('language').checked){status('Metin bekliyor · Dil yardımı kapalı. Elle devam edebilirsin.');return 1500;}
+ if(Math.max(aiRetryAt,frame.contentWindow?.FlyOnline?.retryAt||0)>Date.now()){status('AI hattı bekleniyor · '+Math.ceil((Math.max(aiRetryAt,frame.contentWindow?.FlyOnline?.retryAt||0)-Date.now())/1000)+' saniye');return 1000;}
  if(view.busy){status('Karakterin AI yanıtını bekliyor…');return 1000;}
  // Native Continue reveals the current line while it is typing; it does not skip it.
  if(view.typing&&view.buttons.length){game().choose(view.key,{kind:'click',button:view.buttons[0].id});status('Cümlenin tamamını açıyor; sonra okuyacak.');return 800;}
@@ -82,6 +90,7 @@ async function textStep(view,token){
  if(!wanted||token!==run)return 1000;
  if(d.kind==='wait'){status('Dil modeli beklemeyi seçti. Yeniden değerlendirilecek.');return 15000;}
  if(!['click','write'].includes(d.kind)||!game().choose(view.key,d)){status('Ekran değişti; yeniden okuyacak.');return 1000;}
+ journalEntry({title:d.kind==='write'?'Cevap oyun arayüzüne gönderildi':'Metin okundu ve seçim yapıldı',read:view.text,understanding:d.understanding||'Model bu karar için bir özet üretmedi.',sent:d.kind==='write'?d.text:'',note:d.note});
  memory=d.memory||memory;lastTextKey=view.key;lastTextAt=Date.now();
  textRecent.push({screen:view.text.slice(0,1400),decision:d});textRecent=textRecent.slice(-20);remember();
  addAction({label:(d.kind==='write'?'Yaz: '+d.text+' → ':'Tıkla: ')+view.buttons.find(b=>b.id===d.button).label,source:'Dil modeli',context:view.text,decision:d,detail:d.note});
@@ -120,7 +129,7 @@ async function tick(token){
    monitor.update(result.activity,result.action);addAction({label:names[result.action],source,brainStep:result.steps,action:result.action,x:o.x,z:o.z,activity:result.activity,probabilities:result.probabilities,context:view.text,decision:source==='Dil modeli'?{kind:'move',direction:result.action}:undefined,detail:`x ${o.x.toFixed(1)} · z ${o.z.toFixed(1)} · ödül ${reward.toFixed(2)}`});
   }
   status('Keşfediyor · karar katmanı öğreniyor');
- }catch(e){if(token!==run||!wanted)return;status(e.message+' · 15 saniye sonra yeniden deneyecek.');log(e.message);delay=15000;}
+ }catch(e){if(token!==run||!wanted)return;aiRetryAt=e.retryAt||0;status(e.message+(aiRetryAt?'':' · 15 saniye sonra yeniden deneyecek.'));log(e.message);delay=aiRetryAt?1000:15000;}
  schedule(token,delay);
 }
 $('start').onclick=start;$('stop').onclick=()=>pause();
@@ -152,7 +161,7 @@ $('export').onclick=()=>download({experiment:'flywire-hybrid-v0.5',...identity,r
 $('import-model').onchange=async e=>{const f=e.target.files[0];if(!f)return;pause();try{if(f.size>200000)throw Error('Dosya çok büyük');await rpc({type:'restore',checkpoint:JSON.parse(await f.text())});status('Kaydedilen karar katmanı yüklendi.');}catch(err){status(err.message);}finally{e.target.value='';}};
 $('exit-mirror').onclick=()=>{game()?.closeMirror();lastTextKey='';status('Ayna kapatıldı.');};
 $('test-ai').onclick=async()=>{ $('test-ai').disabled=true;try{const text=await relay.generate([{role:'user',content:'IT-041 connection test. Reply only LINE_OK.'}],512);$('ai-status').textContent='AI hattı yanıt verdi: '+text;}catch(e){$('ai-status').textContent=e.message;}finally{$('test-ai').disabled=false;}};
-function saveConfig(){try{localStorage.setItem('flywire-last-config',JSON.stringify({network:$('network').value,mode:$('mode').value,auto:$('auto-resume').checked,language:$('language').checked}));}catch{}}
+function saveConfig(){try{localStorage.setItem('flywire-last-config',JSON.stringify({network:$('network').value,mode:$('mode').value,auto:$('auto-resume').checked,language:$('language').checked,languageVersion:'online-v1'}));}catch{}}
 $('auto-resume').onchange=()=>{if(!$('auto-resume').checked)autoWaiting=false;saveConfig();};$('language').onchange=saveConfig;
 $('load').onclick=async()=>{
  pause();ready=false;checkpoint=null;worker?.terminate();for(const p of pending.values()){clearTimeout(p.timeout);p.reject(Error('Model yeniden yükleniyor'));}pending.clear();
@@ -160,7 +169,7 @@ $('load').onclick=async()=>{
  const network=$('network').value,mode=$('mode').value;identity={network,mode,seed:41,startedAt:new Date().toISOString()};saveConfig();
  try{
   let buffer;if(network==='full'){status('139.255 nöronluk veri indiriliyor…');const r=await fetch(FULL,{signal:AbortSignal.timeout(60000)});if(!r.ok)throw Error('Tam ağ indirilemedi');buffer=await r.arrayBuffer();}
-  worker=new Worker('./worker.mjs?v=0.5.1',{type:'module'});
+  worker=new Worker('./worker.mjs?v=0.5.2',{type:'module'});
   worker.onmessage=({data:d})=>{if(d.checkpoint)keep(d.checkpoint);const p=pending.get(d.requestId);if(p){pending.delete(d.requestId);clearTimeout(p.timeout);if(d.type==='error'||d.type==='request-error')p.reject(Error(d.message));else p.resolve(d);}};
   worker.onerror=e=>{for(const p of pending.values()){clearTimeout(p.timeout);p.reject(Error(e.message));}pending.clear();ready=false;pause('Model hatası: '+e.message);};
   const d=await rpc({type:'init',seed:41,mode,buffer},buffer?[buffer]:[]);identity={...identity,neurons:d.neurons,edges:d.edges};$('scope').textContent=d.neurons.toLocaleString('tr')+' nöron · '+d.edges.toLocaleString('tr')+' bağlantı';
@@ -170,22 +179,48 @@ $('load').onclick=async()=>{
  }catch(e){status(e.message);log(e.message);}finally{$('load').disabled=false;controls();}
 };
 
-const isolation=`(()=>{function memory(){const m=new Map();return new Proxy({getItem:k=>m.has(String(k))?m.get(String(k)):null,setItem:(k,v)=>m.set(String(k),String(v)),removeItem:k=>m.delete(String(k)),clear:()=>m.clear(),key:i=>Array.from(m.keys())[i]??null,get length(){return m.size;}},{get:(t,p)=>p in t?t[p]:m.get(String(p)),set:(t,p,v)=>{m.set(String(p),String(v));return true;}});}for(const k of ['localStorage','sessionStorage'])Object.defineProperty(window,k,{value:memory()});const original=window.fetch.bind(window);window.fetch=(u,o)=>{const url=new URL(typeof u==='string'?u:u.url,document.baseURI);const method=(o?.method||'GET').toUpperCase();const relay=['https://it041-konsey.lunarisbahal.workers.dev/mirror','https://it041-mirror.lunarisbahal.workers.dev/'].includes(url.href)&&method==='POST';if(!relay&&(url.origin!==new URL(document.baseURI).origin||!['GET','HEAD'].includes(method)))return Promise.reject(new Error('Laboratory: remote services disabled'));return original(u,o);};window.WebSocket=class{constructor(){throw Error('Laboratory: multiplayer disabled');}};window.EventSource=class{constructor(){throw Error('Laboratory: remote services disabled');}};window.XMLHttpRequest=class{open(){throw Error('Laboratory: remote services disabled');}};Object.defineProperty(navigator,'sendBeacon',{value:()=>false});window.open=()=>null;})();`;
+const isolation=`(()=>{window.FlyRuntime={error:null};if(window.addEventListener){const capture=e=>{window.FlyRuntime.error=String(e.message||e.reason?.message||e.reason||'Bilinmeyen oyun hatası').slice(0,350);};window.addEventListener('error',capture);window.addEventListener('unhandledrejection',capture);}function memory(){const m=new Map();return new Proxy({getItem:k=>m.has(String(k))?m.get(String(k)):null,setItem:(k,v)=>m.set(String(k),String(v)),removeItem:k=>m.delete(String(k)),clear:()=>m.clear(),key:i=>Array.from(m.keys())[i]??null,get length(){return m.size;}},{get:(t,p)=>p in t?t[p]:m.get(String(p)),set:(t,p,v)=>{m.set(String(p),String(v));return true;}});}for(const k of ['localStorage','sessionStorage'])Object.defineProperty(window,k,{value:memory()});const original=window.fetch.bind(window);
+const online=window.FlyOnline={pending:0,events:[],retryAt:0,status:'AI karakter bağlantısı bekleniyor.',error:null};
+window.fetch=async(u,o)=>{
+ const url=new URL(typeof u==='string'?u:u.url,document.baseURI);
+ const method=(o?.method||u?.method||'GET').toUpperCase();
+ const relay=['https://it041-konsey.lunarisbahal.workers.dev/mirror','https://it041-mirror.lunarisbahal.workers.dev/'].includes(url.href)&&method==='POST';
+ const resident=url.origin==='https://it041-konsey.lunarisbahal.workers.dev'&&
+  ((method==='GET'&&['/subject','/graduates'].includes(url.pathname))||(method==='POST'&&['/subjectsay','/graduatesay'].includes(url.pathname)));
+ if(!relay&&!resident&&(url.origin!==new URL(document.baseURI).origin||!['GET','HEAD'].includes(method)))throw new Error('Laboratory: remote services disabled');
+ if(!resident)return original(u,o);
+ const chat=method==='POST';
+ if(chat&&online.retryAt>Date.now())throw new Error('AI karakter hattı beklemede.');
+ if(chat&&online.pending)throw new Error('AI karakterin yanıtı hâlâ bekleniyor.');
+ if(chat){online.pending++;online.error=null;online.status='Çevrimiçi AI karakter yanıtlıyor…';}
+ try{
+  const signal=AbortSignal.any([AbortSignal.timeout(25000),...(o?.signal?[o.signal]:u?.signal?[u.signal]:[])]);
+  const response=await original(u,{...o,signal});
+  if(!response.ok){if(response.status===429){const h=response.headers.get('retry-after');const delay=h?(Number.isFinite(Number(h))?Number(h)*1000:Date.parse(h)-Date.now()):60000;online.retryAt=Date.now()+Math.max(30000,Number.isFinite(delay)?delay:60000);}throw new Error('AI karakter hattı: HTTP '+response.status);}
+  const body=await response.text(),data=JSON.parse(body);
+  if(chat&&(!data.reply||typeof data.reply!=='string'||!data.reply.trim()))throw new Error('AI karakter boş yanıt döndürdü.');
+  if(chat){online.retryAt=0;online.events.push({title:'Çevrimiçi AI karakter yanıtladı',reply:data.reply});online.events=online.events.slice(-40);}
+  if(chat||!online.error)online.status=chat?'Çevrimiçi AI karakter yanıt verdi.':'AI karakter listesi çevrimiçi.';
+  return new Response(body,{status:response.status,headers:response.headers});
+ }catch(e){online.error=e.name==='TimeoutError'?'AI karakter 25 saniyede yanıt vermedi.':e.message;online.status=online.error;if(chat)online.events.push({title:'AI karakter bağlantısı',error:online.error});throw new Error(online.error);}
+ finally{if(chat)online.pending--;}
+};window.WebSocket=class{constructor(){throw Error('Laboratory: multiplayer disabled');}};window.EventSource=class{constructor(){throw Error('Laboratory: remote services disabled');}};window.XMLHttpRequest=class{open(){throw Error('Laboratory: remote services disabled');}};Object.defineProperty(navigator,'sendBeacon',{value:()=>false});window.open=()=>null;})();`;
 
 async function loadGame(){
- const [a,b]=await Promise.all([fetch('../index.html'),fetch('./bridge.js?v=0.5.1')]);if(!a.ok||!b.ok)throw Error('Oyun dosyası yüklenemedi');
+ const [a,b]=await Promise.all([fetch('../index.html'),fetch('./bridge.js?v=0.5.2')]);if(!a.ok||!b.ok)throw Error('Oyun dosyası yüklenemedi');
  const [source,bridge]=await Promise.all([a.text(),b.text()]);const base=new URL('../',location.href).href;
  let seed='',savedGame=false;try{const g=JSON.parse(localStorage.getItem('flywire-game-v1'));if(g?.format==='flywire-game-v1'&&g.state){seed='localStorage.setItem("it041_sw_v1",'+JSON.stringify(JSON.stringify(g.state)).replaceAll('<','\\u003c')+');';savedGame=true;for(const k of ['it041_legal_ok','it041_age21'])if(typeof g.entry?.[k]==='string')seed+='localStorage.setItem('+JSON.stringify(k)+','+JSON.stringify(g.entry[k]).replaceAll('<','\\u003c')+');';}}catch{}
  let config;try{config=JSON.parse(localStorage.getItem('flywire-last-config'));}catch{}
- if(config){$('auto-resume').checked=config.auto!==false;$('language').checked=config.language!==false;}
+ if(config){$('auto-resume').checked=config.auto!==false;$('language').checked=config.languageVersion!=='online-v1'||config.language!==false;}
  frame.onload=()=>{if(savedGame&&$('auto-resume').checked)game()?.resume();};
- frame.srcdoc=source.replace('<head>','<head><base href="'+base+'"><script>'+isolation+seed+'<\/script>')+'<script>'+bridge+'<\/script>';
- status('Oyunun girişini tamamla ve ağı yükle.');
+ const labSource=source.replace('window.Presence=Presence;Presence.start();','window.Presence=Presence;');
+ frame.srcdoc=labSource.replace('<head>','<head><base href="'+base+'"><script>'+isolation+seed+'<\/script>')+'<script>'+bridge+'<\/script>';
+ status('Başlat ile ağı yükle ve oyuna gir.');
  if(config&&$('auto-resume').checked&&['full','subset'].includes(config.network)&&['flywire','shuffled','random'].includes(config.mode)){
   $('network').value=config.network;$('mode').value=config.mode;await $('load').onclick();autoWaiting=true;
  }
 }
-setInterval(()=>{saveGame();controls();renderTeaching();if(autoWaiting&&ready&&game()?.observe().ready&&!document.hidden)start();},1000);
+setInterval(()=>{saveGame();controls();renderTeaching();const online=frame.contentWindow?.FlyOnline;if(online){$('resident-status').textContent=online.status+(online.retryAt>Date.now()?' · '+Math.ceil((online.retryAt-Date.now())/1000)+' saniye bekliyor':'');for(const row of online.events.splice(0))journalEntry(row);const chip=frame.contentDocument?.getElementById('onlineChip');if(chip)chip.textContent='◈ '+online.status;}const fault=frame.contentWindow?.FlyRuntime?.error||frame.contentWindow?.FlyGame?.lastError;if(fault)$('runtime-status').textContent='Oyun hatası: '+fault;if(autoWaiting&&ready&&game()&&!document.hidden)start();},1000);
 window.addEventListener('pagehide',()=>pause());
 document.addEventListener('visibilitychange',()=>{if(document.hidden){game()?.release();monitor.setRunning(false);saveGame();}});
 controls();loadGame().catch(e=>status(e.message));
