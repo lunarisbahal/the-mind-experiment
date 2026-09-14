@@ -8,7 +8,7 @@ const names=['ileri','sol','geri','sağ','etkileşim','bekle / kapat'];
 let worker,ready=false,wanted=false,teacherBusy=false,run=0,timer,requestId=0;
 let checkpoint=null,identity={},records=[],seen=new Set(),previous=null,stuck=0,macro=null;
 let history=new ActionHistory(),historyFrozen=false,teacherResume=false,autoWaiting=false,plannerAbort;
-let memory='',textRecent=[],lastTextKey='',lastTextAt=0,lastPlannerAt=0,languageExamples=[];
+let memory='',textRecent=[],lastTextKey='',lastTextAt=0,lastPlannerAt=0,languageExamples=[],readingKey='',readingSince=0;
 const pending=new Map();
 const status=t=>$('status').textContent=t;
 const log=t=>$('log').textContent=(t+'\n'+$('log').textContent).slice(0,5000);
@@ -61,6 +61,8 @@ async function textStep(view,token){
  if(view.busy){status('Karakterin AI yanıtını bekliyor…');return 1000;}
  if(view.key===lastTextKey&&Date.now()-lastTextAt<15000){status('Diyalog sonucunu bekliyor…');return 1000;}
  if(!view.buttons.length){status('Diyalog hazırlanıyor…');return 1500;}
+ if(view.key!==readingKey){readingKey=view.key;readingSince=Date.now();status('Ekrandaki metnin tamamlanmasını bekliyor…');return 800;}
+ if(Date.now()-readingSince<750)return 800;
  status('Okuyor ve düğme / cevap seçiyor · Dil modeli');
  plannerAbort=new AbortController();
  const d=await decide(relay,view,memory,[...textRecent,...languageExamples.slice(-5)],plannerAbort.signal);

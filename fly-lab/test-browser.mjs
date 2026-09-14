@@ -33,7 +33,7 @@ try{
  await game.evaluate(()=>{document.getElementById('intro').style.display='none';Game.running=true;Game.setModal(false);S.flags._tutDone=true;S.flags._tutArmed=false;window.__obDone=true;});
  await page.locator('#network').selectOption('subset');await page.locator('#load').click();await page.waitForFunction(()=>!document.querySelector('#start').disabled);
  await page.locator('#pace').selectOption('750');await page.locator('#language').check();await page.locator('#start').click();
- await page.waitForFunction(()=>document.querySelectorAll('#action-history li').length===10,null,{timeout:45000});
+ await page.waitForFunction(()=>document.querySelectorAll('#action-history li').length===10,null,{timeout:90000});
  await check('last ten actions stay attached to their feedback IDs',async()=>{
   await page.locator('#history-freeze').check();
   const chosen=page.locator('#action-history li').filter({hasText:'FlyWire'}).first();const id=await chosen.getAttribute('data-action-id');const text=await chosen.locator('div').innerText();
@@ -93,5 +93,5 @@ try{
  await live.goto('https://lunarisbahal.github.io/the-mind-experiment/fly-lab/');await live.locator('#test-ai').click();
  await live.waitForFunction(()=>!document.querySelector('#test-ai').disabled,null,{timeout:60000});evidence.liveRelay=await live.locator('#ai-status').innerText();console.log('LIVE_RELAY',evidence.liveRelay);await live.close();
  evidence.success=true;
-}catch(e){evidence.success=false;evidence.failure=e.stack;console.error(e.stack);process.exitCode=1;if(page)await page.screenshot({path:out+'/failure.png',fullPage:true}).catch(()=>{});}
+}catch(e){evidence.success=false;evidence.failure=e.stack;if(page)evidence.state=await page.evaluate(()=>({status:document.querySelector('#status')?.textContent,ai:document.querySelector('#ai-status')?.textContent,stats:document.querySelector('#stats')?.textContent,history:document.querySelector('#action-history')?.innerText,frozen:document.querySelector('#history-freeze')?.checked,view:document.querySelector('#game')?.contentWindow?.FlyGame?.describe()})).catch(()=>null);console.error(e.stack,JSON.stringify(evidence.state));process.exitCode=1;if(page)await page.screenshot({path:out+'/failure.png',fullPage:true}).catch(()=>{});}
 finally{await writeFile(out+'/evidence.json',JSON.stringify(evidence,null,2));if(browser)await browser.close();server.kill();}
