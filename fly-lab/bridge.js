@@ -18,7 +18,7 @@
    const field=input&&input.getClientRects().length?{maxLength:input.maxLength>0?input.maxLength:500,value:input.value}:null;
    const text=root?root.innerText.slice(0,4500):['prompt','ctrlhelp'].map(id=>visible(id)?.innerText||'').join(' ').slice(0,1000);
    const key=JSON.stringify({panel:panel||null,text,buttons,field:field?field.maxLength:null});
-   return {panel:panel||null,text,buttons,field,key,busy:!!window.Mirror?.busy};
+   return {panel:panel||null,text,buttons,field,key,typing:panel==='dlg'&&typeof Dlg!=='undefined'&&Dlg.typing,busy:!!window.Mirror?.busy};
   },
   choose(key,decision){
    const now=this.describe();if(!window.Game?.running||now.key!==key||now.busy)return false;

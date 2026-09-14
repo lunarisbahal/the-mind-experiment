@@ -36,7 +36,7 @@ $('history-freeze').onchange=()=>{historyFrozen=$('history-freeze').checked;refr
 $('action-history').onpointerenter=()=>{historyFrozen=true;$('history-freeze').checked=true;};
 $('action-history').onfocusin=()=>{historyFrozen=true;$('history-freeze').checked=true;};
 async function grade(id,value){
- const row=history.entries.find(r=>r.id===id);if(!row||row.grade!==null)return;
+ const row=history.entries.find(r=>r.id===id);if(!row){log('Bu eylem değerlendirme belleğinden çıktı; listeyi güncelle.');return;}if(row.grade!==null)return;
  row.grade='pending';renderHistory($('action-history'),historyFrozen?Array.from($('action-history').children).map(el=>history.entries.find(r=>r.id===Number(el.dataset.actionId))).filter(Boolean):history.recent(),grade);
  try{
   if(row.source==='FlyWire')await rpc({type:'feedback',id:row.brainStep,value});
@@ -59,6 +59,8 @@ function start(){if(!ready||$('teacher').checked)return;wanted=true;autoWaiting=
 async function textStep(view,token){
  if(!$('language').checked){status('Metin bekliyor · Dil yardımı kapalı. Elle devam edebilirsin.');return 1500;}
  if(view.busy){status('Karakterin AI yanıtını bekliyor…');return 1000;}
+ // Native Continue reveals the current line while it is typing; it does not skip it.
+ if(view.typing&&view.buttons.length){game().choose(view.key,{kind:'click',button:view.buttons[0].id});status('Cümlenin tamamını açıyor; sonra okuyacak.');return 800;}
  if(view.key===lastTextKey&&Date.now()-lastTextAt<15000){status('Diyalog sonucunu bekliyor…');return 1000;}
  if(!view.buttons.length){status('Diyalog hazırlanıyor…');return 1500;}
  if(view.key!==readingKey){readingKey=view.key;readingSince=Date.now();status('Ekrandaki metnin tamamlanmasını bekliyor…');return 800;}
