@@ -8,6 +8,19 @@
  const canvas=document.createElement('canvas');canvas.width=8;canvas.height=8;const ctx=canvas.getContext('2d',{willReadFrequently:true});
  window.FlyGame={
   release,
+  startup(){
+   if(visible('glFail'))return {blocked:true,message:'3B oyun açılamadı: bu tarayıcı WebGL sağlayamıyor. Ajan başlatılmadı.'};
+   if(!document.querySelector('#gl canvas'))return {waiting:true,message:'3B sahnenin yüklenmesi bekleniyor…'};
+   if(window.Game?.running)return {ready:true,message:'Oyun açık.'};
+   if(visible('ageGate'))return {waiting:true,message:'Oyun içindeki yaş onayını bekliyor. Onaydan sonra ajan otomatik devam edecek.'};
+   if(visible('docModal'))return {waiting:true,message:'Oyun içindeki giriş / kullanım onayını bekliyor. Tamamlanınca ajan otomatik devam edecek.'};
+   return {waiting:true,message:'Oyun girişi / açılış sahnesi bekleniyor…'};
+  },
+  begin(){
+   if(this.startup().blocked||window.Game?.running)return;
+   const button=visible('contBtn')||visible('startBtn');
+   if(button)button.click();
+  },
   describe(){
    const panel=panels.find(visible),root=panel&&visible(panel);
    const buttonNodes=root?Array.from(root.querySelectorAll('button,[role="button"]')).filter(e=>e.getClientRects().length&&!e.disabled):[];
@@ -37,7 +50,7 @@
   checkpoint(){
    if(!window.Game?.running)return null;
    // Preserve the native save schema. Interior sessions resume at their outdoor entry.
-   return {format:'flywire-game-v1',state:JSON.parse(JSON.stringify(window.S)),savedAt:new Date().toISOString(),interior:!!window.W3?.inInterior};
+   return {format:'flywire-game-v1',state:JSON.parse(JSON.stringify(window.S)),entry:Object.fromEntries(['it041_legal_ok','it041_age21'].map(k=>[k,localStorage.getItem(k)])),savedAt:new Date().toISOString(),interior:!!window.W3?.inInterior};
   },
   closeMirror(){const modal=visible('mirrorModal');if(!modal)return false;const button=modal.querySelector('button[onclick="Mirror.close()"]');if(!button)return false;release();button.click();return true;},
   resume(){if(window.Game&&!window.Game.running)window.Game.start(true);},
