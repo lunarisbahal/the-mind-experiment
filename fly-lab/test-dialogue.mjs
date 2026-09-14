@@ -13,7 +13,7 @@ assert.throws(()=>parseDecision('{"kind":"click","button":9}',view));assert.thro
 const history=new ActionHistory();for(let i=0;i<30;i++)history.add({label:'step '+i});const id=history.recent()[5].id;history.add({label:'newer'});history.grade(id,1);assert.equal(history.entries.find(x=>x.id===id).grade,1);assert.equal(history.recent()[0].grade,null);assert.throws(()=>history.grade(id,-1));
 console.log('PASS: actual relay payload parsing, persistent shared quota, explicit errors, valid text/button actions, stable feedback IDs.');
 let ownRequest;const own=new Relay({storage,credentials:()=> 'gsk_test_fixture',fetcher:async(url,options)=>{ownRequest={url,options};return {ok:true,json:async()=>({choices:[{message:{content:'OWN_OK'}}]})};}});
-assert.equal(await own.generate([]),'OWN_OK');assert.equal(ownRequest.url,'https://api.groq.com/openai/v1/chat/completions');assert.equal(ownRequest.options.headers.Authorization,'Bearer gsk_test_fixture');assert.equal(JSON.parse(ownRequest.options.body).model,'llama-3.3-70b-versatile');assert.equal(JSON.parse(map.get('it041_relay_q')).n,80);
+assert.equal(await own.generate([]),'OWN_OK');assert.equal(ownRequest.url,'https://api.groq.com/openai/v1/chat/completions');assert.equal(ownRequest.options.headers.Authorization,'Bearer gsk_test_fixture');assert.equal(JSON.parse(ownRequest.options.body).model,'openai/gpt-oss-120b');assert.equal(JSON.parse(map.get('it041_relay_q')).n,80);
 console.log('PASS: explicitly selected own-account transport keeps shared quota intact.');
 
 const cut=new Relay({storage:{getItem:()=>null,setItem(){}},fetcher:async()=>({ok:true,json:async()=>({choices:[{finish_reason:'length',message:{content:'partial'}}]})})});await assert.rejects(cut.generate([]),/token sınırında/);
@@ -34,3 +34,7 @@ console.log('PASS: 429 cooldown persists without extra requests; visible dialogu
 
 let selectedKey=null;const switcher=new Relay({storage:limitStorage,credentials:()=>selectedKey,fetcher:async()=>({ok:true,json:async()=>({choices:[{message:{content:'OWN_READY'}}]})})});await assert.rejects(switcher.generate([]),/429/);selectedKey='gsk_fixture';assert.equal(await switcher.generate([]),'OWN_READY');
 console.log('PASS: selecting an explicitly configured own account does not inherit the shared-account cooldown.');
+
+import {AbilityLedger} from './abilities.mjs';
+const abilities=new AbilityLedger(storage,'test-abilities');abilities.action({action:1,source:'Öğretmen'});abilities.grade({action:1,source:'FlyWire'},1);abilities.dialogue({read:'clue',sent:'reply'});const restoredAbilities=new AbilityLedger(storage,'test-abilities');assert.equal(restoredAbilities.rows()[1].count,1);assert.equal(restoredAbilities.rows()[3].count,1);assert.equal(restoredAbilities.data.taught[1],1);assert.equal(restoredAbilities.data.good[1],1);assert.equal(new AbilityLedger(storage,'other-model').rows()[1].count,0);
+console.log('PASS: skill evidence persists per model, with language activity separate from motor teaching.');

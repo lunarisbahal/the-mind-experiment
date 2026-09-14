@@ -19,7 +19,7 @@ export class Relay {
    try{
     this.report('AI hattına bağlanıyor…');
     const timeout=AbortSignal.timeout(25000),combined=signal?AbortSignal.any([signal,timeout]):timeout;
-    const response=await this.fetcher(url,{method:'POST',headers:{'Content-Type':'application/json',...(key?{Authorization:'Bearer '+key}:{})},body:JSON.stringify({...(key?{model:'llama-3.3-70b-versatile'}:{}),messages,max_tokens:Math.min(2048,Math.max(128,Number(maxTokens)||2048)),temperature:.3}),signal:combined});
+    const response=await this.fetcher(url,{method:'POST',headers:{'Content-Type':'application/json',...(key?{Authorization:'Bearer '+key}:{})},body:JSON.stringify({...(key?{model:'openai/gpt-oss-120b'}:{}),messages,max_tokens:Math.min(2048,Math.max(128,Number(maxTokens)||2048)),temperature:.3}),signal:combined});
     if(!response.ok){error='AI hattı HTTP '+response.status;if(response.status===429){let detail='';try{const body=await response.json();detail=String(body.error?.message||body.error||body.message||'').slice(0,500);}catch{}this.limitDetail=detail;const h=response.headers?.get('retry-after');const delay=h?(Number.isFinite(Number(h))?Number(h)*1000:Date.parse(h)-Date.now()):this.backoff;this.retryAt=Date.now()+Math.max(30000,Number.isFinite(delay)?delay:this.backoff);this.backoff=Math.min(this.backoff*2,900000);if(!key)try{this.storage.setItem('flywire-ai-retry-at',String(this.retryAt));}catch{}throw this.waitError();}continue;}
     const j=await response.json(),content=j.choices?.[0]?.message?.content;
     if(j.choices?.[0]?.finish_reason==='length')throw Error('AI yanıtı token sınırında kesildi; tamamlanmış cevap alınamadı');

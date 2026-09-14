@@ -53,7 +53,7 @@ try{
   const chosen=page.locator('#action-history li').filter({hasText:'FlyWire'}).first();const id=await chosen.getAttribute('data-action-id');const text=await chosen.locator('div').innerText();
   const before=await page.locator('#stats').innerText();await page.waitForFunction(before=>document.querySelector('#stats').innerText!==before,before,{timeout:60000});assert.equal(await chosen.locator('div').innerText(),text);
   await chosen.getByRole('button',{name:`Eylem ${id}: İyi`,exact:true}).click();await page.waitForFunction(()=>document.querySelector('#learning').textContent.includes('Geri bildirim: 1'));
-  assert(await page.locator('#start').isDisabled(),'Feedback must not pause the agent');assert(await chosen.getByRole('button',{name:`Eylem ${id}: İyi`,exact:true}).isDisabled());return {gradedId:id,frozen:true,stillRunning:true};
+  assert((await page.locator('#ability-details').innerText()).includes('Hareket karar katmanı'));assert(await page.locator('#start').isDisabled(),'Feedback must not pause the agent');assert(await chosen.getByRole('button',{name:`Eylem ${id}: İyi`,exact:true}).isDisabled());return {gradedId:id,frozen:true,stillRunning:true};
  });
  await check('teacher movement is learned and autonomy resumes',async()=>{
   await page.locator('#teacher').check();assert(await page.locator('#start').isDisabled());
