@@ -1,4 +1,4 @@
-import {Brain,parseBinary,fromJSON} from './brain.mjs';
+import {Brain,parseBinary,fromJSON} from './brain.mjs?v=0.5.0';
 let brain;
 onmessage=async({data:d})=>{try{
  if(d.type==='init'){

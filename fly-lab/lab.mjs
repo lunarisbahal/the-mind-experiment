@@ -1,6 +1,6 @@
-import {createMonitor} from './visual.mjs';
-import {Relay,decide} from './dialogue.mjs';
-import {ActionHistory,renderHistory} from './history.mjs';
+import {createMonitor} from './visual.mjs?v=0.5.0';
+import {Relay,decide} from './dialogue.mjs?v=0.5.0';
+import {ActionHistory,renderHistory} from './history.mjs?v=0.5.0';
 const $=id=>document.getElementById(id),frame=$('game');
 const FULL='https://raw.githubusercontent.com/snedea/flybrain/9191824d17871b7851645782d53d23f213ddb938/data/connectome.bin.gz';
 const monitor=createMonitor($('brain-view'),$('fly-view'),$('traces'));
@@ -139,11 +139,11 @@ function saveConfig(){try{localStorage.setItem('flywire-last-config',JSON.string
 $('auto-resume').onchange=()=>{if(!$('auto-resume').checked)autoWaiting=false;saveConfig();};$('language').onchange=saveConfig;
 $('load').onclick=async()=>{
  pause();ready=false;checkpoint=null;worker?.terminate();for(const p of pending.values()){clearTimeout(p.timeout);p.reject(Error('Model yeniden yükleniyor'));}pending.clear();
- worker=null;records=[];history=new ActionHistory();historyFrozen=false;$('history-freeze').checked=false;seen=new Set();previous=null;stuck=0;macro=null;monitor.reset();$('teacher').checked=false;teacherBusy=false;refreshHistory();$('load').disabled=true;controls();
+ worker=null;records=[];$('stats').textContent='Adım: 0 · Keşfedilen hücre: 0';history=new ActionHistory();historyFrozen=false;$('history-freeze').checked=false;seen=new Set();previous=null;stuck=0;macro=null;monitor.reset();$('teacher').checked=false;teacherBusy=false;refreshHistory();$('load').disabled=true;controls();
  const network=$('network').value,mode=$('mode').value;identity={network,mode,seed:41,startedAt:new Date().toISOString()};saveConfig();
  try{
   let buffer;if(network==='full'){status('139.255 nöronluk veri indiriliyor…');const r=await fetch(FULL,{signal:AbortSignal.timeout(60000)});if(!r.ok)throw Error('Tam ağ indirilemedi');buffer=await r.arrayBuffer();}
-  worker=new Worker('./worker.mjs',{type:'module'});
+  worker=new Worker('./worker.mjs?v=0.5.0',{type:'module'});
   worker.onmessage=({data:d})=>{if(d.checkpoint)keep(d.checkpoint);const p=pending.get(d.requestId);if(p){pending.delete(d.requestId);clearTimeout(p.timeout);if(d.type==='error'||d.type==='request-error')p.reject(Error(d.message));else p.resolve(d);}};
   worker.onerror=e=>{for(const p of pending.values()){clearTimeout(p.timeout);p.reject(Error(e.message));}pending.clear();ready=false;pause('Model hatası: '+e.message);};
   const d=await rpc({type:'init',seed:41,mode,buffer},buffer?[buffer]:[]);identity={...identity,neurons:d.neurons,edges:d.edges};$('scope').textContent=d.neurons.toLocaleString('tr')+' nöron · '+d.edges.toLocaleString('tr')+' bağlantı';
@@ -156,7 +156,7 @@ $('load').onclick=async()=>{
 const isolation=`(()=>{function memory(){const m=new Map();return new Proxy({getItem:k=>m.has(String(k))?m.get(String(k)):null,setItem:(k,v)=>m.set(String(k),String(v)),removeItem:k=>m.delete(String(k)),clear:()=>m.clear(),key:i=>Array.from(m.keys())[i]??null,get length(){return m.size;}},{get:(t,p)=>p in t?t[p]:m.get(String(p)),set:(t,p,v)=>{m.set(String(p),String(v));return true;}});}for(const k of ['localStorage','sessionStorage'])Object.defineProperty(window,k,{value:memory()});const original=window.fetch.bind(window);window.fetch=(u,o)=>{const url=new URL(typeof u==='string'?u:u.url,document.baseURI);const method=(o?.method||'GET').toUpperCase();const relay=['https://it041-konsey.lunarisbahal.workers.dev/mirror','https://it041-mirror.lunarisbahal.workers.dev/'].includes(url.href)&&method==='POST';if(!relay&&(url.origin!==new URL(document.baseURI).origin||!['GET','HEAD'].includes(method)))return Promise.reject(new Error('Laboratory: remote services disabled'));return original(u,o);};window.WebSocket=class{constructor(){throw Error('Laboratory: multiplayer disabled');}};window.EventSource=class{constructor(){throw Error('Laboratory: remote services disabled');}};window.XMLHttpRequest=class{open(){throw Error('Laboratory: remote services disabled');}};Object.defineProperty(navigator,'sendBeacon',{value:()=>false});window.open=()=>null;})();`;
 
 async function loadGame(){
- const [a,b]=await Promise.all([fetch('../index.html'),fetch('./bridge.js')]);if(!a.ok||!b.ok)throw Error('Oyun dosyası yüklenemedi');
+ const [a,b]=await Promise.all([fetch('../index.html'),fetch('./bridge.js?v=0.5.0')]);if(!a.ok||!b.ok)throw Error('Oyun dosyası yüklenemedi');
  const [source,bridge]=await Promise.all([a.text(),b.text()]);const base=new URL('../',location.href).href;
  let seed='',savedGame=false;try{const g=JSON.parse(localStorage.getItem('flywire-game-v1'));if(g?.format==='flywire-game-v1'&&g.state){seed='localStorage.setItem("it041_sw_v1",'+JSON.stringify(JSON.stringify(g.state)).replaceAll('<','\\u003c')+');';savedGame=true;}}catch{}
  let config;try{config=JSON.parse(localStorage.getItem('flywire-last-config'));}catch{}
