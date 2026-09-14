@@ -116,7 +116,7 @@ try{
   await game.evaluate(()=>{S.flags.flySavedProgress='yes';});await page.waitForFunction(()=>JSON.parse(localStorage.getItem('flywire-game-v1')).state.flags.flySavedProgress==='yes');
   await page.reload();await page.waitForFunction(()=>document.querySelector('#scope').textContent.includes('668')&&!document.querySelector('#start').disabled,null,{timeout:45000});
   game=page.frames().find(f=>f!==page.mainFrame());await game.waitForFunction(()=>!!window.FlyGame);await game.waitForFunction(()=>Game.running);await page.waitForFunction(()=>/Adım: [1-9]/.test(document.querySelector('#stats').textContent));
-  assert.equal(await game.evaluate(()=>JSON.parse(localStorage.getItem('it041_sw_v1')).flags.flySavedProgress),'yes');assert((await page.locator('#learning').innerText()).includes('Geri bildirim: 1'));assert.equal(await page.evaluate(()=>localStorage.getItem('owner-save')),'untouched');assert((await page.locator('#dialogue-journal').innerText()).includes('online AI resident'));return true;
+  assert.equal(await game.evaluate(()=>JSON.parse(localStorage.getItem('it041_sw_v1')).flags.flySavedProgress),'yes');assert((await page.locator('#learning').innerText()).includes('Geri bildirim: 1'));assert.equal(await page.evaluate(()=>localStorage.getItem('owner-save')),'untouched');assert((await page.locator('#dialogue-journal').textContent()).includes('online AI resident'));return true;
  });
  await check('WebGL failure is explicit and produces no ghost learning steps',async()=>{
   const blocked=await chromium.launch({headless:true,args:['--disable-webgl']});

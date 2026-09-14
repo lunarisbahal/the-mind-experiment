@@ -6,7 +6,7 @@ export class DialogueJournal {
 export function renderJournal(root,rows){
  root.replaceChildren();
  for(const row of [...rows].reverse()){
-  const entry=document.createElement('details');entry.open=row===rows.at(-1);
+  const entry=document.createElement('details');entry.open=rows.indexOf(row)>=rows.length-3;
   const title=document.createElement('summary');title.textContent=row.time+' · '+row.title;entry.append(title);
   for(const [key,label] of [['read','Okuduğu metin'],['understanding','Dil modelinin kısa yorumu'],['sent','Oyuna yazdığı cevap'],['reply','Karakterden gelen cevap'],['note','Seçtiği eylem'],['error','Bağlantı hatası']]){
    if(!row[key])continue;const heading=document.createElement('strong');heading.textContent=label;
