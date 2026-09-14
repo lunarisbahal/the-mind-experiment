@@ -7,7 +7,7 @@
  const visible=id=>{const e=document.getElementById(id);return e&&e.getClientRects().length?e:null;};
  const canvas=document.createElement('canvas');canvas.width=8;canvas.height=8;const ctx=canvas.getContext('2d',{willReadFrequently:true});
  window.FlyGame={
-  release,
+  release,lastError:null,
   startup(){
    if(visible('glFail'))return {blocked:true,message:'3B oyun açılamadı: bu tarayıcı WebGL sağlayamıyor. Ajan başlatılmadı.'};
    if(!document.querySelector('#gl canvas'))return {waiting:true,message:'3B sahnenin yüklenmesi bekleniyor…'};
@@ -31,7 +31,7 @@
    const field=input&&input.getClientRects().length?{maxLength:input.maxLength>0?input.maxLength:500,value:input.value}:null;
    const text=root?root.innerText.slice(0,4500):['prompt','ctrlhelp'].map(id=>visible(id)?.innerText||'').join(' ').slice(0,1000);
    const key=JSON.stringify({panel:panel||null,text,buttons,field:field?field.maxLength:null});
-   return {panel:panel||null,text,buttons,field,key,typing:panel==='dlg'&&typeof Dlg!=='undefined'&&Dlg.typing,busy:!!window.Mirror?.busy};
+   return {panel:panel||null,text,buttons,field,key,typing:panel==='dlg'&&typeof Dlg!=='undefined'&&Dlg.typing,busy:!!window.Mirror?.busy||!!window.FlyOnline?.pending};
   },
   choose(key,decision){
    const now=this.describe();if(!window.Game?.running||now.key!==key||now.busy)return false;
@@ -71,15 +71,46 @@
    const k=['w','a','s','d','e',null][a];if(k){held.add(k);event('keydown',k);timer=setTimeout(release,500);}return true;
   }
  };
+ const capture=e=>{window.FlyGame.lastError=String(e.message||e.reason?.message||e.reason||'Bilinmeyen oyun hatası').slice(0,350);};
+ window.addEventListener('error',capture);window.addEventListener('unhandledrejection',capture);
+ if(window.MP)window.MP.toggle=()=>{if(window.UI)UI.toast('Laboratuvar AI karakterlere çevrimiçi bağlanır; insan oyuncu eşleştirmesi kapalı.');};
  window.addEventListener('blur',release);window.addEventListener('pagehide',release);
 })();
+// Native AI residents use their live service. Never count a canned fallback as a reply.
+if(window.SubjHome){
+ const nativeSay=SubjHome.say.bind(SubjHome);
+ SubjHome.say=async function(idx){
+  if(window.FlyOnline?.pending)return;
+  await nativeSay(idx);
+  if(window.FlyOnline?.error){const log=document.getElementById('ghLog');if(log){const p=document.createElement('p');p.textContent=window.FlyOnline.error+' Yeniden sorabilirsin.';log.append(p);}}
+ };
+}
+if(window.House){
+ House._tslSay=async function(){
+  if(window.FlyOnline?.pending)return;
+  const input=document.getElementById('tslIn'),log=document.getElementById('tslLog');
+  const text=input?.value.trim();if(!text||!log)return;
+  if(this._lowEffort(text)){this._effToast();return;}
+  if(window.Safe&&Safe.scan(text)>=2){Safe.trigger(2,text);return;}
+  const state=this._tsl,tr=GAMELANG==='tr';
+  const line=document.createElement('div');line.textContent=(tr?'sen: ':'you: ')+text;log.append(line);input.value='';
+  const wait=document.createElement('div');wait.textContent=tr?'Denek düşünüyor…':'Subject is thinking…';log.append(wait);
+  try{
+   const r=await fetch('https://it041-konsey.lunarisbahal.workers.dev/subjectsay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,lang:tr?'tr':'en'})});
+   const d=await r.json();if(!d.reply)throw Error('AI karakter boş yanıt döndürdü.');
+   const reply=document.createElement('div');reply.textContent=(tr?'DENEK: ':'SUBJECT: ')+d.reply;log.append(reply);
+   if(this._tsl===state){state.ex++;state.last=d.reply;const next=document.getElementById('tslNext');if(next&&!next.children.length){const b=document.createElement('button');b.className='btn ghost';b.textContent=tr?'Cevabı aldım, devam':'Got the answer, continue';b.onclick=()=>this._tslNote();next.append(b);}}
+  }catch(e){const p=document.createElement('div');p.textContent=(tr?'Bağlantı hatası: ':'Connection error: ')+e.message;log.append(p);}
+  finally{wait.remove();log.scrollTop=log.scrollHeight;}
+ };
+}
 // Use the common relay transport from the lab; unrelated remote services stay blocked.
 if(window.Mirror&&typeof parent!=='undefined'&&parent.LabRelay){
  const originalGenerate=Mirror.generate.bind(Mirror);
  Mirror.generate=async function(messages,maxTokens){
   window.FlyGame.aiError=null;
-  try{return this.cfg?.kind==='relay'?await parent.LabRelay.generate(messages,maxTokens):await originalGenerate(messages,maxTokens);}
-  catch(e){window.FlyGame.aiError=e.message;throw e;}
+  try{const reply=this.cfg?.kind==='relay'?await parent.LabRelay.generate(messages,maxTokens):await originalGenerate(messages,maxTokens);parent.LabDialogue?.({title:'Ayna karakteri yanıtladı',reply});return reply;}
+  catch(e){window.FlyGame.aiError=e.message;parent.LabDialogue?.({title:'Ayna bağlantısı',error:e.message});throw e;}
  };
  const originalSend=Mirror.send.bind(Mirror);
  Mirror.send=async function(){

@@ -92,3 +92,9 @@ nor a higher action count proves that the complete game can be solved or that th
 agent improves against baselines. Control modes are available for comparisons.
 
 Startup repair v0.5.1: Start loads the selected network and invokes the native game entry. Entry acknowledgements previously recorded by the user are retained in the isolated game checkpoint; no acknowledgement is manufactured. WebGL failure is reported before stepping. Browser coverage now exercises actual Game.start and a browser with WebGL disabled, rather than forcing Game.running for startup.
+
+### Online residents (v0.5.2)
+
+The laboratory now allows GET `/subject` and `/graduates`, and POST `/subjectsay` and `/graduatesay` on the native Konsey service. Resident replies have a 25-second timeout, an in-flight guard and explicit connection status. The subject task cannot advance on an invented fallback response. The separate LLM reads visible UI, fills native fields, and submits native buttons; FlyWire remains a fixed movement reservoir. Human P2P presence is a separate indicator and remains isolated. Language assistance is enabled once for older saved configurations; later user choices are preserved. Auto-resume also opens native entry instead of waiting indefinitely for an already running game.
+
+The visible dialogue journal stores the last 40 entries locally: observed text, an explicitly requested short LLM summary, submitted text, genuine server reply, and failures. It does not expose or claim private reasoning. HTTP 429 honors Retry-After (otherwise 60s, increasing to 15 minutes) and preserves a shared-line cooldown across reloads; it does not switch endpoints to evade a rate limit. Expected human P2P startup is skipped in this laboratory, while resident AI services have their own truthful status. Actual JavaScript failures remain visible. WebGL requires browser/device support; no website change can guarantee it on unsupported renderers.
