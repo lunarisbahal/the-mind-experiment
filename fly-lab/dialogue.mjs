@@ -1,7 +1,7 @@
 // Text planning is performed by a language model, never attributed to the connectome.
 export const RELAYS=['https://it041-konsey.lunarisbahal.workers.dev/mirror','https://it041-mirror.lunarisbahal.workers.dev'];
 export class Relay {
- constructor({fetcher=fetch,storage=localStorage,report=()=>{},credentials=()=>null}={}){this.credentials=credentials;this.fetcher=fetcher;this.storage=storage;this.report=report;this.tail=Promise.resolve();}
+ constructor({fetcher=(...args)=>globalThis.fetch(...args),storage=localStorage,report=()=>{},credentials=()=>null}={}){this.credentials=credentials;this.fetcher=fetcher;this.storage=storage;this.report=report;this.tail=Promise.resolve();}
  generate(messages,maxTokens=400,signal){
   const task=()=>this.request(messages,maxTokens,signal);const result=this.tail.then(task,task);this.tail=result.catch(()=>{});return result;
  }

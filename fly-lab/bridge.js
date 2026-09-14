@@ -71,8 +71,11 @@ if(window.Mirror&&typeof parent!=='undefined'&&parent.LabRelay){
  const originalSend=Mirror.send.bind(Mirror);
  Mirror.send=async function(){
   const historyLength=this.hist[this.cur]?.length||0;
+  window.FlyGame.aiError=null;
+  const beforeUses=window.S?.flags?._aiUsed||0;
   await originalSend();
   if(window.FlyGame.aiError){
+   if(this.cfg?.kind==='relay'&&window.S?.flags?._aiUsed===beforeUses+1){if(beforeUses>=3)window.S.insight+=30;window.S.flags._aiUsed=beforeUses;if(typeof save==='function')save();if(typeof refreshHud==='function')refreshHud();}
    // Do not treat the game's scripted outage text as an actual AI response.
    const log=document.getElementById('mirrorLog'),lines=log?.querySelectorAll('.mline.them');
    if(lines?.length)lines[lines.length-1].textContent='AI yanıtı alınamadı: '+window.FlyGame.aiError;

@@ -119,6 +119,7 @@ function renderTeaching(){
  const p=document.createElement('p');p.textContent=view.text.slice(0,1200);root.append(p);
  const field=document.createElement('textarea');field.placeholder='Örnek cevabını yaz';field.maxLength=view.field?.maxLength||500;if(view.field)root.append(field);
  for(const choice of view.buttons){const b=document.createElement('button');b.textContent=choice.label;b.onclick=()=>{
+  if(view.field&&!field.value.trim()&&/speak|submit|gönder|konuş/i.test(choice.label)){status('Göndermeden önce örnek cevabını yaz.');return;}
   const d={kind:view.field&&field.value.trim()?'write':'click',button:choice.id,text:field.value};
   if(!game().choose(view.key,d)){status('Ekran değişti; güncel seçeneği kullan.');return;}
   languageExamples.push({text:view.text.slice(0,1600),decision:d,value:1});remember();addAction({label:choice.label,source:'Öğretmen',context:view.text,decision:d,detail:'Dil karar belleğine örnek eklendi.'});status('Diyalog örneği kaydedildi.');teachingKey='';
