@@ -86,7 +86,7 @@ try{
   assert.equal(await game.evaluate(()=>JSON.parse(localStorage.getItem('it041_sw_v1')).flags.flySavedProgress),'yes');assert((await page.locator('#learning').innerText()).includes('Geri bildirim: 1'));assert.equal(await page.evaluate(()=>localStorage.getItem('owner-save')),'untouched');return true;
  });
  // Separate real-browser network probe; do not turn an upstream outage into a passing AI claim.
- const live=await browser.newPage();await live.route('https://lunarisbahal.github.io/the-mind-experiment/fly-lab/**',async route=>{
+ const live=await browser.newPage();evidence.liveResponses=[];live.on('response',async response=>{if(/^https:\/\/it041-(?:konsey|mirror)\.lunarisbahal\.workers\.dev\/?(?:mirror)?$/.test(response.url())){const sample={url:response.url(),status:response.status(),body:(await response.text().catch(()=>'' )).slice(0,2000)};evidence.liveResponses.push(sample);console.log('LIVE_RESPONSE',JSON.stringify(sample));}});await live.route('https://lunarisbahal.github.io/the-mind-experiment/fly-lab/**',async route=>{
   const path=new URL(route.request().url()).pathname.split('/fly-lab/')[1]||'index.html';if(path.includes('..'))return route.abort();
   try{const body=await readFile(root+'fly-lab/'+path);return route.fulfill({body,contentType:path.endsWith('.mjs')?'text/javascript':path.endsWith('.json')?'application/json':'text/html'});}catch{return route.continue();}
  });
