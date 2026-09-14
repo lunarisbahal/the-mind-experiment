@@ -1,137 +1,92 @@
-# DO·LOON·AI EXPRESS × FlyWire — experimental player v0.4
+# DO·LOON·AI EXPRESS × FlyWire — hybrid experiment v0.5
 
-This adds an opt-in laboratory at `fly-lab/index.html`. It loads the repository's
-existing English game into a temporary iframe and connects a measured fly circuit
-to keyboard actions. No existing game file is modified.
+Open `/fly-lab/`, complete the game's normal entry, load a network, and Start.
+For a local checkout: `python -m http.server 8000` from the repository root.
 
-## Run
+## Components and attribution
 
-From the repository root:
+The fixed rate reservoir uses measured FlyWire connectivity: a bundled 668-neuron,
+18,968-edge DesktopFly circuit, or a pinned FlyBrain full-neuron dataset with
+139,255 neurons and 2,698,236 filtered edges. The full source is
+https://raw.githubusercontent.com/snedea/flybrain/9191824d17871b7851645782d53d23f213ddb938/data/connectome.bin.gz
+and does not include every measured synapse. Data terms are in DATA_LICENSE.md.
 
-```sh
-python -m http.server 8000
-```
+The artificial dynamics perform 12 leaky tanh updates, using normalized signed
+weights, up to 4,096 artificial input neurons and 128 disjoint readout neurons.
+Input is the grayscale 8×8 minimap, coordinates and modal/interior indicators.
+A six-action softmax readout learns exploration rewards and movement demonstrations.
+The connectome does not read language, write text, or become conscious.
 
-Open `http://localhost:8000/fly-lab/`. Complete the normal game entry screens,
-choose the network, click **Ağı yükle / kayıttan devam**, then **Başlat**.
-Use **Duraklat** to release the keys and regain control. Loading a network restores its saved decision policy, resets temporary neural activity
-and session statistics, and preserves the current temporary game position. The laboratory saves game progress separately and can reload the last network automatically.
+A SEPARATE language model reads visible dialog text and buttons, selects a button,
+or fills a visible text field then submits it through the game's native controls.
+Narration uses its native E control. The model sees no hidden puzzle answers.
+It also suggests bounded movement sequences when the agent is stuck. Those
+sequences teach the movement readout. Action history labels FlyWire, language
+model and human demonstrations separately. Language examples and notes form a
+persistent retrieval memory; language model weights are not trained here.
 
-## What runs
+## Stability and teaching
 
-- **Bundled subset:** 668 neurons and 18,968 directed connection rows from
-  FlyWire FAFB v783, extracted by DesktopFly. This is NOT the full fly brain.
-- **Full-neuron option:** downloads the 139,255-neuron, filtered-edge binary
-  from FlyBrain, pinned to commit `9191824d17871b7851645782d53d23f213ddb938`.
-  It does not contain every measured synapse. The UI reports actual loaded counts.
-  Download/parse failure is explicit; it never silently substitutes the subset.
-- A fixed, signed, incoming-absolute-weight-normalized rate reservoir runs 12
-  updates per decision with leaky tanh dynamics. These dynamics are artificial.
-- Artificial input indices encode 8×8 grayscale samples of the player's minimap,
-  normalized player coordinates, interior and modal indicators (68 channels).
-  These are **structured game observations**, not biological fly vision or
-  direct perception of the 3D scene. No hidden puzzle solutions enter the model.
-- Up to 128 disjoint downstream samples feed a six-action softmax readout.
-  Only this readout learns, using a one-step reward-baseline policy update.
-- Actions: forward, left strafe, backward, right strafe, interact, wait/close.
-  Movement uses the game's existing keyboard handler and collision engine.
-- Novel 5-unit cells yield +1, revisits −0.01, no movement outside a modal another
-  −0.02. These are engineered exploration rewards, not inferred fly motivations.
-- Compare the real graph with a shuffled-target graph or random actions.
-  The shuffled control preserves the destination degree multiset, but is not a
-  complete biological null model. No superiority claim has been established.
+Start expresses ongoing intent. Ordinary dialogs, short game transitions and AI
+requests put the agent into a waiting state, not a manual-stop state. Failed AI
+requests are shown and retried after 15 seconds. Explicit Pause cancels pending
+planner work and discards stale worker decisions. Hidden tabs release movement
+keys and resume when visible. Closing the browser still stops execution.
 
-The agent pauses at the game's cipher and written-reflection dialogs. It cannot
-read prose, generate answers, solve the entire ARG, or demonstrate self-awareness.
-This milestone is autonomous locomotion/exploration infrastructure, not a trained
-end-to-end player. Mini-games, camera turning, language and long-horizon planning
-remain future work. Learned weights are saved automatically in this browser. Trajectory export contains
-observations/decisions/activity; the separate model export is a resumable policy checkpoint.
+Teacher mode takes control and shows movement buttons plus the current dialog's
+actual choices and optional answer field. Turning teacher mode off resumes a
+previously running agent. A teacher example must be an actual executed action.
+The default delay between decisions is 1.5 seconds and can be adjusted.
 
-## Isolation
+The most recent ten actions have immutable IDs and individual Good/Bad controls.
+The list freezes on hover/focus or with its checkbox; release the checkbox to
+see newer actions. Feedback updates the captured action's feature vector, not
+the newest observation, and does not stop the agent. Language feedback is saved
+as a labeled example for future decisions. Repeated grading is rejected.
 
-The iframe gets isolated in-memory local/session storage before game code executes. Its native game state is seeded from the separate laboratory checkpoint when available.
-Existing player saves are not read or overwritten. Remote fetch, WebSocket,
-EventSource, XHR, beacon and popup calls are disabled in the lab; same-origin GET
-assets and the original game's CDN script/media dependencies remain available.
-This is test-session isolation for trusted repository code, not a security sandbox
-for arbitrary untrusted code. Network services (including live NPC/chat features)
-are intentionally unavailable during this experiment. The game entry/age/consent
-screens remain in place for the human operator.
+## Persistence and limits
 
-## Data provenance and licensing
+Policy weights, graph signature, baseline and learning counters save automatically
+to a separate parent-page storage key. Compatible policies restore after loading
+the same network. Model export/import is separate from trajectory export.
+Native game state also saves separately from the ordinary player's save; interior
+sessions resume at the outdoor entry. Open dialogs and unsaved text are not
+reconstructed. The last network automatically loads, and the agent starts after
+normal game entry if automatic continuation is enabled. Language notes/examples
+persist too. Browser data deletion removes these local records; download backups.
 
-Bundled `circuit.json` is unchanged from:
-https://github.com/DenisSergeevitch/desktop-fly/blob/master/data/circuit.json
-Git blob SHA: `10a7d0726571881e77e93e33bd7a23d900025e49`.
-See `DATA_LICENSE.md`: FlyWire-derived data is CC BY-NC 4.0. This experimental use
-is non-commercial; do not treat it as licensed for commercial deployment.
+All game storage remains isolated in the iframe. Social/multiplayer/API traffic
+is blocked except the two published AI relay POST routes. The lab and its game
+Mirror use one shared relay client with timeouts, failover, explicit errors and
+the existing 80-response/day shared-line allowance. This allowance is persistent
+across reloads. AI requests send visible game text and relevant notes to the
+selected provider. The site's original protections, consent and native game
+costs are not removed.
 
-Full-neuron source:
-https://github.com/snedea/flybrain/blob/9191824d17871b7851645782d53d23f213ddb938/data/connectome.bin.gz
-Git blob SHA: `5559a1ea2fdf7e65e476abd87ff542e4d0b00bf8`.
-Binary layout documented in that project's `js/sim-worker.js`: two uint32 counts,
-12-byte directed edges (pre, post, float weight), then 3-byte neuron metadata.
-Our rate simulator is original code; it does not reproduce FlyBrain's LIF model.
+When the shared service is unavailable, an explicitly entered Groq key selects
+that user's own account at the documented Groq Chat Completions endpoint.
+The key stays in this tab's sessionStorage and never enters checkpoints or logs.
+That account's quotas and charges apply. Clear the field to use the shared line.
+The common relay's server-side secret and Cloudflare account cannot be configured
+through the static game repository.
 
-Cite Dorkenwald et al., Nature 634, 124–138 (2024),
-https://doi.org/10.1038/s41586-024-07558-y and Schlegel et al., Nature 634,
-139–152 (2024), https://doi.org/10.1038/s41586-024-07686-5.
+## Live monitor
+
+The rotatable twin-lobe brain and fly are SCHEMATIC. Colors and four traces use
+actual sampled rate-model activity. Positions are not anatomical coordinates,
+traces are not biological EEG, and the fly is not a MuJoCo body.
 
 ## Validation
 
-```sh
-node fly-lab/test.mjs
-node fly-lab/test-bridge.mjs
-```
+`node fly-lab/test.mjs` tests measured graph dynamics, teaching, feedback and
+checkpoint validation. `node fly-lab/test-bridge.mjs` tests key handling, text
+guards and storage/network isolation. `node fly-lab/test-dialogue.mjs` tests
+request parsing, quota preservation, explicit failures and stable feedback IDs.
 
-Passed on the actual bundled circuit: load/counts, seeded determinism, finite
-activity, probability normalization, real-edge contribution to downstream
-features, shuffled-target degree preservation, and readout updates. Binary
-format validation uses a small fixture. Bridge tests cover observations, key
-release, pause guards, and storage/network isolation in a Node VM.
-
-**Browser validation now runs in GitHub Actions**, with pinned Playwright 1.62.1
-and real Chromium. The first run loaded the actual game renderer, moved the
-character through its normal collision loop, verified stop/key release and
-separate storage, exported a trajectory, and paused at a real cipher dialog.
-The full binary loaded **139,255 neurons and 2,698,236 directed connections**
-and produced game actions. Screenshots and structured evidence are attached to:
-https://github.com/lunarisbahal/the-mind-experiment/actions/runs/34788187138
-
-The browser test uses a synthetic, disposable game-session fixture. It does not
-accept legal terms for the user; actual human entry gates remain in the product.
-Run locally after installing Playwright and Chromium:
-
-```sh
-npm install --prefix fly-lab --no-save --no-package-lock playwright@1.62.1
-npx --prefix fly-lab playwright install chromium
-node fly-lab/test-browser.mjs
-```
-
-Still unvalidated: mobile performance, long-duration stability, improved
-exploration against controls, and whole-game completion. Screenshots are evidence
-of software operation, not evidence of biological fidelity or consciousness.
-
-
-## v0.3 — Human teaching and policy persistence
-
-Enable **Öğretmen modu** and use the six demonstration buttons. Each button captures the current observation, performs that action, then trains the readout with a supervised softmax update. Free keyboard play is not recorded. The existing text-puzzle guard remains in force.
-
-**İyi / Kötü** grades the explicitly displayed last executed autonomous action, once per action, and pauses the agent. Credit is attached to that action's captured reservoir features, not to a later observation. Random-action controls cannot receive teaching or feedback.
-
-The decision weights, reward baseline, and training counters are automatically stored in the parent page's localStorage, separately for each network/control configuration. Loading that network restores a compatible checkpoint. **Modeli indir** exports a portable JSON checkpoint; the file input restores it after validation. Checkpoints validate graph fingerprint, mode, seed, dimensions and finite bounded weights before changing the model. Invalid imports leave the current policy intact. Storage failures are shown in the UI.
-
-This preserves the learned decision policy, not recurrent neural state or the exact random trajectory. The native game state is now also saved separately by v0.4. Clearing browser data deletes local checkpoints; download a backup for another browser/device. Model changes are learning mechanisms, not evidence of improved game performance.
-
-
-## v0.4 — Live monitor and continuing sessions
-
-The rotatable twin-lobe canvas is a schematic arrangement of up to 128 sampled reservoir outputs. Colors and four traces use actual inference/teaching samples; positions are not anatomical coordinates, lines are not EEG, and the fly illustration is not a MuJoCo body. Its animation represents the active/paused state and selected movement.
-
-The parent page saves the laboratory's native `S` state to `flywire-game-v1` every two seconds while visible and on pause/model updates. The ordinary player save is still isolated. After reopening, the saved state seeds the game's existing Continue flow; its legal/age gates remain intact. Interior sessions resume at the saved outdoor entry, and open dialogs/unsaved text are not reconstructed. The last selected network loads automatically, restores its policy, and starts after game entry when automatic continuation is enabled. No game answers or progress flags are invented.
-
-The previous 5,000-action stop is removed; trajectory export retains the most recent 5,000 actions. The agent still pauses for text puzzles, manual pause, errors, or a hidden tab. A previously running agent may resume when the tab becomes visible with automatic continuation enabled. A closed browser cannot run this client-only experiment. It cannot read/solve the entire game; unattended completion and learning improvement are not claimed.
-
-
-v0.4.1 fixes an omitted `mirrorModal` guard: Speak/Step back chat now pauses inference instead of accumulating ineffective keyboard actions. An explicit **Aynadan çık** control clicks the native close button. This does not generate text or enable remote Mirror services.
+The GitHub Actions browser workflow exercises real 3D movement, native game
+narration and rite submission, history feedback, teacher-mode resume and
+persistence. Behavioral language decisions use an explicit deterministic transport
+fixture; a separate live relay probe reports the actual upstream result without
+claiming the fixture proves an available language service. Neither passing tests
+nor a higher action count proves that the complete game can be solved or that the
+agent improves against baselines. Control modes are available for comparisons.

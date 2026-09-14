@@ -1,29 +1,17 @@
-DO-LOON-AI EXPRESS / FLYWIRE — İLK DENEY SÜRÜMÜ
+FLYWIRE + DİL YARDIMI — v0.5
 
-1. ZIP içindeki fly-lab klasörünü mevcut the-mind-experiment deposunun köküne koy.
-   index.html ile fly-lab aynı seviyede olmalı. Ana oyun dosyalarını değiştirmez.
-2. Depo klasöründe: python -m http.server 8000
-3. Tarayıcıda: http://localhost:8000/fly-lab/
-4. Oyunun girişini tamamla. Sağdan ağı yükle, sonra Başlat'a bas.
+1. Oyunun girişini tamamla. Son ağ otomatik yüklenmediyse Ağı yükle'ye bas.
+2. AI hattını test et. Yanıt gelmezse gerçek hat hatası ekranda görünür.
+   Ortak hat kapalıysa kendi Groq bağlantını bu sekme için seçebilirsin.
+3. Başlat. Diyalogda dil modeli görünür metni okur, yazar ve düğmeyi seçer.
+   Ağ/servis beklemeleri elle Başlat gerektirmez. Duraklat bilinçli olarak durdurur.
+4. Öğretmen modunda hareket veya görünür diyalog düğmeleriyle örnek göster.
+   Önceden çalışan ajan, öğretmen modunu kapatınca devam eder.
+5. Son 10 eylemin her birini kendi numarasıyla değerlendir. Listeyi sabitleyip
+   inceleyebilirsin; işaretlediğin eylem değişmez. Sabitlemeyi kaldırınca liste yenilenir.
+6. Model, oyun ilerlemesi ve dil notları aynı tarayıcıda saklanır. Modeli indir
+   ile karar katmanını yedekle. İç mekanlar yeniden açılışta dış kapıdan sürer.
 
-İçerik: Gerçek FlyWire alt devresi (668 nöron / 18.968 bağlantı),
-139.255 nöronlu veri aktarımı yükleyicisi, çevrimiçi öğrenen karar katmanı,
-oyuna klavye bağlantısı, izleme paneli, deney kaydı indirme ve kontrol modelleri.
-
-DURUM: Model ve bağlantı testleri ile gerçek Chromium testi geçti. Tam ağ
-139.255 nöron / 2.698.236 bağlantıyla yüklendi ve oyun eylemleri üretti. Şifre veya yazılı cevap isteyen yerde
-ajan durur. Bu bir keşif prototipidir; tüm oyunu bitiren eğitilmiş ajan değildir.
-
-Bu pakette yer alan veri ticari olmayan kullanım içindir; DATA_LICENSE.md'ye bak.
-
-ÖĞRETME (v0.3): Ağı yükledikten sonra Öğretmen modu seçeneğini aç.
-Hareket düğmeleriyle örnek göster. Klavyeyle serbest oynayış eğitim örneği değildir.
-Ajanın son hareketini İyi / Kötü düğmeleriyle değerlendir; sonra Başlat ile sürdür.
-Model aynı tarayıcıda otomatik saklanır. Yeniden açınca aynı ağı yükle.
-Başka cihazda sürdürmek için Modeli indir ve model dosyası alanından yükle.
-Deney ilerlemesi ayrıca otomatik kaydedilir; iç mekanlardan dış kapıya dönülür.
-Tarayıcı verilerini silmek kayıtları da siler. Son ağı otomatik yükleme açıksa
-oyun girişi tamamlandıktan sonra ajan devam eder. Kapalı tarayıcıda çalışmaz.
-
-CANLI İZLEME (v0.4): Beyni sürükleyerek döndür. Renkler ve çizgiler gerçek
-model çıktılarıdır; nöron konumları ve sinek görünümü şematiktir.
+Okuma/yazma ayrı dil modelinden gelir. FlyWire ağı hareket kararlarını öğrenir.
+Tarayıcı kapalıyken çalışmaz. Tüm oyunu bitirdiği veya bilinç kazandığı gösterilmedi.
+YouTube yayını bu sürümün kapsamı dışındadır.
