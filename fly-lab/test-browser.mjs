@@ -12,7 +12,7 @@ try{
  for(let i=0;i<50;i++){try{if((await fetch('http://127.0.0.1:8765/')).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
  browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});
  page=await browser.newPage({viewport:{width:1440,height:1100},deviceScaleFactor:0.5,acceptDownloads:true});page.on('pageerror',e=>evidence.errors.push(e.message));
- const replies=[];let residentFail=false,residentSends=0;
+ const replies=[];let residentFail=false,residentSends=0,mirrorRateLimited=false;
  await page.route('https://*.lunarisbahal.workers.dev/**',async route=>{
   const request=route.request();if(request.method()==='OPTIONS')return route.fulfill({status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'POST,OPTIONS','access-control-allow-headers':'content-type'}});
   const path=new URL(request.url()).pathname;
@@ -21,6 +21,7 @@ try{
    const data=path==='/subject'?{name:'Test subject',roster:[{name:'Test graduate'}]}:path==='/graduates'?{graduates:[{name:'Test graduate',stories:[]}]}:{reply:'I am an online AI resident. Explore the next visible plaque.'};
    return route.fulfill({status:chat&&residentFail?503:200,headers:{'access-control-allow-origin':'*','content-type':'application/json'},body:JSON.stringify(data)});
   }
+  if(mirrorRateLimited)return route.fulfill({status:429,headers:{'access-control-allow-origin':'*','content-type':'application/json','retry-after':'30'},body:JSON.stringify({error:{message:'Lucida test rate limit'}})});
   const payload=request.postDataJSON();let content;
   if(payload.messages[0]?.content?.includes('LANGUAGE PLANNER')){
    const context=JSON.parse(payload.messages.at(-1).content),screen=context.screen;
@@ -52,7 +53,7 @@ try{
   const chosen=page.locator('#action-history li').filter({hasText:'FlyWire'}).first();const id=await chosen.getAttribute('data-action-id');const text=await chosen.locator('div').innerText();
   const before=await page.locator('#stats').innerText();await page.waitForFunction(before=>document.querySelector('#stats').innerText!==before,before,{timeout:60000});assert.equal(await chosen.locator('div').innerText(),text);
   await chosen.getByRole('button',{name:`Eylem ${id}: İyi`,exact:true}).click();await page.waitForFunction(()=>document.querySelector('#learning').textContent.includes('Geri bildirim: 1'));
-  assert(await page.locator('#start').isDisabled(),'Feedback must not pause the agent');assert(await chosen.getByRole('button',{name:`Eylem ${id}: İyi`,exact:true}).isDisabled());return {gradedId:id,frozen:true,stillRunning:true};
+  assert((await page.locator('#ability-details').innerText()).includes('Hareket karar katmanı'));assert(await page.locator('#start').isDisabled(),'Feedback must not pause the agent');assert(await chosen.getByRole('button',{name:`Eylem ${id}: İyi`,exact:true}).isDisabled());return {gradedId:id,frozen:true,stillRunning:true};
  });
  await check('teacher movement is learned and autonomy resumes',async()=>{
   await page.locator('#teacher').check();assert(await page.locator('#start').isDisabled());
@@ -99,6 +100,19 @@ try{
   residentFail=false;await game.locator('#tslIn').fill('I am a simulated agent learning this game. Which clue should I explore next?');await game.evaluate(()=>House._tslSay());
   assert.equal(await game.evaluate(()=>House._tsl.ex),1);assert.equal(await game.locator('#tslNext button').count(),1);await game.evaluate(()=>UI.closeDoc());return true;
  });
+ await check('Lucida rate limit preserves the exact draft and retries without another planner call',async()=>{
+  await game.evaluate(()=>{S.insight=100;Mirror.open('lucida');});mirrorRateLimited=true;
+  const before=replies.length;const message='I am a simulated agent. I notice uncertainty when I cannot read the next clue.';
+  await game.locator('#mirrorInput').fill(message);await game.locator('#mirrorSend').click();
+  await game.waitForFunction(()=>FlyGame.pendingReply&&!Mirror.busy);
+  assert.equal(await game.locator('#mirrorInput').inputValue(),message);
+  assert((await game.locator('#mirrorLog').innerText()).includes('Lucida test rate limit'));
+  mirrorRateLimited=false;
+  // Advance only the cooldown clock in the local fixture; production respects server Retry-After.
+  await page.evaluate(()=>{LabRelay.retryAt=0;const w=document.querySelector('#game').contentWindow;w.FlyGame.pendingReply.retryAt=0;});
+  await page.locator('#start').click();await game.waitForFunction(()=>Mirror.hist.lucida.some(m=>m.role==='assistant'));
+  await page.locator('#stop').click();assert.equal(replies.length-before,1);assert.equal(await game.evaluate(()=>FlyGame.pendingReply),null);await page.locator('#exit-mirror').click();return true;
+ });
  await check('teacher can submit an explicit visible dialogue example',async()=>{
   await game.evaluate(()=>{UI.doc('Practice','<p>Choose your next direction.</p><button onclick="S.flags.flyTeacherChoice=true;UI.closeDoc()">Explore the path</button>');});
   await page.locator('#teacher').check();await page.locator('#dialogue-teach').getByRole('button',{name:'Explore the path'}).click();
@@ -129,12 +143,21 @@ try{
  });
  await live.goto('https://lunarisbahal.github.io/the-mind-experiment/fly-lab/');await live.locator('#test-ai').click();
  await live.waitForFunction(()=>!document.querySelector('#test-ai').disabled,null,{timeout:60000});evidence.liveRelay=await live.locator('#ai-status').innerText();console.log('LIVE_RELAY',evidence.liveRelay);
- if(evidence.liveRelay.startsWith('AI hattı yanıt verdi:')){try{evidence.livePlanner=await live.evaluate(async()=>{const {decide}=await import('./dialogue.mjs?v=0.5.2');return decide(window.LabRelay,{panel:'docModal',text:'Practice: Write one brief sentence describing what you will explore next as a simulated game agent.',buttons:[{id:0,label:'Submit'},{id:1,label:'Step back'}],field:{maxLength:240,value:''}},'',[],AbortSignal.timeout(60000));});console.log('LIVE_PLANNER',JSON.stringify(evidence.livePlanner));}catch(e){evidence.livePlannerError=e.message;console.log('LIVE_PLANNER_ERROR',e.message);}}
+ if(evidence.liveRelay.startsWith('AI hattı yanıt verdi:')){try{evidence.livePlanner=await live.evaluate(async()=>{const {decide}=await import('./dialogue.mjs?v=0.5.3');return decide(window.LabRelay,{panel:'docModal',text:'Practice: Write one brief sentence describing what you will explore next as a simulated game agent.',buttons:[{id:0,label:'Submit'},{id:1,label:'Step back'}],field:{maxLength:240,value:''}},'',[],AbortSignal.timeout(60000));});console.log('LIVE_PLANNER',JSON.stringify(evidence.livePlanner));}catch(e){evidence.livePlannerError=e.message;console.log('LIVE_PLANNER_ERROR',e.message);}}
  try{
   await live.waitForFunction(()=>document.querySelector('#game').contentWindow?.FlyOnline,null,{timeout:45000});
   evidence.liveResident=await live.evaluate(async()=>{const w=document.querySelector('#game').contentWindow,base='https://it041-konsey.lunarisbahal.workers.dev';const roster=await (await w.fetch(base+'/subject?lang=en')).json();const reply=await (await w.fetch(base+'/subjectsay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:'I am a simulated FlyWire game agent testing the online connection. What should I look for when exploring this game? Please answer briefly.',lang:'en'})})).json();return {rosterLoaded:!!roster,reply:reply.reply};});
   console.log('LIVE_RESIDENT',JSON.stringify(evidence.liveResident));
  }catch(e){evidence.liveResidentError=e.message;console.log('LIVE_RESIDENT_ERROR',e.message);}
+ try{
+  const native=live.frames().find(f=>f!==live.mainFrame());
+  await native.evaluate(()=>Mirror.open('lucida'));
+  evidence.lucidaPromptChars=await native.evaluate(()=>Mirror.sysFor(PERSONAS.lucida,'I am a simulated agent. How can I observe uncertainty while exploring this world?').length);
+  await native.locator('#mirrorInput').fill('I am a simulated agent. How can I observe uncertainty while exploring this world?');
+  await native.locator('#mirrorSend').click();await native.waitForFunction(()=>!Mirror.busy,null,{timeout:60000});
+  evidence.liveLucida=await native.evaluate(()=>({error:FlyGame.aiError,reply:Mirror.hist.lucida?.filter(m=>m.role==='assistant').at(-1)?.content,draft:document.getElementById('mirrorInput').value}));
+  console.log('LIVE_LUCIDA',JSON.stringify({promptChars:evidence.lucidaPromptChars,...evidence.liveLucida}));
+ }catch(e){console.log('LIVE_LUCIDA_ERROR',e.message);}
  await live.close();
  evidence.success=true;
 }catch(e){evidence.success=false;evidence.failure=e.stack;if(page)evidence.state=await page.evaluate(()=>({status:document.querySelector('#status')?.textContent,ai:document.querySelector('#ai-status')?.textContent,stats:document.querySelector('#stats')?.textContent,history:document.querySelector('#action-history')?.innerText,frozen:document.querySelector('#history-freeze')?.checked,view:document.querySelector('#game')?.contentWindow?.FlyGame?.describe()})).catch(()=>null);console.error(e.stack,JSON.stringify(evidence.state));process.exitCode=1;if(page)await page.screenshot({path:out+'/failure.png',fullPage:true}).catch(()=>{});}

@@ -1,6 +1,6 @@
 // Schematic positions only. Colors and traces use measured model output samples.
 export function createMonitor(brainCanvas,flyCanvas,traceCanvas){
- let yaw=.3,pitch=.12,drag=null,activity=[],action=5,running=false,lastTime=0;
+ let yaw=.3,pitch=.12,drag=null,activity=[],action=5,running=false,lastTime=0,abilities=[];
  const traces=[],points=Array.from({length:128},(_,i)=>{const side=i<64?-1:1,k=i%64,z=1-2*(k+.5)/64,a=k*2.399963;return [side*.6+Math.sqrt(1-z*z)*Math.cos(a)*.58,z*.83,Math.sqrt(1-z*z)*Math.sin(a)*.6];});
  function project([x,y,z],w,h){const a=x*Math.cos(yaw)+z*Math.sin(yaw),b=-x*Math.sin(yaw)+z*Math.cos(yaw),c=y*Math.cos(pitch)-b*Math.sin(pitch),d=y*Math.sin(pitch)+b*Math.cos(pitch),s=Math.min(w,h)*.34/(1+d*.18);return [w/2+a*s,h/2+c*s,s,d];}
  brainCanvas.onpointerdown=e=>{drag=[e.clientX,e.clientY];brainCanvas.setPointerCapture(e.pointerId);};
@@ -10,6 +10,8 @@ export function createMonitor(brainCanvas,flyCanvas,traceCanvas){
  function brain(){const c=brainCanvas,ctx=clear(c);ctx.strokeStyle='#294657';
   for(const side of [-1,1])for(const latitude of [-.6,0,.6]){ctx.beginPath();for(let k=0;k<=64;k++){const a=k/64*Math.PI*2,q=project([side*.6+Math.cos(a)*.58*Math.sqrt(1-latitude*latitude),latitude*.83,Math.sin(a)*.6*Math.sqrt(1-latitude*latitude)],c.width,c.height);k?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]);}ctx.stroke();}
   points.slice(0,activity.length).map((p,i)=>({q:project(p,c.width,c.height),v:activity[i]})).sort((a,b)=>b.q[3]-a.q[3]).forEach(({q,v})=>{ctx.beginPath();ctx.fillStyle=v<0?`rgba(182,142,255,${.3+Math.min(1,Math.abs(v))*.7})`:`rgba(104,244,195,${.3+Math.min(1,Math.abs(v))*.7})`;ctx.arc(q[0],q[1],2+Math.min(1,Math.abs(v))*5,0,Math.PI*2);ctx.fill();});
+  abilities.forEach((row,i)=>{const w=(c.width-32)/3,x=16+(i%3)*w,y=i<3?6:c.height-48;ctx.fillStyle='rgba(8,18,28,.88)';ctx.fillRect(x,y,w-8,42);ctx.font='20px system-ui';ctx.fillStyle=i<3?'#a1e6ca':'#cab1ff';ctx.fillText(row.name+' · '+row.count,x+8,y+28);});
+
  }
  function fly(t){const c=flyCanvas,ctx=clear(c),cx=c.width/2,cy=c.height/2;
   ctx.save();ctx.translate(cx,cy);ctx.rotate(action===1?-.15:action===3?.15:0);
@@ -27,5 +29,5 @@ export function createMonitor(brainCanvas,flyCanvas,traceCanvas){
   for(let j=0;j<4;j++){ctx.strokeStyle=colors[j];ctx.beginPath();traces.forEach((row,i)=>{const x=i*c.width/119,y=(j+.5)*c.height/4-(row[j]||0)*c.height/9;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();}
  }
  function tick(t){if(!document.hidden&&t-lastTime>40){lastTime=t;brain();fly(t);}requestAnimationFrame(tick);}requestAnimationFrame(tick);
- return {setRunning(value){running=value;},update(values,a){activity=values.slice(0,128);action=a;traces.push([0,Math.floor(activity.length/3),Math.floor(activity.length*2/3),activity.length-1].map(i=>activity[i]||0));if(traces.length>120)traces.shift();brainCanvas.dataset.samples=String(activity.length);traceCanvas.dataset.updates=String(Number(traceCanvas.dataset.updates||0)+1);trace();},reset(){activity=[];traces.length=0;running=false;delete brainCanvas.dataset.samples;traceCanvas.dataset.updates='0';trace();}};
+ return {setAbilities(rows){abilities=rows;},setRunning(value){running=value;},update(values,a){activity=values.slice(0,128);action=a;traces.push([0,Math.floor(activity.length/3),Math.floor(activity.length*2/3),activity.length-1].map(i=>activity[i]||0));if(traces.length>120)traces.shift();brainCanvas.dataset.samples=String(activity.length);traceCanvas.dataset.updates=String(Number(traceCanvas.dataset.updates||0)+1);trace();},reset(){activity=[];traces.length=0;running=false;delete brainCanvas.dataset.samples;traceCanvas.dataset.updates='0';trace();}};
 }
