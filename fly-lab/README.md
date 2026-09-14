@@ -90,3 +90,5 @@ fixture; a separate live relay probe reports the actual upstream result without
 claiming the fixture proves an available language service. Neither passing tests
 nor a higher action count proves that the complete game can be solved or that the
 agent improves against baselines. Control modes are available for comparisons.
+
+Startup repair v0.5.1: Start loads the selected network and invokes the native game entry. Entry acknowledgements previously recorded by the user are retained in the isolated game checkpoint; no acknowledgement is manufactured. WebGL failure is reported before stepping. Browser coverage now exercises actual Game.start and a browser with WebGL disabled, rather than forcing Game.running for startup.

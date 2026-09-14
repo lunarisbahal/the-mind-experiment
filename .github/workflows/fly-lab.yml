@@ -1,7 +1,7 @@
 name: FlyWire browser validation
 on:
   push:
-    branches: [codex/flywire-exploration-lab, codex/flywire-teaching, codex/flywire-stable-dialogue]
+    branches: [codex/flywire-exploration-lab, codex/flywire-teaching, codex/flywire-stable-dialogue, codex/flywire-start-repair]
     paths: ['fly-lab/**', 'index.html', '.github/workflows/fly-lab.yml']
   workflow_dispatch:
 permissions:

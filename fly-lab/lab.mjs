@@ -1,11 +1,11 @@
-import {createMonitor} from './visual.mjs?v=0.5.0';
-import {Relay,decide} from './dialogue.mjs?v=0.5.0';
-import {ActionHistory,renderHistory} from './history.mjs?v=0.5.0';
+import {createMonitor} from './visual.mjs?v=0.5.1';
+import {Relay,decide} from './dialogue.mjs?v=0.5.1';
+import {ActionHistory,renderHistory} from './history.mjs?v=0.5.1';
 const $=id=>document.getElementById(id),frame=$('game');
 const FULL='https://raw.githubusercontent.com/snedea/flybrain/9191824d17871b7851645782d53d23f213ddb938/data/connectome.bin.gz';
 const monitor=createMonitor($('brain-view'),$('fly-view'),$('traces'));
 const names=['ileri','sol','geri','sağ','etkileşim','bekle / kapat'];
-let worker,ready=false,wanted=false,teacherBusy=false,run=0,timer,requestId=0;
+let worker,ready=false,wanted=false,teacherBusy=false,run=0,timer,requestId=0,entryRequested=false,starting=false;
 let checkpoint=null,identity={},records=[],seen=new Set(),previous=null,stuck=0,macro=null;
 let history=new ActionHistory(),historyFrozen=false,teacherResume=false,autoWaiting=false,plannerAbort;
 let memory='',textRecent=[],lastTextKey='',lastTextAt=0,lastPlannerAt=0,languageExamples=[],readingKey='',readingSince=0;
@@ -23,7 +23,7 @@ function remember(){try{localStorage.setItem('flywire-language-v1',JSON.stringif
 function saveGame(){try{const g=game()?.checkpoint();if(g){localStorage.setItem('flywire-game-v1',JSON.stringify(g));$('game-save-status').textContent='Deney ilerlemesi kaydedildi'+(g.interior?' · yeniden açılış dış kapıdan.':'.');}}catch{$('game-save-status').textContent='Oyun ilerlemesi kaydedilemedi.';}}
 function keep(c){checkpoint=c;$('learning').textContent=`Öğretim: ${c.teachCount} · Geri bildirim: ${c.feedbackCount}`;try{localStorage.setItem(storageKey(),JSON.stringify(c));$('save-status').textContent='Model bu tarayıcıda otomatik kaydedildi.';}catch{$('save-status').textContent='Kaydedilemedi; modeli dosya olarak indir.';}controls();}
 function controls(){
- $('start').disabled=!ready||wanted||$('teacher').checked;
+ $('start').disabled=wanted||starting||$('load').disabled||$('teacher').checked;
  $('stop').disabled=!wanted&&!teacherBusy;
  $('teacher').disabled=!ready;
  for(const b of document.querySelectorAll('[data-teach]'))b.disabled=!ready||teacherBusy||!$('teacher').checked||identity.mode==='random';
@@ -55,7 +55,18 @@ function pause(message='Duraklatıldı.'){
  if(ready)worker?.postMessage({type:'forget-transition'});controls();saveGame();status(message);
 }
 function schedule(token,delay){clearTimeout(timer);if(wanted&&token===run)timer=setTimeout(()=>tick(token),delay);}
-function start(){if(!ready||$('teacher').checked)return;wanted=true;autoWaiting=false;run++;controls();monitor.setRunning(true);tick(run);}
+async function start(){
+ if(wanted||starting||$('teacher').checked)return;
+ starting=true;controls();
+ try{
+  if(!ready)await $('load').onclick();
+  if(!ready)return;
+  const boot=game()?.startup();
+  if(boot?.blocked){status(boot.message);return;}
+  wanted=true;autoWaiting=false;entryRequested=false;run++;controls();monitor.setRunning(true);tick(run);
+ }catch(e){status('Başlatılamadı: '+e.message);}
+ finally{starting=false;controls();}
+}
 async function textStep(view,token){
  if(!$('language').checked){status('Metin bekliyor · Dil yardımı kapalı. Elle devam edebilirsin.');return 1500;}
  if(view.busy){status('Karakterin AI yanıtını bekliyor…');return 1000;}
@@ -81,7 +92,13 @@ async function tick(token){
  let delay=Number($('pace').value);
  try{
   const g=game(),o=g?.observe();
-  if(!o?.ready){monitor.setRunning(false);status('Oyun girişini / geçişini bekliyor; hazır olunca devam edecek.');schedule(token,1500);return;}
+  const boot=g?.startup();
+  if(boot?.blocked){pause(boot.message);return;}
+  if(!o?.ready){
+   monitor.setRunning(false);
+   if(g&&!entryRequested&&!boot?.blocked){entryRequested=true;g.begin();}
+   status(g?.startup()?.message||'Oyun dosyalarının yüklenmesi bekleniyor…');schedule(token,1500);return;
+  }
   if(document.hidden){monitor.setRunning(false);status('Sekme görünür olunca otomatik devam edecek.');schedule(token,1500);return;}
   monitor.setRunning(true);
   const view=g.describe();
@@ -143,7 +160,7 @@ $('load').onclick=async()=>{
  const network=$('network').value,mode=$('mode').value;identity={network,mode,seed:41,startedAt:new Date().toISOString()};saveConfig();
  try{
   let buffer;if(network==='full'){status('139.255 nöronluk veri indiriliyor…');const r=await fetch(FULL,{signal:AbortSignal.timeout(60000)});if(!r.ok)throw Error('Tam ağ indirilemedi');buffer=await r.arrayBuffer();}
-  worker=new Worker('./worker.mjs?v=0.5.0',{type:'module'});
+  worker=new Worker('./worker.mjs?v=0.5.1',{type:'module'});
   worker.onmessage=({data:d})=>{if(d.checkpoint)keep(d.checkpoint);const p=pending.get(d.requestId);if(p){pending.delete(d.requestId);clearTimeout(p.timeout);if(d.type==='error'||d.type==='request-error')p.reject(Error(d.message));else p.resolve(d);}};
   worker.onerror=e=>{for(const p of pending.values()){clearTimeout(p.timeout);p.reject(Error(e.message));}pending.clear();ready=false;pause('Model hatası: '+e.message);};
   const d=await rpc({type:'init',seed:41,mode,buffer},buffer?[buffer]:[]);identity={...identity,neurons:d.neurons,edges:d.edges};$('scope').textContent=d.neurons.toLocaleString('tr')+' nöron · '+d.edges.toLocaleString('tr')+' bağlantı';
@@ -156,9 +173,9 @@ $('load').onclick=async()=>{
 const isolation=`(()=>{function memory(){const m=new Map();return new Proxy({getItem:k=>m.has(String(k))?m.get(String(k)):null,setItem:(k,v)=>m.set(String(k),String(v)),removeItem:k=>m.delete(String(k)),clear:()=>m.clear(),key:i=>Array.from(m.keys())[i]??null,get length(){return m.size;}},{get:(t,p)=>p in t?t[p]:m.get(String(p)),set:(t,p,v)=>{m.set(String(p),String(v));return true;}});}for(const k of ['localStorage','sessionStorage'])Object.defineProperty(window,k,{value:memory()});const original=window.fetch.bind(window);window.fetch=(u,o)=>{const url=new URL(typeof u==='string'?u:u.url,document.baseURI);const method=(o?.method||'GET').toUpperCase();const relay=['https://it041-konsey.lunarisbahal.workers.dev/mirror','https://it041-mirror.lunarisbahal.workers.dev/'].includes(url.href)&&method==='POST';if(!relay&&(url.origin!==new URL(document.baseURI).origin||!['GET','HEAD'].includes(method)))return Promise.reject(new Error('Laboratory: remote services disabled'));return original(u,o);};window.WebSocket=class{constructor(){throw Error('Laboratory: multiplayer disabled');}};window.EventSource=class{constructor(){throw Error('Laboratory: remote services disabled');}};window.XMLHttpRequest=class{open(){throw Error('Laboratory: remote services disabled');}};Object.defineProperty(navigator,'sendBeacon',{value:()=>false});window.open=()=>null;})();`;
 
 async function loadGame(){
- const [a,b]=await Promise.all([fetch('../index.html'),fetch('./bridge.js?v=0.5.0')]);if(!a.ok||!b.ok)throw Error('Oyun dosyası yüklenemedi');
+ const [a,b]=await Promise.all([fetch('../index.html'),fetch('./bridge.js?v=0.5.1')]);if(!a.ok||!b.ok)throw Error('Oyun dosyası yüklenemedi');
  const [source,bridge]=await Promise.all([a.text(),b.text()]);const base=new URL('../',location.href).href;
- let seed='',savedGame=false;try{const g=JSON.parse(localStorage.getItem('flywire-game-v1'));if(g?.format==='flywire-game-v1'&&g.state){seed='localStorage.setItem("it041_sw_v1",'+JSON.stringify(JSON.stringify(g.state)).replaceAll('<','\\u003c')+');';savedGame=true;}}catch{}
+ let seed='',savedGame=false;try{const g=JSON.parse(localStorage.getItem('flywire-game-v1'));if(g?.format==='flywire-game-v1'&&g.state){seed='localStorage.setItem("it041_sw_v1",'+JSON.stringify(JSON.stringify(g.state)).replaceAll('<','\\u003c')+');';savedGame=true;for(const k of ['it041_legal_ok','it041_age21'])if(typeof g.entry?.[k]==='string')seed+='localStorage.setItem('+JSON.stringify(k)+','+JSON.stringify(g.entry[k]).replaceAll('<','\\u003c')+');';}}catch{}
  let config;try{config=JSON.parse(localStorage.getItem('flywire-last-config'));}catch{}
  if(config){$('auto-resume').checked=config.auto!==false;$('language').checked=config.language!==false;}
  frame.onload=()=>{if(savedGame&&$('auto-resume').checked)game()?.resume();};

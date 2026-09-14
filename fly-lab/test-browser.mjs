@@ -30,9 +30,16 @@ try{
   assert(await game.locator('#startBtn').isVisible());await page.evaluate(()=>localStorage.setItem('owner-save','untouched'));
   assert.equal(await game.evaluate(()=>localStorage.getItem('owner-save')),null);assert(await game.locator('#gl canvas').count());return true;
  });
- await game.evaluate(()=>{document.getElementById('intro').style.display='none';Game.running=true;Game.setModal(false);S.flags._tutDone=true;S.flags._tutArmed=false;window.__obDone=true;});
- await page.locator('#network').selectOption('subset');await page.locator('#load').click();await page.waitForFunction(()=>!document.querySelector('#start').disabled);
- await page.locator('#pace').selectOption('750');await page.locator('#language').check();await page.locator('#start').click();
+ await check('Start loads the network and opens native entry without bypassing consent',async()=>{
+  await page.locator('#network').selectOption('subset');await page.locator('#pace').selectOption('750');
+  await page.waitForFunction(()=>!document.querySelector('#start').disabled);await page.locator('#start').click();
+  await game.locator('button[onclick="Legal.accept(Legal._cb)"]').waitFor({state:'visible',timeout:45000});
+  assert.equal(await game.evaluate(()=>Game.running),false);assert.equal(await page.locator('#action-history li').count(),0);
+  // Local test fixture records prior acknowledgements, then follows the native entry callback.
+  // No production consent is accepted and Game.running is never forced by this fixture.
+  await game.evaluate(()=>{localStorage.setItem('it041_legal_ok',Legal.V);localStorage.setItem('it041_age21','1');Game._introShown=true;S.flags._tutDone=true;S.flags._tutArmed=false;window.__obDone=true;UI.closeDoc();Legal._cb();});
+  await game.waitForFunction(()=>Game.running);return {nativeEntry:true,consentGatePreserved:true};
+ });
  await page.waitForFunction(()=>document.querySelectorAll('#action-history li').length===10,null,{timeout:90000});
  await check('last ten actions stay attached to their feedback IDs',async()=>{
   await page.locator('#history-freeze').check();
@@ -82,8 +89,12 @@ try{
   await page.locator('#network').selectOption('subset');await page.locator('#load').click();await page.waitForFunction(()=>!document.querySelector('#start').disabled);
   await game.evaluate(()=>{S.flags.flySavedProgress='yes';});await page.waitForFunction(()=>JSON.parse(localStorage.getItem('flywire-game-v1')).state.flags.flySavedProgress==='yes');
   await page.reload();await page.waitForFunction(()=>document.querySelector('#scope').textContent.includes('668')&&!document.querySelector('#start').disabled,null,{timeout:45000});
-  game=page.frames().find(f=>f!==page.mainFrame());await game.waitForFunction(()=>!!window.FlyGame);
+  game=page.frames().find(f=>f!==page.mainFrame());await game.waitForFunction(()=>!!window.FlyGame);await game.waitForFunction(()=>Game.running);await page.waitForFunction(()=>/Adım: [1-9]/.test(document.querySelector('#stats').textContent));
   assert.equal(await game.evaluate(()=>JSON.parse(localStorage.getItem('it041_sw_v1')).flags.flySavedProgress),'yes');assert((await page.locator('#learning').innerText()).includes('Geri bildirim: 1'));assert.equal(await page.evaluate(()=>localStorage.getItem('owner-save')),'untouched');return true;
+ });
+ await check('WebGL failure is explicit and produces no ghost learning steps',async()=>{
+  const blocked=await chromium.launch({headless:true,args:['--disable-webgl']});
+  try{const tab=await blocked.newPage();await tab.goto('http://127.0.0.1:8765/fly-lab/');await tab.waitForFunction(()=>document.querySelector('#game').contentWindow?.FlyGame);await tab.locator('#network').selectOption('subset');await tab.locator('#start').click();await tab.waitForFunction(()=>document.querySelector('#status').textContent.includes('WebGL'));assert.equal(await tab.locator('#action-history li').count(),0);assert(await tab.locator('#start').isEnabled());return true;}finally{await blocked.close();}
  });
  // Separate real-browser network probe; do not turn an upstream outage into a passing AI claim.
  const live=await browser.newPage();evidence.liveResponses=[];live.on('response',async response=>{if(/^https:\/\/it041-(?:konsey|mirror)\.lunarisbahal\.workers\.dev\/?(?:mirror)?$/.test(response.url())){const sample={url:response.url(),status:response.status(),body:(await response.text().catch(()=>'' )).slice(0,2000)};evidence.liveResponses.push(sample);console.log('LIVE_RESPONSE',JSON.stringify(sample));}});await live.route('https://lunarisbahal.github.io/the-mind-experiment/fly-lab/**',async route=>{
