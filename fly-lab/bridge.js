@@ -7,7 +7,15 @@
  const visible=id=>{const e=document.getElementById(id);return e&&e.getClientRects().length?e:null;};
  const canvas=document.createElement('canvas');canvas.width=8;canvas.height=8;const ctx=canvas.getContext('2d',{willReadFrequently:true});
  window.FlyGame={
-  release,lastError:null,
+  release,lastError:null,pendingReply:null,
+  retryReply(){
+   const p=this.pendingReply;if(!p)return false;
+   if(window.Mirror?.cur!==p.pid||!visible('mirrorModal')){this.pendingReply=null;return false;}
+   const field=document.getElementById('mirrorInput');
+   if(field?.value!==p.text){this.pendingReply=null;return false;}
+   if(Date.now()<p.retryAt)return true;
+   this.pendingReply=null;document.getElementById('mirrorSend')?.click();return true;
+  },
   startup(){
    if(visible('glFail'))return {blocked:true,message:'3B oyun açılamadı: bu tarayıcı WebGL sağlayamıyor. Ajan başlatılmadı.'};
    if(!document.querySelector('#gl canvas'))return {waiting:true,message:'3B sahnenin yüklenmesi bekleniyor…'};
@@ -114,6 +122,9 @@ if(window.Mirror&&typeof parent!=='undefined'&&parent.LabRelay){
  };
  const originalSend=Mirror.send.bind(Mirror);
  Mirror.send=async function(){
+  if(this.busy)return;
+  const pid=this.cur,field=document.getElementById('mirrorInput'),draft=field?.value||'';
+  window.FlyGame.pendingReply=null;
   const historyLength=this.hist[this.cur]?.length||0;
   window.FlyGame.aiError=null;
   const beforeUses=window.S?.flags?._aiUsed||0;
@@ -123,7 +134,9 @@ if(window.Mirror&&typeof parent!=='undefined'&&parent.LabRelay){
    // Do not treat the game's scripted outage text as an actual AI response.
    const log=document.getElementById('mirrorLog'),lines=log?.querySelectorAll('.mline.them');
    if(lines?.length)lines[lines.length-1].textContent='AI yanıtı alınamadı: '+window.FlyGame.aiError;
-   if(this.hist[this.cur]?.length>historyLength)this.hist[this.cur].splice(historyLength);
+   if(this.hist[pid]?.length>historyLength)this.hist[pid].splice(historyLength);
+   if(this.cur===pid&&field&&!field.value)field.value=draft;
+   if(parent.LabRelay.retryAt>Date.now())window.FlyGame.pendingReply={pid,text:draft,retryAt:parent.LabRelay.retryAt};
   }
  };
 }

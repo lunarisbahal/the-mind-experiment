@@ -1,7 +1,7 @@
-import {DialogueJournal,renderJournal} from './journal.mjs?v=0.5.2';
-import {createMonitor} from './visual.mjs?v=0.5.2';
-import {Relay,decide} from './dialogue.mjs?v=0.5.2';
-import {ActionHistory,renderHistory} from './history.mjs?v=0.5.2';
+import {DialogueJournal,renderJournal} from './journal.mjs?v=0.5.3';
+import {createMonitor} from './visual.mjs?v=0.5.3';
+import {Relay,decide} from './dialogue.mjs?v=0.5.3';
+import {ActionHistory,renderHistory} from './history.mjs?v=0.5.3';
 const $=id=>document.getElementById(id),frame=$('game');
 const FULL='https://raw.githubusercontent.com/snedea/flybrain/9191824d17871b7851645782d53d23f213ddb938/data/connectome.bin.gz';
 const monitor=createMonitor($('brain-view'),$('fly-view'),$('traces'));
@@ -23,7 +23,7 @@ let aiRetryAt=0;
 let ownKey='';try{ownKey=sessionStorage.getItem('flywire-groq-key')||'';}catch{}
 $('groq-key').value=ownKey;
 const relay=new Relay({credentials:()=>ownKey||null,report:t=>$('ai-status').textContent=t});
-$('use-key').onclick=()=>{const key=$('groq-key').value.trim();if(key&&!key.startsWith('gsk_')){status('Groq anahtarını kontrol et.');return;}ownKey=key;try{if(key)sessionStorage.setItem('flywire-groq-key',key);else sessionStorage.removeItem('flywire-groq-key');}catch{}$('ai-status').textContent=key?'Kendi Groq hattın seçildi. Bağlantıyı test edebilirsin.':'Ortak hat seçildi.';};window.LabRelay=relay;
+$('use-key').onclick=()=>{const key=$('groq-key').value.trim();if(key&&!key.startsWith('gsk_')){status('Groq anahtarını kontrol et.');return;}const changed=ownKey!==key;ownKey=key;if(changed){aiRetryAt=0;if(game()?.pendingReply)game().pendingReply.retryAt=0;}try{if(key)sessionStorage.setItem('flywire-groq-key',key);else sessionStorage.removeItem('flywire-groq-key');}catch{}$('ai-status').textContent=key?'Kendi Groq hattın seçildi. Bağlantıyı test edebilirsin.':'Ortak hat seçildi.';};window.LabRelay=relay;
 try{const m=JSON.parse(localStorage.getItem('flywire-language-v1'));memory=m?.memory||'';textRecent=m?.recent||[];languageExamples=m?.examples||[];}catch{}
 function remember(){try{localStorage.setItem('flywire-language-v1',JSON.stringify({memory,recent:textRecent.slice(-20),examples:languageExamples.slice(-50)}));}catch{log('Dil belleği kaydedilemedi.');}}
 function saveGame(){try{const g=game()?.checkpoint();if(g){localStorage.setItem('flywire-game-v1',JSON.stringify(g));$('game-save-status').textContent='Deney ilerlemesi kaydedildi'+(g.interior?' · yeniden açılış dış kapıdan.':'.');}}catch{$('game-save-status').textContent='Oyun ilerlemesi kaydedilemedi.';}}
@@ -110,6 +110,7 @@ async function tick(token){
   }
   if(document.hidden){monitor.setRunning(false);status('Sekme görünür olunca otomatik devam edecek.');schedule(token,1500);return;}
   monitor.setRunning(true);
+  if(g.pendingReply){g.release();if(g.retryReply()){status('Yazılan cevap korunuyor · '+Math.max(0,Math.ceil(((g.pendingReply?.retryAt||Date.now())-Date.now())/1000))+' saniye sonra aynı mesaj yeniden gönderilecek.');schedule(token,1000);return;}}
   const view=g.describe();
   if(view.panel){g.release();delay=await textStep(view,token);schedule(token,delay);return;}
   if(o.modal){status('Oyun penceresinin kapanmasını bekliyor…');schedule(token,1500);return;}
@@ -169,7 +170,7 @@ $('load').onclick=async()=>{
  const network=$('network').value,mode=$('mode').value;identity={network,mode,seed:41,startedAt:new Date().toISOString()};saveConfig();
  try{
   let buffer;if(network==='full'){status('139.255 nöronluk veri indiriliyor…');const r=await fetch(FULL,{signal:AbortSignal.timeout(60000)});if(!r.ok)throw Error('Tam ağ indirilemedi');buffer=await r.arrayBuffer();}
-  worker=new Worker('./worker.mjs?v=0.5.2',{type:'module'});
+  worker=new Worker('./worker.mjs?v=0.5.3',{type:'module'});
   worker.onmessage=({data:d})=>{if(d.checkpoint)keep(d.checkpoint);const p=pending.get(d.requestId);if(p){pending.delete(d.requestId);clearTimeout(p.timeout);if(d.type==='error'||d.type==='request-error')p.reject(Error(d.message));else p.resolve(d);}};
   worker.onerror=e=>{for(const p of pending.values()){clearTimeout(p.timeout);p.reject(Error(e.message));}pending.clear();ready=false;pause('Model hatası: '+e.message);};
   const d=await rpc({type:'init',seed:41,mode,buffer},buffer?[buffer]:[]);identity={...identity,neurons:d.neurons,edges:d.edges};$('scope').textContent=d.neurons.toLocaleString('tr')+' nöron · '+d.edges.toLocaleString('tr')+' bağlantı';
@@ -207,7 +208,7 @@ window.fetch=async(u,o)=>{
 };window.WebSocket=class{constructor(){throw Error('Laboratory: multiplayer disabled');}};window.EventSource=class{constructor(){throw Error('Laboratory: remote services disabled');}};window.XMLHttpRequest=class{open(){throw Error('Laboratory: remote services disabled');}};Object.defineProperty(navigator,'sendBeacon',{value:()=>false});window.open=()=>null;})();`;
 
 async function loadGame(){
- const [a,b]=await Promise.all([fetch('../index.html'),fetch('./bridge.js?v=0.5.2')]);if(!a.ok||!b.ok)throw Error('Oyun dosyası yüklenemedi');
+ const [a,b]=await Promise.all([fetch('../index.html'),fetch('./bridge.js?v=0.5.3')]);if(!a.ok||!b.ok)throw Error('Oyun dosyası yüklenemedi');
  const [source,bridge]=await Promise.all([a.text(),b.text()]);const base=new URL('../',location.href).href;
  let seed='',savedGame=false;try{const g=JSON.parse(localStorage.getItem('flywire-game-v1'));if(g?.format==='flywire-game-v1'&&g.state){seed='localStorage.setItem("it041_sw_v1",'+JSON.stringify(JSON.stringify(g.state)).replaceAll('<','\\u003c')+');';savedGame=true;for(const k of ['it041_legal_ok','it041_age21'])if(typeof g.entry?.[k]==='string')seed+='localStorage.setItem('+JSON.stringify(k)+','+JSON.stringify(g.entry[k]).replaceAll('<','\\u003c')+');';}}catch{}
  let config;try{config=JSON.parse(localStorage.getItem('flywire-last-config'));}catch{}

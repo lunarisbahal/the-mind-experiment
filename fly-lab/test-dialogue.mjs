@@ -31,3 +31,6 @@ const journal=new DialogueJournal(storage);journal.add({title:'Read and write',r
 assert.equal(new DialogueJournal(storage).rows.at(-1).sent,'A real submitted answer');
 for(let i=0;i<50;i++)journal.add({title:String(i)});assert.equal(new DialogueJournal(storage).rows.length,40);
 console.log('PASS: 429 cooldown persists without extra requests; visible dialogue journal persists and stays bounded.');
+
+let selectedKey=null;const switcher=new Relay({storage:limitStorage,credentials:()=>selectedKey,fetcher:async()=>({ok:true,json:async()=>({choices:[{message:{content:'OWN_READY'}}]})})});await assert.rejects(switcher.generate([]),/429/);selectedKey='gsk_fixture';assert.equal(await switcher.generate([]),'OWN_READY');
+console.log('PASS: selecting an explicitly configured own account does not inherit the shared-account cooldown.');
