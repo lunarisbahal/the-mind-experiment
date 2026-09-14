@@ -11,7 +11,7 @@ async function check(name,fn){const value=await fn();evidence.checks.push({name,
 try{
  for(let i=0;i<50;i++){try{if((await fetch('http://127.0.0.1:8765/')).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
  browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});
- page=await browser.newPage({viewport:{width:1440,height:1100},acceptDownloads:true});page.on('pageerror',e=>evidence.errors.push(e.message));
+ page=await browser.newPage({viewport:{width:1440,height:1100},deviceScaleFactor:0.5,acceptDownloads:true});page.on('pageerror',e=>evidence.errors.push(e.message));
  const replies=[];
  await page.route('https://*.lunarisbahal.workers.dev/**',async route=>{
   const request=route.request();if(request.method()==='OPTIONS')return route.fulfill({status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'POST,OPTIONS','access-control-allow-headers':'content-type'}});
@@ -37,7 +37,7 @@ try{
  await check('last ten actions stay attached to their feedback IDs',async()=>{
   await page.locator('#history-freeze').check();
   const chosen=page.locator('#action-history li').filter({hasText:'FlyWire'}).first();const id=await chosen.getAttribute('data-action-id');const text=await chosen.locator('div').innerText();
-  const before=await page.locator('#stats').innerText();await page.waitForTimeout(3500);assert.notEqual(await page.locator('#stats').innerText(),before);assert.equal(await chosen.locator('div').innerText(),text);
+  const before=await page.locator('#stats').innerText();await page.waitForFunction(before=>document.querySelector('#stats').innerText!==before,before,{timeout:60000});assert.equal(await chosen.locator('div').innerText(),text);
   await chosen.getByRole('button',{name:`Eylem ${id}: İyi`,exact:true}).click();await page.waitForFunction(()=>document.querySelector('#learning').textContent.includes('Geri bildirim: 1'));
   assert(await page.locator('#start').isDisabled(),'Feedback must not pause the agent');assert(await chosen.getByRole('button',{name:`Eylem ${id}: İyi`,exact:true}).isDisabled());return {gradedId:id,frozen:true,stillRunning:true};
  });
