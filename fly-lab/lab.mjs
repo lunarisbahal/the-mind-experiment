@@ -134,7 +134,7 @@ $('save-model').onclick=()=>download(checkpoint,'flywire-model-'+Date.now()+'.js
 $('export').onclick=()=>download({experiment:'flywire-hybrid-v0.5',...identity,records,memory},'flywire-deney-'+Date.now()+'.json');
 $('import-model').onchange=async e=>{const f=e.target.files[0];if(!f)return;pause();try{if(f.size>200000)throw Error('Dosya çok büyük');await rpc({type:'restore',checkpoint:JSON.parse(await f.text())});status('Kaydedilen karar katmanı yüklendi.');}catch(err){status(err.message);}finally{e.target.value='';}};
 $('exit-mirror').onclick=()=>{game()?.closeMirror();lastTextKey='';status('Ayna kapatıldı.');};
-$('test-ai').onclick=async()=>{ $('test-ai').disabled=true;try{const text=await relay.generate([{role:'user',content:'IT-041 connection test. Reply only LINE_OK.'}],16);$('ai-status').textContent='AI hattı yanıt verdi: '+text;}catch(e){$('ai-status').textContent=e.message;}finally{$('test-ai').disabled=false;}};
+$('test-ai').onclick=async()=>{ $('test-ai').disabled=true;try{const text=await relay.generate([{role:'user',content:'IT-041 connection test. Reply only LINE_OK.'}],512);$('ai-status').textContent='AI hattı yanıt verdi: '+text;}catch(e){$('ai-status').textContent=e.message;}finally{$('test-ai').disabled=false;}};
 function saveConfig(){try{localStorage.setItem('flywire-last-config',JSON.stringify({network:$('network').value,mode:$('mode').value,auto:$('auto-resume').checked,language:$('language').checked}));}catch{}}
 $('auto-resume').onchange=()=>{if(!$('auto-resume').checked)autoWaiting=false;saveConfig();};$('language').onchange=saveConfig;
 $('load').onclick=async()=>{
